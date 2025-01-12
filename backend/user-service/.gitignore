@@ -177,3 +177,4 @@ db/
 mediafiles/
 help/
 staticfiles/
+logs.txt
