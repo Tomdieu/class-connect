@@ -27,7 +27,7 @@ class User(models.Model):
     education_level = models.CharField(max_length=20, choices=EDUCATION_LEVELS)
     class_grade = models.CharField(max_length=50, blank=True)
     email_verified = models.BooleanField(default=False)
-    profile_picture = models.CharField(null=True, blank=True)
+    profile_picture = models.URLField(null=True, blank=True)
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='fr')
     town = models.CharField(max_length=100, blank=True,null=True)
     quarter = models.CharField(max_length=100, blank=True,null=True)
