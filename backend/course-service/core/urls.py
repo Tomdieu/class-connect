@@ -4,7 +4,11 @@ from .views import (
     CourseCategoryViewSet, ClassViewSet, SubjectViewSet,
     ChapterViewSet, TopicViewSet, ResourceViewSet,
     UserProgressViewSet,
-    TeacherAvailabilityViewSet
+    UserAvailabilityViewSet,
+    CourseOfferingViewSet,
+    CourseOfferingActionViewSet,
+    TeacherStudentEnrollmentViewSet,
+    CourseDeclarationViewSet
 )
 
 # Create main router
@@ -12,7 +16,11 @@ router = routers.DefaultRouter()
 router.register(r'categories', CourseCategoryViewSet)
 router.register(r'classes', ClassViewSet)
 router.register(r'user-progress', UserProgressViewSet)
-router.register(r'teacher-availability', TeacherAvailabilityViewSet)
+router.register(r'user-availability', UserAvailabilityViewSet)
+router.register(r'course-offerings', CourseOfferingViewSet)
+router.register(r'offering-actions', CourseOfferingActionViewSet)
+router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
+router.register(r'declarations', CourseDeclarationViewSet)
 
 # Create nested routers
 class_router = routers.NestedDefaultRouter(router, r'classes', lookup='class')
