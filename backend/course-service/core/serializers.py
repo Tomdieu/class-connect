@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import (
     CourseCategory,
     UserProgress,
@@ -7,15 +8,24 @@ from .models import (
     Chapter,
     AbstractResource,
     ExerciseResource,
-    PhoneNumberField,
     PDFResource,
     QuizResource,
     VideoResource,
     RevisionResource,
     Topic,
-    UserAvailability,DailyTimeSlot
+    UserAvailability, DailyTimeSlot,
+    CourseOffering,
+    CourseOfferingAction,
+    TeacherStudentEnrollment,
+    CourseDeclaration,
+    User
 )
 
+class UserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = '__all__'
 
 class CourseCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,7 +55,7 @@ class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
         fields = "__all__"
-        
+
 
 class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,8 +68,11 @@ class TopicSerializer(serializers.ModelSerializer):
         model = Topic
         fields = "__all__"
 
+
 def __str__(self):
-        return f"{self.user.email} - {self.user_type} Availability"
+    return f"{self.user.email} - {self.user_type} Availability"
+
+
 class AbstractResourceSerializer(serializers.ModelSerializer):
     resource_type = serializers.SerializerMethodField()
 
@@ -131,12 +144,25 @@ class DailyTimeSlotSerializer(serializers.ModelSerializer):
         model = DailyTimeSlot
         fields = ['id', 'day', 'time_slot', 'is_available']
 
-class UserAvailabilitySerializer(serializers.ModelSerializer):
-    daily_slots = DailyTimeSlotSerializer(many=True, read_only=True)
+class DailyTimeSlotUpdateSerializer(serializers.ModelSerializer):
+    slot_id = serializers.PrimaryKeyRelatedField(
+        queryset=DailyTimeSlot.objects.all(),
+        write_only=True,
+        source='id'
+    )
+    is_available = serializers.BooleanField()
     
     class Meta:
+        model = DailyTimeSlot
+        fields = ['slot_id','is_available']
+
+
+class UserAvailabilitySerializer(serializers.ModelSerializer):
+    daily_slots = DailyTimeSlotSerializer(many=True, read_only=True)
+
+    class Meta:
         model = UserAvailability
-        fields = ['id', 'teacher', 'is_available', 'last_updated', 'daily_slots']
+        fields = ['id', 'user', 'is_available', 'last_updated', 'daily_slots']
 
 
 # class CourseSerializer(serializers.ModelSerializer):
@@ -173,8 +199,98 @@ class UserAvailabilitySerializer(serializers.ModelSerializer):
 
 #         return instance
 
+class CourseOfferingSerializer(serializers.ModelSerializer):
+    student = UserSerializer(read_only=True)
+    student_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+        source='student'
+    )
+    subject = SubjectSerializer(read_only=True)
+    subject_id = serializers.PrimaryKeyRelatedField(
+        queryset=Subject.objects.all(),
+        write_only=True,
+        source='subject'
+    )
+    class_level = ClassSerializer(read_only=True)
+    class_level_id = serializers.PrimaryKeyRelatedField(
+        queryset=Class.objects.all(),
+        write_only=True,
+        source='class_level'
+    )
+    class Meta:
+        model = CourseOffering
+        fields = '__all__'
+
+class CourseOfferingActionSerializer(serializers.ModelSerializer):
+    teacher = UserSerializer(read_only=True)
+    offer = CourseOfferingSerializer(read_only=True)
+    teacher_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+        source='teacher'
+    )
+    offer_id = serializers.PrimaryKeyRelatedField(
+        queryset=CourseOffering.objects.all(),
+        write_only=True,
+        source='offer'
+    )
+    
+    class Meta:
+        model = CourseOfferingAction
+        fields = '__all__'
+
+class TeacherStudentEnrollmentSerializer(serializers.ModelSerializer):
+    offer = CourseOfferingSerializer(read_only=True)
+    offer_id = serializers.PrimaryKeyRelatedField(
+        queryset=CourseOffering.objects.all(),
+        write_only=True,
+        source='offer'
+    )
+    teacher = UserSerializer(read_only=True)
+    teacher_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+        source='teacher'
+    )
+
+    class Meta:
+        model = TeacherStudentEnrollment
+        fields = ['id', 'teacher','teacher_id', 'offer', 'offer_id', 'created_at', 'has_class_end']
+
+    def create(self, validated_data):
+        return TeacherStudentEnrollment.objects.create(**validated_data)
+
+class CourseDeclarationSerializer(serializers.ModelSerializer):
+    accepted_by = UserSerializer(read_only=True)
+    accepted_by_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+        source='accepted_by'
+    )
+    class Meta:
+        model = CourseDeclaration
+        fields = '__all__'
 
 class UserProgressSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+        source='user'
+    )
+    topic = TopicSerializer(read_only=True)
+    topic_id = serializers.PrimaryKeyRelatedField(
+        queryset=Topic.objects.all(),
+        write_only=True,
+        source='topic'
+    )
+    resource = PolymorphicResourceSerializer(read_only=True)
+    resource_id = serializers.PrimaryKeyRelatedField(
+        queryset=AbstractResource.objects.all(),
+        write_only=True,
+        source='resource'
+    )
     class Meta:
         model = UserProgress
         fields = "__all__"
