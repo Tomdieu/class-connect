@@ -264,6 +264,73 @@ class DailyTimeSlot(models.Model):
     def __str__(self):
         return f"{self.get_day_display()} {self.get_time_slot_display()}"
 
+class CourseOffering(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='offers')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    class_level = models.ForeignKey(Class, on_delete=models.CASCADE)
+    duration = models.PositiveIntegerField(_("Duration in minutes"))
+    frequency = models.PositiveIntegerField(_("Frequency in days (e.g x/week)"))
+    start_date = models.DateField(_("Start Date"))
+    hourly_rate = models.DecimalField(_("Hourly Rate"), max_digits=10, decimal_places=2)
+    is_available = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.subject} - {self.class_level} - {self.hourly_rate} FCFA"
+
+class CourseOfferingAction(models.Model):
+    """
+    Model to track teacher actions on course offerings
+    """
+
+    PENDING = 'PENDING'
+    ACCEPTED = 'ACCEPTED'
+    REJECTED = 'REJECTED'
+    CANCELLED = 'CANCELLED'
+
+    ACTIONS = (
+        (PENDING,'Pending'),
+        (ACCEPTED, 'Accepted'),
+        (REJECTED, 'Rejected'),
+        (CANCELLED, 'Cancelled'),
+    )
+
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='offer_actions')
+    offer = models.ForeignKey(CourseOffering, on_delete=models.CASCADE)
+    action = models.CharField(max_length=20,choices=ACTIONS,default=PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.teacher} - {self.offer} - {self.action}"
+
+class TeacherStudentEnrollment(models.Model):
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='students')
+    offer = models.ForeignKey(CourseOffering, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    has_class_end = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.teacher} - {self.offer.student}"
+    
+class CourseDeclaration(models.Model):
+    PENDING = 'PENDING'
+    ACCEPTED = 'ACCEPTED'
+    REJECTED = 'REJECTED'
+
+    ACTIONS = (
+        (PENDING,'Pending'),
+        (ACCEPTED, 'Accepted'),
+        (REJECTED, 'Rejected')
+    )
+
+    teacher_student_enrollment = models.ForeignKey(TeacherStudentEnrollment, on_delete=models.CASCADE, related_name='declarations')
+    duration = models.PositiveIntegerField(_("Duration in minutes"))
+    declaration_date = models.DateField(_("Declaration Date"))
+    accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_declarations')
+    status = models.CharField(max_length=20, choices=ACTIONS, default=PENDING)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.teacher_student_enrollment} - {self.status}"
 
 class UserProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
