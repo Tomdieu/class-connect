@@ -2,7 +2,8 @@ import django_filters
 from .models import (
     Class, Subject, Chapter, Topic, AbstractResource,
     VideoResource, QuizResource, RevisionResource,
-    PDFResource, ExerciseResource, UserProgress, CourseCategory, User
+    PDFResource, ExerciseResource, UserProgress, CourseCategory, User,
+    CourseOffering,CourseOfferingAction,CourseDeclaration,TeacherStudentEnrollment
 )
 
 # Filter for the Course model
@@ -97,3 +98,38 @@ class UserProgressFilter(django_filters.FilterSet):
     class Meta:
         model = UserProgress
         fields = ['user', 'topic', 'completed', 'progress_percentage']
+
+class CourseOfferingFilter(django_filters.FilterSet):
+    subject = django_filters.ModelChoiceFilter(queryset=Subject.objects.all())
+    class_level = django_filters.ModelChoiceFilter(queryset=Class.objects.all())
+    start_date = django_filters.DateFromToRangeFilter()
+    hourly_rate = django_filters.RangeFilter()
+    is_available = django_filters.BooleanFilter()
+
+    class Meta:
+        model = CourseOffering
+        fields = ['subject', 'class_level', 'is_available', 'student']
+
+class CourseOfferingActionFilter(django_filters.FilterSet):
+    action = django_filters.ChoiceFilter(choices=CourseOfferingAction.ACTIONS)
+    created_at = django_filters.DateTimeFromToRangeFilter()
+
+    class Meta:
+        model = CourseOfferingAction
+        fields = ['teacher', 'offer', 'action']
+
+class TeacherStudentEnrollmentFilter(django_filters.FilterSet):
+    created_at = django_filters.DateTimeFromToRangeFilter()
+    has_class_end = django_filters.BooleanFilter()
+
+    class Meta:
+        model = TeacherStudentEnrollment
+        fields = ['teacher', 'offer', 'has_class_end']
+
+class CourseDeclarationFilter(django_filters.FilterSet):
+    status = django_filters.ChoiceFilter(choices=CourseDeclaration.ACTIONS)
+    declaration_date = django_filters.DateFromToRangeFilter()
+
+    class Meta:
+        model = CourseDeclaration
+        fields = ['status', 'declaration_date']
