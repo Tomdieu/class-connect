@@ -100,6 +100,9 @@ export default {
   "loginDialog.forgotPasswordButton": "Forgot Password?",
   "loginDialog.sendResetLinkButton": "Send Reset Link",
   "loginDialog.backToLoginButton": "Back to Login",
+  "loginDialog.errors.emailRequired": "Email is required",
+  "loginDialog.errors.passwordRequired": "Password is required",
+  "loginDialog.errors.emailInvalid": "Email is not valid",
   "registerDialog.title": "Join ClassConnect",
   "registerDialog.subtitle": "Create your account to start your learning journey",
   "registerDialog.firstNameLabel": "First Name",
@@ -117,5 +120,24 @@ export default {
     "lycee": "High School",
     "university": "University",
     "professional": "Professional"
-  }
+  },
+  "registerDialog.errors.firstNameRequired": "First name is required",
+    "registerDialog.errors.firstNameMin": "First name must be at least 2 characters",
+    "registerDialog.errors.lastNameRequired": "Last name is required",
+    "registerDialog.errors.lastNameMin": "Last name must be at least 2 characters",
+    "registerDialog.errors.phoneRequired": "Phone number is required",
+    "registerDialog.errors.phoneInvalid": "Invalid phone number format",
+    "registerDialog.errors.dateRequired": "Date of birth is required",
+    "registerDialog.errors.dateMinAge": "You must be at least 13 years old",
+    "registerDialog.errors.educationLevelRequired": "Education level is required",
+    "registerDialog.errors.emailRequired": "Email is required",
+    "registerDialog.errors.emailInvalid": "Invalid email address",
+    "registerDialog.errors.townRequired": "Town is required",
+    "registerDialog.errors.townMin": "Town must be at least 2 characters",
+    "registerDialog.errors.quarterRequired": "Quarter is required",
+    "registerDialog.errors.quarterMin": "Quarter must be at least 2 characters",
+    "registerDialog.errors.passwordRequired": "Password is required",
+    "registerDialog.errors.passwordMin": "Password must be at least 8 characters",
+    "registerDialog.errors.passwordComplexity": "Password must include uppercase, lowercase, and numbers"
+  
 } as const
