@@ -1,3 +1,4 @@
+"use client";
 import { motion } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "./ui/button";
