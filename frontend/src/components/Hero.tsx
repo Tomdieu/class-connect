@@ -2,12 +2,12 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Play, UserCheck, Users } from "lucide-react";
-import { useMediaQuery } from "usehooks-ts";
+// import { useMediaQuery } from "usehooks-ts";
 import { AboutContent } from "./AboutContent";
 import { useI18n } from "@/locales/client";
 
 function Hero() {
-  const isMobile = useMediaQuery('(max-width: 640px)')
+  // const isMobile = useMediaQuery('(max-width: 640px)')
   const [showAbout, setShowAbout] = useState(false);
   const t = useI18n()
   return (
