@@ -59,12 +59,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "core.middleware.RequestMiddleware",
+    "core.middleware.SingleSessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -211,5 +213,5 @@ SWAGGER_SETTINGS = {
 
 RABBITMQ_HOST = env("RABBITMQ_HOST", default="localhost")
 RABBITMQ_PORT = env("RABBITMQ_PORT", default=5672)
-RABBITMQ_USERNAME = env("RABBITMQ_USERNAME", default="guest")
-RABBITMQ_PASSWORD = env("RABBITMQ_PASSWORD", default="guest")
+RABBITMQ_USERNAME = env("RABBITMQ_USERNAME", default="classconnect")
+RABBITMQ_PASSWORD = env("RABBITMQ_PASSWORD", default="classconnect")
