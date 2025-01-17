@@ -11,3 +11,8 @@ export const getFullName = (user:UserType) => {
   }
   return user.first_name + user.last_name
 }
+
+export function getPathAfterLanguage(path: string): string {
+  const parts = path.split('/');
+  return `/${parts.slice(2).join('/')}`;
+}
