@@ -1,3 +1,4 @@
+"use client";
 import { motion } from "framer-motion";
 import { useI18n} from "@/locales/client"
 import Image from "next/image";

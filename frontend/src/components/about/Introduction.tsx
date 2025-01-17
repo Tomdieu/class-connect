@@ -1,3 +1,4 @@
+"use client";
 import { useI18n } from "@/locales/client";
 import { motion } from "framer-motion";
 
