@@ -64,11 +64,31 @@ body {
   }
 }
 
+
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #0EA5E9 transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #0EA5E9;
+  border-radius: 10px;
 }
