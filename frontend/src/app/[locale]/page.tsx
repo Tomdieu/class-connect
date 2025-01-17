@@ -1,3 +1,4 @@
+"use client";
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import { SubscriptionPlans } from '@/components/SubscriptionPlans'
