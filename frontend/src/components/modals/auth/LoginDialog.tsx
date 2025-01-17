@@ -12,6 +12,7 @@ import { BookOpen } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import { useI18n } from "@/locales/client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +42,7 @@ type ForgetEmailSchemaType = z.infer<typeof forgotPasswordSchema>;
 function LoginDialog() {
   const { isLoginOpen, closeDialog } = useAuthDialog();
   const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const t = useI18n();
 
   const form = useForm<LoginSchemaType>({
     resolver: zodResolver(loginSchema),
@@ -66,12 +68,12 @@ function LoginDialog() {
             </div>
             <DialogTitle className="text-2xl font-bold text-center">
               {isResettingPassword
-                ? "Réinitialiser le mot de passe"
-                : "Bienvenue sur ClassConnect"}
+                ? t("loginDialog.resetPasswordTitle")
+                : t("loginDialog.title")}
             </DialogTitle>
             {!isResettingPassword && (
               <p className="text-sm text-gray-500 text-center">
-                Connectez-vous pour accéder à votre espace d'apprentissage
+                {t("loginDialog.subtitle")}
               </p>
             )}
           </div>
@@ -87,7 +89,7 @@ function LoginDialog() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("loginDialog.emailLabel")}</FormLabel>
                     <FormControl>
                       <Input placeholder="email" {...field} />
                     </FormControl>
@@ -95,13 +97,13 @@ function LoginDialog() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Envoyer le lien de réinitialisation</Button>
+              <Button type="submit">{t("loginDialog.sendResetLinkButton")}</Button>
               <Button
                 type="button"
                 variant={"link"}
                 onClick={() => setIsResettingPassword(false)}
               >
-                Retour à la connexion
+                {t("loginDialog.backToLoginButton")}
               </Button>
             </form>
           </Form>
@@ -116,7 +118,7 @@ function LoginDialog() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("loginDialog.emailLabel")}</FormLabel>
                     <FormControl>
                       <Input placeholder="email" {...field} />
                     </FormControl>
@@ -129,7 +131,7 @@ function LoginDialog() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mot de passe</FormLabel>
+                    <FormLabel>{t("loginDialog.passwordLabel")}</FormLabel>
                     <FormControl>
                       <Input placeholder="••••••••" {...field} />
                     </FormControl>
@@ -137,13 +139,13 @@ function LoginDialog() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Se connecter</Button>
+              <Button type="submit">{t("loginDialog.loginButton")}</Button>
               <Button
                 type="button"
                 variant={"link"}
                 onClick={() => setIsResettingPassword(true)}
               >
-                Mot de passe oublié ?
+                {t("loginDialog.forgotPasswordButton")}
               </Button>
             </form>
           </Form>
