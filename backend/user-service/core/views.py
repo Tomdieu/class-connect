@@ -27,6 +27,11 @@ from django.contrib.auth.hashers import check_password
 from .producer import UserEventPublisher
 from .utils import generate_signed_token, verify_signed_token
 from django.urls import reverse
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from oauth2_provider.models import AccessToken as OAuth2AccessToken
+from .models import UserActiveToken
+from .middleware import get_current_request, SingleSessionMiddleware
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -415,3 +420,22 @@ class PasswordResetConfirmView(APIView):
                 )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@receiver(post_save, sender=OAuth2AccessToken)
+def update_user_active_token(sender, instance, created, **kwargs):
+    if created and instance.user:
+        request = get_current_request()
+        device_info = SingleSessionMiddleware.get_device_info(request)
+        UserActiveToken.objects.update_or_create(
+            user=instance.user,
+            defaults={
+                'token': instance.token,
+                **device_info
+            }
+        )
+
+@receiver(post_delete, sender=OAuth2AccessToken)
+def delete_user_active_token(sender, instance, **kwargs):
+    if instance.user:
+        UserActiveToken.objects.filter(user=instance.user).delete()
