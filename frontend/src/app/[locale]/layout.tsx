@@ -5,12 +5,12 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Modals from "@/components/modals";
 import { Providers } from "./providers";
 
+
 export const metadata: Metadata = {
   title: "ClassConnect",
   description: "Apprenez à votre rythme avec ClassConnect",
   keywords: "ClassConnect, apprendre, tutoriel, cours, e-learning, formation, enseignement, éducation, apprentissage, tutoriel, cours, e-learning, formation, enseignement, éducation",
   robots: "index,follow",
-  viewport: "width=device-width, initial-scale=1",
   openGraph: {
     type: "website",
     locale: "fr_FR",
@@ -56,8 +56,8 @@ export default async function RootLayout({
 
             {children}
             <Modals />
+            <Toaster />
           </Providers>
-          <Toaster />
         </ThemeProvider>
       </body>
     </html>
