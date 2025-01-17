@@ -95,3 +95,24 @@ class UserPasswordResetToken(models.Model):
         if not self.code:
             self.code = "".join(random.choices("0123456789", k=6))
         super().save(*args, **kwargs)
+
+class UserActiveToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.TextField()
+    device_type = models.CharField(max_length=50, blank=True, null=True)  # mobile, tablet, desktop
+    device_name = models.CharField(max_length=255, blank=True, null=True)  # iPhone 12, Samsung Galaxy S21, etc.
+    os_name = models.CharField(max_length=50, blank=True, null=True)  # iOS, Android, Windows, macOS
+    os_version = models.CharField(max_length=50, blank=True, null=True)
+    browser_name = models.CharField(max_length=50, blank=True, null=True)
+    browser_version = models.CharField(max_length=50, blank=True, null=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    last_activity = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("User Active Token")
+        verbose_name_plural = _("User Active Tokens")
+
+    def __str__(self):
+        return f"{self.user.email}'s active token on {self.device_name}"
