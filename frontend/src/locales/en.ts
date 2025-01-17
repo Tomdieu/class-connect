@@ -122,22 +122,59 @@ export default {
     "professional": "Professional"
   },
   "registerDialog.errors.firstNameRequired": "First name is required",
-    "registerDialog.errors.firstNameMin": "First name must be at least 2 characters",
-    "registerDialog.errors.lastNameRequired": "Last name is required",
-    "registerDialog.errors.lastNameMin": "Last name must be at least 2 characters",
-    "registerDialog.errors.phoneRequired": "Phone number is required",
-    "registerDialog.errors.phoneInvalid": "Invalid phone number format",
-    "registerDialog.errors.dateRequired": "Date of birth is required",
-    "registerDialog.errors.dateMinAge": "You must be at least 13 years old",
-    "registerDialog.errors.educationLevelRequired": "Education level is required",
-    "registerDialog.errors.emailRequired": "Email is required",
-    "registerDialog.errors.emailInvalid": "Invalid email address",
-    "registerDialog.errors.townRequired": "Town is required",
-    "registerDialog.errors.townMin": "Town must be at least 2 characters",
-    "registerDialog.errors.quarterRequired": "Quarter is required",
-    "registerDialog.errors.quarterMin": "Quarter must be at least 2 characters",
-    "registerDialog.errors.passwordRequired": "Password is required",
-    "registerDialog.errors.passwordMin": "Password must be at least 8 characters",
-    "registerDialog.errors.passwordComplexity": "Password must include uppercase, lowercase, and numbers"
-  
+  "registerDialog.errors.firstNameMin": "First name must be at least 2 characters",
+  "registerDialog.errors.lastNameRequired": "Last name is required",
+  "registerDialog.errors.lastNameMin": "Last name must be at least 2 characters",
+  "registerDialog.errors.phoneRequired": "Phone number is required",
+  "registerDialog.errors.phoneInvalid": "Invalid phone number format",
+  "registerDialog.errors.dateRequired": "Date of birth is required",
+  "registerDialog.errors.dateMinAge": "You must be at least 13 years old",
+  "registerDialog.errors.educationLevelRequired": "Education level is required",
+  "registerDialog.errors.emailRequired": "Email is required",
+  "registerDialog.errors.emailInvalid": "Invalid email address",
+  "registerDialog.errors.townRequired": "Town is required",
+  "registerDialog.errors.townMin": "Town must be at least 2 characters",
+  "registerDialog.errors.quarterRequired": "Quarter is required",
+  "registerDialog.errors.quarterMin": "Quarter must be at least 2 characters",
+  "registerDialog.errors.passwordRequired": "Password is required",
+  "registerDialog.errors.passwordMin": "Password must be at least 8 characters",
+  "registerDialog.errors.passwordComplexity": "Password must include uppercase, lowercase, and numbers",
+  "features.title": "Main Features",
+  "features.courseManagement.title": "Course Management",
+  "features.courseManagement.items": [
+    "Structured Courses: Well-organized courses by education level",
+    "Multimedia Support: Interactive videos, PDF documents, exam papers",
+    "Regular Updates: Updated educational content"
+  ],
+  "features.virtualClassroom.title": "Virtual Classroom Space",
+  "features.virtualClassroom.items": [
+    "Live Courses: Live video conference sessions",
+    "Course Replay: Access to recordings",
+    "Interaction Tools: Live chat, Q&A"
+  ],
+  "features.experience.title": "Personalized Experience",
+  "features.experience.items": [
+    "Available Education Levels: Middle School, High School, University, and Professional.",
+    "Middle School: 6th, 5th, 4th, 3rd grade.",
+    "High School: 10th, 11th, 12th grade.",
+    "University: Level I, Level II, Level III.",
+    "Professional: Customized goal (example: technical skills, management, etc.)."
+  ],
+  "features.subscriptions.title": "Adapted Subscriptions",
+  "features.subscriptions.items": [
+    "Basic: Access to basic courses and limited resources.",
+    "Standard: Access to additional courses and collaborative tools.",
+    "Premium: Full access to all courses, video conferences, and exclusive resources."
+  ],
+  "features.payments.title": "Secure Payments",
+  "features.payments.items": [
+    "Integration of mobile payments via MTN Money and Orange Money.",
+    "Instant notifications for successful payments.",
+    "Easy subscription management (renewals, cancellations, etc.)."
+  ],
+  "features.support.title": "Personalized Assistance",
+  "features.support.items": [
+    "Live Chat: Responsive support to answer your questions.",
+    "FAQ and Guides: A comprehensive knowledge base to assist you."
+  ]
 } as const
