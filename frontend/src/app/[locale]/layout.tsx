@@ -8,6 +8,27 @@ import { Providers } from "./providers";
 export const metadata: Metadata = {
   title: "ClassConnect",
   description: "Apprenez à votre rythme avec ClassConnect",
+  keywords: "ClassConnect, apprendre, tutoriel, cours, e-learning, formation, enseignement, éducation, apprentissage, tutoriel, cours, e-learning, formation, enseignement, éducation",
+  robots: "index,follow",
+  viewport: "width=device-width, initial-scale=1",
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: "https://class-connect-alpha.vercel.app",
+    title: "ClassConnect",
+    description: "Apprenez à votre rythme avec ClassConnect",
+    images: [
+      {
+        url: "https://class-connect-alpha.vercel.app/next.svg",
+        width: 1200,
+        height: 630,
+        alt: "ClassConnect"
+      }
+    ],
+    siteName: "ClassConnect",
+    alternateLocale: ['en', 'fr'],
+    countryName: "Cameroon",
+  },
 };
 
 export default async function RootLayout({
