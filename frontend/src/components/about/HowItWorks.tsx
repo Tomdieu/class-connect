@@ -4,7 +4,6 @@ import Image from "next/image";
 
 export const HowItWorks = () => {
   const t = useI18n();
-  const scopeT = useScopedI18n("about.howItWorks.steps");
 
   return (
     <motion.section
@@ -29,9 +28,14 @@ export const HowItWorks = () => {
             {t("about.howItWorks.registration")}
           </h3>
           <ul className="space-y-3 text-gray-600">
-            {Array.from({length:5}).map((_, index) => (
-              <li key={index}>{index + 1}.{t(`about.howItWorks.steps.${index}` as any)}</li>
-            ))}
+            {Array.from({length:5}).map((_, index) => {
+              const  translate = `about.howItWorks.steps.${index}`;
+              return (
+                <li key={index}>
+                  <span className="font-semibold">{t(translate as keyof typeof t)}</span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
