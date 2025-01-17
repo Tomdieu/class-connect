@@ -10,6 +10,7 @@ import { BookOpen } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import { useI18n } from "@/locales/client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -47,6 +48,7 @@ type RegisterSchemaType = z.infer<typeof registerSchema>;
 
 function RegisterDialog() {
   const { isRegisterOpen, closeDialog } = useAuthDialog();
+  const t = useI18n();
 
   const form = useForm<RegisterSchemaType>({
     resolver: zodResolver(registerSchema),
@@ -67,11 +69,10 @@ function RegisterDialog() {
                 <BookOpen className="h-8 w-8 text-blue-600" />
               </div>
               <DialogTitle className="text-2xl font-bold text-center">
-                Rejoignez ClassConnect
+                {t("registerDialog.title")}
               </DialogTitle>
               <p className="text-sm text-gray-500 text-center">
-                Créez votre compte pour commencer votre parcours
-                d&apos;apprentissage
+                {t("registerDialog.subtitle")}
               </p>
             </div>
           </CredenzaHeader>
@@ -87,9 +88,9 @@ function RegisterDialog() {
                     name="first_name"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <FormLabel>Prénom</FormLabel>
+                        <FormLabel>{t("registerDialog.firstNameLabel")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Nom" {...field} />
+                          <Input placeholder={t("registerDialog.firstNameLabel")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -100,9 +101,9 @@ function RegisterDialog() {
                     name="last_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nom</FormLabel>
+                        <FormLabel>{t("registerDialog.lastNameLabel")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Prénom" {...field} />
+                          <Input placeholder={t("registerDialog.lastNameLabel")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -114,9 +115,9 @@ function RegisterDialog() {
                   name="phone_number"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Numéro de téléphone</FormLabel>
+                      <FormLabel>{t("registerDialog.phoneNumberLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Numéro de téléphone" {...field} />
+                        <Input placeholder={t("registerDialog.phoneNumberLabel")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -128,11 +129,11 @@ function RegisterDialog() {
                     name="date_of_birth"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Date de naissance</FormLabel>
+                        <FormLabel>{t("registerDialog.dateOfBirthLabel")}</FormLabel>
                         <FormControl>
                           <Input
                             type="date"
-                            placeholder="Date de naissance"
+                            placeholder={t("registerDialog.dateOfBirthLabel")}
                             className="w-full"
                             {...field}
                           />
@@ -146,24 +147,20 @@ function RegisterDialog() {
                     name="education_level"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Niveau d&apos;éducation</FormLabel>
+                        <FormLabel>{t("registerDialog.educationLevelLabel")}</FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Choisissez votre niveau" />
+                              <SelectValue placeholder={t("registerDialog.educationLevelLabel")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="COLLEGE">Collège</SelectItem>
-                              <SelectItem value="LYCEE">Secondaire</SelectItem>
-                              <SelectItem value="UNIVERSITY">
-                                UNIVERSITY
-                              </SelectItem>
-                              <SelectItem value="PROFESSIONAL">
-                                Professionnel
-                              </SelectItem>
+                              <SelectItem value="COLLEGE">{t("registerDialog.educationLevels.college")}</SelectItem>
+                              <SelectItem value="LYCEE">{t("registerDialog.educationLevels.lycee")}</SelectItem>
+                              <SelectItem value="UNIVERSITY">{t("registerDialog.educationLevels.university")}</SelectItem>
+                              <SelectItem value="PROFESSIONAL">{t("registerDialog.educationLevels.professional")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -177,9 +174,9 @@ function RegisterDialog() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("registerDialog.emailLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Email" {...field} />
+                        <Input placeholder={t("registerDialog.emailLabel")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -191,9 +188,9 @@ function RegisterDialog() {
                     name="town"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Ville</FormLabel>
+                        <FormLabel>{t("registerDialog.townLabel")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ville" {...field} />
+                          <Input placeholder={t("registerDialog.townLabel")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -204,9 +201,9 @@ function RegisterDialog() {
                     name="quarter"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Quartier</FormLabel>
+                        <FormLabel>{t("registerDialog.quarterLabel")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Quartier" {...field} />
+                          <Input placeholder={t("registerDialog.quarterLabel")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -218,11 +215,11 @@ function RegisterDialog() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mot de passe</FormLabel>
+                      <FormLabel>{t("registerDialog.passwordLabel")}</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="••••••••"
+                          placeholder={t("registerDialog.passwordLabel")}
                           {...field}
                         />
                       </FormControl>
@@ -230,7 +227,7 @@ function RegisterDialog() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit">S&apos;inscrire</Button>
+                <Button type="submit">{t("registerDialog.submitButton")}</Button>
               </form>
             </Form>
           </div>
