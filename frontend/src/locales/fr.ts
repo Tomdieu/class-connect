@@ -64,6 +64,58 @@ export default {
       "Accédez à vos cours",
       "Participez aux sessions live"
     ],
-    "about.conclusion": "ClassConnect n'est pas juste une plateforme, c'est une révolution dans l'éducation. Rejoignez-nous pour transformer votre façon d'apprendre et atteindre vos objectifs académiques ou professionnels."
-    
+    "about.conclusion": "ClassConnect n'est pas juste une plateforme, c'est une révolution dans l'éducation. Rejoignez-nous pour transformer votre façon d'apprendre et atteindre vos objectifs académiques ou professionnels.",
+    "subscriptionPlans.title": "Nos formules d'abonnement",
+    "subscriptionPlans.basic.name": "Basic",
+    "subscriptionPlans.basic.description": "Parfait pour commencer",
+    "subscriptionPlans.basic.features": [
+      "Accès aux cours de base",
+      "Forum communautaire",
+      "Ressources d'apprentissage limitées"
+    ],
+    "subscriptionPlans.standard.name": "Standard",
+    "subscriptionPlans.standard.description": "Pour les apprenants sérieux",
+    "subscriptionPlans.standard.features": [
+      "Toutes les fonctionnalités Basic",
+      "Accès à plus de cours",
+      "Sessions Q&R hebdomadaires",
+      "Téléchargement des ressources"
+    ],
+    "subscriptionPlans.premium.name": "Premium",
+    "subscriptionPlans.premium.description": "L'expérience complète",
+    "subscriptionPlans.premium.features": [
+      "Toutes les fonctionnalités Standard",
+      "Accès à tous les cours",
+      "Sessions vidéo illimitées",
+      "Support prioritaire",
+      "Contenu exclusif"
+    ],
+    "subscriptionPlans.choose": "Choisir cette formule",
+    "loginDialog.title": "Bienvenue sur ClassConnect",
+    "loginDialog.subtitle": "Connectez-vous pour accéder à votre espace d'apprentissage",
+    "loginDialog.resetPasswordTitle": "Réinitialiser le mot de passe",
+    "loginDialog.emailLabel": "Email",
+    "loginDialog.passwordLabel": "Mot de passe",
+    "loginDialog.loginButton": "Se connecter",
+    "loginDialog.forgotPasswordButton": "Mot de passe oublié ?",
+    "loginDialog.sendResetLinkButton": "Envoyer le lien de réinitialisation",
+    "loginDialog.backToLoginButton": "Retour à la connexion",
+    "registerDialog.title": "Rejoignez ClassConnect",
+    "registerDialog.subtitle": "Créez votre compte pour commencer votre parcours d'apprentissage",
+    "registerDialog.firstNameLabel": "Prénom",
+    "registerDialog.lastNameLabel": "Nom",
+    "registerDialog.phoneNumberLabel": "Numéro de téléphone",
+    "registerDialog.dateOfBirthLabel": "Date de naissance",
+    "registerDialog.educationLevelLabel": "Niveau d'éducation",
+    "registerDialog.emailLabel": "Email",
+    "registerDialog.townLabel": "Ville",
+    "registerDialog.quarterLabel": "Quartier",
+    "registerDialog.passwordLabel": "Mot de passe",
+    "registerDialog.submitButton": "S'inscrire",
+    "registerDialog.educationLevels": {
+      "college": "Collège",
+      "lycee": "Secondaire",
+      "university": "Université",
+      "professional": "Professionnel"
+    }
   } as const
