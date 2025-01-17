@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useI18n, useScopedI18n } from "@/locales/client";
+import { useI18n } from "@/locales/client";
 import Image from "next/image";
 
 export const HowItWorks = () => {
