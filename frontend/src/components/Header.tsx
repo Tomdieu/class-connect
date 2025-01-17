@@ -6,6 +6,7 @@ import { Button } from './ui/button'
 import { useAuthDialog } from '@/hooks/use-auth-dialog'
 import { ModeToggle } from './ModeToggle';
 import { useMediaQuery } from 'usehooks-ts'
+import ChangeLanguage from './ChangeLanguage';
 
 function Header() {
     const {openLogin,openRegister} = useAuthDialog()
@@ -25,6 +26,7 @@ function Header() {
                 <UserPlus/>
                 <span className='hidden sm:flex'>S&apos;inscrire</span>
             </Button>
+            <ChangeLanguage/>
             {/* <ModeToggle/> */}
         </div>
     </div>
