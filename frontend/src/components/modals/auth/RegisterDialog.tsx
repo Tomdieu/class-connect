@@ -7,9 +7,9 @@ import {
 import { DialogTitle } from "@/components/ui/dialog";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 import { BookOpen } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import z from "zod";
+import { z } from "zod";
 import { useI18n } from "@/locales/client";
 
 import { Button } from "@/components/ui/button";
@@ -32,31 +32,92 @@ import {
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const registerSchema = z.object({
-  first_name: z.string(),
-  last_name: z.string(),
-  phone_number: z.string(),
-  date_of_birth: z.string(),
-  education_level: z.string(),
-  email: z.string(),
-  town: z.string(),
-  quarter: z.string(),
-  password: z.string(),
-});
-
-type RegisterSchemaType = z.infer<typeof registerSchema>;
+const EDUCATION_LEVELS = ["COLLEGE", "LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
 
 function RegisterDialog() {
   const { isRegisterOpen, closeDialog } = useAuthDialog();
   const t = useI18n();
 
-  const form = useForm<RegisterSchemaType>({
-    resolver: zodResolver(registerSchema),
+  // Create registration schema with translations
+  const createRegisterSchema = (t: (key: string) => string) =>
+    z.object({
+      first_name: z.string()
+        .min(1, { message: t("registerDialog.errors.firstNameRequired") })
+        .min(2, { message: t("registerDialog.errors.firstNameMin") }),
+      
+      last_name: z.string()
+        .min(1, { message: t("registerDialog.errors.lastNameRequired") })
+        .min(2, { message: t("registerDialog.errors.lastNameMin") }),
+      
+      phone_number: z.string()
+        .min(1, { message: t("registerDialog.errors.phoneRequired") })
+        .regex(/^[0-9+\s-]+$/, { message: t("registerDialog.errors.phoneInvalid") }),
+      
+      date_of_birth: z.string()
+        .min(1, { message: t("registerDialog.errors.dateRequired") })
+        .refine((date) => {
+          const birthDate = new Date(date);
+          const today = new Date();
+          const age = today.getFullYear() - birthDate.getFullYear();
+          return age >= 13;
+        }, { message: t("registerDialog.errors.dateMinAge") }),
+      
+      education_level: z.enum(EDUCATION_LEVELS, {
+        errorMap: () => ({ message: t("registerDialog.errors.educationLevelRequired") }),
+      }),
+      
+      email: z.string()
+        .min(1, { message: t("registerDialog.errors.emailRequired") })
+        .email({ message: t("registerDialog.errors.emailInvalid") }),
+      
+      town: z.string()
+        .min(1, { message: t("registerDialog.errors.townRequired") })
+        .min(2, { message: t("registerDialog.errors.townMin") }),
+      
+      quarter: z.string()
+        .min(1, { message: t("registerDialog.errors.quarterRequired") })
+        .min(2, { message: t("registerDialog.errors.quarterMin") }),
+      
+      password: z.string()
+        .min(1, { message: t("registerDialog.errors.passwordRequired") })
+        .min(8, { message: t("registerDialog.errors.passwordMin") })
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+          message: t("registerDialog.errors.passwordComplexity"),
+        }),
+    });
+
+  type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>;
+
+  const form = useForm<RegisterFormData>({
+    resolver: zodResolver(createRegisterSchema(t as keyof typeof t)),
     mode: "onSubmit",
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      phone_number: "",
+      date_of_birth: "",
+      education_level: undefined,
+      email: "",
+      town: "",
+      quarter: "",
+      password: "",
+    },
   });
 
-  const handleRegisterSubmit = (values: RegisterSchemaType) => {
-    console.log(values);
+  // Update form validation whenever language changes
+  useEffect(() => {
+    if (form.formState.isDirty) {
+      form.trigger();
+    }
+  }, [t]);
+
+  const handleRegisterSubmit = async (values: RegisterFormData) => {
+    try {
+      console.log(values);
+      // Handle registration logic here
+    } catch (error) {
+      console.error('Registration error:', error);
+    }
   };
 
   return (
@@ -154,13 +215,16 @@ function RegisterDialog() {
                             defaultValue={field.value}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder={t("registerDialog.educationLevelLabel")} />
+                              <SelectValue 
+                                placeholder={t("registerDialog.educationLevelLabel")} 
+                              />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="COLLEGE">{t("registerDialog.educationLevels.college")}</SelectItem>
-                              <SelectItem value="LYCEE">{t("registerDialog.educationLevels.lycee")}</SelectItem>
-                              <SelectItem value="UNIVERSITY">{t("registerDialog.educationLevels.university")}</SelectItem>
-                              <SelectItem value="PROFESSIONAL">{t("registerDialog.educationLevels.professional")}</SelectItem>
+                              {EDUCATION_LEVELS.map((level) => (
+                                <SelectItem key={level} value={level}>
+                                  {t(`registerDialog.educationLevels.${level.toLowerCase()}` as keyof typeof t)}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -176,7 +240,11 @@ function RegisterDialog() {
                     <FormItem>
                       <FormLabel>{t("registerDialog.emailLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder={t("registerDialog.emailLabel")} {...field} />
+                        <Input 
+                          type="email"
+                          placeholder="email@example.com" 
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -219,7 +287,7 @@ function RegisterDialog() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder={t("registerDialog.passwordLabel")}
+                          placeholder="••••••••"
                           {...field}
                         />
                       </FormControl>
@@ -227,7 +295,12 @@ function RegisterDialog() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit">{t("registerDialog.submitButton")}</Button>
+                <Button 
+                  type="submit"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {t("registerDialog.submitButton")}
+                </Button>
               </form>
             </Form>
           </div>
