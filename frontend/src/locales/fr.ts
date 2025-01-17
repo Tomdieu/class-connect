@@ -138,5 +138,43 @@ export default {
     "registerDialog.errors.quarterMin": "Le quartier doit contenir au moins 2 caractères",
     "registerDialog.errors.passwordRequired": "Le mot de passe est requis",
     "registerDialog.errors.passwordMin": "Le mot de passe doit contenir au moins 8 caractères",
-    "registerDialog.errors.passwordComplexity": "Le mot de passe doit contenir des majuscules, des minuscules et des chiffres"
+    "registerDialog.errors.passwordComplexity": "Le mot de passe doit contenir des majuscules, des minuscules et des chiffres",
+    "features.title": "Principales Fonctionnalités",
+    "features.courseManagement.title": "Gestion des Cours",
+    "features.courseManagement.items": [
+      "Cours Structurés : Des cours bien organisés selon le niveau d'études",
+      "Supports Multimédias : Vidéos interactives, documents PDF, annales d'examens",
+      "Mises à Jour Régulières : Contenus pédagogiques actualisés"
+    ],
+    "features.virtualClassroom.title": "Espace Salle de Classe Virtuelle",
+    "features.virtualClassroom.items": [
+      "Cours en Direct : Sessions de visioconférence en direct",
+      "Relecture des Cours : Accès aux enregistrements",
+      "Outils d'Interaction : Chat en direct, questions-réponses"
+    ],
+    "features.experience.title": "Personnalisation de l'Expérience",
+    "features.experience.items": [
+      "Niveaux d'études Disponibles : Collège, Lycée, Université, et Professionnel.",
+      "Collège : 6ème, 5ème, 4ème, 3ème.",
+      "Lycée : 2nde, 1ère, Terminale.",
+      "Université : Niveau I, Niveau II, Niveau III.",
+      "Professionnel : But personnalisé (exemple : compétences techniques, management, etc.)."
+    ],
+    "features.subscriptions.title": "Abonnements Adaptés",
+    "features.subscriptions.items": [
+      "Basic : Accès aux cours de base et supports limités.",
+      "Standard : Accès à des cours supplémentaires et outils collaboratifs.",
+      "Premium : Accès complet à tous les cours, aux visioconférences, et aux ressources exclusives."
+    ],
+    "features.payments.title": "Paiements Sécurisés",
+    "features.payments.items": [
+      "Intégration des paiements mobiles via MTN Money et Orange Money.",
+      "Notifications instantanées pour les paiements réussis.",
+      "Gestion facile des abonnements (renouvellements, annulations, etc.)."
+    ],
+    "features.support.title": "Assistance Personnalisée",
+    "features.support.items": [
+      "Chat en Direct : Un support réactif pour répondre à vos questions.",
+      "FAQ et Guides : Une base de connaissances complète pour vous accompagner."
+    ]
   } as const
