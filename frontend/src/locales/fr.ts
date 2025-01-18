@@ -176,5 +176,17 @@ export default {
     "features.support.items": [
       "Chat en Direct : Un support réactif pour répondre à vos questions.",
       "FAQ et Guides : Une base de connaissances complète pour vous accompagner."
-    ]
+    ],
+    "dashboardSidebar.menu": "Menu",
+    "dashboardSidebar.home": "Accueil",
+    "dashboardSidebar.myStudents": "Mes élèves",
+    "dashboardSidebar.myAvailabilities": "Mes disponibilités",
+    "dashboardSidebar.myPayments": "Mes paiements",
+    "dashboardSidebar.myResources": "Mes ressources",
+    "dashboardSidebar.contactUs": "Nous contacter",
+    "dashboardPage.welcome": "Bienvenue sur votre tableau de bord",
+    "dashboardPage.overview": "Vue d'ensemble",
+    "dashboardPage.recentActivities": "Activités récentes",
+    "dashboardPage.statistics": "Statistiques",
+    "dashboardPage.settings": "Paramètres"
   } as const

@@ -176,5 +176,17 @@ export default {
   "features.support.items": [
     "Live Chat: Responsive support to answer your questions.",
     "FAQ and Guides: A comprehensive knowledge base to assist you."
-  ]
+  ],
+  "dashboardSidebar.menu": "Menu",
+  "dashboardSidebar.home": "Home",
+  "dashboardSidebar.myStudents": "My Students",
+  "dashboardSidebar.myAvailabilities": "My Availabilities",
+  "dashboardSidebar.myPayments": "My Payments",
+  "dashboardSidebar.myResources": "My Resources",
+  "dashboardSidebar.contactUs": "Contact Us",
+  "dashboardPage.welcome": "Welcome to your dashboard",
+  "dashboardPage.overview": "Overview",
+  "dashboardPage.recentActivities": "Recent Activities",
+  "dashboardPage.statistics": "Statistics",
+  "dashboardPage.settings": "Settings"
 } as const
