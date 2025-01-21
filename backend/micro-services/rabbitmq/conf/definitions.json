@@ -1,0 +1,206 @@
+{
+  
+  "users": [
+    {
+      "name": "classconnect",
+      "password": "classconnect",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "classconnect",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "parameters": [],
+  
+  "policies": [],
+  "queues": [
+    
+    {
+      "name": "course_queue",
+      "durable": true,
+      "auto_delete": false,
+      "vhost": "/",
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "payement_queue",
+      "durable": true,
+      "auto_delete": false,
+      "vhost": "/",
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "streaming_queue",
+      "durable": true,
+      "auto_delete": false,
+      "vhost": "/",
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "notification_queue",
+      "durable": true,
+      "auto_delete": false,
+      "vhost": "/",
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "account",
+      "type": "topic",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "course",
+      "type": "topic",
+      "durable": true,
+      "vhost": "/",
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "payement",
+      "type": "direct",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "streaming",
+      "type": "direct",
+      "durable": true,
+      "vhost": "/",
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    
+    {
+      "source": "account",
+      "destination": "course_queue",
+      "routing_key": "account.*",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "account",
+      "destination": "payement_queue",
+      "routing_key": "account.*",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "account",
+      "destination": "streaming_queue",
+      "routing_key": "account.*",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "account",
+      "destination": "notification_queue",
+      "routing_key": "account.*",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "course",
+      "destination": "notification_queue",
+      "routing_key": "course.*",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "payement",
+      "destination": "notification_queue",
+      "routing_key": "payment.*",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "article-event",
+      "destination": "notification_queue",
+      "routing_key": "article-approved",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "article-event",
+      "destination": "notification_queue",
+      "routing_key": "article-rejected",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "account",
+      "destination": "media_queue",
+      "routing_key": "account.*",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "account",
+      "destination": "streaming_queue",
+      "routing_key": "account.*",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "article",
+      "destination": "streaming_queue",
+      "routing_key": "article.*",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "moderation",
+      "destination": "course_queue",
+      "routing_key": "article-approved",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    },
+    {
+      "source": "moderation",
+      "destination": "course_queue",
+      "routing_key": "article-rejected",
+      "destination_type": "queue",
+      "vhost": "/",
+      "arguments": {}
+    }
+  ]
+}

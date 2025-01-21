@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.10-management-alpine
+    container_name: rabbitmq
+    hostname: rabbitmq
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=classconnect
+      - RABBITMQ_DEFAULT_PASS=classconnect
+    ports:
+      # AMQ protocol port
+      - "5672:5672"
+      # Http Managent UI
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./conf/definitions.json:/etc/rabbitmq/definitions.json
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    network_mode: bridge
+
+volumes:
+  rabbitmq_data:
