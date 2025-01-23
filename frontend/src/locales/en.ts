@@ -114,13 +114,46 @@ export default {
   "registerDialog.townLabel": "Town",
   "registerDialog.quarterLabel": "Quarter",
   "registerDialog.passwordLabel": "Password",
+  "registerDialog.confirmPasswordLabel": "Confirm Password",
   "registerDialog.submitButton": "Register",
   "registerDialog.educationLevels": {
-    "college": "College",
     "lycee": "High School",
     "university": "University",
     "professional": "Professional"
   },
+  "registerDialog.lyceeClasses": {
+    "6eme": "Form 1",
+    "5eme": "Form 2",
+    "4eme": "Form 3",
+    "3eme": "Form 4",
+    "2nde": "Form 5",
+    "1ere": "Lower Sixth",
+    "terminale": "Upper Sixth"
+  },
+  "registerDialog.universityLevels": {
+    "licence": "Bachelor",
+    "master": "Master",
+    "doctorat": "Doctorate"
+  },
+  "registerDialog.licenceYears": {
+    "L1": "First Year",
+    "L2": "Second Year",
+    "L3": "Third Year"
+  },
+  "registerDialog.masterYears": {
+    "M1": "Master 1",
+    "M2": "Master 2"
+  },
+  "registerDialog.professionalFields": {
+    "enterprise": "Enterprise Name",
+    "reason": "Reason for Using Platform"
+  },
+  "registerDialog.lyceeClassLabel": "Class",
+  "registerDialog.universityLevelLabel": "University Level",
+  "registerDialog.licenceYearLabel": "Bachelor Year",
+  "registerDialog.masterYearLabel": "Master Year",
+  "registerDialog.enterpriseNameLabel": "Enterprise Name",
+  "registerDialog.platformUsageReasonLabel": "Reason for Using Platform",
   "registerDialog.errors.firstNameRequired": "First name is required",
   "registerDialog.errors.firstNameMin": "First name must be at least 2 characters",
   "registerDialog.errors.lastNameRequired": "Last name is required",
@@ -139,6 +172,8 @@ export default {
   "registerDialog.errors.passwordRequired": "Password is required",
   "registerDialog.errors.passwordMin": "Password must be at least 8 characters",
   "registerDialog.errors.passwordComplexity": "Password must include uppercase, lowercase, and numbers",
+  "registerDialog.errors.confirmPasswordRequired": "Password confirmation is required",
+  "registerDialog.errors.passwordsMustMatch": "Passwords must match",
   "features.title": "Main Features",
   "features.courseManagement.title": "Course Management",
   "features.courseManagement.items": [
