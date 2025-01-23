@@ -24,7 +24,6 @@ from drf_yasg import openapi
 from rest_framework.views import APIView
 from django.utils import timezone
 from django.contrib.auth.hashers import check_password
-from .producer import UserEventPublisher
 from .utils import generate_signed_token, verify_signed_token
 from django.urls import reverse
 from django.db.models.signals import post_save, post_delete
@@ -89,7 +88,7 @@ class UserViewSet(viewsets.ModelViewSet):
             )
         },
     )
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"],url_path='change-password')
     def change_password(self, request, pk=None):
         user = self.get_object()
         serializer = ChangePasswordSerializer(data=request.data)
@@ -104,7 +103,15 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({"status": "password set"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(tags=["Users"])
+    @swagger_auto_schema(
+        tags=["Users"],
+        responses={
+            200: openapi.Response(
+                description="User information retrieved successfully",
+                schema=UserSerializer
+            )
+        }
+    )
     @action(detail=False, methods=["get"])
     def info(self, request):
         user = request.user
@@ -113,14 +120,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = serializer.save()
-        try:
-            # Publish user created event
-            publisher = UserEventPublisher()
-            publisher.publish_user_created(user)
-            publisher.close()
-        except Exception as e:
-            # Log the exception
-            print(f"Error publishing user created event: {e}")
 
         try:
             # Generate verification token
@@ -148,31 +147,48 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         user = serializer.save()
-        try:
-            publisher = UserEventPublisher()
-            publisher.publish_user_updated(user)
-            publisher.close()
-        except Exception as e:
-            # Log the exception
-            print(f"Error publishing user updated event: {e}")
 
     def perform_destroy(self, instance):
         user_id = instance.id
         instance.delete()
-        try:
-            publisher = UserEventPublisher()
-            publisher.publish_user_deleted(user_id)
-            publisher.close()
-        except Exception as e:
-            # Log the exception
-            print(f"Error publishing user deleted event: {e}")
 
 
 class VerifyEmailView(APIView):
     permission_classes = [AllowAny]
     swagger_tags = ["Email Verification"]
 
-    @swagger_auto_schema(tags=["Email Verification"])
+    @swagger_auto_schema(
+        tags=["Email Verification"],
+        responses={
+            200: openapi.Response(
+                description="Email verified successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Invalid or expired token",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            500: openapi.Response(
+                description="Internal server error",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+        }
+    )
     def get(self, request, token):
         try:
             email = verify_signed_token(token)
@@ -201,7 +217,48 @@ class PasswordResetView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     swagger_tags = ["Password Reset"]
 
-    @swagger_auto_schema(tags=["Password Reset"])
+    @swagger_auto_schema(
+        tags=["Password Reset"],
+        request_body=PasswordResetSerializer,
+        responses={
+            200: openapi.Response(
+                description="Password reset code sent successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "success": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            404: openapi.Response(
+                description="Email not found",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Password reset not allowed for Google accounts",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            500: openapi.Response(
+                description="Internal server error",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+        }
+    )
     def post(self, request):
         serializer = PasswordResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -265,7 +322,20 @@ class CheckEmailExistsView(APIView):
     permission_classes = [AllowAny]
     swagger_tags = ["Email Verification"]
 
-    @swagger_auto_schema(tags=["Email Verification"])
+    @swagger_auto_schema(
+        tags=["Email Verification"],
+        responses={
+            200: openapi.Response(
+                description="Email existence check result",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "exists": openapi.Schema(type=openapi.TYPE_BOOLEAN)
+                    }
+                )
+            )
+        }
+    )
     def get(self, request, email):
 
         exists = User.objects.filter(email=email).exists()
@@ -278,7 +348,19 @@ class ValidatePhoneNumberView(APIView):
     swagger_tags = ["Phone Number Validation"]
 
     @swagger_auto_schema(
-        tags=["Phone Number Validation"], request_body=PhoneNumberValidationSerializer
+        tags=["Phone Number Validation"],
+        request_body=PhoneNumberValidationSerializer,
+        responses={
+            200: openapi.Response(
+                description="Phone number validation result",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "valid": openapi.Schema(type=openapi.TYPE_BOOLEAN)
+                    }
+                )
+            )
+        }
     )
     def post(self, request, *args, **kwargs):
         serializer = PhoneNumberValidationSerializer(data=request.data)
@@ -291,7 +373,20 @@ class VerifyCodeView(APIView):
     permission_classes = [AllowAny]
     swagger_tags = ["Password Reset"]
 
-    @swagger_auto_schema(tags=["Password Reset"])
+    @swagger_auto_schema(
+        tags=["Password Reset"],
+        responses={
+            200: openapi.Response(
+                description="Verification result",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "exists": openapi.Schema(type=openapi.TYPE_BOOLEAN)
+                    }
+                )
+            )
+        }
+    )
     def post(self, request, code):
 
         current_datetime = timezone.now()
@@ -312,7 +407,19 @@ class VerifyPasswordView(generics.CreateAPIView):
     swagger_tags = ["Password Verification"]
 
     @swagger_auto_schema(
-        tags=["Password Verification"], request_body=VerifyPasswordSerializer
+        tags=["Password Verification"],
+        request_body=VerifyPasswordSerializer,
+        responses={
+            200: openapi.Response(
+                description="Password verification result",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "valid": openapi.Schema(type=openapi.TYPE_BOOLEAN)
+                    }
+                )
+            )
+        }
     )
     def post(self, request):
 
@@ -340,6 +447,35 @@ class ResendVerificationEmailView(APIView):
                 type=openapi.TYPE_STRING,
             )
         ],
+        responses={
+            200: openapi.Response(
+                description="Verification email sent successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            500: openapi.Response(
+                description="Internal server error",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+        }
     )
     def post(self, request):
         email = request.query_params.get("email")
@@ -391,7 +527,28 @@ class PasswordResetConfirmView(APIView):
     swagger_tags = ["Password Reset"]
 
     @swagger_auto_schema(
-        tags=["Password Reset"], request_body=PasswordResetConfirmSerializer
+        tags=["Password Reset"],
+        request_body=PasswordResetConfirmSerializer,
+        responses={
+            200: openapi.Response(
+                description="Password reset successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Invalid or expired reset code",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+        }
     )
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)
