@@ -31,8 +31,13 @@ import {
 } from "@/components/ui/select";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Textarea } from "@/components/ui/textarea";
 
-const EDUCATION_LEVELS = ["COLLEGE", "LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
+const EDUCATION_LEVELS = ["LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
+const LYCEE_CLASSES = ["6eme", "5eme", "4eme", "3eme", "2nde", "1ere", "terminale"] as const;
+const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
+const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
+const MASTER_YEARS = ["M1", "M2"] as const;
 
 function RegisterDialog() {
   const { isRegisterOpen, closeDialog } = useAuthDialog();
@@ -84,6 +89,17 @@ function RegisterDialog() {
         .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
           message: t("registerDialog.errors.passwordComplexity"),
         }),
+      confirm_password: z.string()
+        .min(1, { message: t("registerDialog.errors.confirmPasswordRequired") }),
+      // Dynamic fields
+      lycee_class: z.enum(LYCEE_CLASSES).optional(),
+      university_level: z.enum(UNIVERSITY_LEVELS).optional(),
+      university_year: z.string().optional(),
+      enterprise_name: z.string().optional(),
+      platform_usage_reason: z.string().optional(),
+    }).refine((data) => data.password === data.confirm_password, {
+      message: t("registerDialog.errors.passwordsMustMatch"),
+      path: ["confirm_password"],
     });
 
   type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>;
@@ -104,6 +120,9 @@ function RegisterDialog() {
     },
   });
 
+  // Add state for university level
+  const [universityLevel, setUniversityLevel] = React.useState<string>("");
+
   // Update form validation whenever language changes
   useEffect(() => {
     if (form.formState.isDirty) {
@@ -120,9 +139,184 @@ function RegisterDialog() {
     }
   };
 
+  // Render dynamic fields based on education level
+  const renderDynamicFields = () => {
+    const educationLevel = form.watch("education_level");
+
+    if (educationLevel === "LYCEE") {
+      return (
+        <FormField
+          control={form.control}
+          name="lycee_class"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("registerDialog.lyceeClassLabel")}</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue 
+                      placeholder={t("registerDialog.lyceeClassLabel")} 
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LYCEE_CLASSES.map((lyceeClass) => (
+                      <SelectItem key={lyceeClass} value={lyceeClass}>
+                        {t(`registerDialog.lyceeClasses.${lyceeClass}` as keyof typeof t)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+    }
+
+    if (educationLevel === "UNIVERSITY") {
+      return (
+        <>
+          <FormField
+            control={form.control}
+            name="university_level"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("registerDialog.universityLevelLabel")}</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setUniversityLevel(value);
+                    }}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue 
+                        placeholder={t("registerDialog.universityLevelLabel")} 
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UNIVERSITY_LEVELS.map((level) => (
+                        <SelectItem key={level} value={level}>
+                          {t(`registerDialog.universityLevels.${level}` as keyof typeof t)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {universityLevel === "licence" && (
+            <FormField
+              control={form.control}
+              name="university_year"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("registerDialog.licenceYearLabel")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue 
+                          placeholder={t("registerDialog.licenceYearLabel")} 
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LICENCE_YEARS.map((year) => (
+                          <SelectItem key={year} value={year}>
+                            {t(`registerDialog.licenceYears.${year}` as keyof typeof t)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+          {universityLevel === "master" && (
+            <FormField
+              control={form.control}
+              name="university_year"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("registerDialog.masterYearLabel")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue 
+                          placeholder={t("registerDialog.masterYearLabel")} 
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MASTER_YEARS.map((year) => (
+                          <SelectItem key={year} value={year}>
+                            {t(`registerDialog.masterYears.${year}` as keyof typeof t)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+        </>
+      );
+    }
+
+    if (educationLevel === "PROFESSIONAL") {
+      return (
+        <>
+          <FormField
+            control={form.control}
+            name="enterprise_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("registerDialog.enterpriseNameLabel")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("registerDialog.enterpriseNameLabel")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="platform_usage_reason"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("registerDialog.platformUsageReasonLabel")}</FormLabel>
+                <FormControl>
+                  <Textarea rows={5} placeholder={t("registerDialog.platformUsageReasonLabel")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <Credenza open={isRegisterOpen} onOpenChange={closeDialog}>
-      <CredenzaContent>
+      <CredenzaContent className="px-3 py-5 ">
         <div className="overflow-y-auto max-h-[calc(100vh-120px)] w-full">
           <CredenzaHeader>
             <div className="flex flex-col items-center space-y-4">
@@ -233,6 +427,7 @@ function RegisterDialog() {
                     )}
                   />
                 </div>
+                {renderDynamicFields()}
                 <FormField
                   control={form.control}
                   name="email"
@@ -284,6 +479,23 @@ function RegisterDialog() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("registerDialog.passwordLabel")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirm_password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("registerDialog.confirmPasswordLabel")}</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
