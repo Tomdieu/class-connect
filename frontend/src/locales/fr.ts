@@ -114,12 +114,39 @@ export default {
     "registerDialog.townLabel": "Ville",
     "registerDialog.quarterLabel": "Quartier",
     "registerDialog.passwordLabel": "Mot de passe",
+    "registerDialog.confirmPasswordLabel": "Confirmer le mot de passe",
     "registerDialog.submitButton": "S'inscrire",
     "registerDialog.educationLevels": {
-      "college": "Collège",
-      "lycee": "Secondaire",
+      "lycee": "Lycée",
       "university": "Université",
       "professional": "Professionnel"
+    },
+    "registerDialog.lyceeClasses": {
+      "6eme": "6ème",
+      "5eme": "5ème",
+      "4eme": "4ème",
+      "3eme": "3ème",
+      "2nde": "2nde",
+      "1ere": "1ère",
+      "terminale": "Terminale"
+    },
+    "registerDialog.universityLevels": {
+      "licence": "Licence",
+      "master": "Master",
+      "doctorat": "Doctorat"
+    },
+    "registerDialog.licenceYears": {
+      "L1": "L1",
+      "L2": "L2",
+      "L3": "L3"
+    },
+    "registerDialog.masterYears": {
+      "M1": "M1",
+      "M2": "M2"
+    },
+    "registerDialog.professionalFields": {
+      "enterprise": "Nom de l'entreprise",
+      "reason": "Raison d'utilisation de la plateforme"
     },
     "registerDialog.errors.firstNameRequired": "Le prénom est requis",
     "registerDialog.errors.firstNameMin": "Le prénom doit contenir au moins 2 caractères",
@@ -139,6 +166,8 @@ export default {
     "registerDialog.errors.passwordRequired": "Le mot de passe est requis",
     "registerDialog.errors.passwordMin": "Le mot de passe doit contenir au moins 8 caractères",
     "registerDialog.errors.passwordComplexity": "Le mot de passe doit contenir des majuscules, des minuscules et des chiffres",
+    "registerDialog.errors.confirmPasswordRequired": "La confirmation du mot de passe est requise",
+    "registerDialog.errors.passwordsMustMatch": "Les mots de passe doivent correspondre",
     "features.title": "Principales Fonctionnalités",
     "features.courseManagement.title": "Gestion des Cours",
     "features.courseManagement.items": [
