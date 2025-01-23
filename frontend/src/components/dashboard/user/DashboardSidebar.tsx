@@ -75,8 +75,9 @@ export default function DashboardSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title} className={`rounded-md hover:bg-default/15 ${correctPath === item.url ? "bg-indigo-500 text-white" : ""}`}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url} className="w-full flex items-center gap-2 p-2 text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-default/15">
-                      <item.icon className="w-8 h-8"/>
+                  {/* className="w-full flex items-center gap-2 p-2 text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-default/15" */}
+                    <a href={item.url} >
+                      <item.icon className="size-8"/>
                       <span className="text-base">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
