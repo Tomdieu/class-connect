@@ -1,8 +1,11 @@
 import React from 'react'
+import UserTable from './user-table'
 
-function UsersPage() {
+async function UsersPage() {
   return (
-    <div>UsersPage</div>
+    <div className='flex flex-col gap-5 px-2 sm:container pt-10'>
+      <UserTable/>
+    </div>
   )
 }
 
