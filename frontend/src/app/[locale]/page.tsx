@@ -6,8 +6,8 @@ import React from 'react'
 
 function LandingPage() {
   return (
-    <div className='flex-1 w-full h-full flex flex-col container mx-auto'>
-      <Header/>
+    <div className='relative flex-1 w-full h-full flex flex-col px-3 sm:container mx-auto'>
+      <Header className=' bg-white'/>
       <Hero/>
       <SubscriptionPlans/>
     </div>
