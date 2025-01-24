@@ -18,26 +18,16 @@ from .models import (
     CourseOfferingAction,
     TeacherStudentEnrollment,
     CourseDeclaration,
-    User
 )
+from users.serializers import UserSerializer
+from django.contrib.auth import get_user_model
 
-class UserSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = User
-        fields = '__all__'
+User = get_user_model()
 
 class CourseCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseCategory
         fields = "__all__"
-
-
-# class CourseResourceSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = CourseResource
-#         fields = "__all__"
-
 
 class ClassSerializer(serializers.ModelSerializer):
     class Meta:
@@ -163,41 +153,6 @@ class UserAvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAvailability
         fields = ['id', 'user', 'is_available', 'last_updated', 'daily_slots']
-
-
-# class CourseSerializer(serializers.ModelSerializer):
-#     resources = CourseResourceSerializer(many=True, required=False)
-
-#     class Meta:
-#         model = Course
-#         fields = "__all__"
-
-#     def create(self, validated_data):
-#         resources_data = validated_data.pop("resources", [])
-#         course = Course.objects.create(**validated_data)
-
-#         for resource_data in resources_data:
-#             CourseResource.objects.create(course=course, **resource_data)
-
-#         return course
-
-#     def update(self, instance, validated_data):
-#         resources_data = validated_data.pop("resources", [])
-
-#         # Update course fields
-#         for attr, value in validated_data.items():
-#             setattr(instance, attr, value)
-#         instance.save()
-
-#         # Handle resources update
-#         if resources_data:
-#             # Optional: Clear existing resources if you want to replace them
-#             # instance.resources.all().delete()
-
-#             for resource_data in resources_data:
-#                 CourseResource.objects.create(course=instance, **resource_data)
-
-#         return instance
 
 class CourseOfferingSerializer(serializers.ModelSerializer):
     student = UserSerializer(read_only=True)
