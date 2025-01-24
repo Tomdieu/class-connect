@@ -35,8 +35,8 @@ function DashboardHeader() {
         href={"/dashboard"}
         className="select-none flex items-center gap-1 cursor-pointer text-blue-600"
       >
-        <BookOpen className="size-8" />
-        <h1 className="font-black text-lg sm:text-lg">ClassConnect</h1>
+        <BookOpen className="size-5 sm:size-8" />
+        <h1 className="font-black text-sm sm:text-lg">ClassConnect</h1>
       </Link>
       <div className="flex items-center gap-2">
         <Avatar>
@@ -92,13 +92,6 @@ function DashboardHeader() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <div
-          aria-labelledby="dashboard-sidebar"
-          onClick={toggleSidebar}
-          className="cursor-pointer"
-        >
-          <MenuIcon className="size-8 text-muted-foreground" />
-        </div>
       </div>
     </div>
   );
