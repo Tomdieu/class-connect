@@ -48,12 +48,12 @@ export const registerUser = async (data: UserCreateType) => {
   }
 };
 
-export const listUsers = async ({
+export const getUsers = async ({
   page = 1,
   params,
 }: {
   page: string | number;
-  params: UserParams;
+  params?: UserParams;
 }) => {
   try {
     const session = await auth();
@@ -361,3 +361,7 @@ export const sendResetPasswordEmailLinl = async ({
     throw error;
   }
 };
+
+export const verifyCode = async ({code}:{code:string}) => {
+  
+}
