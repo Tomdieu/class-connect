@@ -4,46 +4,9 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 import uuid
 from polymorphic.models import PolymorphicModel
+from django.contrib.auth import get_user_model
 
-class User(models.Model):
-    EDUCATION_LEVELS = [
-        ('COLLEGE', 'Collège'),
-        ('LYCEE', 'Lycée'),
-        ('UNIVERSITY', 'Université'),
-        ('PROFESSIONAL', 'Professionnel'),
-    ]
-    
-    LANGUAGE_CHOICES = [
-        ('en', 'English'),
-        ('fr', 'French'),
-    ]
-    
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(_("email address"), unique=True)
-    first_name = models.CharField(_("first name"), max_length=150, blank=True)
-    last_name = models.CharField(_("last name"), max_length=150, blank=True)
-    phone_number = PhoneNumberField(unique=True, region='CM')
-    date_of_birth = models.DateField(null=True)
-    education_level = models.CharField(max_length=20, choices=EDUCATION_LEVELS)
-    class_grade = models.CharField(max_length=50, blank=True)
-    email_verified = models.BooleanField(default=False)
-    profile_picture = models.URLField(null=True, blank=True)
-    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='fr')
-    town = models.CharField(max_length=100, blank=True,null=True)
-    quarter = models.CharField(max_length=100, blank=True,null=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-    date_joined = models.DateTimeField(blank=True,null=True)
-
-    class Meta:
-        verbose_name = _("User")
-        verbose_name_plural = _("Users")
-
-    def __str__(self):
-        return self.email
-    
-    
+User = get_user_model()
 class CourseCategory(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -54,7 +17,6 @@ class CourseCategory(models.Model):
 
 class Class(models.Model):
     EDUCATION_LEVELS = [
-        ('COLLEGE', 'Collège'),
         ('LYCEE', 'Lycée'),
         ('UNIVERSITY', 'Université'),
         ('PROFESSIONAL', 'Professionnel'),
@@ -147,42 +109,6 @@ class ExerciseResource(AbstractResource):
     solution_file = models.FileField(upload_to="exercises/solutions/", blank=True, null=True)
     exercise_file = models.FileField(upload_to="exercises/", blank=True, null=True)
 
-# class Course(models.Model):
-#     COURSE_LEVELS = [
-#         ('COLLEGE', 'Collège'),
-#         ('LYCEE', 'Lycée'),
-#         ('UNIVERSITY', 'Université'),
-#         ('PROFESSIONAL', 'Professionnel'),
-#     ]
-    
-#     title = models.CharField(max_length=200)
-#     description = models.TextField()
-#     level = models.CharField(max_length=20, choices=COURSE_LEVELS)
-#     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE)
-#     instructor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses')
-#     minimum_subscription_plan_id = models.IntegerField()  # Reference to Subscription service
-#     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='courses', null=True)
-#     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name='courses', null=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-    
-#     def __str__(self):
-#         return self.title
-
-# class CourseResource(models.Model):
-    
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='resources')
-#     title = models.CharField(max_length=200)
-#     file = models.FileField(upload_to='course_resources/')
-#     description = models.TextField(blank=True)
-#     order = models.PositiveIntegerField(default=0)
-    
-#     @property
-#     def resource_type(self):
-#         return self.file.url.split('.')[-1]
-    
-#     def __str__(self):
-#         return self.title
 
 class UserAvailability(models.Model):
     """
@@ -194,7 +120,7 @@ class UserAvailability(models.Model):
         ('STUDENT', 'Student'),
     )
     
-    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='availabilities')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='availabilities')
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
     is_available = models.BooleanField(default=True)
     last_updated = models.DateTimeField(auto_now=True)
@@ -342,3 +268,42 @@ class UserProgress(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.topic} - {self.resource}"
+    
+    
+
+# class Course(models.Model):
+#     COURSE_LEVELS = [
+#         ('COLLEGE', 'Collège'),
+#         ('LYCEE', 'Lycée'),
+#         ('UNIVERSITY', 'Université'),
+#         ('PROFESSIONAL', 'Professionnel'),
+#     ]
+    
+#     title = models.CharField(max_length=200)
+#     description = models.TextField()
+#     level = models.CharField(max_length=20, choices=COURSE_LEVELS)
+#     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE)
+#     instructor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses')
+#     minimum_subscription_plan_id = models.IntegerField()  # Reference to Subscription service
+#     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='courses', null=True)
+#     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name='courses', null=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+    
+#     def __str__(self):
+#         return self.title
+
+# class CourseResource(models.Model):
+    
+#     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='resources')
+#     title = models.CharField(max_length=200)
+#     file = models.FileField(upload_to='course_resources/')
+#     description = models.TextField(blank=True)
+#     order = models.PositiveIntegerField(default=0)
+    
+#     @property
+#     def resource_type(self):
+#         return self.file.url.split('.')[-1]
+    
+#     def __str__(self):
+#         return self.title
