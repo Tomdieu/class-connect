@@ -7,14 +7,24 @@ from phonenumber_field.serializerfields import PhoneNumberField
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 'education_level', 'email_verified', 'profile_picture', 'is_staff', 'is_active', 'created_at', 'updated_at', 'date_joined']
+        fields = [
+            'id', 'email', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 
+            'education_level', 'lycee_class', 'university_level', 'university_year', 
+            'enterprise_name', 'platform_usage_reason', 'email_verified', 'profile_picture', 
+            'language', 'town', 'quarter', 'is_staff', 'is_active', 'created_at', 
+            'updated_at', 'date_joined'
+        ]
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 'education_level','password']
+        fields = [
+            'email', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 
+            'education_level', 'lycee_class', 'university_level', 'university_year', 
+            'enterprise_name', 'platform_usage_reason', 'password'
+        ]
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -25,6 +35,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             phone_number=validated_data.get('phone_number', ''),
             date_of_birth=validated_data.get('date_of_birth', None),
             education_level=validated_data.get('education_level', ''),
+            lycee_class=validated_data.get('lycee_class', None),
+            university_level=validated_data.get('university_level', None),
+            university_year=validated_data.get('university_year', None),
+            enterprise_name=validated_data.get('enterprise_name', ''),
+            platform_usage_reason=validated_data.get('platform_usage_reason', ''),
         )
         return user
 
