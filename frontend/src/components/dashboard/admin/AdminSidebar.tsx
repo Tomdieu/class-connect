@@ -1,3 +1,4 @@
+"use client";
 import {
   Users,
   BookOpen,
@@ -16,6 +17,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { usePathname } from "next/navigation";
+import { getPathAfterLanguage } from "@/lib/utils";
 
 const menuItems = [
   {
@@ -35,13 +38,13 @@ const menuItems = [
   },
   {
     label: "Configuration",
-    items: [
-      { title: "Paramètres", icon: Settings, url: "/admin/settings" },
-    ],
+    items: [{ title: "Paramètres", icon: Settings, url: "/admin/settings" }],
   },
 ];
 
 export const AdminSidebar = () => {
+  const pathname = usePathname();
+  const correctPath = getPathAfterLanguage(pathname);
   return (
     <Sidebar>
       <SidebarContent>
@@ -52,7 +55,7 @@ export const AdminSidebar = () => {
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={item.title} className={`hover:text-primary/80 hover:bg-primary/5 ${correctPath.startsWith(item.url) ? "text-primary bg-primary/5 font-semibold" : ""}`}>
                     <SidebarMenuButton asChild>
                       <a href={item.url}>
                         <item.icon className="h-4 w-4" />
