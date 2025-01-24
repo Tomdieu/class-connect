@@ -7,6 +7,7 @@ import { Providers } from "./providers";
 
 import localFont from "next/font/local";
 import { SessionProvider } from "next-auth/react";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
 
 const Inter = localFont({
   src: [
@@ -36,15 +37,14 @@ const Inter = localFont({
     },
   ],
   variable: "--font-inter",
-  display:"swap"
+  display: "swap",
 });
-
-
 
 export const metadata: Metadata = {
   title: "ClassConnect",
   description: "Apprenez à votre rythme avec ClassConnect",
-  keywords: "ClassConnect, apprendre, tutoriel, cours, e-learning, formation, enseignement, éducation, apprentissage, tutoriel, cours, e-learning, formation, enseignement, éducation",
+  keywords:
+    "ClassConnect, apprendre, tutoriel, cours, e-learning, formation, enseignement, éducation, apprentissage, tutoriel, cours, e-learning, formation, enseignement, éducation",
   robots: {
     index: true,
     follow: true,
@@ -69,50 +69,50 @@ export const metadata: Metadata = {
         url: "https://class-connect-alpha.vercel.app/next.svg",
         width: 1200,
         height: 630,
-        alt: "ClassConnect"
-      }
+        alt: "ClassConnect",
+      },
     ],
     siteName: "ClassConnect",
-    alternateLocale: ['en', 'fr'],
+    alternateLocale: ["en", "fr"],
     countryName: "Cameroon",
   },
-  twitter:{
-    card:"summary_large_image",
-    title:"ClassConnect",
-    description:"Apprenez à votre rythme avec ClassConnect",
-    site:"@classconnect",
-    creator:"@tomdieuivan",
-    images:[
+  twitter: {
+    card: "summary_large_image",
+    title: "ClassConnect",
+    description: "Apprenez à votre rythme avec ClassConnect",
+    site: "@classconnect",
+    creator: "@tomdieuivan",
+    images: [
       {
         url: "https://class-connect-alpha.vercel.app/icon.svg",
         width: 1200,
         height: 630,
-        alt: "ClassConnect"
-      }
+        alt: "ClassConnect",
+      },
     ],
   },
-  metadataBase:new URL('https://class-connect-alpha.vercel.app'),
-  creator:"Tomdieu Ivan",
-  category:"Education",
-  icons:[
+  metadataBase: new URL("https://class-connect-alpha.vercel.app"),
+  creator: "Tomdieu Ivan",
+  category: "Education",
+  icons: [
     {
-      rel:"icon",
-      href:"/icon.svg",
-      type:"image/svg",
-      sizes:"32x32",
-      url:"/icon.svg"
-    }
-  ]
+      rel: "icon",
+      href: "/icon.svg",
+      type: "image/svg",
+      sizes: "32x32",
+      url: "/icon.svg",
+    },
+  ],
 };
 
 export default async function RootLayout({
   children,
-  params
+  params,
 }: {
   children: React.ReactNode;
   params: {
-    locale: string
-  }
+    locale: string;
+  };
 }) {
   const { locale } = await params;
   return (
@@ -126,15 +126,13 @@ export default async function RootLayout({
           defaultTheme="light"
           disableTransitionOnChange
         >
-        <SessionProvider>
-
-          <Providers locale={locale}>
-
-            {children}
-            <Modals />
-            <Toaster />
-          </Providers>
-        </SessionProvider>
+          <SessionProvider>
+            <Providers locale={locale}>
+              <ReactQueryProvider>{children}</ReactQueryProvider>
+              <Modals />
+              <Toaster />
+            </Providers>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>
