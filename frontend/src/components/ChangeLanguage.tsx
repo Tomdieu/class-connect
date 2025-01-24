@@ -5,10 +5,9 @@ import {
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue,
+    // SelectValue,
 } from "@/components/ui/select"
 import { useChangeLocale, useCurrentLocale } from '@/locales/client'
-import { Languages } from 'lucide-react'
 
 
 function ChangeLanguage() {
@@ -16,15 +15,22 @@ function ChangeLanguage() {
     const currentLocale = useCurrentLocale()
     const [value, setValue] = React.useState(currentLocale)
 
+    const flag = {
+        'en': '🇺🇸',
+        'fr': '🇫🇷'
+    }
+
     const handleChange = (value: "en" | "fr") => {
         changeLocalLangauge(value)
         setValue(value)
     }
     return (
         <Select value={value} onValueChange={handleChange}>
-            <SelectTrigger className="w-fit flex items-center gap-1">
-                <Languages className='w-4 h-4 text-muted-foreground'/>
-                <SelectValue placeholder="Lang" className='mr-1' />
+            <SelectTrigger className="w-fit p-1 px-1.5 flex items-center gap-1">
+                {/* <Languages className='w-4 h-4 text-muted-foreground'/> */}
+                <span>{flag[value]}</span>
+                <span className='capitalize font-bold'>{value}</span>
+                {/* <SelectValue placeholder="Lang" className='mr-1' /> */}
             </SelectTrigger>
             <SelectContent>
                 <SelectItem value="en">English</SelectItem>
