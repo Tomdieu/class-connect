@@ -32,6 +32,10 @@ from oauth2_provider.models import AccessToken as OAuth2AccessToken
 from .models import UserActiveToken
 from .middleware import get_current_request, SingleSessionMiddleware
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -66,7 +70,9 @@ class UserViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(tags=["Users"])
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
-
+    
+    # With cookie: cache requested url for each user for 2 hours
+    @method_decorator(cache_page(60*60*2,key_prefix='user_list'))
     @swagger_auto_schema(tags=["Users"])
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -112,6 +118,7 @@ class UserViewSet(viewsets.ModelViewSet):
             )
         }
     )
+    @method_decorator(cache_page(60 * 60 * 2,key_prefix='user_info'))
     @action(detail=False, methods=["get"])
     def info(self, request):
         user = request.user
