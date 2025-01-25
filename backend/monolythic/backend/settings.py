@@ -224,3 +224,17 @@ RABBITMQ_HOST = env("RABBITMQ_HOST", default="localhost")
 RABBITMQ_PORT = env("RABBITMQ_PORT", default=5672)
 RABBITMQ_USERNAME = env("RABBITMQ_USERNAME", default="classconnect")
 RABBITMQ_PASSWORD = env("RABBITMQ_PASSWORD", default="classconnect")
+
+# Google Service Account
+GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE", BASE_DIR / "secret/google-secret.json")
+
+# Caching
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
