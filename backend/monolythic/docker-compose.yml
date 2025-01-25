@@ -5,25 +5,26 @@ networks:
     driver: bridge
 
 services:
-  web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
-      - ${GOOGLE_SERVICE_ACCOUNT_FILE}:/app/secret/google-secret.json:ro
-    ports:
-      - "8000:8000"
-    environment:
-      - GOOGLE_SERVICE_ACCOUNT_FILE=/app/secret/google-secret.json
-    depends_on:
-      - db
-      - rabbitmq
-      - redis
-    networks:
-      - e_learning_network
+  # web:
+  #   build: .
+  #   command: python manage.py runserver 0.0.0.0:8000
+  #   volumes:
+  #     - .:/app
+  #     - ${GOOGLE_SERVICE_ACCOUNT_FILE}:/app/secret/google-secret.json:ro
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - GOOGLE_SERVICE_ACCOUNT_FILE=/app/secret/google-secret.json
+  #   depends_on:
+  #     - db
+  #     - rabbitmq
+  #     - redis
+  #   networks:
+  #     - e_learning_network
 
   db:
-    image: postgres:13
+    image: postgres:alpine3.20
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -37,6 +38,8 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.10-management-alpine
+    hostname: rabbitmq
+    restart: unless-stopped
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -50,6 +53,7 @@ services:
 
   redis:
     image: redis:7.4
+    restart: unless-stopped
     ports:
       - "6379:6379"
     networks:
