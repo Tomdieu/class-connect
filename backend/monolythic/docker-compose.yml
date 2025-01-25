@@ -1,0 +1,60 @@
+version: '3.8'
+
+networks:
+  e_learning_network:
+    driver: bridge
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - ${GOOGLE_SERVICE_ACCOUNT_FILE}:/app/secret/google-secret.json:ro
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_SERVICE_ACCOUNT_FILE=/app/secret/google-secret.json
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+    networks:
+      - e_learning_network
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: e_learning
+      POSTGRES_USER: e_learning_user
+      POSTGRES_PASSWORD: e_learning_password
+    ports:
+      - "5432:5432"
+    networks:
+      - e_learning_network
+
+  rabbitmq:
+    image: rabbitmq:3.10-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: classconnect
+      RABBITMQ_DEFAULT_PASS: classconnect
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - e_learning_network
+
+  redis:
+    image: redis:7.4
+    ports:
+      - "6379:6379"
+    networks:
+      - e_learning_network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
