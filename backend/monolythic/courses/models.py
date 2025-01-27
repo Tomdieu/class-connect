@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 import uuid
 from polymorphic.models import PolymorphicModel
 from django.contrib.auth import get_user_model
+from django.utils.text import slugify
 
 User = get_user_model()
 class CourseCategory(models.Model):
@@ -76,26 +77,162 @@ class AbstractResource(PolymorphicModel):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="%(class)s_resources")
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["created_at"]
+        
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title}"
 
 
 class VideoResource(AbstractResource):
-    video_url = models.URLField(_("Video URL"), blank=True, null=True)
     video_file = models.FileField(upload_to="videos/", blank=True, null=True)
 
 
 class QuizResource(AbstractResource):
-    total_questions = models.PositiveIntegerField()
-    duration_minutes = models.PositiveIntegerField()  # Time limit in minutes
+   total_questions = models.PositiveIntegerField()
+   duration_minutes = models.PositiveIntegerField()
+   passing_score = models.PositiveIntegerField(default=60)
+   show_correct_answers = models.BooleanField(default=True)
+   show_explanation = models.BooleanField(default=True)
+   shuffle_questions = models.BooleanField(default=False)
+   attempts_allowed = models.PositiveIntegerField(default=1)
+   partial_credit = models.BooleanField(default=True)
 
+   def get_user_attempts(self, user):
+       return self.attempts.filter(user=user).count()
 
+   def can_user_attempt(self, user):
+       attempts = self.get_user_attempts(user)
+       return attempts < self.attempts_allowed
+
+   def get_user_best_score(self, user):
+       return self.attempts.filter(
+           user=user, 
+           is_completed=True
+       ).aggregate(best_score=models.Max('score'))['best_score']
+       
+class Question(models.Model):
+   QUESTION_TYPES = [
+       ('MULTIPLE_CHOICE', 'Multiple Choice'),
+       ('SINGLE_CHOICE', 'Single Choice'),
+       ('TRUE_FALSE', 'True/False'),
+       ('SHORT_ANSWER', 'Short Answer'),
+   ]
+
+   quiz = models.ForeignKey(QuizResource, on_delete=models.CASCADE, related_name='questions') 
+   text = models.TextField()
+   image = models.ImageField(upload_to='quiz_questions/', blank=True, null=True)
+   type = models.CharField(max_length=20, choices=QUESTION_TYPES)
+   points = models.PositiveIntegerField(default=1)
+   order = models.PositiveIntegerField(default=0)
+   explanation = models.TextField(blank=True)
+   explanation_image = models.ImageField(upload_to='quiz_explanations/', blank=True, null=True)
+   created_at = models.DateTimeField(auto_now_add=True)
+   updated_at = models.DateTimeField(auto_now=True)
+
+   class Meta:
+       ordering = ['order']
+
+   def __str__(self):
+       return f"Question {self.order}: {self.text[:50]}..."
+   
+class QuestionOption(models.Model):
+   question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
+   text = models.CharField(max_length=255)
+   image = models.ImageField(upload_to='quiz_options/', blank=True, null=True)
+   is_correct = models.BooleanField(default=False)
+   order = models.PositiveIntegerField(default=0)
+   created_at = models.DateTimeField(auto_now_add=True)
+   updated_at = models.DateTimeField(auto_now=True)
+
+   class Meta:
+       ordering = ['order']
+
+   def __str__(self):
+       return f"Option for {self.question}: {self.text[:30]}.."
+   
+class QuizAttempt(models.Model):
+   quiz = models.ForeignKey(QuizResource, on_delete=models.CASCADE, related_name='attempts')
+   user = models.ForeignKey(User, on_delete=models.CASCADE)
+   score = models.DecimalField(max_digits=5, decimal_places=2)
+   started_at = models.DateTimeField(auto_now_add=True)
+   completed_at = models.DateTimeField(null=True, blank=True)
+   is_completed = models.BooleanField(default=False)
+
+   def __str__(self):
+       return f"Attempt by {self.user} on {self.quiz.title}"
+
+   @property
+   def duration(self):
+       if self.completed_at:
+           return self.completed_at - self.started_at
+       return None
+
+   def finish_attempt(self):
+       self.completed_at = timezone.now()
+       self.is_completed = True
+       self.calculate_score()
+       self.save()
+
+   def calculate_score(self):
+       total_points = self.quiz.questions.aggregate(total=models.Sum('points'))['total']
+       earned_points = self.responses.filter(is_correct=True).aggregate(
+           earned=models.Sum('points_earned'))['earned'] or 0
+       self.score = (earned_points / total_points * 100) if total_points > 0 else 0
+       self.save()
+
+class QuestionResponse(models.Model):
+   attempt = models.ForeignKey(QuizAttempt, on_delete=models.CASCADE, related_name='responses')
+   question = models.ForeignKey(Question, on_delete=models.CASCADE)
+   selected_options = models.ManyToManyField(QuestionOption, blank=True)
+   text_response = models.TextField(blank=True)
+   is_correct = models.BooleanField(default=False)
+   points_earned = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+   created_at = models.DateTimeField(auto_now_add=True)
+   updated_at = models.DateTimeField(auto_now=True)
+
+   def calculate_score(self):
+       if self.question.type in ['MULTIPLE_CHOICE', 'SINGLE_CHOICE']:
+           correct_options = set(self.question.options.filter(is_correct=True))
+           selected_options = set(self.selected_options.all())
+           
+           if self.question.type == 'SINGLE_CHOICE':
+               self.is_correct = len(selected_options) == 1 and selected_options.issubset(correct_options)
+               self.points_earned = self.question.points if self.is_correct else 0
+           else:
+               correct_selections = len(selected_options.intersection(correct_options))
+               incorrect_selections = len(selected_options - correct_options)
+               total_correct = len(correct_options)
+               
+               if incorrect_selections == 0:
+                   self.points_earned = (correct_selections / total_correct) * self.question.points
+                   self.is_correct = correct_selections == total_correct
+               else:
+                   self.points_earned = 0
+                   self.is_correct = False
+                   
+       elif self.question.type == 'TRUE_FALSE':
+           self.is_correct = self.selected_options.filter(is_correct=True).exists()
+           self.points_earned = self.question.points if self.is_correct else 0
+           
+       elif self.question.type == 'SHORT_ANSWER':
+           correct_answer = self.question.options.filter(is_correct=True).first()
+           if correct_answer and self.text_response.lower().strip() == correct_answer.text.lower().strip():
+               self.is_correct = True
+               self.points_earned = self.question.points
+           
+       self.save()
+
+       
 class RevisionResource(AbstractResource):
     content = models.TextField()
 
