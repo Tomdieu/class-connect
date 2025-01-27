@@ -30,7 +30,7 @@ function DashboardHeader() {
   };
 
   return (
-    <div className="sticky top-0 z-50 shadow-lg w-full flex items-center justify-between p-3">
+    <div className="sticky top-0 z-50 shadow-lg w-full flex items-center justify-between p-3 bg-white">
       <Link
         href={"/dashboard"}
         className="select-none flex items-center gap-1 cursor-pointer text-blue-600"
