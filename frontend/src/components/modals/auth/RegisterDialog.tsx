@@ -128,7 +128,7 @@ function RegisterDialog() {
     if (form.formState.isDirty) {
       form.trigger();
     }
-  }, [t]);
+  }, [form, t]);
 
   const handleRegisterSubmit = async (values: RegisterFormData) => {
     try {
