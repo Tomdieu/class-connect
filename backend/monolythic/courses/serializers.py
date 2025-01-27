@@ -18,6 +18,7 @@ from .models import (
     CourseOfferingAction,
     TeacherStudentEnrollment,
     CourseDeclaration,
+    Question, QuestionOption, QuizAttempt, QuestionResponse
 )
 from users.serializers import UserSerializer
 from django.contrib.auth import get_user_model
@@ -74,16 +75,33 @@ class AbstractResourceSerializer(serializers.ModelSerializer):
         return obj.__class__.__name__
 
 
+class QuestionOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionOption
+        fields = "__all__"
+
+class QuestionSerializer(serializers.ModelSerializer):
+    options = QuestionOptionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Question
+        fields = "__all__"
+
+class QuizResourceSerializer(AbstractResourceSerializer):
+    questions = QuestionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = QuizResource
+        fields = AbstractResourceSerializer.Meta.fields + [
+            "total_questions", "duration_minutes", "passing_score",
+            "show_correct_answers", "show_explanation", "shuffle_questions",
+            "attempts_allowed", "partial_credit", "questions"
+        ]
+
 class VideoResourceSerializer(AbstractResourceSerializer):
     class Meta:
         model = VideoResource
-        fields = AbstractResourceSerializer.Meta.fields + ["video_url", "video_file"]
-
-
-class QuizResourceSerializer(AbstractResourceSerializer):
-    class Meta:
-        model = QuizResource
-        fields = AbstractResourceSerializer.Meta.fields + ["total_questions", "duration_minutes"]
+        fields = AbstractResourceSerializer.Meta.fields + ["video_file"]
 
 
 class RevisionResourceSerializer(AbstractResourceSerializer):
@@ -248,4 +266,14 @@ class UserProgressSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = UserProgress
+        fields = "__all__"
+
+class QuizAttemptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizAttempt
+        fields = "__all__"
+
+class QuestionResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionResponse
         fields = "__all__"
