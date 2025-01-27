@@ -25,7 +25,7 @@ const menuItems = [
     label: "Gestion",
     items: [
       { title: "Utilisateurs", icon: Users, url: "/admin/users" },
-      { title: "Cours", icon: BookOpen, url: "/admin/courses" },
+      { title: "Cours", icon: BookOpen, url: "/admin/classes" },
       { title: "Paiements", icon: CreditCard, url: "/admin/payments" },
     ],
   },
