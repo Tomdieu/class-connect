@@ -66,7 +66,7 @@ export const getUsers = async ({
       },
       params,
     });
-    const data = (await res.data) as PaginationType<UserType>;
+    const data = (await res.data) as UserType[];
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
