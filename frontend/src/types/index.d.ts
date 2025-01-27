@@ -94,7 +94,7 @@ export declare interface CourseCategoryCreateType {
   parent?: number;
 }
 
-export declare interface Class {
+export declare interface ClassType {
   id: number;
   name: string;
   level: EducationLevel;
@@ -109,7 +109,7 @@ export declare interface ClassCreateType {
   description?: string;
 }
 
-export declare interface Subject {
+export declare interface SubjectType {
   id: number;
   name: string;
   description: string | null;
@@ -124,7 +124,7 @@ export declare interface SubjectCreateType {
   class_level: number;
 }
 
-export declare interface Chapter {
+export declare interface ChapterType {
   id: number;
   title: string;
   description: string | null;
@@ -137,11 +137,11 @@ export declare interface Chapter {
 export declare interface ChapterCreateType {
   title: string;
   description?: string;
-  subject: number;
+  subject: number|string;
   order: number;
 }
 
-export declare interface Topic {
+export declare interface TopicType {
   id: number;
   title: string;
   chapter: Chapter;
@@ -158,32 +158,130 @@ export declare interface TopicCreateType {
   order: number;
 }
 
-export declare interface AbstractResource {
-  id: number;
-  topic: Topic;
-  title: string;
-  description: string | null;
-  created_at: string;
-  updated_at: string;
+export declare interface AbstractResourceType {
+id: number;
+topic: number;
+title: string;
+description: string | null;
+created_at: string;
+updated_at: string;
+polymorphic_ctype: number;
+resource_type: 'VideoResource' | 'QuizResource' | 'RevisionResource' | 'PDFResource' | 'ExerciseResource';
 }
 
 export declare interface AbstractResourceCreateType {
-  topic: number;
-  title: string;
-  description?: string;
+topic: number;
+title: string;
+description?: string;
+polymorphic_ctype: number; 
 }
 
-export declare interface VideoResource extends AbstractResource {
-  video_url: string | null;
-  video_file: string | null;
-}
-
-export declare interface VideoResourceCreateType extends AbstractResourceCreateType {
-  video_url?: string;
-  video_file?: File;
-}
-
-export declare interface UserAvailability {
+// Quiz Types
+export declare interface QuestionOptionType {
+  id: number;
+  question: number;
+  text: string;
+  image: string | null;
+  is_correct: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+ }
+ 
+ export declare interface QuestionType {
+  id: number;
+  quiz: number;
+  text: string;
+  image: string | null;
+  type: 'MULTIPLE_CHOICE' | 'SINGLE_CHOICE' | 'TRUE_FALSE' | 'SHORT_ANSWER';
+  points: number;
+  order: number;
+  explanation: string;
+  explanation_image: string | null;
+  created_at: string;
+  updated_at: string;
+  options: QuestionOptionType[];
+ }
+ 
+ export declare interface QuizResourceType extends AbstractResourceType {
+  total_questions: number;
+  duration_minutes: number;
+  passing_score: number;
+  show_correct_answers: boolean;
+  show_explanation: boolean;
+  shuffle_questions: boolean;
+  attempts_allowed: number;
+  partial_credit: boolean;
+  questions: QuestionType[];
+ }
+ 
+ export declare interface QuizAttemptType {
+  id: number;
+  quiz: number;
+  user: number;
+  score: number;
+  started_at: string;
+  completed_at: string | null;
+  is_completed: boolean;
+ }
+ 
+ export declare interface QuestionResponseType {
+  id: number;
+  attempt: number;
+  question: number;
+  selected_options: number[];
+  text_response: string;
+  is_correct: boolean;
+  points_earned: number;
+  created_at: string;
+  updated_at: string;
+ }
+ 
+ // Create Types
+ export declare interface QuestionOptionCreateType {
+  text: string;
+  image?: File;
+  is_correct: boolean;
+  order: number;
+ }
+ 
+ export declare interface QuestionCreateType {
+  text: string;
+  image?: File;
+  type: 'MULTIPLE_CHOICE' | 'SINGLE_CHOICE' | 'TRUE_FALSE' | 'SHORT_ANSWER';
+  points: number;
+  order: number;
+  explanation: string;
+  explanation_image?: File;
+  options: QuestionOptionCreateType[];
+ }
+ 
+ export declare interface QuizResourceCreateType extends AbstractResourceCreateType {
+  total_questions: number;
+  duration_minutes: number;
+  passing_score: number;
+  show_correct_answers: boolean;
+  show_explanation: boolean;
+  shuffle_questions: boolean;
+  attempts_allowed: number;
+  partial_credit: boolean;
+  questions: QuestionCreateType[];
+ }
+ 
+ export declare interface PDFResourceCreateType extends AbstractResourceCreateType {
+  pdf_file: File;
+ }
+ 
+ export declare interface ExerciseResourceCreateType extends AbstractResourceCreateType {
+  instructions: string;
+  solution_file?: File;
+  exercise_file?: File;
+ }
+ 
+ export declare interface RevisionResourceCreateType extends AbstractResourceCreateType {
+  content: string;
+ }
+export declare interface UserAvailabilityType {
   id: number;
   user: User;
   user_type: UserType;
@@ -197,7 +295,7 @@ export declare interface UserAvailabilityCreateType {
   is_available: boolean;
 }
 
-export declare interface DailyTimeSlot {
+export declare interface DailyTimeSlotType {
   id: number;
   availability: UserAvailability;
   day: DayOfWeek;
@@ -212,7 +310,7 @@ export declare interface DailyTimeSlotCreateType {
   is_available: boolean;
 }
 
-export declare interface CourseOffering {
+export declare interface CourseOfferingType {
   id: number;
   student: User;
   subject: Subject;
@@ -234,7 +332,7 @@ export declare interface CourseOfferingCreateType {
   hourly_rate: number;
 }
 
-export declare interface CourseOfferingAction {
+export declare interface CourseOfferingActionType {
   id: number;
   teacher: User;
   offer: CourseOffering;
@@ -248,7 +346,7 @@ export declare interface CourseOfferingActionCreateType {
   action: ActionStatus;
 }
 
-export declare interface TeacherStudentEnrollment {
+export declare interface TeacherStudentEnrollmentType {
   id: number;
   teacher: User;
   offer: CourseOffering;
@@ -262,7 +360,7 @@ export declare interface TeacherStudentEnrollmentCreateType {
   has_class_end: boolean;
 }
 
-export declare interface CourseDeclaration {
+export declare interface CourseDeclarationType {
   id: number;
   teacher_student_enrollment: TeacherStudentEnrollment;
   duration: number;
@@ -280,11 +378,11 @@ export declare interface CourseDeclarationCreateType {
   status: ActionStatus;
 }
 
-export declare interface UserProgress {
+export declare interface UserProgressType {
   id: number;
   user: User;
   topic: Topic;
-  resource: AbstractResource;
+  resource: AbstractResourceType;
   completed: boolean;
   progress_percentage: number;
   last_accessed: string;
