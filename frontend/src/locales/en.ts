@@ -3,32 +3,38 @@ export default {
   "nav.register": "Register",
   "nav.language": "Language",
   "hero.title": "Learn at your own pace with ClassConnect",
-  "hero.subtitle": "An online learning platform tailored to your needs, with quality courses and personalized monitoring.",
+  "hero.subtitle":
+    "An online learning platform tailored to your needs, with quality courses and personalized monitoring.",
   "hero.start": "Get Started",
   "hero.learnMore": "Learn More",
   "features.interactive": "Interactive Courses",
-  "features.interactive.desc": "Learn with multimedia content and practical exercises",
+  "features.interactive.desc":
+    "Learn with multimedia content and practical exercises",
   "features.personalized": "Personalized Monitoring",
-  "features.personalized.desc": "Progress at your own pace with tailored recommendations",
+  "features.personalized.desc":
+    "Progress at your own pace with tailored recommendations",
   "features.community": "Active Community",
   "features.community.desc": "Exchange with other learners and experts",
   "about.title": "Welcome to ClassConnect",
-  "about.subtitle": "The online learning platform designed to revolutionize education in Africa and beyond.",
+  "about.subtitle":
+    "The online learning platform designed to revolutionize education in Africa and beyond.",
   "about.whatIs.title": "What is ClassConnect?",
-  "about.whatIs.desc1": "ClassConnect is an online learning platform dedicated to middle school, high school, university students and professionals. It offers modern tools for effective learning, course tracking, access to personalized resources, and interaction with teachers or experts in various fields.",
-  "about.whatIs.desc2": "Whether you're a student preparing for an exam or a professional looking to acquire new skills, ClassConnect is designed to support you on your journey.",
+  "about.whatIs.desc1":
+    "ClassConnect is an online learning platform dedicated to middle school, high school, university students and professionals. It offers modern tools for effective learning, course tracking, access to personalized resources, and interaction with teachers or experts in various fields.",
+  "about.whatIs.desc2":
+    "Whether you're a student preparing for an exam or a professional looking to acquire new skills, ClassConnect is designed to support you on your journey.",
   "about.features.title": "Main Features",
   "about.features.courseManagement": "Course Management",
   "about.features.courseManagement.desc": [
     "Structured Courses: Well-organized courses by education level",
     "Multimedia Support: Interactive videos, PDF documents, exam papers",
-    "Regular Updates: Updated educational content"
+    "Regular Updates: Updated educational content",
   ],
   "about.features.virtualClassroom": "Virtual Classroom Space",
   "about.features.virtualClassroom.desc": [
     "Live Courses: Live video conference sessions",
     "Course Replay: Access to recordings",
-    "Interaction Tools: Live chat, Q&A"
+    "Interaction Tools: Live chat, Q&A",
   ],
   "about.features.experience": "Personalized Experience",
   "about.features.experience.desc": [
@@ -36,24 +42,24 @@ export default {
     "Middle School: 6th, 5th, 4th, 3rd grade",
     "High School: 10th, 11th, 12th grade",
     "University: Level I, Level II, Level III",
-    "Professional: Customized goal (example: technical skills, management, etc.)"
+    "Professional: Customized goal (example: technical skills, management, etc.)",
   ],
   "about.features.subscriptions": "Adapted Subscriptions",
   "about.features.subscriptions.desc": [
     "Basic: Access to basic courses and limited resources",
     "Standard: Access to additional courses and collaborative tools",
-    "Premium: Full access to all courses, video conferences, and exclusive resources"
+    "Premium: Full access to all courses, video conferences, and exclusive resources",
   ],
   "about.features.payments": "Secure Payments",
   "about.features.payments.desc": [
     "Integration of mobile payments via MTN Money and Orange Money",
     "Instant notifications for successful payments",
-    "Easy subscription management (renewals, cancellations, etc.)"
+    "Easy subscription management (renewals, cancellations, etc.)",
   ],
   "about.features.support": "Personalized Assistance",
   "about.features.support.desc": [
     "Live Chat: Responsive support to answer your questions",
-    "FAQ and Guides: A comprehensive knowledge base to assist you"
+    "FAQ and Guides: A comprehensive knowledge base to assist you",
   ],
   "about.howItWorks.title": "How It Works?",
   "about.howItWorks.registration": "Easy Registration",
@@ -62,16 +68,17 @@ export default {
     "Receive a confirmation email",
     "Choose your subscription",
     "Access your courses",
-    "Participate in live sessions"
+    "Participate in live sessions",
   ],
-  "about.conclusion": "ClassConnect isn't just a platform, it's a revolution in education. Join us to transform your way of learning and achieve your academic or professional goals.",
+  "about.conclusion":
+    "ClassConnect isn't just a platform, it's a revolution in education. Join us to transform your way of learning and achieve your academic or professional goals.",
   "subscriptionPlans.title": "Our Subscription Plans",
   "subscriptionPlans.basic.name": "Basic",
   "subscriptionPlans.basic.description": "Perfect to get started",
   "subscriptionPlans.basic.features": [
     "Access to basic courses",
     "Community forum",
-    "Limited learning resources"
+    "Limited learning resources",
   ],
   "subscriptionPlans.standard.name": "Standard",
   "subscriptionPlans.standard.description": "For serious learners",
@@ -79,7 +86,7 @@ export default {
     "All Basic features",
     "Access to more courses",
     "Weekly Q&A sessions",
-    "Resource downloads"
+    "Resource downloads",
   ],
   "subscriptionPlans.premium.name": "Premium",
   "subscriptionPlans.premium.description": "The complete experience",
@@ -88,7 +95,7 @@ export default {
     "Access to all courses",
     "Unlimited video sessions",
     "Priority support",
-    "Exclusive content"
+    "Exclusive content",
   ],
   "subscriptionPlans.choose": "Choose this plan",
   "loginDialog.title": "Welcome to ClassConnect",
@@ -104,7 +111,8 @@ export default {
   "loginDialog.errors.passwordRequired": "Password is required",
   "loginDialog.errors.emailInvalid": "Email is not valid",
   "registerDialog.title": "Join ClassConnect",
-  "registerDialog.subtitle": "Create your account to start your learning journey",
+  "registerDialog.subtitle":
+    "Create your account to start your learning journey",
   "registerDialog.firstNameLabel": "First Name",
   "registerDialog.lastNameLabel": "Last Name",
   "registerDialog.phoneNumberLabel": "Phone Number",
@@ -117,9 +125,9 @@ export default {
   "registerDialog.confirmPasswordLabel": "Confirm Password",
   "registerDialog.submitButton": "Register",
   "registerDialog.educationLevels": {
-    "lycee": "High School",
-    "university": "University",
-    "professional": "Professional"
+    lycee: "High School",
+    university: "University",
+    professional: "Professional",
   },
   "registerDialog.lyceeClasses": {
     "6eme": "Form 1",
@@ -128,25 +136,25 @@ export default {
     "3eme": "Form 4",
     "2nde": "Form 5",
     "1ere": "Lower Sixth",
-    "terminale": "Upper Sixth"
+    terminale: "Upper Sixth",
   },
   "registerDialog.universityLevels": {
-    "licence": "Bachelor",
-    "master": "Master",
-    "doctorat": "Doctorate"
+    licence: "Bachelor",
+    master: "Master",
+    doctorat: "Doctorate",
   },
   "registerDialog.licenceYears": {
-    "L1": "First Year",
-    "L2": "Second Year",
-    "L3": "Third Year"
+    L1: "First Year",
+    L2: "Second Year",
+    L3: "Third Year",
   },
   "registerDialog.masterYears": {
-    "M1": "Master 1",
-    "M2": "Master 2"
+    M1: "Master 1",
+    M2: "Master 2",
   },
   "registerDialog.professionalFields": {
-    "enterprise": "Enterprise Name",
-    "reason": "Reason for Using Platform"
+    enterprise: "Enterprise Name",
+    reason: "Reason for Using Platform",
   },
   "registerDialog.lyceeClassLabel": "Class",
   "registerDialog.universityLevelLabel": "University Level",
@@ -155,9 +163,11 @@ export default {
   "registerDialog.enterpriseNameLabel": "Enterprise Name",
   "registerDialog.platformUsageReasonLabel": "Reason for Using Platform",
   "registerDialog.errors.firstNameRequired": "First name is required",
-  "registerDialog.errors.firstNameMin": "First name must be at least 2 characters",
+  "registerDialog.errors.firstNameMin":
+    "First name must be at least 2 characters",
   "registerDialog.errors.lastNameRequired": "Last name is required",
-  "registerDialog.errors.lastNameMin": "Last name must be at least 2 characters",
+  "registerDialog.errors.lastNameMin":
+    "Last name must be at least 2 characters",
   "registerDialog.errors.phoneRequired": "Phone number is required",
   "registerDialog.errors.phoneInvalid": "Invalid phone number format",
   "registerDialog.errors.dateRequired": "Date of birth is required",
@@ -171,21 +181,23 @@ export default {
   "registerDialog.errors.quarterMin": "Quarter must be at least 2 characters",
   "registerDialog.errors.passwordRequired": "Password is required",
   "registerDialog.errors.passwordMin": "Password must be at least 8 characters",
-  "registerDialog.errors.passwordComplexity": "Password must include uppercase, lowercase, and numbers",
-  "registerDialog.errors.confirmPasswordRequired": "Password confirmation is required",
+  "registerDialog.errors.passwordComplexity":
+    "Password must include uppercase, lowercase, and numbers",
+  "registerDialog.errors.confirmPasswordRequired":
+    "Password confirmation is required",
   "registerDialog.errors.passwordsMustMatch": "Passwords must match",
   "features.title": "Main Features",
   "features.courseManagement.title": "Course Management",
   "features.courseManagement.items": [
     "Structured Courses: Well-organized courses by education level",
     "Multimedia Support: Interactive videos, PDF documents, exam papers",
-    "Regular Updates: Updated educational content"
+    "Regular Updates: Updated educational content",
   ],
   "features.virtualClassroom.title": "Virtual Classroom Space",
   "features.virtualClassroom.items": [
     "Live Courses: Live video conference sessions",
     "Course Replay: Access to recordings",
-    "Interaction Tools: Live chat, Q&A"
+    "Interaction Tools: Live chat, Q&A",
   ],
   "features.experience.title": "Personalized Experience",
   "features.experience.items": [
@@ -193,24 +205,24 @@ export default {
     "Middle School: 6th, 5th, 4th, 3rd grade.",
     "High School: 10th, 11th, 12th grade.",
     "University: Level I, Level II, Level III.",
-    "Professional: Customized goal (example: technical skills, management, etc.)."
+    "Professional: Customized goal (example: technical skills, management, etc.).",
   ],
   "features.subscriptions.title": "Adapted Subscriptions",
   "features.subscriptions.items": [
     "Basic: Access to basic courses and limited resources.",
     "Standard: Access to additional courses and collaborative tools.",
-    "Premium: Full access to all courses, video conferences, and exclusive resources."
+    "Premium: Full access to all courses, video conferences, and exclusive resources.",
   ],
   "features.payments.title": "Secure Payments",
   "features.payments.items": [
     "Integration of mobile payments via MTN Money and Orange Money.",
     "Instant notifications for successful payments.",
-    "Easy subscription management (renewals, cancellations, etc.)."
+    "Easy subscription management (renewals, cancellations, etc.).",
   ],
   "features.support.title": "Personalized Assistance",
   "features.support.items": [
     "Live Chat: Responsive support to answer your questions.",
-    "FAQ and Guides: A comprehensive knowledge base to assist you."
+    "FAQ and Guides: A comprehensive knowledge base to assist you.",
   ],
   "dashboardSidebar.menu": "Menu",
   "dashboardSidebar.home": "Home",
@@ -223,5 +235,14 @@ export default {
   "dashboardPage.overview": "Overview",
   "dashboardPage.recentActivities": "Recent Activities",
   "dashboardPage.statistics": "Statistics",
-  "dashboardPage.settings": "Settings"
-} as const
+  "dashboardPage.settings": "Settings",
+  "userDialog.title": "Update User",
+  "userDialog.subtitle": "Modify user details below",
+  "class.title": "Class",
+  "educationLevels": {
+    lycee: "High School",
+    university: "University",
+    professional: "Professional",
+  },
+  "error": "Error",
+} as const;
