@@ -19,11 +19,11 @@ function UserTable() {
   const [users, setUsers] = useState<UserType[]>([]);
 
   useEffect(() => {
-    if (data?.results) {
-      setUsers(data.results);
+    if (data) {
+      setUsers(data);
     }
-  }, [data?.results]);
-  console.log(data);
+  }, [data]);
+  console.log({data});
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -35,7 +35,7 @@ function UserTable() {
 
   const handleFilter = (value: string) => {
     if (value) {
-      const _usersToDisplay = data?.results.filter(
+      const _usersToDisplay = data?.filter(
         (user) =>
           user.first_name?.toLocaleLowerCase().includes(value) ||
           user.last_name?.toLocaleLowerCase().includes(value) ||
@@ -43,24 +43,24 @@ function UserTable() {
       );
       setUsers(_usersToDisplay!);
     } else {
-      if (data?.results) {
-        setUsers(data?.results);
+      if (data) {
+        setUsers(data);
       }
     }
   };
 
-  if (data && data.results) {
+  if (data) {
     return (
       <div className="space-y-4">
         <DataTable onChange={handleFilter} columns={userColumns} data={users} />
-        {data.count > 1 && (
+        {/* {d > 1 && (
           <CustomPagination
             onPageChange={() => {}}
             itemsPerPage={25}
             currentPage={parseInt(page)}
             pagination={data}
           />
-        )}
+        )} */}
       </div>
     );
   }
