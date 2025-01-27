@@ -8,7 +8,10 @@ from .views import (
     CourseOfferingViewSet,
     CourseOfferingActionViewSet,
     TeacherStudentEnrollmentViewSet,
-    CourseDeclarationViewSet
+    CourseDeclarationViewSet,
+    QuizResourceViewSet, QuestionViewSet, QuestionOptionViewSet,
+    QuizAttemptViewSet, QuestionResponseViewSet,
+    VideoResourceViewSet, RevisionResourceViewSet, PDFResourceViewSet, ExerciseResourceViewSet
 )
 
 # Create main router
@@ -21,6 +24,11 @@ router.register(r'course-offerings', CourseOfferingViewSet)
 router.register(r'offering-actions', CourseOfferingActionViewSet)
 router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
 router.register(r'declarations', CourseDeclarationViewSet)
+router.register(r'quizzes', QuizResourceViewSet)
+router.register(r'questions', QuestionViewSet)
+router.register(r'question-options', QuestionOptionViewSet)
+router.register(r'quiz-attempts', QuizAttemptViewSet)
+router.register(r'question-responses', QuestionResponseViewSet)
 
 # Create nested routers
 class_router = routers.NestedDefaultRouter(router, r'classes', lookup='class')
@@ -33,7 +41,12 @@ chapter_router = routers.NestedDefaultRouter(subject_router, r'chapters', lookup
 chapter_router.register(r'topics', TopicViewSet, basename='chapter-topics')
 
 topic_router = routers.NestedDefaultRouter(chapter_router, r'topics', lookup='topic')
-topic_router.register(r'resources', ResourceViewSet, basename='topic-resources')
+topic_router.register(r'resources', ResourceViewSet, basename='topics')
+topic_router.register(r'videos', VideoResourceViewSet, basename='topic-videos')
+topic_router.register(r'quizs', QuizResourceViewSet, basename='topic-quizs')
+topic_router.register(r'revisions', RevisionResourceViewSet, basename='topic-revisions')
+topic_router.register(r'pdfs', PDFResourceViewSet, basename='topic-pdfs')
+topic_router.register(r'exercises', ExerciseResourceViewSet, basename='topic-exercises')
 
 urlpatterns = [
     path('', include(router.urls)),
