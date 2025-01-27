@@ -133,7 +133,6 @@ function RegisterDialog() {
   const handleRegisterSubmit = async (values: RegisterFormData) => {
     try {
       console.log(values);
-      // Handle registration logic here
     } catch (error) {
       console.error('Registration error:', error);
     }
