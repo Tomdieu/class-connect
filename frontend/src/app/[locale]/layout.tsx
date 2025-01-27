@@ -127,11 +127,13 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <SessionProvider>
-            <Providers locale={locale}>
-              <ReactQueryProvider>{children}</ReactQueryProvider>
-              <Modals />
-              <Toaster />
-            </Providers>
+            <ReactQueryProvider>
+              <Providers locale={locale}>
+                {children}
+                <Modals />
+                <Toaster />
+              </Providers>
+            </ReactQueryProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>
