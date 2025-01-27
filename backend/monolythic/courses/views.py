@@ -8,14 +8,18 @@ from drf_yasg import openapi
 from .models import (
     CourseCategory, Class, Subject, Chapter, Topic,
     AbstractResource, UserProgress,UserAvailability,DailyTimeSlot,
-    CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration
+    CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,
+    QuizResource, Question, QuestionOption, QuizAttempt, QuestionResponse,
+    VideoResource, RevisionResource, PDFResource, ExerciseResource
 )
 from .serializers import (
     CourseCategorySerializer, ClassSerializer, SubjectSerializer,
     ChapterSerializer, TopicSerializer, PolymorphicResourceSerializer,
     UserProgressSerializer,UserAvailabilitySerializer,
     CourseOfferingSerializer, CourseOfferingActionSerializer,
-    TeacherStudentEnrollmentSerializer, CourseDeclarationSerializer,DailyTimeSlotSerializer,DailyTimeSlotUpdateSerializer
+    TeacherStudentEnrollmentSerializer, CourseDeclarationSerializer,DailyTimeSlotSerializer,DailyTimeSlotUpdateSerializer,
+    QuizResourceSerializer, QuestionSerializer, QuestionOptionSerializer, QuizAttemptSerializer, QuestionResponseSerializer,
+    VideoResourceSerializer, RevisionResourceSerializer, PDFResourceSerializer, ExerciseResourceSerializer
 )
 from .pagination import CustomPagination
 from .filters import (
@@ -44,7 +48,7 @@ class ClassViewSet(viewsets.ModelViewSet):
     API endpoint for managing classes.
     """
     permission_classes = [IsAuthenticated]
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
     filter_backends = [DjangoFilterBackend]
@@ -64,7 +68,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
     API endpoint for managing subjects within a class.
     """
     permission_classes = [IsAuthenticated]
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
     serializer_class = SubjectSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = SubjectFilter
@@ -73,7 +77,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
         queryset = Subject.objects.filter(class_level=self.kwargs['class_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 
-    @method_decorator(cache_page(60*60*2,key_prefix='subject_list'))
+    @method_decorator(cache_page(60*60*2,key_prefix='subjects_list'))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -82,7 +86,7 @@ class ChapterViewSet(viewsets.ModelViewSet):
     API endpoint for managing chapters within a subject.
     """
     permission_classes = [IsAuthenticated]
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
     serializer_class = ChapterSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ChapterFilter
@@ -343,3 +347,130 @@ class CourseDeclarationViewSet(viewsets.ModelViewSet):
             declaration.save()
             return Response({'status': 'updated'})
         return Response({'error': 'Invalid status'}, status=400)
+
+class QuizResourceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing quiz resources.
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+    queryset = QuizResource.objects.all()
+    serializer_class = QuizResourceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ResourceFilter
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing questions within a quiz.
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['quiz']
+
+class QuestionOptionViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing question options.
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = QuestionOption.objects.all()
+    serializer_class = QuestionOptionSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['question']
+
+class QuizAttemptViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing quiz attempts.
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+    queryset = QuizAttempt.objects.all()
+    serializer_class = QuizAttemptSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['quiz', 'user', 'is_completed']
+
+    @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter('user_id', openapi.IN_QUERY, description="User ID", type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('quiz_id', openapi.IN_QUERY, description="Quiz ID", type=openapi.TYPE_INTEGER, required=True),
+        ],
+        responses={200: QuizAttemptSerializer(many=True)}
+    )
+    @action(detail=False, methods=['get'], url_path='user-attempts')
+    def get_user_attempts(self, request):
+        """
+        Get quiz attempts for a specific user and quiz.
+        """
+        user_id = request.query_params.get('user_id')
+        quiz_id = request.query_params.get('quiz_id')
+
+        if not user_id or not quiz_id:
+            return Response(
+                {"error": "user_id and quiz_id are required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        queryset = self.queryset.filter(user_id=user_id, quiz_id=quiz_id)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+class QuestionResponseViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing question responses.
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = QuestionResponse.objects.all()
+    serializer_class = QuestionResponseSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['attempt', 'question', 'is_correct']
+
+class VideoResourceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing video resources.
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+    queryset = VideoResource.objects.all()
+    serializer_class = VideoResourceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ResourceFilter
+
+class RevisionResourceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing revision resources.
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+    queryset = RevisionResource.objects.all()
+    serializer_class = RevisionResourceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ResourceFilter
+
+class PDFResourceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing PDF resources.
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+    queryset = PDFResource.objects.all()
+    serializer_class = PDFResourceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ResourceFilter
+
+class ExerciseResourceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing exercise resources.
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+    queryset = ExerciseResource.objects.all()
+    serializer_class = ExerciseResourceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ResourceFilter
