@@ -153,7 +153,7 @@ export declare interface TopicType {
 
 export declare interface TopicCreateType {
   title: string;
-  chapter: number;
+  chapter: number|string;
   description?: string;
   order: number;
 }
