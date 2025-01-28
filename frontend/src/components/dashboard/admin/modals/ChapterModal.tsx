@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import {
   Form,
@@ -36,7 +36,7 @@ function ChapterModal() {
   const createChapterSchema = (t: (key: string) => string) =>
     z.object({
       id: z.number().optional(),
-      title: z.string(),
+      title: z.string().min(3),
       description: z.string().optional(),
       order: z.number().default(0).optional(),
     });
@@ -78,13 +78,19 @@ function ChapterModal() {
     }
   }, [form, chapter]);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     form.reset({
       id: undefined,
       title: undefined,
       description: undefined,
     });
-  };
+  },[form]);
+
+  useEffect(()=>{
+    if(!isOpen){
+        resetForm()
+    }
+  },[isOpen, resetForm])
 
   const handleSubjectSubmit = async (data: ChapterFormData) => {
     console.log(data);
