@@ -101,7 +101,7 @@ class TopicViewSet(viewsets.ModelViewSet):
     API endpoint for managing topics within a chapter.
     """
     permission_classes = [IsAuthenticated]
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
     serializer_class = TopicSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = TopicFilter
