@@ -532,7 +532,7 @@ export const listTopics = async ({
   class_pk: string;
   subject_pk: string;
   chapter_pk: string;
-  params: TopicParams;
+  params?: TopicParams;
 }) => {
   try {
     const session = await auth();
@@ -567,9 +567,9 @@ export const addTopic = async ({
   chapter_pk,
   body,
 }: {
-  class_pk: string;
-  subject_pk: string;
-  chapter_pk: string;
+  class_pk: string|number;
+  subject_pk: string|number;
+  chapter_pk: string|number;
   body: TopicCreateType;
 }) => {
   try {
@@ -643,10 +643,10 @@ export const updateTopic = async ({
   topic_pk,
   body,
 }: {
-  class_pk: string;
-  subject_pk: string;
-  chapter_pk: string;
-  topic_pk: string;
+  class_pk: string|number;
+  subject_pk: string|number;
+  chapter_pk: string|number;
+  topic_pk: string|number;
   body: Partial<TopicCreateType>;
 }) => {
   try {
