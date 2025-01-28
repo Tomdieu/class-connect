@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import {
   Form,
@@ -79,19 +79,20 @@ function SubjectModal() {
     }
   }, [form, subject]);
 
-  const resetForm = () => {
-    form.reset({
-      id: undefined,
-      name: undefined,
-      description: undefined,
-    });
-  };
+  const resetForm = useCallback(() => {
+      form.reset({
+        id: undefined,
+        name: undefined,
+        description: undefined,
+      });
+    },[form]);
+  
+    useEffect(()=>{
+      if(!isOpen){
+          resetForm()
+      }
+    },[isOpen, resetForm])
 
-  // useEffect(()=>{
-  //   if(classId){
-  //     form.setValue("class_level",classId)
-  //   }
-  // },[classId, form])
 
   const handleSubjectSubmit = async (data: SubjectFormData) => {
     console.log(data);
