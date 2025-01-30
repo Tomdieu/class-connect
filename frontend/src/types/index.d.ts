@@ -158,6 +158,12 @@ export declare interface TopicCreateType {
   order: number;
 }
 
+export declare interface ResourceType { 
+  id:number,
+  resource:AbstractResourceType
+}
+
+
 export declare interface AbstractResourceType {
 id: number;
 topic: number;
@@ -168,6 +174,7 @@ updated_at: string;
 polymorphic_ctype: number;
 resource_type: 'VideoResource' | 'QuizResource' | 'RevisionResource' | 'PDFResource' | 'ExerciseResource';
 }
+
 
 export declare interface AbstractResourceCreateType {
 topic: number;
@@ -281,6 +288,7 @@ export declare interface QuestionOptionType {
  export declare interface RevisionResourceCreateType extends AbstractResourceCreateType {
   content: string;
  }
+ 
 export declare interface UserAvailabilityType {
   id: number;
   user: User;
