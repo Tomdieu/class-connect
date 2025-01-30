@@ -5,11 +5,13 @@ import { Play, UserCheck, Users } from "lucide-react";
 // import { useMediaQuery } from "usehooks-ts";
 import { AboutContent } from "./AboutContent";
 import { useI18n } from "@/locales/client";
+import { useRouter } from "next/navigation";
 
 function Hero() {
   // const isMobile = useMediaQuery('(max-width: 640px)')
   const [showAbout, setShowAbout] = useState(false);
   const t = useI18n()
+  const router = useRouter()
   return (
     <div className="flex flex-col gap-10 py-20 bg-[#F0F9FF]">
       <div className="flex items-center justify-center text-black flex-col gap-8">
@@ -25,6 +27,7 @@ function Hero() {
         <div className="flex items-center justify-between gap-6">
           <Button
             size={"lg"}
+            onClick={()=>router.push('/dashboard')}
             className="bg-default hover:bg-default/80 text-white rounded-md"
           >
             {t("hero.start")}
