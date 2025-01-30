@@ -154,6 +154,11 @@ export default {
   "registerDialog.masterYearLabel": "Année de master",
   "registerDialog.enterpriseNameLabel": "Nom de l'entreprise",
   "registerDialog.platformUsageReasonLabel": "Raison d'utilisation de la plateforme",
+  "registerDialog.lyceeSpecialityLabel": "Spécialité",
+  "registerDialog.lyceeSpecialities": {
+    "scientifique": "Scientifique",
+    "litteraire": "Littéraire"
+  },
   "registerDialog.errors.firstNameRequired": "Le prénom est requis",
   "registerDialog.errors.firstNameMin": "Le prénom doit contenir au moins 2 caractères",
   "registerDialog.errors.lastNameRequired": "Le nom est requis",
