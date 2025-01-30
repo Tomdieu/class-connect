@@ -16,6 +16,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import { getPathAfterLanguage } from "@/lib/utils";
@@ -44,11 +46,19 @@ const menuItems = [
 
 export const AdminSidebar = () => {
   const pathname = usePathname();
+  const { toggleSidebar, isMobile, openMobile } = useSidebar();
+
   const correctPath = getPathAfterLanguage(pathname);
   return (
     <Sidebar>
-      <SidebarContent>
-        <div className="font-bold text-xl p-5 pb-0">Administrator</div>
+      <SidebarContent className="bg-white">
+        <div className="font-bold text-xl p-5 pb-0 flex items-center justify-between">
+          <span>Administrator</span>
+          {openMobile && (
+
+            <SidebarTrigger />
+          )}
+        </div>
         {menuItems.map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
