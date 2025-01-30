@@ -8,6 +8,7 @@ import {
   ChapterType,
   ClassCreateType,
   ClassType,
+  ResourceType,
   SubjectCreateType,
   SubjectType,
   TopicCreateType,
@@ -724,7 +725,7 @@ interface ResourceParams {
     page:number
 }
 
-export const listResources = async ({class_pk,subject_pk,chapter_pk,topic_pk,params}:{class_pk:string,subject_pk:string,chapter_pk:string,topic_pk:string,params:ResourceParams})=>{
+export const listResources = async ({class_pk,subject_pk,chapter_pk,topic_pk,params}:{class_pk:string,subject_pk:string,chapter_pk:string,topic_pk:string,params?:ResourceParams})=>{
     try {
         const session = await auth();
         if (!session?.user) throw Error("Unauthorize user!");
@@ -736,7 +737,7 @@ export const listResources = async ({class_pk,subject_pk,chapter_pk,topic_pk,par
             },
             params,
         });
-        const data = (await res.data) as AbstractResourceType[];
+        const data = (await res.data) as ResourceType[];
         return data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
