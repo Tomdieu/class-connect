@@ -1,8 +1,8 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useSidebar } from "@/components/ui/sidebar";
-import { BookOpen, ChevronDown, LogOut, MenuIcon } from "lucide-react";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { BookOpen, ChevronDown, LogOut, Menu, MenuIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 function DashboardHeader() {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, isMobile } = useSidebar();
   const { data: session } = useSession();
   const getInitials = (name: string) => {
     const [firstName, lastName] = name.split(" ");
@@ -52,7 +52,7 @@ function DashboardHeader() {
             <div className="flex flex-col gap-0.5 cursor-pointer select-none">
               <span className="text-muted-foreground text-xs">Bonjour</span>
               <div className="flex items-center gap-1">
-                <span className="text-sm">{session?.user.first_name}</span>
+                <span className="text-sm/3">{session?.user.first_name}</span>
                 <ChevronDown className="size-4" />
               </div>
             </div>
@@ -92,6 +92,12 @@ function DashboardHeader() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        {isMobile && (
+
+          <Button onClick={toggleSidebar} size={"icon"} variant={"ghost"}>
+            <Menu />
+          </Button>
+        )}
       </div>
     </div>
   );
