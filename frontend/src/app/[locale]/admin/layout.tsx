@@ -3,15 +3,17 @@ import DashboardHeader from '@/components/dashboard/global/DashboardHeader'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import React from 'react'
 
-export default function AdminLayout({children}:React.PropsWithChildren) {
+export default function AdminLayout({ children }: React.PropsWithChildren) {
   return (
     <SidebarProvider aria-describedby="dashboard-layout">
 
-      <div className='w-full h-full flex'>
+      <div className='flex-1 h-full flex'>
         <AdminSidebar />
-        <main className='flex flex-col h-full w-full relative'>
+        <main className='flex w-full flex-col h-full relative gap-3'>
           <DashboardHeader />
-          {children}
+          <div className='flex-1 flex flex-col h-full w-full overflow-y-auto'>
+            {children}
+          </div>
         </main>
 
       </div>
