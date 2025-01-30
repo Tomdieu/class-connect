@@ -38,6 +38,7 @@ const LYCEE_CLASSES = ["6eme", "5eme", "4eme", "3eme", "2nde", "1ere", "terminal
 const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
 const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
 const MASTER_YEARS = ["M1", "M2"] as const;
+const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 
 function RegisterDialog() {
   const { isRegisterOpen, closeDialog } = useAuthDialog();
@@ -93,6 +94,7 @@ function RegisterDialog() {
         .min(1, { message: t("registerDialog.errors.confirmPasswordRequired") }),
       // Dynamic fields
       lycee_class: z.enum(LYCEE_CLASSES).optional(),
+      lycee_speciality: z.enum(LYCEE_SPECIALITIES).optional(),
       university_level: z.enum(UNIVERSITY_LEVELS).optional(),
       university_year: z.string().optional(),
       enterprise_name: z.string().optional(),
@@ -100,6 +102,16 @@ function RegisterDialog() {
     }).refine((data) => data.password === data.confirm_password, {
       message: t("registerDialog.errors.passwordsMustMatch"),
       path: ["confirm_password"],
+    }).refine((data) => {
+      // Add validation for speciality
+      if (data.education_level === "LYCEE" && 
+          ["2nde", "1ere", "terminale"].includes(data.lycee_class || '')) {
+        return !!data.lycee_speciality;
+      }
+      return true;
+    }, {
+      message: "Speciality is required for this class",
+      path: ["lycee_speciality"],
     });
 
   type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>;
@@ -141,38 +153,72 @@ function RegisterDialog() {
   // Render dynamic fields based on education level
   const renderDynamicFields = () => {
     const educationLevel = form.watch("education_level");
+    const lyceeClass = form.watch("lycee_class");
 
     if (educationLevel === "LYCEE") {
       return (
-        <FormField
-          control={form.control}
-          name="lycee_class"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("registerDialog.lyceeClassLabel")}</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger>
-                    <SelectValue 
-                      placeholder={t("registerDialog.lyceeClassLabel")} 
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {LYCEE_CLASSES.map((lyceeClass) => (
-                      <SelectItem key={lyceeClass} value={lyceeClass}>
-                        {t(`registerDialog.lyceeClasses.${lyceeClass}` as keyof typeof t)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+        <>
+          <FormField
+            control={form.control}
+            name="lycee_class"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("registerDialog.lyceeClassLabel")}</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue 
+                        placeholder={t("registerDialog.lyceeClassLabel")} 
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LYCEE_CLASSES.map((lyceeClass) => (
+                        <SelectItem key={lyceeClass} value={lyceeClass}>
+                          {t(`registerDialog.lyceeClasses.${lyceeClass}` as keyof typeof t)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {lyceeClass && ["2nde", "1ere", "terminale"].includes(lyceeClass) && (
+            <FormField
+              control={form.control}
+              name="lycee_speciality"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("registerDialog.lyceeSpecialityLabel")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue 
+                          placeholder={t("registerDialog.lyceeSpecialityLabel")} 
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LYCEE_SPECIALITIES.map((speciality) => (
+                          <SelectItem key={speciality} value={speciality}>
+                            {t(`registerDialog.lyceeSpecialities.${speciality}` as keyof typeof t)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           )}
-        />
+        </>
       );
     }
 
