@@ -116,7 +116,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
     API endpoint for managing resources within a topic.
     """
     permission_classes = [IsAuthenticated]
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
     serializer_class = PolymorphicResourceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ResourceFilter
