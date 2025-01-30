@@ -162,6 +162,11 @@ export default {
   "registerDialog.masterYearLabel": "Master Year",
   "registerDialog.enterpriseNameLabel": "Enterprise Name",
   "registerDialog.platformUsageReasonLabel": "Reason for Using Platform",
+  "registerDialog.lyceeSpecialityLabel": "Speciality",
+  "registerDialog.lyceeSpecialities": {
+    "scientifique": "Scientific",
+    "litteraire": "Literary"
+  },
   "registerDialog.errors.firstNameRequired": "First name is required",
   "registerDialog.errors.firstNameMin":
     "First name must be at least 2 characters",
