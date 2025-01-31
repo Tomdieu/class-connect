@@ -22,8 +22,9 @@ type TopicStore = {
     topic,
   }: {
     topic: TopicType;
-    subjectId: string | number;
     classId: string | number;
+    subjectId: string | number;
+    chapterId: string | number;
   }) => void;
   onClose: () => void;
 };
@@ -36,8 +37,8 @@ export const useTopicStore = create<TopicStore>((set) => ({
   classId: undefined,
   onAdd: ({ chapterId, classId, subjectId }) =>
     set({ isOpen: true, chapterId, classId, subjectId }),
-  setTopic: ({ classId, subjectId, topic }) =>
-    set({ topic: topic, isOpen: true, classId, subjectId }),
+  setTopic: ({ classId, subjectId, topic,chapterId }) =>
+    set({ topic: topic, isOpen: true, classId, subjectId,chapterId }),
   onClose: () =>
     set({
       isOpen: false,
