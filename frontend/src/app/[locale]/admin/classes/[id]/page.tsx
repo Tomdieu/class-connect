@@ -151,7 +151,7 @@ function ClassDetail() {
 
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Link href={`/admin/classes/${id}/subjects/${subject.id}`}>
+                      <Link href={`/admin/classes/${id}/subjects/${subject.id}/chapters`}>
                       <Button variant="default">
                         <Eye className="size-4 mr-2" />
                         View Chapters
