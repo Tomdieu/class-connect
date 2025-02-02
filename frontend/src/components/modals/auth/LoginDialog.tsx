@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/credenza";
 import { DialogTitle } from "@/components/ui/dialog";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
-import { BookOpen } from "lucide-react";
+import { BookOpen, LoaderCircle } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -33,6 +33,7 @@ function LoginDialog() {
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const t = useI18n();
   const router = useRouter();
+  const [isLoading,setIsLoading] = useState(false)
 
   // Create login schema with translations
   const createLoginSchema = (t: (key: string) => string) =>
@@ -71,6 +72,8 @@ function LoginDialog() {
     },
   });
 
+  const {formState:{errors}} = loginForm
+
   // Initialize forgot password form
   const forgotPasswordForm = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(createForgotPasswordSchema(t as keyof typeof t)),
@@ -91,13 +94,19 @@ function LoginDialog() {
     if (forgotPasswordForm.formState.isDirty) {
       forgotPasswordForm.trigger();
     }
-  }, [t]);
+  }, [forgotPasswordForm, loginForm, t]);
 
   const handleLoginSubmit = async (values: LoginFormData) => {
     try {
+      setIsLoading(true)
       const res = await signIn("credentials", { ...values, redirect: false });
       console.log(res)
+      if(res?.error == "CredentialsSignin"){
+        loginForm.setError("root",{message:t("loginDialog.invalidCredential")})
+        return;
+      }
       if (res && res.ok && !res.error) {
+        setIsLoading(false)
         closeDialog(false)
         router.refresh();
         toast("Login successfull");
@@ -206,6 +215,11 @@ function LoginDialog() {
               onSubmit={loginForm.handleSubmit(handleLoginSubmit)}
               className="flex flex-col gap-2 px-4"
             >
+              {errors.root && (
+                <div className="w-full border border-red-500 rounded-md p-2">
+                  <span className="text-red-500 font-semibold">{errors.root.message}</span>
+                </div>
+              )}
               <FormField
                 control={loginForm.control}
                 name="email"
@@ -249,6 +263,7 @@ function LoginDialog() {
                 onClick={handleSwitchToForgotPassword}
                 disabled={loginForm.formState.isSubmitting}
               >
+                {isLoading && (<LoaderCircle className="size-4 animate-spin text-white mr-2"/>)}
                 {t("loginDialog.forgotPasswordButton")}
               </Button>
             </form>
