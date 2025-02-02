@@ -98,6 +98,7 @@ export default {
     "Exclusive content",
   ],
   "subscriptionPlans.choose": "Choose this plan",
+  "loginDialog.invalidCredential":"Email or Password incorrect",
   "loginDialog.title": "Welcome to ClassConnect",
   "loginDialog.subtitle": "Log in to access your learning space",
   "loginDialog.resetPasswordTitle": "Reset Password",
