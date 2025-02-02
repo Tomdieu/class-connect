@@ -35,6 +35,16 @@ class Class(models.Model):
     def __str__(self):
         return f"{self.name} - {self.get_level_display()}"
 
+
+class UserClass(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    class_level = models.ForeignKey(Class, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.class_level}"
+
 class Subject(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
