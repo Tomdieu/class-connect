@@ -1,7 +1,10 @@
 from django.db.models.signals import post_save,post_delete
 from django.dispatch import receiver
-from .models import UserAvailability,Class,Subject
+from .models import UserAvailability,Class,Subject,UserClass
 from django.core.cache import cache
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 @receiver(post_save, sender=UserAvailability)
 def create_time_slots(sender, instance:UserAvailability, created, **kwargs):
@@ -29,3 +32,23 @@ def invalidate_subjects_cache(sender,instance,**kwargs):
     
     # TODO
     cache.delete_pattern('*class_list*')
+    
+# create a user class when a user is created
+@receiver(post_save,sender=User)
+def create_user_class(sender,instance,created,**kwargs):
+    if created:
+        education_level = instance.education_level
+        if education_level == 'LYCEE':
+            class_name = instance.lycee_class
+            if class_name:
+                class_obj = Class.objects.get_or_create(name=class_name,education_level=education_level)
+                UserClass.objects.create(user=instance,class_name=class_obj)
+            else:
+                pass
+        if education_level == 'UNIVERSITY':
+            class_name = instance.university_year
+            if class_name:
+                class_obj = Class.objects.get_or_create(name=class_name,education_level=education_level)
+                UserClass.objects.create(user=instance,class_name=class_obj)
+            else:
+                pass
