@@ -91,6 +91,7 @@ export default {
     "Contenu exclusif",
   ],
   "subscriptionPlans.choose": "Choisir ce forfait",
+  "loginDialog.invalidCredential":"Email ou mot de passe incorrect",
   "loginDialog.title": "Bienvenue sur ClassConnect",
   "loginDialog.subtitle": "Connectez-vous pour accéder à votre espace d'apprentissage",
   "loginDialog.resetPasswordTitle": "Réinitialiser le Mot de Passe",
