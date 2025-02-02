@@ -1,11 +1,13 @@
 export const EDUCATION_LEVELS = ["LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
 export const LYCEE_CLASSES = ["6eme", "5eme", "4eme", "3eme", "2nde", "1ere", "terminale"] as const;
+export const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 export const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
 export const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
 export const MASTER_YEARS = ["M1", "M2"] as const;
 
 export type EducationLevel = typeof EDUCATION_LEVELS[number];
 export type LyceeClass = typeof LYCEE_CLASSES[number];
+export type LyceeSpecialities = typeof LYCEE_SPECIALITIES[number];
 export type UniversityLevel = typeof UNIVERSITY_LEVELS[number];
 export type LicenceYear = typeof LICENCE_YEARS[number];
 export type MasterYear = typeof MASTER_YEARS[number];
@@ -26,6 +28,7 @@ export declare interface UserCreateType {
   confirm_password: string;
   // Optional fields based on education level
   lycee_class?: LyceeClass;
+  lycee_speciality?:LyceeSpecialities;
   university_level?: UniversityLevel;
   university_year?: string;
   enterprise_name?: string;
@@ -41,6 +44,7 @@ export declare interface UserType {
   date_of_birth: string | null;
   education_level: EducationLevel;
   lycee_class: LyceeClass | null;
+  lycee_speciality:LyceeSpecialities|null;
   university_level: UniversityLevel | null;
   university_year: string | null;
   enterprise_name: string | null;
