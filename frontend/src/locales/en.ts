@@ -113,6 +113,7 @@ export default {
   "loginDialog.errors.emailRequired": "Email is required",
   "loginDialog.errors.passwordRequired": "Password is required",
   "loginDialog.errors.emailInvalid": "Email is not valid",
+  "loginDialog.alreadyHaveAccount": "Already have an account?",
   "registerDialog.title": "Join ClassConnect",
   "registerDialog.subtitle":
     "Create your account to start your learning journey",
@@ -199,6 +200,12 @@ export default {
     "Password confirmation is required",
   "registerDialog.errors.passwordsMustMatch": "Passwords must match",
   "registerDialog.closeButton": "Close",
+  "registerDialog.yearPlaceholder": "Year",
+  "registerDialog.monthPlaceholder": "Month",
+  "registerDialog.dayPlaceholder": "Day",
+  "registerDialog.yearLabel": "Year",
+  "registerDialog.monthLabel": "Month",
+  "registerDialog.dayLabel": "Day",
   "features.title": "Main Features",
   "features.courseManagement.title": "Course Management",
   "features.courseManagement.items": [
@@ -371,6 +378,8 @@ export default {
   "topic.form.submit.edit": "Update",
   "common.cancel": "Cancel",
   "common.delete": "Delete",
+  "common.back": "Back",
+  "common.error": "Error",
   "resources.title": "Learning Resources",
   "resources.empty": "No resources available",
   "resources.loading": "Loading resources...",
@@ -593,8 +602,7 @@ export default {
   "courseOfferings.success.deleted": "Course offering deleted successfully",
   "courseOfferings.error.deleted": "Error deleting course offering",
   "courseOfferings.teacher": "Teacher",
-  "adminSidebar.items.courseOfferings": "Course Offerings",
-  
+
   // Course offering detail page translations
   "courseOfferings.detail.title": "Course Offering Details",
   "courseOfferings.detail.loading": "Loading course offering details...",
@@ -663,4 +671,96 @@ export default {
   "courseOfferings.edit.success": "Course offering updated successfully",
   "courseOfferings.edit.error": "Failed to update course offering",
   "courseOfferings.edit.notFound": "Course offering not found",
+
+  // Student dashboard translations
+  "student.dashboard.title": "Student Dashboard",
+  "student.dashboard.welcome": "Welcome to your learning portal. Access your classes and learning materials here.",
+  "student.dashboard.myClasses": "My Classes",
+  "student.dashboard.myClassesDesc": "Access your enrolled classes and subjects",
+  "student.dashboard.recentActivity": "Recent Activity",
+  "student.dashboard.recentActivityDesc": "Your recent learning progress",
+  "student.dashboard.noClasses": "No enrolled classes yet.",
+  "student.dashboard.enroll": "Enroll in a Class",
+  "student.dashboard.emptyActivity": "Your recent learning activities will appear here.",
+  "student.dashboard.quickAccess": "Quick Access",
+  "student.dashboard.quickAccessDesc": "Access frequently used resources",
+  "student.dashboard.browseClasses": "Browse Classes",
+
+  // Student classes page translations
+  "student.classes.title": "My Classes",
+  "student.classes.description": "Browse all your enrolled classes and access learning materials",
+  "student.classes.viewSubjects": "View Subjects",
+  "student.classes.noClasses": "No classes found",
+  "student.classes.notEnrolled": "You are not enrolled in any classes yet.",
+
+  // Student subject pages translations
+  "student.subject.exploreFor": "Explore your subjects for {name}",
+  "student.subject.noSubjects": "No subjects available",
+  "student.subject.noSubjectsDesc": "There are no subjects assigned to this class yet.",
+  "student.subject.chapters": "Chapters",
+  "student.subject.topics": "Topics",
+  "student.subject.backToSubjects": "Back to Subjects",
+  "student.subject.noChapters": "No chapters available",
+  "student.subject.noChaptersDesc": "There are no chapters added to this subject yet.",
+
+  // Student chapter/topic page translations
+  "student.chapter.noTopics": "No topics available for this chapter.",
+  "student.topic.title": "Access learning materials for this topic",
+  "student.topic.learningResources": "Learning Resources",
+  "student.topic.resourcesDesc": "Access videos, documents, and exercises for this topic",
+  "student.topic.backToChapters": "Back to Chapters",
+  "student.topic.noResources": "No learning resources available for this topic.",
+
+  // Student resources translations
+  "student.resource.allResources": "All Resources",
+  "student.resource.pdfs": "PDFs",
+  "student.resource.videos": "Videos",
+  "student.resource.exercises": "Exercises",
+  "student.resource.revisions": "Revisions",
+  "student.resource.quizzes": "Quizzes",
+  "student.resource.backToTopic": "Back to Topic Resources",
+  "student.resource.resourceFor": "Resource for {title}",
+  "student.resource.exerciseInstructions": "Exercise Instructions",
+  "student.resource.exerciseFile": "Exercise File",
+  "student.resource.downloadExercise": "Download Exercise",
+  "student.resource.solution": "Solution",
+  "student.resource.viewSolution": "View Solution",
+  "student.resource.revisionNotes": "Revision Notes",
+  "student.resource.quiz": "Quiz",
+  "student.resource.questions": "This quiz contains {count} questions.",
+  "student.resource.timeAllowed": "Time allowed: {minutes} minutes",
+  "student.resource.startQuiz": "Start Quiz",
+  "student.resource.unsupportedType": "This resource type is not supported in the viewer. Please contact support if you believe this is an error.",
+
+  // Common phrases
+  "common.errorDesc": "Failed to load {item}. Please try again later.",
+  "common.return": "Return to {destination}",
+  "common.dashboard": "Dashboard",
+  "common.loading": "Loading...",
+
+  // Student profile page translations
+  "student.profile.title": "My Profile",
+  "student.profile.description": "Manage your account information and settings",
+  "student.profile.personalInfo": "Personal Information",
+  "student.profile.personalInfoDesc": "Update your personal details and contact information.",
+  "student.profile.personalTab": "Profile",
+  "student.profile.passwordTab": "Password",
+  "student.profile.changePassword": "Change Password",
+  "student.profile.changePasswordDesc": "Update your password to secure your account.",
+  "student.profile.firstName": "First Name",
+  "student.profile.lastName": "Last Name",
+  "student.profile.email": "Email",
+  "student.profile.phone": "Phone Number",
+  "student.profile.town": "Town",
+  "student.profile.quarter": "Quarter",
+  "student.profile.update": "Update Profile",
+  "student.profile.updating": "Updating...",
+  "student.profile.currentPassword": "Current Password",
+  "student.profile.newPassword": "New Password",
+  "student.profile.confirmPassword": "Confirm New Password",
+  "student.profile.changePasswordButton": "Change Password",
+  "student.profile.changingPassword": "Changing Password...",
+  
+  // Error messages
+  "error.failedToLoadProfile": "Failed to load profile information. Please try again later.",
 } as const;
