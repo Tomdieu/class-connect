@@ -137,3 +137,13 @@ export function createClassSelectOptions(classes: ClassType[]) {
     };
   });
 }
+
+export const getUserRole = (user:UserType)=>{
+  if(user.is_superuser || user.is_staff){
+    return "admin";
+  }
+  if(user.education_level === "PROFESSIONAL"){
+    return "teacher";
+  }
+  return "student";
+}
