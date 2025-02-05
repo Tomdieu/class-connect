@@ -17,14 +17,28 @@ class CourseCategory(models.Model):
         return self.name
 
 class Class(models.Model):
+
+    LYCEE = 'LYCEE'
+    UNIVERSITY = 'UNIVERSITY'
+    PROFESSIONAL = 'PROFESSIONAL'
+
     EDUCATION_LEVELS = [
-        ('LYCEE', 'Lycée'),
-        ('UNIVERSITY', 'Université'),
-        ('PROFESSIONAL', 'Professionnel'),
+        (LYCEE, 'Lycée'),
+        (UNIVERSITY, 'Université'),
+        (PROFESSIONAL, 'Professionnel'),
+    ]
+
+    FRANCOPHONE = 'FRANCOPHONE'
+    ANGLOPHONE = 'ANGLOPHONE'
+
+    SECTIONS = [
+        (FRANCOPHONE,'Francophone'),
+        (ANGLOPHONE,'Anglophone')
     ]
     
     name = models.CharField(max_length=100)
     level = models.CharField(max_length=20, choices=EDUCATION_LEVELS)
+    section = models.CharField(max_length=20,choices=SECTIONS,default=FRANCOPHONE)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
