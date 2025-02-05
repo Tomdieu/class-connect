@@ -71,7 +71,7 @@ const CredenzaClose = ({ className, children, ...props }: CredenzaProps) => {
   )
 }
 
-const CredenzaContent = ({ className, children, ...props }: CredenzaProps) => {
+const CredenzaContent = ({ className, children, ...props }: CredenzaProps&{showIcon?:boolean}) => {
   const isDesktop = useMediaQuery(desktop)
   const CredenzaContent = isDesktop ? DialogContent : DrawerContent
 
