@@ -8,6 +8,7 @@ import { Providers } from "./providers";
 import localFont from "next/font/local";
 import { SessionProvider } from "next-auth/react";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import React from "react";
 
 const Inter = localFont({
   src: [
