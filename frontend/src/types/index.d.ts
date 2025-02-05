@@ -179,7 +179,6 @@ polymorphic_ctype: number;
 resource_type: 'VideoResource' | 'QuizResource' | 'RevisionResource' | 'PDFResource' | 'ExerciseResource';
 }
 
-
 export declare interface AbstractResourceCreateType {
 topic: number;
 title: string;
@@ -281,6 +280,10 @@ export declare interface QuestionOptionType {
  
  export declare interface PDFResourceCreateType extends AbstractResourceCreateType {
   pdf_file: File;
+ }
+
+ export declare interface VideoResourceCreateType extends AbstractResourceCreateType {
+  video_file: string;
  }
  
  export declare interface ExerciseResourceCreateType extends AbstractResourceCreateType {
