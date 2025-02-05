@@ -1,6 +1,6 @@
 "use client"
 
-import { create } from "zustand";
+import {create} from "zustand";
 
 // Base Store Type
 type BaseResourceStore = {
@@ -28,9 +28,15 @@ export const useQuizStore = create<QuizStore>((set) => ({
     chapterId: undefined,
     classId: undefined,
     subjectId: undefined,
-    onOpen: ({ classId, subjectId, chapterId, topicId }) => 
-        set({ isOpen: true, classId, subjectId, chapterId, topicId }),
-    onClose: () => set({ isOpen: false, topicId: undefined, classId: undefined, subjectId: undefined, chapterId: undefined })
+    onOpen: ({classId, subjectId, chapterId, topicId}) =>
+        set({isOpen: true, classId, subjectId, chapterId, topicId}),
+    onClose: () => set({
+        isOpen: false,
+        topicId: undefined,
+        classId: undefined,
+        subjectId: undefined,
+        chapterId: undefined
+    })
 }));
 
 // PDF Store
@@ -50,9 +56,15 @@ export const usePDFStore = create<PDFStore>((set) => ({
     chapterId: undefined,
     classId: undefined,
     subjectId: undefined,
-    onOpen: ({ classId, subjectId, chapterId, topicId }) => 
-        set({ isOpen: true, classId, subjectId, chapterId, topicId }),
-    onClose: () => set({ isOpen: false, topicId: undefined, classId: undefined, subjectId: undefined, chapterId: undefined })
+    onOpen: ({classId, subjectId, chapterId, topicId}) =>
+        set({isOpen: true, classId, subjectId, chapterId, topicId}),
+    onClose: () => set({
+        isOpen: false,
+        topicId: undefined,
+        classId: undefined,
+        subjectId: undefined,
+        chapterId: undefined
+    })
 }));
 
 // Exercise Store
@@ -72,9 +84,15 @@ export const useExerciseStore = create<ExerciseStore>((set) => ({
     chapterId: undefined,
     classId: undefined,
     subjectId: undefined,
-    onOpen: ({ classId, subjectId, chapterId, topicId }) => 
-        set({ isOpen: true, classId, subjectId, chapterId, topicId }),
-    onClose: () => set({ isOpen: false, topicId: undefined, classId: undefined, subjectId: undefined, chapterId: undefined })
+    onOpen: ({classId, subjectId, chapterId, topicId}) =>
+        set({isOpen: true, classId, subjectId, chapterId, topicId}),
+    onClose: () => set({
+        isOpen: false,
+        topicId: undefined,
+        classId: undefined,
+        subjectId: undefined,
+        chapterId: undefined
+    })
 }));
 
 // Revision Store
@@ -94,7 +112,41 @@ export const useRevisionStore = create<RevisionStore>((set) => ({
     chapterId: undefined,
     classId: undefined,
     subjectId: undefined,
-    onOpen: ({ classId, subjectId, chapterId, topicId }) => 
-        set({ isOpen: true, classId, subjectId, chapterId, topicId }),
-    onClose: () => set({ isOpen: false, topicId: undefined, classId: undefined, subjectId: undefined, chapterId: undefined })
+    onOpen: ({classId, subjectId, chapterId, topicId}) =>
+        set({isOpen: true, classId, subjectId, chapterId, topicId}),
+    onClose: () => set({
+        isOpen: false,
+        topicId: undefined,
+        classId: undefined,
+        subjectId: undefined,
+        chapterId: undefined
+    })
+}));
+
+// Vidoe Store
+type VideoStore = BaseResourceStore & {
+    onOpen: (params: {
+        classId: string | number,
+        subjectId: string | number,
+        chapterId: string | number,
+        topicId: number | string
+    }) => void;
+    onClose: () => void;
+}
+
+export const useVideoStore = create<VideoStore>((set) => ({
+    isOpen: false,
+    topicId: undefined,
+    chapterId: undefined,
+    classId: undefined,
+    subjectId: undefined,
+    onOpen: ({classId, subjectId, chapterId, topicId}) =>
+        set({isOpen: true, classId, subjectId, chapterId, topicId}),
+    onClose: () => set({
+        isOpen: false,
+        topicId: undefined,
+        classId: undefined,
+        subjectId: undefined,
+        chapterId: undefined
+    })
 }));
