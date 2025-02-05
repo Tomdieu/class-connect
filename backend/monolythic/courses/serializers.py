@@ -81,7 +81,7 @@ class QuestionOptionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class QuestionSerializer(serializers.ModelSerializer):
-    options = QuestionOptionSerializer(many=True, read_only=True)
+    options = QuestionOptionSerializer(many=True)
 
     class Meta:
         model = Question
@@ -277,3 +277,22 @@ class QuestionResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionResponse
         fields = "__all__"
+
+class BulkQuestionSerializer(serializers.Serializer):
+    questions = QuestionSerializer(many=True)
+    
+    def create(self, validated_data):
+        questions_data = validated_data.get('questions', [])
+        questions = []
+        
+        for question_data in questions_data:
+            options_data = question_data.pop('options', [])
+            question = Question.objects.create(
+                quiz=self.context['quiz'],
+                **question_data
+            )
+            for option_data in options_data:
+                QuestionOption.objects.create(question=question, **option_data)
+            questions.append(question)
+            
+        return questions
