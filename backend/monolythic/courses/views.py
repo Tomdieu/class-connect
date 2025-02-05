@@ -19,7 +19,8 @@ from .serializers import (
     CourseOfferingSerializer, CourseOfferingActionSerializer,
     TeacherStudentEnrollmentSerializer, CourseDeclarationSerializer,DailyTimeSlotSerializer,DailyTimeSlotUpdateSerializer,
     QuizResourceSerializer, QuestionSerializer, QuestionOptionSerializer, QuizAttemptSerializer, QuestionResponseSerializer,
-    VideoResourceSerializer, RevisionResourceSerializer, PDFResourceSerializer, ExerciseResourceSerializer
+    VideoResourceSerializer, RevisionResourceSerializer, PDFResourceSerializer, ExerciseResourceSerializer,
+    BulkQuestionSerializer
 )
 from .pagination import CustomPagination
 from .filters import (
@@ -30,6 +31,7 @@ from .filters import (
 )
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from rest_framework import serializers
 
 class CourseCategoryViewSet(viewsets.ModelViewSet):
     """
@@ -358,6 +360,40 @@ class QuizResourceViewSet(viewsets.ModelViewSet):
     serializer_class = QuizResourceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ResourceFilter
+
+    @swagger_auto_schema(
+        method='post',
+        request_body=BulkQuestionSerializer,
+        responses={201: QuestionSerializer(many=True)},
+        operation_description="Bulk create questions for a quiz"
+    )
+    @action(detail=True, methods=['post'], url_path='create-questions')
+    def create_questions(self, request, pk=None):
+        quiz = self.get_object()
+        
+        serializer = BulkQuestionSerializer(
+            data=request.data,
+            context={'quiz': quiz}
+        )
+        
+        if serializer.is_valid():
+            try:
+                questions = serializer.create(serializer.validated_data)
+                response_serializer = QuestionSerializer(questions, many=True)
+                return Response(
+                    response_serializer.data,
+                    status=status.HTTP_201_CREATED
+                )
+            except Exception as e:
+                return Response(
+                    {'error': str(e)},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 class QuestionViewSet(viewsets.ModelViewSet):
     """
