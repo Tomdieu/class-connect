@@ -5,22 +5,22 @@ networks:
     driver: bridge
 
 services:
-  # web:
-  #   build: .
-  #   command: python manage.py runserver 0.0.0.0:8000
-  #   volumes:
-  #     - .:/app
-  #     - ${GOOGLE_SERVICE_ACCOUNT_FILE}:/app/secret/google-secret.json:ro
-  #   ports:
-  #     - "8000:8000"
-  #   environment:
-  #     - GOOGLE_SERVICE_ACCOUNT_FILE=/app/secret/google-secret.json
-  #   depends_on:
-  #     - db
-  #     - rabbitmq
-  #     - redis
-  #   networks:
-  #     - e_learning_network
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - ${GOOGLE_SERVICE_ACCOUNT_FILE}:/app/secret/google-secret.json:ro
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_SERVICE_ACCOUNT_FILE=/app/secret/google-secret.json
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+    networks:
+      - e_learning_network
 
   db:
     image: postgres:alpine3.20
