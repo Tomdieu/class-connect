@@ -62,6 +62,9 @@ INSTALLED_APPS = [
     "drf_social_oauth2",
     "drf_yasg",
     "corsheaders",
+
+    "django_celery_beat",
+    # "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -152,6 +155,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -218,6 +224,28 @@ SWAGGER_SETTINGS = {
     },
     "USE_SESSION_AUTH": False,
 }
+
+# Celery configurations
+CELERY_BROKER_URL = env('CELERY_BROKER_URL',default=' "redis://localhost:6379/0"')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND',default='redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+CELERY_TASK_TRACK_STARTED = True
+CELERY_ACKS_LATE = True
+CELERY_WORKER_SEND_TASK_EVENTS = True
+CELERY_TASK_SEND_SENT_EVENT = True
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": ["redis://127.0.0.1:6379/0"]
+#         },
+#     },
+# }
 
 # Rabbitmq configuration
 
