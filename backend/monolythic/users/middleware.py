@@ -4,6 +4,7 @@ from .models import UserActiveToken
 from django.conf import settings
 import user_agents
 import threading
+from urllib.parse import parse_qs
 
 # Thread local storage
 _thread_locals = threading.local()
@@ -74,3 +75,5 @@ class SingleSessionMiddleware:
             'browser_version': user_agent.browser.version_string,
             'ip_address': request.META.get('REMOTE_ADDR'),
         }
+
+# class TokenAuthMiddleware(Bas)
