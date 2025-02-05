@@ -1,0 +1,119 @@
+version: '3.8'
+
+networks:
+  e_learning_network:
+    driver: bridge
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - ${GOOGLE_SERVICE_ACCOUNT_FILE}:/app/secret/google-secret.json:ro
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_SERVICE_ACCOUNT_FILE=/app/secret/google-secret.json
+      - DATABASE_URL=postgres://e_learning_user:e_learning_password@db:5432/e_learning
+    depends_on:
+      - db
+      - db_slave_1
+      - db_slave_2
+      - rabbitmq
+      - redis
+    networks:
+      - e_learning_network
+
+  db:
+    image: postgres:alpine3.20
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: e_learning
+      POSTGRES_USER: e_learning_user
+      POSTGRES_PASSWORD: e_learning_password
+      # Enable streaming replication
+      POSTGRES_INITDB_ARGS: "--wal-level=replica --max_wal_senders=5"
+    ports:
+      - "5432:5432"
+    networks:
+      - e_learning_network
+
+  db_slave_1:
+    image: postgres:alpine3.20
+    restart: unless-stopped
+    volumes:
+      - postgres_slave_1_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: e_learning
+      POSTGRES_USER: e_learning_user
+      POSTGRES_PASSWORD: e_learning_password
+      PG_PRIMARY_HOST: db
+      PG_PRIMARY_PORT: 5432
+      PG_PRIMARY_USER: e_learning_user
+      PG_PRIMARY_PASSWORD: e_learning_password
+      PG_REPLICATION_SLOT_NAME: replica_slot_1
+    entrypoint: |
+      bash -c "
+        echo 'host replication e_learning_user 0.0.0.0/0 md5' >> /var/lib/postgresql/data/pg_hba.conf &&
+        echo 'primary_conninfo = user=e_learning_user password=e_learning_password host=db port=5432' > /var/lib/postgresql/data/recovery.conf &&
+        echo 'trigger_file = /tmp/touch_me_to_promote_to_master' >> /var/lib/postgresql/data/recovery.conf &&
+        exec gosu postgres pg_ctl promote || exec gosu postgres postgres
+      "
+    networks:
+      - e_learning_network
+
+  db_slave_2:
+    image: postgres:alpine3.20
+    restart: unless-stopped
+    volumes:
+      - postgres_slave_2_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: e_learning
+      POSTGRES_USER: e_learning_user
+      POSTGRES_PASSWORD: e_learning_password
+      PG_PRIMARY_HOST: db
+      PG_PRIMARY_PORT: 5432
+      PG_PRIMARY_USER: e_learning_user
+      PG_PRIMARY_PASSWORD: e_learning_password
+      PG_REPLICATION_SLOT_NAME: replica_slot_2
+    entrypoint: |
+      bash -c "
+        echo 'host replication e_learning_user 0.0.0.0/0 md5' >> /var/lib/postgresql/data/pg_hba.conf &&
+        echo 'primary_conninfo = user=e_learning_user password=e_learning_password host=db port=5432' > /var/lib/postgresql/data/recovery.conf &&
+        echo 'trigger_file = /tmp/touch_me_to_promote_to_master' >> /var/lib/postgresql/data/recovery.conf &&
+        exec gosu postgres pg_ctl promote || exec gosu postgres postgres
+      "
+    networks:
+      - e_learning_network
+
+  rabbitmq:
+    image: rabbitmq:3.10-management-alpine
+    hostname: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: classconnect
+      RABBITMQ_DEFAULT_PASS: classconnect
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - e_learning_network
+
+  redis:
+    image: redis:7.4
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - e_learning_network
+
+volumes:
+  postgres_data:
+  postgres_slave_1_data:
+  postgres_slave_2_data:
+  rabbitmq_data:
