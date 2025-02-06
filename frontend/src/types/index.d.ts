@@ -487,3 +487,102 @@ declare interface Subscription{
   auto_renew:boolean;
   is_active:boolean;
 }
+
+
+// Enum definitions for choice fields
+enum TransactionType {
+  COLLECT = 'collect',
+  WITHDRAW = 'withdraw'
+}
+
+enum TransactionStatus {
+  SUCCESSFUL = 'SUCCESSFUL',
+  FAILED = 'FAILED',
+  PENDING = 'PENDING'
+}
+
+enum Operator {
+  MTN = 'MTN',
+  ORANGE = 'ORANGE'
+}
+
+enum Currency {
+  XAF = 'XAF'
+}
+
+// Main Transaction interface
+interface Transaction {
+  // Core transaction fields
+  reference: string;  // UUID
+  status: TransactionStatus;
+  amount: number;
+  app_amount: number;
+  currency: Currency;
+  operator: Operator;
+  endpoint: TransactionType;
+
+  // Reference numbers
+  code: string;
+  operator_reference: string;
+  external_reference?: string;  // Optional UUID
+
+  // Customer information
+  phone_number: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  email?: string | null;
+  external_user?: string | null;
+
+  // Security and verification
+  signature: string;
+
+  // Metadata
+  created_at: string;  // ISO date string
+  updated_at: string;  // ISO date string
+
+  // Computed properties
+  transaction_type_display: string;
+  is_successful: boolean;
+  formatted_amount: string;
+}
+
+// Response type for API endpoints
+interface TransactionResponse {
+  data: Transaction;
+  status: 'success' | 'error';
+  message?: string;
+}
+
+// List response type
+interface TransactionListResponse {
+  results: Transaction[];
+  count: number;
+  next?: string | null;
+  previous?: string | null;
+}
+
+// Date range filter type
+interface DateRangeFilter {
+  after?: string;    // ISO date string
+  before?: string;   // ISO date string
+}
+
+// Main transaction filter parameters
+interface TransactionFilterParams {
+  // Filter fields from TransactionFilter class
+  status?: 'SUCCESSFUL' | 'FAILED' | 'PENDING';
+  endpoint?: 'collect' | 'withdraw';
+  operator?: 'MTN' | 'ORANGE';
+  phone_number?: string;
+  created_at?: DateRangeFilter;
+
+  // Search parameter (from search_fields)
+  search?: string;   // Will search in phone_number and reference
+
+  // Ordering parameter (from ordering_fields)
+  ordering?: 'created_at' | '-created_at' | 'amount' | '-amount';
+
+  // Pagination parameters (from CustomPagination)
+  page?: number;
+  page_size?: number;
+}
