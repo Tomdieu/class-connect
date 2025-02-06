@@ -10,6 +10,7 @@ import { ExerciseModal, PDFModal, RevisionModal, VideoModal } from '../dashboard
 import { PDFDialog } from '../dashboard/admin/modals/PDFDialog'
 import { VideoPreviewModal } from "@/components/dashboard/admin/modals/VideoPreviewModal";
 import ClassModal from '../dashboard/admin/modals/ClassModal'
+import PlanModal from '../dashboard/admin/modals/PlanModal'
 
 function Modals() {
   return (
@@ -27,6 +28,7 @@ function Modals() {
       {/* <QuizModal /> */}
       <RevisionModal />
       <VideoModal />
+      <PlanModal/>
 
       {/*  */}
       <PDFDialog />
