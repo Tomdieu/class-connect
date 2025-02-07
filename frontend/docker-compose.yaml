@@ -15,6 +15,5 @@ services:
       - /app/node_modules
     # Environment variables (if needed)
     environment:
-      NODE_ENV: production
     # Restart policy (optional)
     restart: always
