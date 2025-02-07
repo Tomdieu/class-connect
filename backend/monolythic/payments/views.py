@@ -19,6 +19,8 @@ class SubscriptionViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = SubscriptionFilter
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
+            return Subscription.objects.none()  # Return empty queryset for swagger
         return Subscription.objects.filter(user=self.request.user)
 
 class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
@@ -27,8 +29,10 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = PaymentFilter
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
+            return Payment.objects.none()  # Return empty queryset for swagger
         return Payment.objects.filter(user=self.request.user)
-
+    
 @csrf_exempt
 @api_view(['POST'])
 def payment_webhook(request):
