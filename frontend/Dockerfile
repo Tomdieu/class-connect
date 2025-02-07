@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install -f
 
 # Copy the rest of the application code
 COPY . .
@@ -33,6 +33,3 @@ COPY --from=builder /app/node_modules ./node_modules
 
 # Expose the port Next.js runs on (default is 3000)
 EXPOSE 3000
-
-# Start the Next.js server in production mode
-CMD ["npm", "start"]

@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    command: npm start
 
     # Map the container's port 3000 to the host machine's port 3000
     ports:
