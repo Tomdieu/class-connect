@@ -24,8 +24,8 @@ interface TopicLayoutProps {
     });
   
     return (
-      <div className="container py-10 flex flex-col gap-5 h-full flex-1">
-        <div className="grid 2xl:grid-cols-12 gap-5 h-full flex-1">
+      <div className="container py-10 flex flex-col h-full flex-1 ">
+        <div className="grid 2xl:grid-cols-12 gap-4 h-full flex-1">
           <div className="col-span-3">
             <div>
               <Link
@@ -45,7 +45,7 @@ interface TopicLayoutProps {
               </div>
             </div>
           </div>
-          <div className="col-span-9 w-full h-full">{children}</div>
+          <div className="col-span-9 w-full h-full flex flex-col">{children}</div>
         </div>
       </div>
     );

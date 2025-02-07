@@ -16,8 +16,14 @@ import {
   Eye,
   Pencil,
   Trash2,
+  MoreVertical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { AbstractResourceType } from "@/types";
 
@@ -28,7 +34,6 @@ export type ResourceType =
   | "PDFResource"
   | "ExerciseResource";
 
-
 export interface ResourceCardProps {
   className?: string;
   resource: AbstractResourceType;
@@ -36,6 +41,7 @@ export interface ResourceCardProps {
   onUpdate?: (resource: AbstractResourceType) => void;
   onDelete?: (resource: AbstractResourceType) => void;
 }
+
 const getResourceIcon = (type: ResourceType) => {
   switch (type) {
     case "VideoResource":
@@ -77,6 +83,38 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     onDelete?.(resource);
   };
 
+  const ActionButtons = () => (
+    <>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleView}
+        className="h-8 w-8 p-0 hover:bg-gray-100"
+        title="View"
+      >
+        <Eye className="h-4 w-4 text-gray-600 hover:text-gray-900" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleUpdate}
+        className="h-8 w-8 p-0 hover:bg-gray-100"
+        title="Edit"
+      >
+        <Pencil className="h-4 w-4 text-gray-600 hover:text-gray-900" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleDelete}
+        className="h-8 w-8 p-0 hover:bg-gray-100"
+        title="Delete"
+      >
+        <Trash2 className="h-4 w-4 text-red-500 hover:text-red-700" />
+      </Button>
+    </>
+  );
+
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
@@ -103,40 +141,64 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
               {resource.resource_type.replace("Resource", "")}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          
+          {/* Mobile Popover */}
+          <div className="sm:hidden">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="h-8 w-8 p-0"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent 
+                className="w-40 p-2" 
+                align="end"
+              >
+                <div className="flex flex-col gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleView}
+                    className="w-full justify-start"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleUpdate}
+                    className="w-full justify-start"
+                  >
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDelete}
+                    className="w-full justify-start text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Desktop Buttons */}
+          <div className="hidden sm:flex items-center gap-2">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: isHovered ? 1 : 0 }}
               transition={{ duration: 0.2 }}
               className="flex gap-1"
             >
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleView}
-                className="h-8 w-8 p-0 hover:bg-gray-100"
-                title="View"
-              >
-                <Eye className="h-4 w-4 text-gray-600 hover:text-gray-900" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleUpdate}
-                className="h-8 w-8 p-0 hover:bg-gray-100"
-                title="Edit"
-              >
-                <Pencil className="h-4 w-4 text-gray-600 hover:text-gray-900" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDelete}
-                className="h-8 w-8 p-0 hover:bg-gray-100"
-                title="Delete"
-              >
-                <Trash2 className="h-4 w-4 text-red-500 hover:text-red-700" />
-              </Button>
+              <ActionButtons />
             </motion.div>
           </div>
         </CardHeader>
