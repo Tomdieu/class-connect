@@ -1,18 +1,24 @@
-"use server"
+"use server";
 
 import { auth } from "@/auth";
 import api from "@/services/api";
 import {
-    AbstractResourceType,
+  AbstractResourceType,
   ChapterCreateType,
   ChapterType,
   ClassCreateType,
   ClassType,
+  ExerciseResourceCreateType,
+  ExerciseResourceType,
+  PDFResourceCreateType,
   ResourceType,
+  RevisionResourceCreateType,
   SubjectCreateType,
   SubjectType,
   TopicCreateType,
   TopicType,
+  VideoResourceCreateType,
+  VideoResourceType,
 } from "@/types";
 import axios from "axios";
 
@@ -27,7 +33,7 @@ export const listClasses = async ({
   params,
 }: {
   params?: ClassFilterParams;
-}={}) => {
+} = {}) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
@@ -39,7 +45,7 @@ export const listClasses = async ({
       },
       params,
     });
-    const data = await res.data ;
+    const data = await res.data;
     return data as ClassType[];
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -198,7 +204,7 @@ export const addSubject = async ({
   class_pk,
   body,
 }: {
-  class_pk: string|number;
+  class_pk: string | number;
   body: SubjectCreateType;
 }) => {
   try {
@@ -262,8 +268,8 @@ export const updateSubject = async ({
   subject_pk,
   body,
 }: {
-  class_pk: string|number;
-  subject_pk: string|number;
+  class_pk: string | number;
+  subject_pk: string | number;
   body: Partial<SubjectType>;
 }) => {
   try {
@@ -376,8 +382,8 @@ export const addChapter = async ({
   subject_pk,
   body,
 }: {
-  class_pk: string|number;
-  subject_pk: string|number;
+  class_pk: string | number;
+  subject_pk: string | number;
   body: ChapterCreateType;
 }) => {
   try {
@@ -448,9 +454,9 @@ export const updateChapter = async ({
   chapter_pk,
   body,
 }: {
-  class_pk: string|number;
-  subject_pk: string|number;
-  chapter_pk: string|number;
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
   body: Partial<ChapterType>;
 }) => {
   try {
@@ -568,9 +574,9 @@ export const addTopic = async ({
   chapter_pk,
   body,
 }: {
-  class_pk: string|number;
-  subject_pk: string|number;
-  chapter_pk: string|number;
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
   body: TopicCreateType;
 }) => {
   try {
@@ -644,10 +650,10 @@ export const updateTopic = async ({
   topic_pk,
   body,
 }: {
-  class_pk: string|number;
-  subject_pk: string|number;
-  chapter_pk: string|number;
-  topic_pk: string|number;
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
+  topic_pk: string | number;
   body: Partial<TopicCreateType>;
 }) => {
   try {
@@ -714,38 +720,242 @@ export const deleteTopic = async ({
   }
 };
 
-
 // region Resources
 
 interface ResourceParams {
-    title:string,
-    topic:string,
-    created_at:string,
-    resource_type:string,
-    page:number
+  title: string;
+  topic: string;
+  created_at: string;
+  resource_type: string;
+  page: number;
 }
 
-export const listResources = async ({class_pk,subject_pk,chapter_pk,topic_pk,params}:{class_pk:string,subject_pk:string,chapter_pk:string,topic_pk:string,params?:ResourceParams})=>{
-    try {
-        const session = await auth();
-        if (!session?.user) throw Error("Unauthorize user!");
+export const listResources = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  params,
+}: {
+  class_pk: string;
+  subject_pk: string;
+  chapter_pk: string;
+  topic_pk: string;
+  params?: ResourceParams;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
 
-        const res = await api.get(`/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/resources/`, {
-            headers: {
-                Authorization: `Bearer ${session?.user.accessToken}`,
-                "Content-Type": "application/json",
-            },
-            params,
-        });
-        const data = (await res.data) as ResourceType[];
-        return data;
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            // Type guard for Axios errors
-            if (error.response && error.response.data) {
-                throw error.response.data;
-            }
-        }
-        throw error;
+    const res = await api.get(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/resources/`,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+          "Content-Type": "application/json",
+        },
+        params,
+      }
+    );
+    const data = (await res.data) as ResourceType[];
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // Type guard for Axios errors
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
     }
-}
+    throw error;
+  }
+};
+
+export const addPdfResource = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  resource,
+}: {
+  class_pk: string|number;
+  subject_pk: string|number;
+  chapter_pk: string|number;
+  topic_pk: string|number;
+  resource: PDFResourceCreateType;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const formData = new FormData();
+    formData.append("topic", `${topic_pk}`);
+    formData.append("title", resource.title);
+    formData.append("description", resource.description || "");
+    formData.append("pdf_file", resource.pdf_file);
+
+    const res = await api.post(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/pdfs/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        },
+      }
+    );
+    const data = (await res.data) as AbstractResourceType;
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // Type guard for Axios errors
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+    }
+    throw error;
+  }
+};
+
+export const addVideoResource = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  resource,
+}: {
+  class_pk: string|number;
+  subject_pk: string|number;
+  chapter_pk: string|number;
+  topic_pk: string|number;
+  resource: VideoResourceCreateType;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const formData = new FormData();
+    formData.append("topic", `${topic_pk}`);
+    formData.append("title", resource.title);
+    formData.append("description", resource.description || "");
+    formData.append("video_file", resource.video_file);
+
+
+    console.log(formData.values())
+
+    const res = await api.post(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/videos/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        },
+      }
+    );
+    const data = (await res.data) as AbstractResourceType;
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // Type guard for Axios errors
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+    }
+    throw error;
+  }
+};
+
+
+export const addExerciseResource = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  resource,
+}: {
+  class_pk: string|number;
+  subject_pk: string|number;
+  chapter_pk: string|number;
+  topic_pk: string|number;
+  resource: ExerciseResourceCreateType;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const formData = new FormData();
+    formData.append("topic", `${topic_pk}`);
+    formData.append("title", resource.title);
+    formData.append("description", resource.description || "");
+    formData.append("instructions", resource.instructions);
+    formData.append("exercise_file", resource.exercise_file);
+    if(resource.solution_file){
+      formData.append("solution_file", resource.solution_file);
+
+    }
+
+
+    const res = await api.post(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/exercises/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        },
+      }
+    );
+    const data = (await res.data) as AbstractResourceType;
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // Type guard for Axios errors
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+    }
+    throw error;
+  }
+};
+
+export const addRevisionResource = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  resource,
+}: {
+  class_pk: string|number;
+  subject_pk: string|number;
+  chapter_pk: string|number;
+  topic_pk: string|number;
+  resource: RevisionResourceCreateType;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const formData = new FormData();
+    formData.append("topic", `${topic_pk}`);
+    formData.append("title", resource.title);
+    formData.append("description", resource.description || "");
+    formData.append("content", resource.content);
+
+    const res = await api.post(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/revisions/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        },
+      }
+    );
+    const data = (await res.data) as AbstractResourceType;
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // Type guard for Axios errors
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+    }
+    throw error;
+  }
+};
