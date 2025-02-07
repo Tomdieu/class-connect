@@ -1,80 +1,105 @@
 "use client";
-
 import { useDropzone } from "react-dropzone";
 import { FC, useState } from "react";
-import { FileText, Image as ImageIcon, File as GenericFileIcon } from "lucide-react";
+import {
+  FileText,
+  Image as ImageIcon,
+  File as GenericFileIcon,
+} from "lucide-react";
 import { FaFilePdf } from "react-icons/fa6";
 import { FaRegFileVideo } from "react-icons/fa";
-// Define the props type for the FileDropzone component
+
 interface FileDropzoneProps {
-    onDrop: (acceptedFiles: File[]) => void; // Callback for handling dropped files
-    accept?: { [mimeType: string]: string[] }; // MIME types to accept
-    label?: string; // Label text for the dropzone
-    className?: string; // Additional CSS class names
+  onDrop: (acceptedFiles: File[]) => void;
+  accept?: { [mimeType: string]: string[] };
+  label?: string;
+  className?: string;
 }
 
-// FileDropzone Component
 export const FileDropzone: FC<FileDropzoneProps> = ({
-                                                        onDrop,
-                                                        accept = {},
-                                                        label = "Drop files here or click to select",
-                                                        className = "",
-                                                    }) => {
-    const [selectedFile, setSelectedFile] = useState<File | null>(null); // State to store the selected file
+  onDrop,
+  accept = {},
+  label = "Drop files here or click to select",
+  className = "",
+}) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-    // Use the `useDropzone` hook with the provided configuration
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop: (acceptedFiles) => {
-            if (acceptedFiles.length > 0) {
-                setSelectedFile(acceptedFiles[0]); // Update the selected file state
-                onDrop(acceptedFiles); // Call the parent callback
-            }
-        },
-        accept, // Accepted file types
-        maxFiles: 1, // Allow only one file at a time
-    });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        setSelectedFile(acceptedFiles[0]);
+        onDrop(acceptedFiles);
+      }
+    },
+    accept,
+    maxFiles: 1,
+  });
 
-    // Function to determine the file icon based on the file type
-    const getFileIcon = (file: File) => {
-        const mimeType = file.type;
+  const getFileIcon = (file: File) => {
+    const mimeType = file.type;
+    if (mimeType.includes("pdf")) {
+      return <FaFilePdf className="size-6 text-red-500" />;
+    } else if (mimeType.includes("image")) {
+      return <ImageIcon className="size-6 text-blue-500" />;
+    } else if (mimeType.includes("video")) {
+      return <FaRegFileVideo className="size-6 text-purple-500" />;
+    } else if (
+      mimeType.includes("text") ||
+      mimeType.includes("application/msword")
+    ) {
+      return <FileText className="size-6 text-green-500" />;
+    } else {
+      return <GenericFileIcon className="size-6 text-gray-500" />;
+    }
+  };
 
-        if (mimeType.includes("pdf")) {
-            return <FaFilePdf className="w-6 h-6 mr-2 text-red-500" />;
-        } else if (mimeType.includes("image")) {
-            return <ImageIcon className="w-6 h-6 mr-2 text-blue-500" />;
-        }
-        else if (mimeType.includes("video")) {
-            return <FaRegFileVideo className="w-6 h-6 mr-2 text-purple-500" />; // Video file icon
-        }
-        else if (mimeType.includes("text") || mimeType.includes("application/msword")) {
-            return <FileText className="w-6 h-6 mr-2 text-green-500" />;
-        } else {
-            return <GenericFileIcon className="w-6 h-6 mr-2 text-gray-500" />;
-        }
-    };
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
 
-    return (
-        <div
-            {...getRootProps()} // Spread root props from `useDropzone`
-            className={`
-                border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
-                ${isDragActive ? "border-primary bg-primary/10" : "border-gray-300 hover:border-primary"}
-                ${className} // Add any additional classes
-            `}
-        >
-            <input {...getInputProps()} /> {/* Input element for file selection */}
+  // Function to truncate filename if it's too long
+  const getTruncatedFilename = (filename: string, maxLength: number = 40): string => {
+    if (filename.length <= maxLength) return filename;
+    
+    const extension = filename.split('.').pop();
+    const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
+    
+    const truncatedLength = maxLength - (extension?.length || 0) - 3; // Account for "..." and "."
+    return `${nameWithoutExt.substring(0, truncatedLength)}...${extension ? `.${extension}` : ''}`;
+  };
 
-            {/* Display the selected file */}
-            {selectedFile ? (
-                <div className="flex items-center justify-center">
-                    {getFileIcon(selectedFile)} {/* Show the file icon */}
-                    <span className="text-sm text-gray-700">
-                        {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
-                    </span>
-                </div>
-            ) : (
-                <p className="text-sm text-gray-600">{label}</p>
-                )}
+  return (
+    <div
+      {...getRootProps()}
+      className={`
+        relative border-2 border-dashed rounded-lg p-4 cursor-pointer transition-colors
+        ${isDragActive ? "border-primary bg-primary/10" : "border-gray-300 hover:border-primary"}
+        ${className}
+      `}
+    >
+      <input {...getInputProps()} />
+      {selectedFile ? (
+        <div className="flex items-start space-x-3 overflow-hidden">
+          <div className="flex-shrink-0 mt-1">
+            {getFileIcon(selectedFile)}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div 
+              className="text-sm text-gray-700 break-all line-clamp-2" 
+              title={selectedFile.name}
+            >
+              {getTruncatedFilename(selectedFile.name)}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              {formatFileSize(selectedFile.size)}
+            </div>
+          </div>
         </div>
-    );
+      ) : (
+        <p className="text-sm text-gray-600">{label}</p>
+      )}
+    </div>
+  );
 };
