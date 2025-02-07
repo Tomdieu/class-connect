@@ -18,11 +18,15 @@ env = environ.Env(
     # set casting, default value
     DEBUG=(bool, True)
 )
+environ.Env.read_env()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+try:
+    environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+except FileNotFoundError:
+    pass
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -34,7 +38,6 @@ SECRET_KEY = 'django-insecure-)%^x%9(v84+=#1vc3wgh=^uq7d6gtcyw-tl%x5k+8cj1nt6wdm
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-
 
 # Application definition
 
@@ -64,7 +67,8 @@ INSTALLED_APPS = [
     "corsheaders",
 
     "django_celery_beat",
-    # "django_celery_results",
+    "django_celery_results",
+    "storages",
 ]
 
 MIDDLEWARE = [
@@ -151,13 +155,40 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
+print("USING S3 = ",env('USE_S3', default=False))
+if env('USE_S3', default=False):
+    # WASABI SETTINGS for MEDIA files only
+    AWS_ACCESS_KEY_ID = env('B2_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env('B2_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env('B2_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = env('B2_S3_REGION_NAME')
+    # AWS_S3_ENDPOINT_URL = f'https://s3.{AWS_S3_REGION_NAME}.wasabisys.com'
+    AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
+    AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+    # Force private access for free trial
+    AWS_DEFAULT_ACL = 'private'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = True
+    
+    # Media settings only for Wasabi
+    DEFAULT_FILE_STORAGE = 'backend.storage_backends.MediaStorage'
+    # MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.wasabisys.com/media/'
+    MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}..backblazeb2.com/media/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'mediafiles'
+    print(AWS_S3_ENDPOINT_URL,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_STORAGE_BUCKET_NAME)
 
+    
+else:
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'mediafiles'
+
+# Static files always local regardless of USE_S3
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static"
+# ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -238,15 +269,6 @@ CELERY_WORKER_SEND_TASK_EVENTS = True
 CELERY_TASK_SEND_SENT_EVENT = True
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": ["redis://127.0.0.1:6379/0"]
-#         },
-#     },
-# }
-
 # Rabbitmq configuration
 
 RABBITMQ_HOST = env("RABBITMQ_HOST", default="localhost")
@@ -267,3 +289,37 @@ CACHES = {
         }
     }
 }
+
+
+# AWS S3 Configuration
+
+# AWS_ACCESS_KEY_ID = env('B2_ACCESS_KEY_ID',default='<your b2 application key>')
+# AWS_SECRET_ACCESS_KEY = env('B2_SECRET_ACCESS_KEY',default='<your b2 application key>')
+# AWS_STORAGE_BUCKET_NAME = env('B2_STORAGE_BUCKET_NAME',default='classconnect')
+# AWS_PRIVATE_BUCKET_NAME = env('B2_STORAGE_BUCKET_NAME',default='classconnect')
+# AWS_S3_REGION_NAME = env('B2_S3_REGION_NAME',default='us-east-005')
+
+# AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
+# AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
+
+# AWS_QUERYSTRING_AUTH = True  # This is important for private buckets
+# AWS_DEFAULT_ACL = 'private'
+# AWS_S3_FILE_OVERWRITE = False
+# AWS_S3_VERIFY = True
+# AWS_S3_SIGNATURE_NAME = 's3v4'
+# AWS_S3_FILE_OVERWRITE=False
+# AWS_DEFAULT_ACL= None
+# AWS_S3_VERIFY=True
+
+# AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
+# PRIVATE_FILE_STORAGE = 'backend.storage_backends.PrivateMediaStorage'
+
+# AWS_S3_OBJECT_PARAMETERS = {
+#     'CacheControl': 'max-age=86400',
+# }
+
+
+
+# DEFAULT_FILE_STORAGE = 'backend.storage_backends.PrivateMediaStorage'
+# DEFAULT_FILE_STORAGE = 'backend.storage_backends.B2Storage'
+
