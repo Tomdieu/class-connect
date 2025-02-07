@@ -183,7 +183,7 @@ export declare interface AbstractResourceCreateType {
 topic: number;
 title: string;
 description?: string;
-polymorphic_ctype: number; 
+polymorphic_ctype?: number; 
 }
 
 // Quiz Types
@@ -282,14 +282,28 @@ export declare interface QuestionOptionType {
   pdf_file: File;
  }
 
+ export declare interface PDFResourceType extends AbstractResourceType {
+  pdf_file: string;
+ }
+
  export declare interface VideoResourceCreateType extends AbstractResourceCreateType {
-  video_file: string;
+  video_file: File;
+ }
+
+ export declare interface VideoResourceType extends AbstractResourceType {
+  video_file:string
  }
  
  export declare interface ExerciseResourceCreateType extends AbstractResourceCreateType {
   instructions: string;
   solution_file?: File;
-  exercise_file?: File;
+  exercise_file: File;
+ }
+
+ export declare interface ExerciseResourceType extends AbstractResourceCreateType {
+  instructions: string;
+  solution_file:string;
+  exercise_file:string;
  }
  
  export declare interface RevisionResourceCreateType extends AbstractResourceCreateType {
