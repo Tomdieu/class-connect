@@ -13,7 +13,5 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    # Environment variables (if needed)
-    environment:
     # Restart policy (optional)
     restart: always
