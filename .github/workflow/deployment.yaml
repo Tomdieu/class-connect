@@ -1,0 +1,23 @@
+
+name: CI/CD auth-app
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy_main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy using SSH (Main)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /home/ubuntu/class-connect/frontend
+            rm -rf node_modules # Remove node modules on the server
+            rm -rf .cache # Remove .cache directory on the server
+            git pull origin main
+            docker compose  up --build -d
