@@ -19,16 +19,17 @@ export default {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
+  output: 'standalone',
   images: {
-    remotePatterns:[
+    remotePatterns: [
       {
-          protocol: 'https',
-          hostname:"**",
+        protocol: 'https',
+        hostname: "**",
       },
       {
-          protocol: 'http',
-          hostname:"**",
+        protocol: 'http',
+        hostname: "**",
       },
-  ]
+    ]
   },
 };

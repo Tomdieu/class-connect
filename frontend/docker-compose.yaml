@@ -1,17 +1,9 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  nextjs-app:
-    # Build the container using the Dockerfile in the current directory
-    build:
-      context: .
-      dockerfile: Dockerfile
-    # Map port 3000 on the host to port 3000 in the container
+  classc-connect-frontend:
+    container_name: classc-connect-frontend
+    image: classconnect/frontend
+    build: .
     ports:
       - "3000:3000"
-    # Mount the local code directory to the container (optional for development)
-    volumes:
-      - .:/app
-      - /app/node_modules
-    # Restart policy (optional)
-    restart: always
