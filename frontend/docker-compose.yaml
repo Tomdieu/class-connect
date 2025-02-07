@@ -2,32 +2,13 @@ version: '3.8'
 
 services:
   nextjs-app:
-    # Build the container from the Dockerfile in the current directory
     build:
       context: .
       dockerfile: Dockerfile
-    command: npm start
-
-    # Map the container's port 3000 to the host machine's port 3000
+    command: ["npm", "start"]
     ports:
       - "3000:3000"
-
-    # Set environment variables (optional)
-    environment:
-      - NEXT_PUBLIC_API_URL=https://api.example.com
-      - NODE_ENV=production
-      - AUTH_SECRET=
-      - NEXT_PUBLIC_BACKEND_URL=
-      - NEXT_CLASS_CONNECT_CLIENT_SECRETE=
-      - NEXT_CLASS_CONNECT_CLIENT_ID=
-      - NEXTAUTH_SECRET=
-      - NEXTAUTH_URL
-
-    # Mount volumes for development (optional)
-    # Uncomment the following lines if you want to mount the local code into the container
     volumes:
       - .:/app
       - /app/node_modules
-
-    # Restart policy (optional)
     restart: always
