@@ -45,7 +45,6 @@ import { toast } from "sonner";
 import axios from "axios";
 import api from "@/services/api";
 import { useSession } from "next-auth/react";
-import 'md-editor-rt/lib/style.css';
 
 // -------------------------
 // Form Schemas
