@@ -13,8 +13,6 @@ services:
       - web_static:/app/staticfiles  # For static files
     ports:
       - "8000:8000"
-    environment:
-      - GOOGLE_SERVICE_ACCOUNT_FILE=/app/secret/google-secret.json
     depends_on:
       - db
       - rabbitmq
