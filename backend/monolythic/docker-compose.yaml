@@ -10,7 +10,6 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
-      - ${GOOGLE_SERVICE_ACCOUNT_FILE}:/app/secret/google-secret.json:ro
     ports:
       - "8000:8000"
     environment:
