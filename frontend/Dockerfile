@@ -24,7 +24,7 @@ WORKDIR /app
 
 # Install only production dependencies in the runner stage
 COPY --from=builder /app/package*.json ./
-RUN npm install --only=production
+RUN npm install -f --only=production
 
 # Copy the built application from the builder stage
 COPY --from=builder /app/.next ./.next
