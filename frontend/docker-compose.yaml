@@ -2,13 +2,19 @@ version: '3.8'
 
 services:
   nextjs-app:
+    # Build the container using the Dockerfile in the current directory
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["npm", "start"]
+    # Map port 3000 on the host to port 3000 in the container
     ports:
       - "3000:3000"
+    # Mount the local code directory to the container (optional for development)
     volumes:
       - .:/app
       - /app/node_modules
+    # Environment variables (if needed)
+    environment:
+      NODE_ENV: production
+    # Restart policy (optional)
     restart: always
