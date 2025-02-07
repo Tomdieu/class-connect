@@ -284,6 +284,7 @@ export declare interface QuestionOptionType {
 
  export declare interface PDFResourceType extends AbstractResourceType {
   pdf_file: string;
+  pdf_url?:string;
  }
 
  export declare interface VideoResourceCreateType extends AbstractResourceCreateType {
@@ -291,7 +292,8 @@ export declare interface QuestionOptionType {
  }
 
  export declare interface VideoResourceType extends AbstractResourceType {
-  video_file:string
+  video_file:string;
+  video_url?:string;
  }
  
  export declare interface ExerciseResourceCreateType extends AbstractResourceCreateType {
@@ -304,6 +306,8 @@ export declare interface QuestionOptionType {
   instructions: string;
   solution_file:string;
   exercise_file:string;
+  solution_url?:string;
+  exercise_url?:string;
  }
  
  export declare interface RevisionResourceCreateType extends AbstractResourceCreateType {
