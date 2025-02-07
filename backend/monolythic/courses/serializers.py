@@ -93,15 +93,20 @@ class QuizResourceSerializer(AbstractResourceSerializer):
     class Meta:
         model = QuizResource
         fields = AbstractResourceSerializer.Meta.fields + [
-            "total_questions", "duration_minutes", "passing_score",
-            "show_correct_answers", "show_explanation", "shuffle_questions",
-            "attempts_allowed", "partial_credit", "questions"
+            "duration_minutes", "passing_score",
+            "show_correct_answers","shuffle_questions",
+            "questions"
         ]
 
 class VideoResourceSerializer(AbstractResourceSerializer):
+    video_url = serializers.SerializerMethodField()
+
     class Meta:
         model = VideoResource
-        fields = AbstractResourceSerializer.Meta.fields + ["video_file"]
+        fields = AbstractResourceSerializer.Meta.fields + ["video_file", "video_url"]
+    
+    def get_video_url(self, obj):
+        return obj.get_video_url() if obj.video_file else None
 
 
 class RevisionResourceSerializer(AbstractResourceSerializer):
@@ -111,19 +116,35 @@ class RevisionResourceSerializer(AbstractResourceSerializer):
 
 
 class PDFResourceSerializer(AbstractResourceSerializer):
+    pdf_url = serializers.SerializerMethodField()
+
     class Meta:
         model = PDFResource
-        fields = AbstractResourceSerializer.Meta.fields + ["pdf_file"]
+        fields = AbstractResourceSerializer.Meta.fields + ["pdf_file", "pdf_url"]
+    
+    def get_pdf_url(self, obj):
+        return obj.get_pdf_url() if obj.pdf_file else None
 
 
 class ExerciseResourceSerializer(AbstractResourceSerializer):
+    exercise_url = serializers.SerializerMethodField()
+    solution_url = serializers.SerializerMethodField()
+
     class Meta:
         model = ExerciseResource
         fields = AbstractResourceSerializer.Meta.fields + [
             "instructions",
             "exercise_file",
             "solution_file",
+            "exercise_url",
+            "solution_url"
         ]
+    
+    def get_exercise_url(self, obj):
+        return obj.get_exercise_url() if obj.exercise_file else None
+        
+    def get_solution_url(self, obj):
+        return obj.get_solution_url() if obj.solution_file else None
 
 
 class PolymorphicResourceSerializer(serializers.ModelSerializer):
@@ -135,16 +156,17 @@ class PolymorphicResourceSerializer(serializers.ModelSerializer):
 
     def get_resource(self, obj):
         if isinstance(obj, VideoResource):
-            return VideoResourceSerializer(obj).data
+            return VideoResourceSerializer(obj, context=self.context).data
         elif isinstance(obj, QuizResource):
-            return QuizResourceSerializer(obj).data
+            return QuizResourceSerializer(obj, context=self.context).data
         elif isinstance(obj, RevisionResource):
-            return RevisionResourceSerializer(obj).data
+            return RevisionResourceSerializer(obj, context=self.context).data
         elif isinstance(obj, PDFResource):
-            return PDFResourceSerializer(obj).data
+            return PDFResourceSerializer(obj, context=self.context).data
         elif isinstance(obj, ExerciseResource):
-            return ExerciseResourceSerializer(obj).data
-        return AbstractResourceSerializer(obj).data
+            return ExerciseResourceSerializer(obj, context=self.context).data
+        return AbstractResourceSerializer(obj, context=self.context).data
+
 
 
 class DailyTimeSlotSerializer(serializers.ModelSerializer):

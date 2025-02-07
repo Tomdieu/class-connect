@@ -76,6 +76,8 @@ class SubjectViewSet(viewsets.ModelViewSet):
     filterset_class = SubjectFilter
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
+            return Subject.objects.none()  # Return empty queryset for swagger
         queryset = Subject.objects.filter(class_level=self.kwargs['class_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 
@@ -94,6 +96,8 @@ class ChapterViewSet(viewsets.ModelViewSet):
     filterset_class = ChapterFilter
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
+            return Chapter.objects.none()  # Return empty queryset for swagger
         queryset = Chapter.objects.filter(subject=self.kwargs['subject_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 
@@ -109,6 +113,8 @@ class TopicViewSet(viewsets.ModelViewSet):
     filterset_class = TopicFilter
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
+            return Topic.objects.none()  # Return empty queryset for swagger
         queryset = Topic.objects.filter(chapter=self.kwargs['chapter_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 
@@ -124,6 +130,8 @@ class ResourceViewSet(viewsets.ModelViewSet):
     filterset_class = ResourceFilter
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
+            return AbstractResource.objects.none()  # Return empty queryset for swagger
         queryset = AbstractResource.objects.filter(topic=self.kwargs['topic_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 

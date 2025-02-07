@@ -113,6 +113,16 @@ class AbstractResource(PolymorphicModel):
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
+    def get_signed_url(self, field_name):
+        """Get a presigned URL for any file field"""
+        file_field = getattr(self, field_name)
+        if file_field:
+            try:
+                return file_field.storage.url(file_field.name)
+            except:
+                return None
+        return None
+
     def __str__(self):
         return f"{self.title}"
 
@@ -120,16 +130,15 @@ class AbstractResource(PolymorphicModel):
 class VideoResource(AbstractResource):
     video_file = models.FileField(upload_to="videos/", blank=True, null=True)
 
+    def get_video_url(self):
+        return self.get_signed_url('video_file')
+
 
 class QuizResource(AbstractResource):
-   total_questions = models.PositiveIntegerField()
    duration_minutes = models.PositiveIntegerField()
    passing_score = models.PositiveIntegerField(default=60)
    show_correct_answers = models.BooleanField(default=True)
-   show_explanation = models.BooleanField(default=True)
    shuffle_questions = models.BooleanField(default=False)
-   attempts_allowed = models.PositiveIntegerField(default=1)
-   partial_credit = models.BooleanField(default=True)
 
    def get_user_attempts(self, user):
        return self.attempts.filter(user=user).count()
@@ -264,11 +273,20 @@ class RevisionResource(AbstractResource):
 class PDFResource(AbstractResource):
     pdf_file = models.FileField(upload_to="pdfs/")
 
+    def get_pdf_url(self):
+        return self.get_signed_url('pdf_file')
+
 
 class ExerciseResource(AbstractResource):
     instructions = models.TextField()
     solution_file = models.FileField(upload_to="exercises/solutions/", blank=True, null=True)
     exercise_file = models.FileField(upload_to="exercises/", blank=True, null=True)
+
+    def get_solution_url(self):
+        return self.get_signed_url('solution_file')
+        
+    def get_exercise_url(self):
+        return self.get_signed_url('exercise_file')
 
 
 class UserAvailability(models.Model):

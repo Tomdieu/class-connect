@@ -65,7 +65,7 @@ class VideoResourceAdmin(ResourceChildAdmin):
 
 @admin.register(QuizResource)
 class QuizResourceAdmin(ResourceChildAdmin):
-    list_display = ('title', 'topic', 'total_questions', 'duration_minutes')
+    list_display = ('title', 'topic', 'duration_minutes')
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
