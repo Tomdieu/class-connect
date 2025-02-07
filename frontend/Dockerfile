@@ -1,23 +1,23 @@
-# Stage 1: Build the application
-FROM node:20-alpine AS builder
+# Use the official Node.js image
+FROM node:20-alpine
 
+# Set the working directory
 WORKDIR /app
 
+# Copy package.json and package-lock.json first
 COPY package*.json ./
-RUN npm install --frozen-lockfile -f
 
+# Install dependencies
+RUN npm install -f --frozen-lockfile
+
+# Copy the rest of the application code
 COPY . .
+
+# Build the Next.js app
 RUN npm run build
 
-# Stage 2: Create a production-ready image
-FROM node:20-alpine AS runner
-
-WORKDIR /app
-
-# Copy package.json and node_modules from builder
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-
+# Expose the Next.js default port
 EXPOSE 3000
+
+# Start the Next.js server
+CMD ["npm", "start"]
