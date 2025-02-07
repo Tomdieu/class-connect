@@ -68,4 +68,6 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
     serializer_class = ChatMessageSerializer
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
+            return ChatMessage.objects.none()  # Return empty queryset for swagger
         return ChatMessage.objects.filter(session_id=self.kwargs['session_pk'])
