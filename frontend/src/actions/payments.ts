@@ -3,7 +3,7 @@
 import api from "@/services/api";
 import { auth } from "@/auth";
 import axios from "axios";
-import { Payments, SubscriptionPlan } from "@/types";
+import { Payments, SubscriptionPlan, TransactionFilterParams, TransactionListResponse } from "@/types";
 
 // region Payments
 
@@ -205,3 +205,27 @@ export const getSubscription = async (id: number) => {
     throw error;
   }
 };
+
+// region Transactions
+
+export const listTransactions = async ({params}:{params?:TransactionFilterParams})=>{
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get("/api/transactions/", {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+      params
+    });
+    return response.data as TransactionListResponse;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+          // Type guard for Axios errors
+          if (error.response && error.response.data) {
+            throw error.response.data;
+          }
+        }
+        throw error;
+  }
+}
