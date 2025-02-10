@@ -36,8 +36,8 @@ RUN python manage.py makemigrations && python manage.py migrate
 # Copy the Google service account file
 COPY secret/google-secret.json /app/secret/google-secret.json
 
-# Make port 8000 available to the world outside this container
-EXPOSE 8000
+# Make port 8001 available to the world outside this container
+EXPOSE 8001
 
 # Define environment variable
 ENV DJANGO_SETTINGS_MODULE=backend.settings
