@@ -62,12 +62,12 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://class-connect-alpha.vercel.app",
+    url: "https://www.classconnect.cm",
     title: "ClassConnect",
     description: "Apprenez à votre rythme avec ClassConnect",
     images: [
       {
-        url: "https://class-connect-alpha.vercel.app/next.svg",
+        url: "https://www.classconnect.cm/next.svg",
         width: 1200,
         height: 630,
         alt: "ClassConnect",
@@ -85,14 +85,14 @@ export const metadata: Metadata = {
     creator: "@tomdieuivan",
     images: [
       {
-        url: "https://class-connect-alpha.vercel.app/icon.svg",
+        url: "https://www.classconnect.cm/icon.svg",
         width: 1200,
         height: 630,
         alt: "ClassConnect",
       },
     ],
   },
-  metadataBase: new URL("https://class-connect-alpha.vercel.app"),
+  metadataBase: new URL("https://www.classconnect.cm/"),
   creator: "Tomdieu Ivan",
   category: "Education",
   icons: [
@@ -104,6 +104,9 @@ export const metadata: Metadata = {
       url: "/icon.svg",
     },
   ],
+  verification:{
+    google: "google1a036d19159746c1.html",
+  }
 };
 
 export default async function RootLayout({
