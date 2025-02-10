@@ -19,7 +19,8 @@ export default {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
-  output: 'standalone',
+  // pageExtensions: ['ts', 'tsx'],
+  // output: 'standalone',
   images: {
     remotePatterns: [
       {
