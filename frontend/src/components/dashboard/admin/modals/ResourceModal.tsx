@@ -11,9 +11,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 import {
   Credenza,
@@ -24,17 +23,13 @@ import {
 import {
   useExerciseStore,
   usePDFStore,
-  useQuizStore,
   useRevisionStore,
   useVideoStore,
 } from "@/hooks/resources-store";
-import { QuestionField } from "./QuestionField";
+// import { QuestionField } from "./QuestionField";
 import { FileDropzone } from "@/components/FileDropzone";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Maximize2, Minimize2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   addExerciseResource,
@@ -65,35 +60,35 @@ const baseResourceSchema = z.object({
     .optional(),
 });
 
-const quizSchema = baseResourceSchema.extend({
-  duration_minutes: z.number().min(1, "Duration must be at least 1 minute"),
-  passing_score: z.number().min(0).max(100),
-  show_correct_answers: z.boolean(),
-  shuffle_questions: z.boolean(),
-  questions: z.array(
-    z.object({
-      text: z.string().min(1, "Question text is required"),
-      type: z.enum([
-        "MULTIPLE_CHOICE",
-        "SINGLE_CHOICE",
-        "TRUE_FALSE",
-        "SHORT_ANSWER",
-      ]),
-      points: z.number().min(1, "Points must be at least 1"),
-      order: z.number(),
-      explanation: z.string().optional(),
-      options: z
-        .array(
-          z.object({
-            text: z.string().min(1, "Option text is required"),
-            is_correct: z.boolean(),
-            order: z.number(),
-          })
-        )
-        .optional(), // Options may be optional for some question types
-    })
-  ),
-});
+// const quizSchema = baseResourceSchema.extend({
+//   duration_minutes: z.number().min(1, "Duration must be at least 1 minute"),
+//   passing_score: z.number().min(0).max(100),
+//   show_correct_answers: z.boolean(),
+//   shuffle_questions: z.boolean(),
+//   questions: z.array(
+//     z.object({
+//       text: z.string().min(1, "Question text is required"),
+//       type: z.enum([
+//         "MULTIPLE_CHOICE",
+//         "SINGLE_CHOICE",
+//         "TRUE_FALSE",
+//         "SHORT_ANSWER",
+//       ]),
+//       points: z.number().min(1, "Points must be at least 1"),
+//       order: z.number(),
+//       explanation: z.string().optional(),
+//       options: z
+//         .array(
+//           z.object({
+//             text: z.string().min(1, "Option text is required"),
+//             is_correct: z.boolean(),
+//             order: z.number(),
+//           })
+//         )
+//         .optional(), // Options may be optional for some question types
+//     })
+//   ),
+// });
 
 const pdfSchema = baseResourceSchema.extend({
   pdf_file: z.instanceof(File, {
@@ -121,247 +116,248 @@ const revisionSchema = baseResourceSchema.extend({
 // Quiz Modal
 // -------------------------
 
-export const QuizModal = () => {
-  const { isOpen, onClose, classId, subjectId, chapterId, topicId } =
-    useQuizStore();
-  const [isFullscreen, setIsFullscreen] = useState(false);
+// export const QuizModal = () => {
+//   const { isOpen, onClose, classId, subjectId, chapterId, topicId } =
+//     useQuizStore();
+//   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const form = useForm({
-    resolver: zodResolver(quizSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      topic: 0,
-      polymorphic_ctype: 0,
-      duration_minutes: 1,
-      passing_score: 50,
-      show_correct_answers: true,
-      show_explanation: true,
-      shuffle_questions: false,
-      attempts_allowed: 1,
-      partial_credit: false,
-      questions: [],
-    },
-  });
+//   const form = useForm({
+//     resolver: zodResolver(quizSchema),
+//     defaultValues: {
+//       title: "",
+//       description: "",
+//       topic: 0,
+//       polymorphic_ctype: 0,
+//       duration_minutes: 1,
+//       passing_score: 50,
+//       show_correct_answers: true,
+//       show_explanation: true,
+//       shuffle_questions: false,
+//       attempts_allowed: 1,
+//       partial_credit: false,
+//       questions: [],
+//     },
+//   });
 
-  const {
-    fields: questionFields,
-    append: appendQuestion,
-    remove: removeQuestion,
-  } = useFieldArray({
-    control: form.control,
-    name: "questions",
-  });
+//   const {
+//     fields: questionFields,
+//     append: appendQuestion,
+//     remove: removeQuestion,
+//   } = useFieldArray({
+//     control: form.control,
+//     name: "questions",
+//   });
 
-  const handleAddQuestion = () => {
-    appendQuestion({
-      text: "",
-      type: "MULTIPLE_CHOICE",
-      points: 1,
-      order: questionFields.length + 1,
-      explanation: "",
-      options: [
-        { text: "", is_correct: false, order: 1 },
-        { text: "", is_correct: false, order: 2 },
-      ],
-    });
-  };
+//   const handleAddQuestion = () => {
+//     appendQuestion({
+//       text: "",
+//       type: "MULTIPLE_CHOICE",
+//       points: 1,
+//       order: questionFields.length + 1,
+//       explanation: "",
+//       options: [
+//         { text: "", is_correct: false, order: 1 },
+//         { text: "", is_correct: false, order: 2 },
+//       ],
+//     });
+//   };
 
-  const onSubmit = async (data) => {
-    try {
-      console.log("Quiz form submitted:", data);
-      onClose();
-    } catch (error) {
-      console.error("Error submitting quiz form:", error);
-    }
-  };
+//   const onSubmit = async (data) => {
+//     try {
+//       console.log("Quiz form submitted:", data);
+//       onClose();
+//     } catch (error) {
+//       console.error("Error submitting quiz form:", error);
+//     }
+//   };
 
-  const modalClasses = isFullscreen
-    ? "max-w-full w-full h-full"
-    : "sm:max-w-[800px]";
+//   const modalClasses = isFullscreen
+//     ? "max-w-full w-full h-full"
+//     : "sm:max-w-[800px]";
 
-  return (
-    <Credenza open={isOpen} onOpenChange={onClose}>
-      <CredenzaContent
-        showIcon={false}
-        className={`${modalClasses} p-6 transition-all duration-300 flex flex-col`}
-      >
-        <div className="flex justify-between items-center">
-          <CredenzaTitle>Create Quiz Resource</CredenzaTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsFullscreen(!isFullscreen)}
-          >
-            {isFullscreen ? <Minimize2 /> : <Maximize2 />}
-          </Button>
-        </div>
+//   return (
+//     <Credenza open={isOpen} onOpenChange={onClose}>
+//       <CredenzaContent
+//         showIcon={false}
+//         className={`${modalClasses} p-6 transition-all duration-300 flex flex-col`}
+//       >
+//         <div className="flex justify-between items-center">
+//           <CredenzaTitle>Create Quiz Resource</CredenzaTitle>
+//           <Button
+//             variant="ghost"
+//             size="icon"
+//             onClick={() => setIsFullscreen(!isFullscreen)}
+//           >
+//             {isFullscreen ? <Minimize2 /> : <Maximize2 />}
+//           </Button>
+//         </div>
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-1 flex-col"
-          >
-            <Tabs defaultValue="quiz-info" className="w-full flex-1">
-              <TabsList className="gap-1 bg-transparent">
-                <TabsTrigger
-                  value="quiz-info"
-                  className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-                >
-                  Quiz Information
-                </TabsTrigger>
-                <TabsTrigger
-                  value="questions"
-                  className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-                >
-                  Questions
-                </TabsTrigger>
-              </TabsList>
+//         <Form {...form}>
+//           <form
+//             onSubmit={form.handleSubmit(onSubmit)}
+//             className="flex flex-1 flex-col"
+//           >
+//             <Tabs defaultValue="quiz-info" className="w-full flex-1">
+//               <TabsList className="gap-1 bg-transparent">
+//                 <TabsTrigger
+//                   value="quiz-info"
+//                   className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
+//                 >
+//                   Quiz Information
+//                 </TabsTrigger>
+//                 <TabsTrigger
+//                   value="questions"
+//                   className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
+//                 >
+//                   Questions
+//                 </TabsTrigger>
+//               </TabsList>
 
-              <TabsContent value="quiz-info" className="p-4">
-                <div className="space-y-6 h-full">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Title</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Quiz Title" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea {...field} placeholder="Quiz Description" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+//               <TabsContent value="quiz-info" className="p-4">
+//                 <div className="space-y-6 h-full">
+//                   <FormField
+//                     control={form.control}
+//                     name="title"
+//                     render={({ field }) => (
+//                       <FormItem>
+//                         <FormLabel>Title</FormLabel>
+//                         <FormControl>
+//                           <Input {...field} placeholder="Quiz Title" />
+//                         </FormControl>
+//                       </FormItem>
+//                     )}
+//                   />
+//                   <FormField
+//                     control={form.control}
+//                     name="description"
+//                     render={({ field }) => (
+//                       <FormItem>
+//                         <FormLabel>Description</FormLabel>
+//                         <FormControl>
+//                           <Textarea {...field} placeholder="Quiz Description" />
+//                         </FormControl>
+//                       </FormItem>
+//                     )}
+//                   />
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+//                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     
-                    <FormField
-                      control={form.control}
-                      name="duration_minutes"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Duration (minutes)</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="passing_score"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Passing Score</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+//                     <FormField
+//                       control={form.control}
+//                       name="duration_minutes"
+//                       render={({ field }) => (
+//                         <FormItem>
+//                           <FormLabel>Duration (minutes)</FormLabel>
+//                           <FormControl>
+//                             <Input {...field} type="number" />
+//                           </FormControl>
+//                         </FormItem>
+//                       )}
+//                     />
+//                     <FormField
+//                       control={form.control}
+//                       name="passing_score"
+//                       render={({ field }) => (
+//                         <FormItem>
+//                           <FormLabel>Passing Score</FormLabel>
+//                           <FormControl>
+//                             <Input {...field} type="number" />
+//                           </FormControl>
+//                         </FormItem>
+//                       )}
+//                     />
+//                   </div>
 
-                  <div className="grid grid-cols-2 items-center sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+//                   <div className="grid grid-cols-2 items-center sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
                     
-                    <FormField
-                      control={form.control}
-                      name="show_correct_answers"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2">
-                          <FormLabel>Show Answers</FormLabel>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="show_explanation"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2">
-                          <FormLabel>Show Explanation</FormLabel>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="shuffle_questions"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2">
-                          <FormLabel>Shuffle</FormLabel>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+//                     <FormField
+//                       control={form.control}
+//                       name="show_correct_answers"
+//                       render={({ field }) => (
+//                         <FormItem className="flex items-center space-x-2">
+//                           <FormLabel>Show Answers</FormLabel>
+//                           <FormControl>
+//                             <Switch
+//                               checked={field.value}
+//                               onCheckedChange={field.onChange}
+//                             />
+//                           </FormControl>
+//                         </FormItem>
+//                       )}
+//                     />
+//                     <FormField
+//                       control={form.control}
+//                       name="show_explanation"
+//                       render={({ field }) => (
+//                         <FormItem className="flex items-center space-x-2">
+//                           <FormLabel>Show Explanation</FormLabel>
+//                           <FormControl>
+//                             <Switch
+//                               checked={field.value}
+//                               onCheckedChange={field.onChange}
+//                             />
+//                           </FormControl>
+//                         </FormItem>
+//                       )}
+//                     />
+//                     <FormField
+//                       control={form.control}
+//                       name="shuffle_questions"
+//                       render={({ field }) => (
+//                         <FormItem className="flex items-center space-x-2">
+//                           <FormLabel>Shuffle</FormLabel>
+//                           <FormControl>
+//                             <Switch
+//                               checked={field.value}
+//                               onCheckedChange={field.onChange}
+//                             />
+//                           </FormControl>
+//                         </FormItem>
+//                       )}
+//                     />
+//                   </div>
 
-                </div>
-              </TabsContent>
+//                 </div>
+//               </TabsContent>
 
-              <TabsContent value="questions" className="min-h-96">
-                <ScrollArea
-                  className={cn(
-                    "space-y-6 overflow-y-auto",
-                    isFullscreen ? "max-h-[680px]" : "max-h-[400px]"
-                  )}
-                >
-                  {questionFields.map((_, index) => (
-                    <QuestionField
-                      key={questionFields[index].id}
-                      questionIndex={index}
-                      control={form.control}
-                      removeQuestion={removeQuestion}
-                    />
-                  ))}
-                  <Button
-                    onClick={handleAddQuestion}
-                    className="w-full"
-                    size={"sm"}
-                  >
-                    Add Question
-                  </Button>
-                </ScrollArea>
-              </TabsContent>
-            </Tabs>
+//               <TabsContent value="questions" className="min-h-96">
+//                 <ScrollArea
+//                   className={cn(
+//                     "space-y-6 overflow-y-auto",
+//                     isFullscreen ? "max-h-[680px]" : "max-h-[400px]"
+//                   )}
+//                 >
+//                   {questionFields.map((_, index) => (
+//                     <QuestionField
+//                       key={questionFields[index].id}
+//                       questionIndex={index}
+//                       control={form.control}
+//                       removeQuestion={removeQuestion}
+//                     />
+//                   ))}
+//                   <Button
+//                     onClick={handleAddQuestion}
+//                     className="w-full"
+//                     size={"sm"}
+//                   >
+//                     Add Question
+//                   </Button>
+//                 </ScrollArea>
+//               </TabsContent>
+//             </Tabs>
 
-            <div className="bg-background pt-4 border-t">
-              <Button type="submit" className="w-full">
-                Create Quiz
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CredenzaContent>
-    </Credenza>
-  );
-};
+//             <div className="bg-background pt-4 border-t">
+//               <Button type="submit" className="w-full">
+//                 Create Quiz
+//               </Button>
+//             </div>
+//           </form>
+//         </Form>
+//       </CredenzaContent>
+//     </Credenza>
+//   );
+// };
+
 // -------------------------
 // PDF Modal
 // -------------------------
