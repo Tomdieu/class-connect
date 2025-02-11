@@ -1,7 +1,7 @@
 import django_filters
 from .models import (
     Class, Subject, Chapter, Topic, AbstractResource,
-    VideoResource, QuizResource, RevisionResource,
+    VideoResource, RevisionResource,
     PDFResource, ExerciseResource, UserProgress, CourseCategory, User,
     CourseOffering,CourseOfferingAction,CourseDeclaration,TeacherStudentEnrollment
 )
@@ -79,7 +79,6 @@ class ResourceFilter(django_filters.FilterSet):
     def filter_resource_type(self, queryset, name, value):
         resource_types = {
             'video': VideoResource,
-            'quiz': QuizResource,
             'revision': RevisionResource,
             'pdf': PDFResource,
             'exercise': ExerciseResource
