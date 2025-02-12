@@ -31,7 +31,11 @@ COPY . .
 # Copy the Google service account file
 COPY secret/google-secret.json /app/secret/google-secret.json
 
-# Copier le start script, convertir les fins de ligne et les rendre exécutables
+# Copier le entrypoint et start script, convertir les fins de ligne et les rendre exécutables
+
+COPY ./docker/prod/entrypoint.sh /entrypoint.sh
+RUN sed -i 's/\r$//g' /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 COPY ./docker/prod/start.sh /start.sh
 RUN sed -i 's/\r$//g' /start.sh

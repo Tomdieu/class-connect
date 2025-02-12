@@ -6,14 +6,16 @@ networks:
     driver: bridge
 
 services:
-  web:
+  api:
     build: 
       context: .
       dockerfile: ./docker/prod/Dockerfile
     command: /start.sh
+    container_name: classconnect_api
+    restart: always
     volumes:
       - .:/app
-      - web_static:/app/staticfiles  # For static files
+      - static_volume:/app/staticfiles  # For static files
     ports:
       - "8001:8001"
     env_file:
@@ -29,6 +31,7 @@ services:
   db:
     image: postgres:alpine3.20
     restart: unless-stopped
+    container_name: classconnect_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
@@ -41,6 +44,7 @@ services:
   rabbitmq:
     image: rabbitmq:3.10-management-alpine
     hostname: rabbitmq
+    container_name: classconnect_rabbitmq
     restart: unless-stopped
     ports:
       - "5672:5672"
@@ -54,6 +58,7 @@ services:
 
   redis:
     image: redis:7.4
+    container_name: classconnect_redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -63,4 +68,4 @@ services:
 volumes:
   postgres_data:
   rabbitmq_data:
-  web_static:   # New volume for static files
+  static_volume:   # New volume for static files
