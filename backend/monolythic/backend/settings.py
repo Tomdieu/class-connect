@@ -110,8 +110,6 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 USE_POSTGRES = env("USE_POSTGRES", default=True)
 
-print("USE_POSTGRES : ", USE_POSTGRES)
-
 if USE_POSTGRES:
 
     DATABASES = {
@@ -132,8 +130,6 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-
-print("Database config :", DATABASES)
 
 AUTH_USER_MODEL = "users.User"
 
@@ -171,8 +167,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-print("USING S3 = ", env("USE_S3", default=False))
-if env("USE_S3", default=False):
+USER_S3 = env("USE_S3", default=False)
+if USER_S3:
     # WASABI SETTINGS for MEDIA files only
     # AWS_ACCESS_KEY_ID = env("WASABI_ACCESS_KEY_ID")
     # AWS_SECRET_ACCESS_KEY = env("WASABI_SECRET_ACCESS_KEY")
@@ -217,14 +213,6 @@ if env("USE_S3", default=False):
     }
     
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-    print(
-        AWS_S3_ENDPOINT_URL,
-        AWS_ACCESS_KEY_ID,
-        AWS_SECRET_ACCESS_KEY,
-        AWS_STORAGE_BUCKET_NAME,
-    )
-
 
 else:
     MEDIA_URL = "/media/"
