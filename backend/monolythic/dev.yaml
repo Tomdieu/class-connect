@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./docker/dev/Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - web_static:/app/staticfiles
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+    networks:
+      - e_learning_network
+  db:
+    image: postgres:alpine3.20
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: e_learning
+      POSTGRES_USER: e_learning_user
+      POSTGRES_PASSWORD: e_learning_password
+    ports:
+      - "5432:5432"
+    networks:
+      - e_learning_network
+
+  rabbitmq:
+    image: rabbitmq:3.10-management-alpine
+    hostname: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: classconnect
+      RABBITMQ_DEFAULT_PASS: classconnect
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - e_learning_network
+
+  redis:
+    image: redis:7.4
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - e_learning_network
+
+networks:
+  default:
+    name: e_learning_network
+
+volumes:
+  postgres_data:
