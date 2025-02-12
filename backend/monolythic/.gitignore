@@ -1,2 +1,8 @@
 secret
 static
+.env
+# Ignore everything inside .envs folder
+.envs/*
+# Allow the .locals folder and its contents inside .envs
+!.envs/.locals/
+!.envs/.locals/**
