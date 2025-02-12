@@ -33,7 +33,7 @@ COPY secret/google-secret.json /app/secret/google-secret.json
 
 # Copier le start script, convertir les fins de ligne et les rendre exécutables
 
-COPY ./.envs/.prod/start.sh /start.sh
+COPY ./docker/dev/start.sh /start.sh
 RUN sed -i 's/\r$//g' /start.sh
 RUN chmod +x /start.sh
 

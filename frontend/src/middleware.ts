@@ -28,6 +28,10 @@ export default auth((req) => {
   return I18nMiddleware(req)
 })
 
+// export const config = {
+//   matcher:'/'
+// }
+
 export const config = {
   matcher: [
     "/((?!api|static|.*\\..*|_next|favicon.ico|robots.txt).*)",

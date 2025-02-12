@@ -178,3 +178,5 @@ mediafiles/
 help/
 staticfiles/
 env
+!.envs/.locals/
+!.envs/.locals/**

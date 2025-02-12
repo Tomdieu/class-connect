@@ -294,8 +294,9 @@ SWAGGER_SETTINGS = {
 }
 
 # Celery configurations
-CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=' "redis://localhost:6379/0"')
-CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
+REDIS_HOST = env("REDIS_HOST", default="localhost")
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=f"redis://{REDIS_HOST}:6379/0")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=f"redis://{REDIS_HOST}:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
@@ -322,7 +323,7 @@ GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv(
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": f"redis://{REDIS_HOST}:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },

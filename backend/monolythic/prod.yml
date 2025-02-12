@@ -1,3 +1,4 @@
+
 version: '3.8'
 
 networks:
@@ -6,8 +7,10 @@ networks:
 
 services:
   web:
-    build: .
-    command: /start
+    build: 
+      context: .
+      dockerfile: ./docker/prod/Dockerfile
+    command: /start.sh
     volumes:
       - .:/app
       - web_static:/app/staticfiles  # For static files
