@@ -1,5 +1,5 @@
-# Use an official Python runtime as a parent image
-FROM python:3.10.13-slim-bullseye
+# Utiliser l'image officielle de Python comme image parente
+FROM python:3.11
 LABEL authors="ivantom"
 
 # Set Environment variables
@@ -13,34 +13,32 @@ RUN python -m venv /opt/venv
 # Activate the virtual environment
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Set the working directory in the container
+# Définir le répertoire de travail dans le conteneur
 WORKDIR /app
 
-# Copy the requirements file into the container
-COPY requirements.txt /app/
+# Copier les fichiers de dépendances
+COPY requirements.txt ./
 
-# Install requirements
-RUN python -m venv /opt/venv && \
-    /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install -r /app/requirements.txt
+# Installer les dépendances
+RUN pip install --no-cache-dir -r requirements.txt
 
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy the current directory contents into the container at /app
-COPY . /app/
-
-# Migrate the database
-RUN python manage.py makemigrations && python manage.py migrate
+# Copier le reste des fichiers de votre application dans le conteneur
+COPY . .
 
 # Copy the Google service account file
 COPY secret/google-secret.json /app/secret/google-secret.json
+
+# Copier le start script, convertir les fins de ligne et les rendre exécutables
+
+COPY ./.envs/.prod/start.sh /start.sh
+RUN sed -i 's/\r$//g' /start.sh
+RUN chmod +x /start.sh
 
 # Make port 8001 available to the world outside this container
 EXPOSE 8001
 
 # Define environment variable
 ENV DJANGO_SETTINGS_MODULE=backend.settings
-
-# Collect Static 
-RUN python manage.py collectstatic --noinput
