@@ -1,0 +1,21 @@
+
+name: CI/CD auth-app
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy_main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy using SSH (Main)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /home/ubuntu/class-connect/backend/monolythic
+            git pull --all
+            docker compose -f prod.yml up --build -d
