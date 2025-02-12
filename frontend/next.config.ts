@@ -19,7 +19,14 @@ export default {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
-  output: 'standalone',
+  experimental: {
+    esmExternals: "loose", // required for the canvas to work
+  },
+  webpack: (config) => {
+    config.externals = [...config.externals, { canvas: "canvas" }]; // required for the canvas to work
+    return config;
+  },
+  // output: 'standalone',
   images: {
     remotePatterns: [
       {
