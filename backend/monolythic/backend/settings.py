@@ -24,7 +24,7 @@ environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 try:
-    environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+    environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 except FileNotFoundError:
     pass
 
@@ -32,7 +32,7 @@ except FileNotFoundError:
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)%^x%9(v84+=#1vc3wgh=^uq7d6gtcyw-tl%x5k+8cj1nt6wdm'
+SECRET_KEY = "django-insecure-)%^x%9(v84+=#1vc3wgh=^uq7d6gtcyw-tl%x5k+8cj1nt6wdm"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,21 +42,19 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'polymorphic',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "polymorphic",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
     # local apps
     "users",
     "courses",
     "notifications",
     "payments",
     "streamings",
-    
     # third party adds
     "rest_framework",
     "phonenumber_field",
@@ -65,38 +63,37 @@ INSTALLED_APPS = [
     "drf_social_oauth2",
     "drf_yasg",
     "corsheaders",
-
     "django_celery_beat",
     "django_celery_results",
     "storages",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
     "users.middleware.RequestMiddleware",
     "users.middleware.SingleSessionMiddleware",
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
                 # Social Auth
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
@@ -105,21 +102,40 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+USE_POSTGRES = env("USE_POSTGRES", default=True)
+
+print("USE_POSTGRES : ", USE_POSTGRES)
+
+if USE_POSTGRES:
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env("POSTGRES_DB"),
+            "USER": env("POSTGRES_USER"),
+            "PASSWORD": env("POSTGRES_PASSWORD"),
+            "HOST": env("POSTGRES_HOST", default="localhost"),
+            "PORT": env("POSTGRES_PORT", default="5432"),
+        }
     }
-}
+else:
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
+print("Database config :", DATABASES)
 
 AUTH_USER_MODEL = "users.User"
-
 
 
 # Password validation
@@ -127,16 +143,16 @@ AUTH_USER_MODEL = "users.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -144,9 +160,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -155,44 +171,75 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-print("USING S3 = ",env('USE_S3', default=False))
-if env('USE_S3', default=False):
+print("USING S3 = ", env("USE_S3", default=False))
+if env("USE_S3", default=False):
     # WASABI SETTINGS for MEDIA files only
+    # AWS_ACCESS_KEY_ID = env("WASABI_ACCESS_KEY_ID")
+    # AWS_SECRET_ACCESS_KEY = env("WASABI_SECRET_ACCESS_KEY")
+    # AWS_STORAGE_BUCKET_NAME = env("WASABI_STORAGE_BUCKET_NAME")
+    # AWS_S3_REGION_NAME = env("WASABI_REGION_NAME")
+    # AWS_S3_ENDPOINT_URL = f"https://s3.{AWS_S3_REGION_NAME}.wasabisys.com"
+    
     AWS_ACCESS_KEY_ID = env('B2_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = env('B2_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = env('B2_STORAGE_BUCKET_NAME')
     AWS_S3_REGION_NAME = env('B2_S3_REGION_NAME')
-    # AWS_S3_ENDPOINT_URL = f'https://s3.{AWS_S3_REGION_NAME}.wasabisys.com'
     AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
     AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
+    # AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_ENDPOINT}'
+    
+    # AWS_S3_ADDRESSING_STYLE = "virtual"
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    
+    # AWS_S3_OBJECT_PARAMETERS = {
+    #     "ACL": "private",  # or 'public-read' depending on your needs
+    # }
 
     # Force private access for free trial
-    AWS_DEFAULT_ACL = 'private'
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_QUERYSTRING_AUTH = True
-    
+    # AWS_DEFAULT_ACL = 'private'
+    # AWS_S3_FILE_OVERWRITE = False
+    # AWS_QUERYSTRING_AUTH = True
+
     # Media settings only for Wasabi
-    DEFAULT_FILE_STORAGE = 'backend.storage_backends.MediaStorage'
-    # MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.wasabisys.com/media/'
-    MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}..backblazeb2.com/media/'
+    # DEFAULT_FILE_STORAGE = "backend.storage_backends.MediaStorage"
+    # MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.wasabisys.com/media/"
+    # MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/media/'
 
-    print(AWS_S3_ENDPOINT_URL,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_STORAGE_BUCKET_NAME)
-
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
     
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+    print(
+        AWS_S3_ENDPOINT_URL,
+        AWS_ACCESS_KEY_ID,
+        AWS_SECRET_ACCESS_KEY,
+        AWS_STORAGE_BUCKET_NAME,
+    )
+
+
 else:
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'mediafiles'
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 # Static files always local regardless of USE_S3
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 # STATICFILES_DIRS = [
 #     BASE_DIR / "static"
 # ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Rest Framework
 
@@ -233,19 +280,19 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
 ]
 
 OAUTH2_PROVIDER = {
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 2592000,  # 1 month (30 days)
-    'REFRESH_TOKEN_EXPIRE_SECONDS': 3888000,  # 1 month and 15 days (45 days)
-    'ROTATE_REFRESH_TOKEN': True,
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 2592000,  # 1 month (30 days)
+    "REFRESH_TOKEN_EXPIRE_SECONDS": 3888000,  # 1 month and 15 days (45 days)
+    "ROTATE_REFRESH_TOKEN": True,
 }
 
 # Email settings (configure according to your email provider)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = env('EMAIL_HOST', default='smtp.example.com')
-EMAIL_PORT = env('EMAIL_PORT', default=587)
-EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
-EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='your-email@example.com')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='your-email-password')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='webmaster@example.com')
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.example.com")
+EMAIL_PORT = env("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="your-email@example.com")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="your-email-password")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="webmaster@example.com")
 
 # SWAGGER
 
@@ -257,8 +304,8 @@ SWAGGER_SETTINGS = {
 }
 
 # Celery configurations
-CELERY_BROKER_URL = env('CELERY_BROKER_URL',default=' "redis://localhost:6379/0"')
-CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND',default='redis://localhost:6379/0')
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=' "redis://localhost:6379/0"')
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
@@ -267,7 +314,7 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_ACKS_LATE = True
 CELERY_WORKER_SEND_TASK_EVENTS = True
 CELERY_TASK_SEND_SENT_EVENT = True
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # Rabbitmq configuration
 
@@ -277,16 +324,18 @@ RABBITMQ_USERNAME = env("RABBITMQ_USERNAME", default="classconnect")
 RABBITMQ_PASSWORD = env("RABBITMQ_PASSWORD", default="classconnect")
 
 # Google Service Account
-GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE", BASE_DIR / "secret/google-secret.json")
+GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv(
+    "GOOGLE_SERVICE_ACCOUNT_FILE", BASE_DIR / "secret/google-secret.json"
+)
 
 # Caching
 CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
     }
 }
 
@@ -319,7 +368,5 @@ CACHES = {
 # }
 
 
-
 # DEFAULT_FILE_STORAGE = 'backend.storage_backends.PrivateMediaStorage'
 # DEFAULT_FILE_STORAGE = 'backend.storage_backends.B2Storage'
-

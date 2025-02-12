@@ -9,7 +9,7 @@ from .models import (
     AbstractResource,
     ExerciseResource,
     PDFResource,
-    QuizResource,
+    # QuizResource,
     VideoResource,
     RevisionResource,
     Topic,
@@ -18,7 +18,7 @@ from .models import (
     CourseOfferingAction,
     TeacherStudentEnrollment,
     CourseDeclaration,
-    Question, QuestionOption, QuizAttempt, QuestionResponse
+    # Question, QuestionOption, QuizAttempt, QuestionResponse
 )
 from users.serializers import UserSerializer
 from django.contrib.auth import get_user_model
@@ -75,28 +75,28 @@ class AbstractResourceSerializer(serializers.ModelSerializer):
         return obj.__class__.__name__
 
 
-class QuestionOptionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = QuestionOption
-        fields = "__all__"
+# class QuestionOptionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = QuestionOption
+#         fields = "__all__"
 
-class QuestionSerializer(serializers.ModelSerializer):
-    options = QuestionOptionSerializer(many=True)
+# class QuestionSerializer(serializers.ModelSerializer):
+#     options = QuestionOptionSerializer(many=True)
 
-    class Meta:
-        model = Question
-        fields = "__all__"
+#     class Meta:
+#         model = Question
+#         fields = "__all__"
 
-class QuizResourceSerializer(AbstractResourceSerializer):
-    questions = QuestionSerializer(many=True, read_only=True)
+# class QuizResourceSerializer(AbstractResourceSerializer):
+#     questions = QuestionSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = QuizResource
-        fields = AbstractResourceSerializer.Meta.fields + [
-            "duration_minutes", "passing_score",
-            "show_correct_answers","shuffle_questions",
-            "questions"
-        ]
+#     class Meta:
+#         model = QuizResource
+#         fields = AbstractResourceSerializer.Meta.fields + [
+#             "duration_minutes", "passing_score",
+#             "show_correct_answers","shuffle_questions",
+#             "questions"
+#         ]
 
 class VideoResourceSerializer(AbstractResourceSerializer):
     video_url = serializers.SerializerMethodField()
@@ -157,8 +157,8 @@ class PolymorphicResourceSerializer(serializers.ModelSerializer):
     def get_resource(self, obj):
         if isinstance(obj, VideoResource):
             return VideoResourceSerializer(obj, context=self.context).data
-        elif isinstance(obj, QuizResource):
-            return QuizResourceSerializer(obj, context=self.context).data
+        # elif isinstance(obj, QuizResource):
+        #     return QuizResourceSerializer(obj, context=self.context).data
         elif isinstance(obj, RevisionResource):
             return RevisionResourceSerializer(obj, context=self.context).data
         elif isinstance(obj, PDFResource):
@@ -290,31 +290,31 @@ class UserProgressSerializer(serializers.ModelSerializer):
         model = UserProgress
         fields = "__all__"
 
-class QuizAttemptSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = QuizAttempt
-        fields = "__all__"
+# class QuizAttemptSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = QuizAttempt
+#         fields = "__all__"
 
-class QuestionResponseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = QuestionResponse
-        fields = "__all__"
+# class QuestionResponseSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = QuestionResponse
+#         fields = "__all__"
 
-class BulkQuestionSerializer(serializers.Serializer):
-    questions = QuestionSerializer(many=True)
+# class BulkQuestionSerializer(serializers.Serializer):
+#     questions = QuestionSerializer(many=True)
     
-    def create(self, validated_data):
-        questions_data = validated_data.get('questions', [])
-        questions = []
+#     def create(self, validated_data):
+#         questions_data = validated_data.get('questions', [])
+#         questions = []
         
-        for question_data in questions_data:
-            options_data = question_data.pop('options', [])
-            question = Question.objects.create(
-                quiz=self.context['quiz'],
-                **question_data
-            )
-            for option_data in options_data:
-                QuestionOption.objects.create(question=question, **option_data)
-            questions.append(question)
+#         for question_data in questions_data:
+#             options_data = question_data.pop('options', [])
+#             question = Question.objects.create(
+#                 quiz=self.context['quiz'],
+#                 **question_data
+#             )
+#             for option_data in options_data:
+#                 QuestionOption.objects.create(question=question, **option_data)
+#             questions.append(question)
             
-        return questions
+#         return questions

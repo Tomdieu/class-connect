@@ -2,11 +2,11 @@ from django.contrib import admin
 from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin
 from .models import (
     User, Topic, Class, Subject, Chapter,
-    AbstractResource, VideoResource, QuizResource,
+    AbstractResource, VideoResource,
     RevisionResource, PDFResource, ExerciseResource,
     UserProgress, CourseCategory, UserAvailability, DailyTimeSlot,
     CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,
-    Question, QuestionOption, QuizAttempt, QuestionResponse
+    # Question, QuestionOption, QuizAttempt, QuestionResponse
 )
 
 @admin.register(User)
@@ -54,7 +54,7 @@ class ResourceChildAdmin(PolymorphicChildModelAdmin):
 @admin.register(AbstractResource)
 class ResourceParentAdmin(PolymorphicParentModelAdmin):
     base_model = AbstractResource
-    child_models = (VideoResource, QuizResource, RevisionResource, PDFResource, ExerciseResource)
+    child_models = (VideoResource, RevisionResource, PDFResource, ExerciseResource)
     list_display = ('title', 'topic', 'created_at')
     list_filter = ('topic',)
     search_fields = ('title',)
@@ -63,33 +63,33 @@ class ResourceParentAdmin(PolymorphicParentModelAdmin):
 class VideoResourceAdmin(ResourceChildAdmin):
     list_display = ('title', 'topic',)
 
-@admin.register(QuizResource)
-class QuizResourceAdmin(ResourceChildAdmin):
-    list_display = ('title', 'topic', 'duration_minutes')
+# @admin.register(QuizResource)
+# class QuizResourceAdmin(ResourceChildAdmin):
+#     list_display = ('title', 'topic', 'duration_minutes')
 
-@admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'quiz', 'type', 'order')
-    search_fields = ('text', 'quiz__title')
-    list_filter = ('quiz', 'type')
+# @admin.register(Question)
+# class QuestionAdmin(admin.ModelAdmin):
+#     list_display = ('text', 'quiz', 'type', 'order')
+#     search_fields = ('text', 'quiz__title')
+#     list_filter = ('quiz', 'type')
 
-@admin.register(QuestionOption)
-class QuestionOptionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'question', 'is_correct', 'order')
-    search_fields = ('text', 'question__text')
-    list_filter = ('question', 'is_correct')
+# @admin.register(QuestionOption)
+# class QuestionOptionAdmin(admin.ModelAdmin):
+#     list_display = ('text', 'question', 'is_correct', 'order')
+#     search_fields = ('text', 'question__text')
+#     list_filter = ('question', 'is_correct')
 
-@admin.register(QuizAttempt)
-class QuizAttemptAdmin(admin.ModelAdmin):
-    list_display = ('quiz', 'user', 'score', 'started_at', 'completed_at', 'is_completed')
-    search_fields = ('quiz__title', 'user__email')
-    list_filter = ('quiz', 'is_completed')
+# @admin.register(QuizAttempt)
+# class QuizAttemptAdmin(admin.ModelAdmin):
+#     list_display = ('quiz', 'user', 'score', 'started_at', 'completed_at', 'is_completed')
+#     search_fields = ('quiz__title', 'user__email')
+#     list_filter = ('quiz', 'is_completed')
 
-@admin.register(QuestionResponse)
-class QuestionResponseAdmin(admin.ModelAdmin):
-    list_display = ('question', 'attempt', 'is_correct', 'points_earned')
-    search_fields = ('question__text', 'attempt__user__email')
-    list_filter = ('question', 'is_correct')
+# @admin.register(QuestionResponse)
+# class QuestionResponseAdmin(admin.ModelAdmin):
+#     list_display = ('question', 'attempt', 'is_correct', 'points_earned')
+#     search_fields = ('question__text', 'attempt__user__email')
+#     list_filter = ('question', 'is_correct')
 
 @admin.register(RevisionResource)
 class RevisionResourceAdmin(ResourceChildAdmin):

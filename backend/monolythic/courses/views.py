@@ -9,7 +9,7 @@ from .models import (
     CourseCategory, Class, Subject, Chapter, Topic,
     AbstractResource, UserProgress,UserAvailability,DailyTimeSlot,
     CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,
-    QuizResource, Question, QuestionOption, QuizAttempt, QuestionResponse,
+    # QuizResource, Question, QuestionOption, QuizAttempt, QuestionResponse,
     VideoResource, RevisionResource, PDFResource, ExerciseResource
 )
 from .serializers import (
@@ -18,9 +18,7 @@ from .serializers import (
     UserProgressSerializer,UserAvailabilitySerializer,
     CourseOfferingSerializer, CourseOfferingActionSerializer,
     TeacherStudentEnrollmentSerializer, CourseDeclarationSerializer,DailyTimeSlotSerializer,DailyTimeSlotUpdateSerializer,
-    QuizResourceSerializer, QuestionSerializer, QuestionOptionSerializer, QuizAttemptSerializer, QuestionResponseSerializer,
     VideoResourceSerializer, RevisionResourceSerializer, PDFResourceSerializer, ExerciseResourceSerializer,
-    BulkQuestionSerializer
 )
 from .pagination import CustomPagination
 from .filters import (
@@ -358,123 +356,6 @@ class CourseDeclarationViewSet(viewsets.ModelViewSet):
             return Response({'status': 'updated'})
         return Response({'error': 'Invalid status'}, status=400)
 
-class QuizResourceViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for managing quiz resources.
-    """
-    permission_classes = [IsAuthenticated]
-    pagination_class = CustomPagination
-    queryset = QuizResource.objects.all()
-    serializer_class = QuizResourceSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = ResourceFilter
-
-    @swagger_auto_schema(
-        method='post',
-        request_body=BulkQuestionSerializer,
-        responses={201: QuestionSerializer(many=True)},
-        operation_description="Bulk create questions for a quiz"
-    )
-    @action(detail=True, methods=['post'], url_path='create-questions')
-    def create_questions(self, request, pk=None):
-        quiz = self.get_object()
-        
-        serializer = BulkQuestionSerializer(
-            data=request.data,
-            context={'quiz': quiz}
-        )
-        
-        if serializer.is_valid():
-            try:
-                questions = serializer.create(serializer.validated_data)
-                response_serializer = QuestionSerializer(questions, many=True)
-                return Response(
-                    response_serializer.data,
-                    status=status.HTTP_201_CREATED
-                )
-            except Exception as e:
-                return Response(
-                    {'error': str(e)},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-                
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-class QuestionViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for managing questions within a quiz.
-    """
-    permission_classes = [IsAuthenticated]
-    queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['quiz']
-
-class QuestionOptionViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for managing question options.
-    """
-    permission_classes = [IsAuthenticated]
-    queryset = QuestionOption.objects.all()
-    serializer_class = QuestionOptionSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['question']
-
-class QuizAttemptViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for managing quiz attempts.
-    """
-    permission_classes = [IsAuthenticated]
-    pagination_class = CustomPagination
-    queryset = QuizAttempt.objects.all()
-    serializer_class = QuizAttemptSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['quiz', 'user', 'is_completed']
-
-    @swagger_auto_schema(
-        method='get',
-        manual_parameters=[
-            openapi.Parameter('user_id', openapi.IN_QUERY, description="User ID", type=openapi.TYPE_STRING, required=True),
-            openapi.Parameter('quiz_id', openapi.IN_QUERY, description="Quiz ID", type=openapi.TYPE_INTEGER, required=True),
-        ],
-        responses={200: QuizAttemptSerializer(many=True)}
-    )
-    @action(detail=False, methods=['get'], url_path='user-attempts')
-    def get_user_attempts(self, request):
-        """
-        Get quiz attempts for a specific user and quiz.
-        """
-        user_id = request.query_params.get('user_id')
-        quiz_id = request.query_params.get('quiz_id')
-
-        if not user_id or not quiz_id:
-            return Response(
-                {"error": "user_id and quiz_id are required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        queryset = self.queryset.filter(user_id=user_id, quiz_id=quiz_id)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-class QuestionResponseViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for managing question responses.
-    """
-    permission_classes = [IsAuthenticated]
-    queryset = QuestionResponse.objects.all()
-    serializer_class = QuestionResponseSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['attempt', 'question', 'is_correct']
-
 class VideoResourceViewSet(viewsets.ModelViewSet):
     """
     API endpoint for managing video resources.
@@ -509,6 +390,7 @@ class PDFResourceViewSet(viewsets.ModelViewSet):
     filterset_class = ResourceFilter
 
 class ExerciseResourceViewSet(viewsets.ModelViewSet):
+
     """
     API endpoint for managing exercise resources.
     """
@@ -518,3 +400,120 @@ class ExerciseResourceViewSet(viewsets.ModelViewSet):
     serializer_class = ExerciseResourceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ResourceFilter
+
+# class QuizResourceViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint for managing quiz resources.
+#     """
+#     permission_classes = [IsAuthenticated]
+#     pagination_class = CustomPagination
+#     queryset = QuizResource.objects.all()
+#     serializer_class = QuizResourceSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_class = ResourceFilter
+
+#     @swagger_auto_schema(
+#         method='post',
+#         request_body=BulkQuestionSerializer,
+#         responses={201: QuestionSerializer(many=True)},
+#         operation_description="Bulk create questions for a quiz"
+#     )
+#     @action(detail=True, methods=['post'], url_path='create-questions')
+#     def create_questions(self, request, pk=None):
+#         quiz = self.get_object()
+        
+#         serializer = BulkQuestionSerializer(
+#             data=request.data,
+#             context={'quiz': quiz}
+#         )
+        
+#         if serializer.is_valid():
+#             try:
+#                 questions = serializer.create(serializer.validated_data)
+#                 response_serializer = QuestionSerializer(questions, many=True)
+#                 return Response(
+#                     response_serializer.data,
+#                     status=status.HTTP_201_CREATED
+#                 )
+#             except Exception as e:
+#                 return Response(
+#                     {'error': str(e)},
+#                     status=status.HTTP_400_BAD_REQUEST
+#                 )
+                
+#         return Response(
+#             serializer.errors,
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
+
+# class QuestionViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint for managing questions within a quiz.
+#     """
+#     permission_classes = [IsAuthenticated]
+#     queryset = Question.objects.all()
+#     serializer_class = QuestionSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_fields = ['quiz']
+
+# class QuestionOptionViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint for managing question options.
+#     """
+#     permission_classes = [IsAuthenticated]
+#     queryset = QuestionOption.objects.all()
+#     serializer_class = QuestionOptionSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_fields = ['question']
+
+# class QuizAttemptViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint for managing quiz attempts.
+#     """
+#     permission_classes = [IsAuthenticated]
+#     pagination_class = CustomPagination
+#     queryset = QuizAttempt.objects.all()
+#     serializer_class = QuizAttemptSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_fields = ['quiz', 'user', 'is_completed']
+
+#     @swagger_auto_schema(
+#         method='get',
+#         manual_parameters=[
+#             openapi.Parameter('user_id', openapi.IN_QUERY, description="User ID", type=openapi.TYPE_STRING, required=True),
+#             openapi.Parameter('quiz_id', openapi.IN_QUERY, description="Quiz ID", type=openapi.TYPE_INTEGER, required=True),
+#         ],
+#         responses={200: QuizAttemptSerializer(many=True)}
+#     )
+#     @action(detail=False, methods=['get'], url_path='user-attempts')
+#     def get_user_attempts(self, request):
+#         """
+#         Get quiz attempts for a specific user and quiz.
+#         """
+#         user_id = request.query_params.get('user_id')
+#         quiz_id = request.query_params.get('quiz_id')
+
+#         if not user_id or not quiz_id:
+#             return Response(
+#                 {"error": "user_id and quiz_id are required"}, 
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         queryset = self.queryset.filter(user_id=user_id, quiz_id=quiz_id)
+#         page = self.paginate_queryset(queryset)
+#         if page is not None:
+#             serializer = self.get_serializer(page, many=True)
+#             return self.get_paginated_response(serializer.data)
+
+#         serializer = self.get_serializer(queryset, many=True)
+#         return Response(serializer.data)
+
+# class QuestionResponseViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint for managing question responses.
+#     """
+#     permission_classes = [IsAuthenticated]
+#     queryset = QuestionResponse.objects.all()
+#     serializer_class = QuestionResponseSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_fields = ['attempt', 'question', 'is_correct']

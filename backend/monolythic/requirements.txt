@@ -1,8 +1,8 @@
 amqp==5.3.1
 asgiref==3.8.1
 billiard==4.2.1
-boto3==1.36.15
-botocore==1.36.15
+boto3==1.25.5
+botocore==1.28.5
 cachetools==5.5.1
 campay==1.0.9
 celery==5.4.0
@@ -57,6 +57,7 @@ pillow==11.1.0
 prompt_toolkit==3.0.50
 proto-plus==1.25.0
 protobuf==5.29.3
+psycopg2-binary==2.9.10
 pyasn1==0.6.1
 pyasn1_modules==0.4.1
 pycparser==2.22
@@ -71,7 +72,7 @@ redis==5.2.1
 requests==2.32.3
 requests-oauthlib==2.0.0
 rsa==4.9
-s3transfer==0.11.2
+s3transfer==0.6.2
 setuptools==75.8.0
 six==1.17.0
 social-auth-app-django==5.4.2
@@ -82,7 +83,7 @@ tzdata==2025.1
 ua-parser==1.0.0
 ua-parser-builtins==0.18.0.post1
 uritemplate==4.1.1
-urllib3==2.3.0
+urllib3==1.26.20
 user-agents==2.2.0
 vine==5.1.0
 wcwidth==0.2.13
