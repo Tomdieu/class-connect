@@ -7,12 +7,15 @@ networks:
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: /start
     volumes:
       - .:/app
       - web_static:/app/staticfiles  # For static files
     ports:
-      - "8000:8000"
+      - "8001:8001"
+    env_file:
+      - .envs/.prod/django
+      - .envs/.prod/backblaze
     depends_on:
       - db
       - rabbitmq
@@ -25,10 +28,8 @@ services:
     restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: e_learning
-      POSTGRES_USER: e_learning_user
-      POSTGRES_PASSWORD: e_learning_password
+    env_file:
+      - .envs/.prod/postgres
     ports:
       - "5432:5432"
     networks:
@@ -41,9 +42,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: classconnect
-      RABBITMQ_DEFAULT_PASS: classconnect
+    env_file:
+      - .envs/.prod/rabbitmq
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
