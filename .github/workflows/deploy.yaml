@@ -8,7 +8,7 @@ jobs:
   deploy_main:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy using SSH (Main)
+      - name: Deploy Backend using SSH (Main)
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.HOST }}
