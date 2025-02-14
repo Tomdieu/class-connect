@@ -137,8 +137,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     platform_usage_reason = models.TextField(null=True, blank=True)
 
     email_verified = models.BooleanField(default=False)
-    profile_picture = models.ImageField(
-        upload_to="profile_pictures/", null=True, blank=True
+    avatar = models.ImageField(
+        upload_to="avatars/",
+        null=True,
+        blank=True,
+        verbose_name=_("Avatar"),
+        help_text=_("User profile picture")
     )
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default="fr")
     town = models.CharField(max_length=100, blank=True, null=True)
@@ -286,15 +290,51 @@ class User(AbstractBaseUser, PermissionsMixin):
             # Only current level
             return [current_level]
     
+    @property
+    def subscription_status(self):
+        """Returns the current subscription status of the user"""
+        active_sub = self.get_active_subscription()
+        if active_sub:
+            return {
+                'active': True,
+                'plan': active_sub.plan.name,
+                'expires': active_sub.end_date
+            }
+        return {'active': False}
+
     def get_active_subscription(self):
         """
         Returns the user's active subscription.
-        Implement this method based on your subscription model.
         """
-        return self.subscriptions.filter(
-            is_active=True,
-            end_date__gte=timezone.now()
-        ).first()
+        try:
+            return self.subscriptions.select_related('plan').get(
+                end_date__gt=timezone.now()
+            )
+        except:
+            return None
+
+    def has_active_subscription(self):
+        """Check if user has any active subscription"""
+        return self.get_active_subscription() is not None
+
+    def get_subscription_plan(self):
+        """Returns the current subscription plan name or None"""
+        subscription = self.get_active_subscription()
+        return subscription.plan.name if subscription else None
+
+    def can_access_content(self, content_level=None):
+        """
+        Determines if user can access specific content based on subscription level
+        and education level
+        """
+        subscription = self.get_active_subscription()
+        if not subscription:
+            return False
+
+        if not content_level:
+            return True
+
+        return self.can_access_class_level(content_level)
     
     def get_class_display(self) -> str:
         """
