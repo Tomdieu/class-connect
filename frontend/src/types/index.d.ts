@@ -444,3 +444,35 @@ declare interface ChangePasswordType {
   confirm_password:string;
 
 }
+
+declare interface Payments {
+  id:number;
+  amount:number;
+  payment_method:"MTN"|"ORANGE",
+  transaction_id:string;
+  status:"PENDING"|"SUCCESSFUL"|"FAILED",
+  user:string,
+  subscription:string,
+  payment_date:string;
+}
+
+declare interface SubscriptionPlan{
+  id:number;
+  name:string;
+  price:number;
+  duration_days:number;
+  description:string;
+  features:object;
+  active:boolean;
+  created_at:string;
+}
+
+declare interface Subscription{
+  id:number;
+  user:string;
+  plan:number;
+  start_date:string;
+  end_date:string;
+  auto_renew:boolean;
+  is_active:boolean;
+}
