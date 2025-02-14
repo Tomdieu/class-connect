@@ -6,6 +6,8 @@ import { Loader } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useI18n } from "@/locales/client";
 import Link from "next/link";
+import { useClassStore } from "@/hooks/class-store";
+import { Button } from "@/components/ui/button";
 
 function CoursesPages() {
   const { data, isError, isLoading, error } = useQuery({
@@ -14,6 +16,8 @@ function CoursesPages() {
   });
 
   const t = useI18n();
+
+  const { onAdd, } = useClassStore();
 
   const [groupClass, setGroupClass] = useState<{ [key: string]: ClassType[] }>(
     {}
@@ -56,7 +60,11 @@ function CoursesPages() {
 
   return (
     <div className="container py-10">
-      <h1 className="text-3xl font-medium">{t("class.title")}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-medium">{t("class.title")}</h1>
+        <Button onClick={onAdd}>Ajouter une classe</Button>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {Object.entries(groupClass).map(([level, classes]) => (
           <React.Fragment key={level}>
