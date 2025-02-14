@@ -14,10 +14,7 @@ from pathlib import Path
 import environ
 import os
 
-env = environ.Env(
-    # set casting, default value
-    DEBUG=(bool, True)
-)
+env = environ.Env()
 environ.Env.read_env()
 
 
@@ -35,7 +32,7 @@ except FileNotFoundError:
 SECRET_KEY = "django-insecure-)%^x%9(v84+=#1vc3wgh=^uq7d6gtcyw-tl%x5k+8cj1nt6wdm"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG',default=True)
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -71,6 +68,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -223,9 +221,7 @@ else:
 # Static files always local regardless of USE_S3
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static"
-# ]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
