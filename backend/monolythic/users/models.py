@@ -215,6 +215,25 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.university_level = None
             self.university_year = None
 
+    def get_class_level(self) -> int | None:
+        """
+        Returns the numeric level of the user's class.
+        College: 1-4 (6eme-3eme)
+        Lycee: 5-7 (2nde-terminale)
+        University: 8-13 (L1-Doctorat)
+        Returns None if user has no class or is not in college/lycee/university
+        """
+        if self.education_level == "COLLEGE" and self.college_class:
+            return self.CLASS_LEVELS.get(self.college_class)
+        elif self.education_level == "LYCEE" and self.lycee_class:
+            return self.CLASS_LEVELS.get(self.lycee_class)
+        elif self.education_level == "UNIVERSITY":
+            if self.university_level == "doctorat":
+                return self.CLASS_LEVELS.get("doctorat")
+            elif self.university_year:
+                return self.CLASS_LEVELS.get(self.university_year)
+        return None
+
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
