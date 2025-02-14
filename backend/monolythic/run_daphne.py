@@ -7,4 +7,4 @@ django.setup()
 
 if __name__ == '__main__':
     cli = CommandLineInterface()
-    cli.run(['-b', '0.0.0.0', '-p', '8000', 'backend.asgi:application'])
+    cli.run(['-b', '0.0.0.0', '-p', '8001', 'backend.asgi:application'])
