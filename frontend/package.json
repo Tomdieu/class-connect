@@ -55,6 +55,7 @@
     "next-pwa": "^5.6.0",
     "next-themes": "^0.4.4",
     "pdfjs-dist": "^4.10.38",
+    "pspdfkit": "^2024.8.1",
     "react": "^19.0.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^19.0.0",
@@ -72,6 +73,8 @@
     "tailwindcss-animate": "^1.0.7",
     "usehooks-ts": "^3.1.0",
     "vaul": "^1.1.2",
+    "video.js": "^8.21.0",
+    "vidstack": "^1.12.12",
     "web-push": "^3.6.7",
     "zod": "^3.24.1",
     "zustand": "^5.0.2"

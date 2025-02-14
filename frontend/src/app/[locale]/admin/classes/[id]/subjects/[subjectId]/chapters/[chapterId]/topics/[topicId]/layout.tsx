@@ -24,9 +24,9 @@ interface TopicLayoutProps {
     });
   
     return (
-      <div className="container py-10 flex flex-col h-full flex-1 ">
-        <div className="grid 2xl:grid-cols-12 gap-4 h-full flex-1">
-          <div className="col-span-3">
+      <div className="container py-10 flex flex-col h-full flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:flex-1">
+          <div className="md:col-span-3">
             <div>
               <Link
                 className="flex items-center gap-1"
@@ -37,7 +37,7 @@ interface TopicLayoutProps {
             </div>
             <h1 className="text-3xl font-medium">Topic</h1>
             <div>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <h2 className="text-lg font-medium">{topic?.title}</h2>
                 <p className="text-muted-foreground text-sm">
                   {topic?.description}
@@ -45,7 +45,7 @@ interface TopicLayoutProps {
               </div>
             </div>
           </div>
-          <div className="col-span-9 w-full h-full flex flex-col">{children}</div>
+          <div className="md:col-span-9 w-full h-full flex flex-col">{children}</div>
         </div>
       </div>
     );

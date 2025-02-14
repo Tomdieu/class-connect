@@ -1,20 +1,45 @@
-import { AdminSidebar } from '@/components/dashboard/admin/AdminSidebar'
-import DashboardHeader from '@/components/dashboard/global/DashboardHeader'
-import { SidebarProvider } from '@/components/ui/sidebar'
-import React from 'react'
+"use client";
+import { AdminSidebar } from "@/components/dashboard/admin/AdminSidebar";
+import DashboardHeader from "@/components/dashboard/global/DashboardHeader";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import React,{useEffect} from "react";
+import { useSession, signOut } from "next-auth/react";
 
 export default function AdminLayout({ children }: React.PropsWithChildren) {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (!session?.user?.expiresAt) return;
+
+    const checkExpiration = () => {
+      const currentTime = Date.now();
+      const expiresAt = session.user.expiresAt as number;
+
+      if (currentTime >= expiresAt) {
+        signOut({ redirect: true, callbackUrl: "/" });
+      }
+    };
+
+    const intervalId = setInterval(checkExpiration, 1000);
+
+    // Initial check
+    checkExpiration();
+
+    return () => clearInterval(intervalId);
+  }, [session]);
+
   return (
-      <SidebarProvider aria-describedby="dashboard-layout" className="min-h-screen flex">
-        <div className='flex flex-1 h-screen '>
-          <AdminSidebar />
-          <main className='flex flex-col flex-1 h-full '>
-            <DashboardHeader />
-            <div className='flex-1 overflow-y-auto '>
-              {children}
-            </div>
-          </main>
-        </div>
-      </SidebarProvider>
-  )
+    <SidebarProvider
+      aria-describedby="dashboard-layout"
+      className="min-h-screen flex"
+    >
+      <div className="flex flex-1 h-screen ">
+        <AdminSidebar />
+        <main className="flex flex-col flex-1 h-full ">
+          <DashboardHeader />
+          <div className="flex-1 overflow-y-auto ">{children}</div>
+        </main>
+      </div>
+    </SidebarProvider>
+  );
 }

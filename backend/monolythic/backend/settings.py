@@ -35,7 +35,7 @@ except FileNotFoundError:
 SECRET_KEY = "django-insecure-)%^x%9(v84+=#1vc3wgh=^uq7d6gtcyw-tl%x5k+8cj1nt6wdm"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG',default=True)
 
 ALLOWED_HOSTS = ["*"]
 
@@ -244,9 +244,24 @@ REST_FRAMEWORK = {
 }
 
 # Cors Configuration
+# CORS_ALLOWED_ORIGINS = [
+#     "https://www.classconnect.cm",
+#     "https://classconnect.cm",
+#     "https://www.api.classconnect.cm",
+#     "https://api.classconnect.cm",
+# ]
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = ("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+
+# Add CSRF trusted origins
+CSRF_TRUSTED_ORIGINS = [
+    "https://www.classconnect.cm",
+    "https://classconnect.cm",
+    "https://www.api.classconnect.cm",
+    "https://api.classconnect.cm",
+    'http://localhost:3000',
+]
 
 # Social Auth
 
