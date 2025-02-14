@@ -118,15 +118,18 @@ export default {
   "registerDialog.confirmPasswordLabel": "Confirmer le mot de passe",
   "registerDialog.submitButton": "S'inscrire",
   "registerDialog.educationLevels": {
+    college: "Collège",
     lycee: "Lycée",
     university: "Université",
     professional: "Professionnel",
   },
-  "registerDialog.lyceeClasses": {
+  "registerDialog.collegeClasses": {
     "6eme": "6ème",
     "5eme": "5ème",
     "4eme": "4ème",
     "3eme": "3ème",
+  },
+  "registerDialog.lyceeClasses": {
     "2nde": "Seconde",
     "1ere": "Première",
     terminale: "Terminale",
@@ -150,6 +153,7 @@ export default {
     reason: "Raison d'utilisation de la plateforme",
   },
   "registerDialog.lyceeClassLabel": "Classe",
+  "registerDialog.collegeClassLabel": "Classe",
   "registerDialog.universityLevelLabel": "Niveau universitaire",
   "registerDialog.licenceYearLabel": "Année de licence",
   "registerDialog.masterYearLabel": "Année de master",

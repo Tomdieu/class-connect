@@ -126,19 +126,23 @@ export default {
   "registerDialog.confirmPasswordLabel": "Confirm Password",
   "registerDialog.submitButton": "Register",
   "registerDialog.educationLevels": {
+    college: "Middle School",
     lycee: "High School",
     university: "University",
     professional: "Professional",
   },
-  "registerDialog.lyceeClasses": {
+  "registerDialog.collegeClasses": {
     "6eme": "Form 1",
     "5eme": "Form 2",
     "4eme": "Form 3",
     "3eme": "Form 4",
+  },
+  "registerDialog.lyceeClasses": {
     "2nde": "Form 5",
     "1ere": "Lower Sixth",
     terminale: "Upper Sixth",
   },
+  "registerDialog.collegeClassLabel": "Class",
   "registerDialog.universityLevels": {
     licence: "Bachelor",
     master: "Master",
