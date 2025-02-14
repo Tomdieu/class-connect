@@ -14,10 +14,7 @@ from pathlib import Path
 import environ
 import os
 
-env = environ.Env(
-    # set casting, default value
-    DEBUG=(bool, True)
-)
+env = environ.Env()
 environ.Env.read_env()
 
 
@@ -223,9 +220,9 @@ else:
 # Static files always local regardless of USE_S3
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static"
-# ]
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
