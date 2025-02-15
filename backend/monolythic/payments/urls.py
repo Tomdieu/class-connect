@@ -6,6 +6,7 @@ router = DefaultRouter()
 router.register(r'plans', views.SubscriptionPlanViewSet, basename='plan')
 router.register(r'subscriptions', views.SubscriptionViewSet, basename='subscription')
 router.register(r'payments', views.PaymentViewSet, basename='payment')
+router.register(r'transactions', views.TransactionViewSet, basename='transaction')
 
 urlpatterns = [
     path('', include(router.urls)),
