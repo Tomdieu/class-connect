@@ -1,5 +1,5 @@
 import django_filters
-from .models import Subscription, Payment
+from .models import Subscription, Payment, Transaction
 
 class SubscriptionFilter(django_filters.FilterSet):
     is_active = django_filters.BooleanFilter()
@@ -16,3 +16,12 @@ class PaymentFilter(django_filters.FilterSet):
     class Meta:
         model = Payment
         fields = ['user_id', 'payment_method', 'status']
+
+class TransactionFilter(django_filters.FilterSet):
+    status = django_filters.ChoiceFilter(choices=Transaction.TRANSACTION_STATUS)
+    endpoint = django_filters.ChoiceFilter(choices=Transaction.TRANSACTION_TYPES)
+    created_at = django_filters.DateTimeFromToRangeFilter()
+    
+    class Meta:
+        model = Transaction
+        fields = ['status', 'endpoint', 'operator', 'phone_number']
