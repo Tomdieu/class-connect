@@ -1,21 +1,27 @@
-from django.shortcuts import render
-from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import api_view, permission_classes, action
-from rest_framework.permissions import IsAuthenticated
+import django_filters
+from rest_framework import viewsets, permissions, status, filters
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from .models import SubscriptionPlan, Subscription, Payment
-from .serializers import SubscriptionPlanSerializer, SubscriptionSerializer, PaymentSerializer
-from .filters import SubscriptionFilter, PaymentFilter
-from django_filters.rest_framework import DjangoFilterBackend
+from .models import SubscriptionPlan, Subscription, Payment,Transaction
+from .serializers import SubscriptionPlanSerializer, SubscriptionSerializer, PaymentSerializer, TransactionSerializer
+from .filters import SubscriptionFilter, PaymentFilter,TransactionFilter
 from .lib.campay import CamPayManager
 from django.urls import reverse
 import uuid
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.utils import timezone
+import json
+from .tasks.process_payments import process_payment_task
+import hashlib
+import hmac
+from rest_framework.authentication import TokenAuthentication
+from django.core.cache import cache
+from .pagination import CustomPagination
 
 class SubscriptionPlanViewSet(viewsets.ModelViewSet):
     queryset = SubscriptionPlan.objects.filter(active=True)
@@ -57,29 +63,90 @@ class PaymentLinkView(APIView):
         ],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
+            required=['phone_number'],  # Make phone_number required
             properties={
-                'success_url': openapi.Schema(type=openapi.TYPE_STRING, description='Success redirect URL'),
-                'failure_url': openapi.Schema(type=openapi.TYPE_STRING, description='Failure redirect URL'),
+                'phone_number': openapi.Schema(
+                    type=openapi.TYPE_STRING, 
+                    description='Phone number in international format (e.g., 237650039773)'
+                ),
+                'success_url': openapi.Schema(
+                    type=openapi.TYPE_STRING, 
+                    description='Success redirect URL',
+                    default='http://your-domain.com/payment/success'
+                ),
+                'failure_url': openapi.Schema(
+                    type=openapi.TYPE_STRING, 
+                    description='Failure redirect URL',
+                    default='http://your-domain.com/payment/failure'
+                ),
             }
         ),
         responses={
             200: openapi.Response(
                 description="Success",
-                examples={
-                    "application/json": {
-                        "payment_link": "https://checkout.campay.net/...",
-                        "transaction_id": "uuid-string",
-                        "success_url": "https://...",
-                        "failure_url": "https://..."
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'payment_link': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Generated payment link'
+                        ),
+                        'transaction_id': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Generated transaction ID'
+                        ),
+                        'success_url': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Success redirect URL'
+                        ),
+                        'failure_url': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Failure redirect URL'
+                        ),
                     }
-                }
+                )
             ),
-            404: "Subscription plan not found",
-            400: "Bad request"
+            404: openapi.Response(
+                description="Subscription plan not found",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            )
         }
     )
+    def generate_short_reference(self, plan_id, user_id):
+        """Generate a short but unique reference string"""
+        # Combine the IDs with a timestamp for uniqueness
+        combined = f"{plan_id}-{user_id}-{int(timezone.now().timestamp())}"
+        # Create a hash of the combined string
+        hash_object = hashlib.md5(combined.encode())
+        # Take first 12 characters of the hash
+        short_hash = hash_object.hexdigest()[:12]
+        # Combine with IDs in a shorter format
+        return f"p{plan_id}u{user_id}h{short_hash}"
+
     def post(self, request, plan_id):
         try:
+            # Validate phone number
+            phone_number = request.data.get('phone_number')
+            if not phone_number:
+                return Response(
+                    {'error': 'Phone number is required'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             # Try to get plan by ID first, then by slug
             try:
                 if plan_id.isdigit():
@@ -92,15 +159,6 @@ class PaymentLinkView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             
-            # Create subscription first (but don't activate it yet)
-            subscription = Subscription.objects.create(
-                user=request.user,
-                plan=plan,
-                start_date=timezone.now(),
-                end_date=timezone.now() + timezone.timedelta(days=plan.duration_days),
-                auto_renew=False
-            )
-            
             # Initialize CamPay client
             campay = CamPayManager(
                 app_username=settings.CAMPAY_APP_USERNAME,
@@ -108,8 +166,19 @@ class PaymentLinkView(APIView):
                 environment=settings.CAMPAY_ENVIRONMENT
             )
             
-            # Generate unique transaction reference
-            transaction_id = str(uuid.uuid4())
+            # Generate short transaction ID
+            transaction_id = self.generate_short_reference(plan.id, request.user.id)
+            
+            # Store the full reference data in Redis for later lookup
+            reference_data = {
+                'plan_id': str(plan.id),
+                'user_id': str(request.user.id),
+                'uuid': str(uuid.uuid4())
+            }
+            
+            # Store in Redis with 24-hour expiry
+            cache_key = f"payment_ref_{transaction_id}"
+            cache.set(cache_key, json.dumps(reference_data), timeout=86400)  # 24 hours
             
             # Create payment description
             description = f"Subscription to {plan.name} plan"
@@ -125,27 +194,32 @@ class PaymentLinkView(APIView):
             payment_link = campay.create_payment_link(
                 amount=str(plan.price),
                 description=description,
-                external_reference=transaction_id,
+                external_reference=transaction_id,  # Using short reference
                 redirect_url=success_url,
                 failure_redirect_url=failure_url,
                 first_name=request.user.first_name,
                 last_name=request.user.last_name,
                 email=request.user.email,
-                phone=str(request.user.phone_number).replace('+', '')
+                phone=phone_number.replace('+', '')  # Use provided phone number
             )
             
-            # Create pending payment record with subscription
-            payment = Payment.objects.create(
-                user=request.user,
-                subscription=subscription,  # Link the subscription
+            # Create pending transaction record
+            transaction = Transaction.objects.create(
+                reference=transaction_id,
+                status='PENDING',
                 amount=plan.price,
-                payment_method='MTN',  # Default to MTN, can be updated later
-                transaction_id=transaction_id,
-                status='PENDING'
+                app_amount=plan.price,
+                currency='XAF',
+                operator='MTN',  # Default to MTN, can be updated later
+                endpoint='collect',
+                code='',
+                operator_reference='',
+                phone_number=phone_number.replace('+', ''),
+                external_reference=transaction_id,
             )
             
             return Response({
-                'payment_link': payment_link['payment_url'],
+                'payment_link': payment_link['link'],
                 'transaction_id': transaction_id,
                 'success_url': success_url,
                 'failure_url': failure_url
@@ -157,7 +231,6 @@ class PaymentLinkView(APIView):
                 {'error': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
 class SubscriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SubscriptionSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -178,47 +251,65 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
             return Payment.objects.none()  # Return empty queryset for swagger
         return Payment.objects.filter(user=self.request.user)
     
+class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = TransactionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_class = TransactionFilter
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, django_filters.rest_framework.DjangoFilterBackend]
+    search_fields = ['phone_number', 'reference']
+    ordering_fields = ['created_at', 'amount']
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        """
+        Return all transactions.
+        """
+        return Transaction.objects.all()
+    
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'created_at_after',
+                openapi.IN_QUERY,
+                description="Filter by created_at after this datetime (format: YYYY-MM-DD HH:MM:SS)",
+                type=openapi.TYPE_STRING,
+                format=openapi.FORMAT_DATETIME,
+            ),
+            openapi.Parameter(
+                'created_at_before',
+                openapi.IN_QUERY,
+                description="Filter by created_at before this datetime (format: YYYY-MM-DD HH:MM:SS)",
+                type=openapi.TYPE_STRING,
+                format=openapi.FORMAT_DATETIME,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 @csrf_exempt
 @api_view(['POST', 'GET'])
+@permission_classes([AllowAny])  # This will allow any request to access the endpoint
 def payment_webhook(request):
     """
     Webhook to handle payment notifications from payment providers
     """
     try:
-        # Get all data from request
-        webhook_data = request.GET
+        # Get webhook data and convert QueryDict to dict
+        webhook_data = request.GET.dict()
         
-        # Find the payment
-        external_reference = webhook_data.get('external_reference')
-        payment = Payment.objects.get(transaction_id=external_reference)
+        # # Log the webhook data for debugging
+        # print(f"Received webhook data: {webhook_data}")
         
-        if webhook_data.get('status') == 'SUCCESSFUL':
-            payment.process_successful_payment(webhook_data)
-            
-            return Response({
-                'status': 'success',
-                'message': 'Payment processed successfully',
-                'data': {
-                    'amount': payment.amount,
-                    'operator': payment.payment_method,
-                    'reference': payment.operator_reference,
-                    'subscription_plan': payment.subscription.plan.name,
-                    'valid_until': payment.subscription.end_date
-                }
-            })
-        else:
-            payment.status = 'FAILED'
-            payment.save()
-            return Response({
-                'status': 'error',
-                'message': 'Payment was not successful'
-            }, status=status.HTTP_400_BAD_REQUEST)
-            
-    except Payment.DoesNotExist:
+        # Queue payment processing using Celery
+        result = process_payment_task.delay(webhook_data)
+        
         return Response({
-            'status': 'error',
-            'message': 'Payment not found'
-        }, status=status.HTTP_404_NOT_FOUND)
+            'status': 'success',
+            'message': 'Payment queued for processing',
+            'task_id': result.id
+        })
+        
     except Exception as e:
         print(f"Payment webhook error: {str(e)}")
         return Response({
@@ -249,11 +340,13 @@ def payment_success(request):
             payment.save()
             
             # Activate the subscription
-            subscription = payment.subscription
-            if subscription:
-                subscription.start_date = timezone.now()
-                subscription.end_date = timezone.now() + timezone.timedelta(days=subscription.plan.duration_days)
-                subscription.save()
+            subscription = Subscription.objects.create(
+                user=payment.user,
+                plan=SubscriptionPlan.objects.get(id=payment.plan_id),
+                start_date=timezone.now(),
+                end_date=timezone.now() + timezone.timedelta(days=payment.plan.duration_days),
+                auto_renew=False
+            )
             
             return Response({
                 'status': 'success',
