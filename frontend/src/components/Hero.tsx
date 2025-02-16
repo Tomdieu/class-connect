@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Play, UserCheck, Users } from "lucide-react";
@@ -6,12 +6,16 @@ import { Play, UserCheck, Users } from "lucide-react";
 import { AboutContent } from "./AboutContent";
 import { useI18n } from "@/locales/client";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useAuthDialog } from "@/hooks/use-auth-dialog";
 
 function Hero() {
   // const isMobile = useMediaQuery('(max-width: 640px)')
   const [showAbout, setShowAbout] = useState(false);
-  const t = useI18n()
-  const router = useRouter()
+  const { openLogin } = useAuthDialog();
+  const { data: session } = useSession();
+  const t = useI18n();
+  const router = useRouter();
   return (
     <div className="flex flex-col gap-10 py-20 bg-[#F0F9FF]">
       <div className="flex items-center justify-center text-black flex-col gap-8">
@@ -27,7 +31,13 @@ function Hero() {
         <div className="flex items-center justify-between gap-6">
           <Button
             size={"lg"}
-            onClick={()=>router.push('/dashboard')}
+            onClick={() => {
+              if (session?.user) {
+                router.push("/dashboard");
+              } else {
+                openLogin();
+              }
+            }}
             className="bg-default hover:bg-default/80 text-white rounded-md"
           >
             {t("hero.start")}
@@ -38,7 +48,7 @@ function Hero() {
             onClick={() => setShowAbout(true)}
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-neutral-50 hover:text-default h-11 rounded-md px-8 border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#D3E4FD]"
           >
-            {t("hero.learnMore")} 
+            {t("hero.learnMore")}
           </Button>
         </div>
       </div>
@@ -50,9 +60,7 @@ function Hero() {
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
             {t("features.interactive")}
           </h3>
-          <p className="text-gray-600">
-            {t("features.interactive.desc")}
-          </p>
+          <p className="text-gray-600">{t("features.interactive.desc")}</p>
         </div>
         <div className="p-6 bg-white rounded-xl shadow-sm border border-[#0EA5E9]/20">
           <div className="flex justify-center mb-4">
@@ -61,9 +69,7 @@ function Hero() {
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
             {t("features.personalized")}
           </h3>
-          <p className="text-gray-600">
-            {t("features.personalized.desc")}
-          </p>
+          <p className="text-gray-600">{t("features.personalized.desc")}</p>
         </div>
         <div className="p-6 bg-white rounded-xl shadow-sm border border-[#0EA5E9]/20">
           <div className="flex justify-center mb-4">
@@ -72,9 +78,7 @@ function Hero() {
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
             {t("features.community")}
           </h3>
-          <p className="text-gray-600">
-            {t("features.community.desc")}
-          </p>
+          <p className="text-gray-600">{t("features.community.desc")}</p>
         </div>
       </div>
       {showAbout && <AboutContent onClose={() => setShowAbout(false)} />}
