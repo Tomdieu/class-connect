@@ -394,7 +394,7 @@ function RegisterDialog() {
 
   return (
     <Credenza open={isRegisterOpen} onOpenChange={closeDialog}>
-      <CredenzaContent className="px-3 py-5 ">
+      <CredenzaContent className="py-5">
         <div className="overflow-y-auto max-h-[calc(100vh-120px)] w-full">
           <CredenzaHeader>
             <div className="flex flex-col items-center space-y-4">
