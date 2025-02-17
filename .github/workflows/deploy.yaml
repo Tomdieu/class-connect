@@ -1,4 +1,3 @@
-
 name: CI/CD auth-app
 on:
   push:
@@ -14,6 +13,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}  # Add this line
           port: ${{ secrets.PORT }}
           script: |
             cd /home/ubuntu/class-connect/backend/monolythic
