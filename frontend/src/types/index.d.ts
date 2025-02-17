@@ -1,10 +1,11 @@
-export const EDUCATION_LEVELS = ["LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
+export const EDUCATION_LEVELS = ["COLLEGE", "LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
 export const LYCEE_CLASSES = ["6eme", "5eme", "4eme", "3eme", "2nde", "1ere", "terminale"] as const;
 export const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 export const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
 export const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
 export const MASTER_YEARS = ["M1", "M2"] as const;
 export const SECTIONS = ["FRANCOPHONE","ANGLOPHONE"] as const;
+export const COLLEGE_CLASSES = ["6eme", "5eme", "4eme", "3eme"] as const;
 
 export type EducationLevel = typeof EDUCATION_LEVELS[number];
 export type LyceeClass = typeof LYCEE_CLASSES[number];
@@ -13,6 +14,7 @@ export type UniversityLevel = typeof UNIVERSITY_LEVELS[number];
 export type LicenceYear = typeof LICENCE_YEARS[number];
 export type MasterYear = typeof MASTER_YEARS[number];
 export type Section = typeof SECTIONS[number];
+export type CollegeClass = typeof COLLEGE_CLASSES[number];
 
 export const LANGUAGE_CHOICES = ["en", "fr"] as const;
 export type LanguageChoice = typeof LANGUAGE_CHOICES[number];
@@ -35,6 +37,9 @@ export declare interface UserCreateType {
   university_year?: string;
   enterprise_name?: string;
   platform_usage_reason?: string;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  college_class?: CollegeClass;
 }
 
 export declare interface UserType {
@@ -57,10 +62,12 @@ export declare interface UserType {
   town: string | null;
   quarter: string | null;
   is_staff: boolean;
+  is_superuser: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;
   date_joined: string;
+  college_class: CollegeClass | null;
 }
 
 export declare interface UserActiveToken {
