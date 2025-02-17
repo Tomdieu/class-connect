@@ -35,16 +35,20 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     EDUCATION_LEVELS = [
+        ("COLLEGE", "Collège"),
         ("LYCEE", "Lycée"),
         ("UNIVERSITY", "Université"),
         ("PROFESSIONAL", "Professionnel"),
     ]
 
-    LYCEE_CLASSES = [
+    COLLEGE_CLASSES = [
         ("6eme", "6ème"),
         ("5eme", "5ème"),
         ("4eme", "4ème"),
         ("3eme", "3ème"),
+    ]
+
+    LYCEE_CLASSES = [
         ("2nde", "2nde"),
         ("1ere", "1ère"),
         ("terminale", "Terminale"),
@@ -71,6 +75,28 @@ class User(AbstractBaseUser, PermissionsMixin):
         ("M1", "M1"),
         ("M2", "M2"),
     ]
+    
+    CLASS_LEVELS = {
+        # College classes (6eme = 1, 5eme = 2, etc.)
+        "6eme": 1,
+        "5eme": 2,
+        "4eme": 3,
+        "3eme": 4,
+        # Lycee classes (2nde = 5, 1ere = 6, etc.)
+        "2nde": 5,
+        "1ere": 6,
+        "terminale": 7,
+        # University levels
+        # Licence
+        "L1": 8,
+        "L2": 9,
+        "L3": 10,
+        # Master
+        "M1": 11,
+        "M2": 12,
+        # Doctorat
+        "doctorat": 13,
+    }
 
     LANGUAGE_CHOICES = [
         ("en", "English"),
@@ -86,8 +112,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     education_level = models.CharField(max_length=20, choices=EDUCATION_LEVELS)
 
     # Education level specific fields
+    college_class = models.CharField(
+        max_length=20, 
+        choices=COLLEGE_CLASSES,
+        null=True, 
+        blank=True,
+        help_text=_("Class for college students")
+    )
     lycee_class = models.CharField(
-        max_length=20, choices=LYCEE_CLASSES, null=True, blank=True
+        max_length=20, 
+        choices=LYCEE_CLASSES,
+        null=True, 
+        blank=True,
+        help_text=_("Class for lycee students")
     )
     lycee_speciality = models.CharField(max_length=255,choices=LYCEE_SPECIALITIES, null=True, blank=True)
     university_level = models.CharField(
@@ -137,9 +174,22 @@ class User(AbstractBaseUser, PermissionsMixin):
         from django.core.exceptions import ValidationError
 
         # Validate education level specific fields
+        if self.education_level == "COLLEGE":
+            if not self.college_class:
+                raise ValidationError(_("College class is required for college students"))
+            self.lycee_class = None
+            self.lycee_speciality = None
+            self.university_level = None
+            self.university_year = None
+            self.enterprise_name = None
+            self.platform_usage_reason = None
+            
         if self.education_level == "LYCEE":
             if not self.lycee_class:
                 raise ValidationError(_("Lycee class is required for lycee students"))
+            if not self.lycee_speciality:
+                raise ValidationError(_("Speciality is required for lycee students"))
+            self.college_class = None
             self.university_level = None
             self.university_year = None
             self.enterprise_name = None
@@ -147,30 +197,42 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         elif self.education_level == "UNIVERSITY":
             if not self.university_level:
-                raise ValidationError(
-                    _("University level is required for university students")
-                )
-            if (
-                self.university_level in ["licence", "master"]
-                and not self.university_year
-            ):
-                raise ValidationError(
-                    _("University year is required for licence and master students")
-                )
+                raise ValidationError(_("University level is required for university students"))
+            if self.university_level in ["licence", "master"] and not self.university_year:
+                raise ValidationError(_("University year is required for licence and master students"))
+            self.college_class = None
             self.lycee_class = None
+            self.lycee_speciality = None
             self.enterprise_name = None
             self.platform_usage_reason = None
 
         elif self.education_level == "PROFESSIONAL":
             if not self.enterprise_name or not self.platform_usage_reason:
-                raise ValidationError(
-                    _(
-                        "Enterprise name and platform usage reason are required for professionals"
-                    )
-                )
+                raise ValidationError(_("Enterprise name and platform usage reason are required for professionals"))
+            self.college_class = None
             self.lycee_class = None
+            self.lycee_speciality = None
             self.university_level = None
             self.university_year = None
+
+    def get_class_level(self) -> int | None:
+        """
+        Returns the numeric level of the user's class.
+        College: 1-4 (6eme-3eme)
+        Lycee: 5-7 (2nde-terminale)
+        University: 8-13 (L1-Doctorat)
+        Returns None if user has no class or is not in college/lycee/university
+        """
+        if self.education_level == "COLLEGE" and self.college_class:
+            return self.CLASS_LEVELS.get(self.college_class)
+        elif self.education_level == "LYCEE" and self.lycee_class:
+            return self.CLASS_LEVELS.get(self.lycee_class)
+        elif self.education_level == "UNIVERSITY":
+            if self.university_level == "doctorat":
+                return self.CLASS_LEVELS.get("doctorat")
+            elif self.university_year:
+                return self.CLASS_LEVELS.get(self.university_year)
+        return None
 
     def save(self, *args, **kwargs):
         self.clean()

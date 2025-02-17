@@ -4,6 +4,7 @@ export const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 export const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
 export const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
 export const MASTER_YEARS = ["M1", "M2"] as const;
+export const SECTIONS = ["FRANCOPHONE","ANGLOPHONE"] as const;
 
 export type EducationLevel = typeof EDUCATION_LEVELS[number];
 export type LyceeClass = typeof LYCEE_CLASSES[number];
@@ -11,6 +12,7 @@ export type LyceeSpecialities = typeof LYCEE_SPECIALITIES[number];
 export type UniversityLevel = typeof UNIVERSITY_LEVELS[number];
 export type LicenceYear = typeof LICENCE_YEARS[number];
 export type MasterYear = typeof MASTER_YEARS[number];
+export type Section = typeof SECTIONS[number];
 
 export const LANGUAGE_CHOICES = ["en", "fr"] as const;
 export type LanguageChoice = typeof LANGUAGE_CHOICES[number];
@@ -102,6 +104,7 @@ export declare interface ClassType {
   id: number;
   name: string;
   level: EducationLevel;
+  secion: Section;
   description: string | null;
   created_at: string;
   updated_at: string;
@@ -110,6 +113,7 @@ export declare interface ClassType {
 export declare interface ClassCreateType {
   name: string;
   level: EducationLevel;
+  section:Section;
   description?: string;
 }
 

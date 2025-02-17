@@ -9,6 +9,7 @@ import TopicModal from '../dashboard/admin/modals/TopicModal'
 import { ExerciseModal, PDFModal, RevisionModal, VideoModal } from '../dashboard/admin/modals/ResourceModal'
 import { PDFDialog } from '../dashboard/admin/modals/PDFDialog'
 import { VideoPreviewModal } from "@/components/dashboard/admin/modals/VideoPreviewModal";
+import ClassModal from '../dashboard/admin/modals/ClassModal'
 
 function Modals() {
   return (
@@ -16,6 +17,7 @@ function Modals() {
       <LoginDialog />
       <RegisterDialog />
       <UserDialog />
+      <ClassModal/>
       <SubjectModal />
       <ChapterModal />
       <TopicModal />

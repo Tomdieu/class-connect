@@ -33,8 +33,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea";
 
-const EDUCATION_LEVELS = ["LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
-const LYCEE_CLASSES = ["6eme", "5eme", "4eme", "3eme", "2nde", "1ere", "terminale"] as const;
+const EDUCATION_LEVELS = ["COLLEGE", "LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
+const COLLEGE_CLASSES = ["6eme", "5eme", "4eme", "3eme"] as const;
+const LYCEE_CLASSES = ["2nde", "1ere", "terminale"] as const;
 const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
 const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
 const MASTER_YEARS = ["M1", "M2"] as const;
@@ -155,6 +156,40 @@ function RegisterDialog() {
     const educationLevel = form.watch("education_level");
     const lyceeClass = form.watch("lycee_class");
 
+    if (educationLevel === "COLLEGE") {
+      return (
+        <FormField
+          control={form.control}
+          name="lycee_class"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("registerDialog.collegeClassLabel")}</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue 
+                      placeholder={t("registerDialog.collegeClassLabel")} 
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COLLEGE_CLASSES.map((collegeClass) => (
+                      <SelectItem key={collegeClass} value={collegeClass}>
+                        {t(`registerDialog.collegeClasses.${collegeClass}` as keyof typeof t)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+    }
+
     if (educationLevel === "LYCEE") {
       return (
         <>
@@ -187,37 +222,35 @@ function RegisterDialog() {
               </FormItem>
             )}
           />
-          {lyceeClass && ["2nde", "1ere", "terminale"].includes(lyceeClass) && (
-            <FormField
-              control={form.control}
-              name="lycee_speciality"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("registerDialog.lyceeSpecialityLabel")}</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue 
-                          placeholder={t("registerDialog.lyceeSpecialityLabel")} 
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LYCEE_SPECIALITIES.map((speciality) => (
-                          <SelectItem key={speciality} value={speciality}>
-                            {t(`registerDialog.lyceeSpecialities.${speciality}` as keyof typeof t)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+          <FormField
+            control={form.control}
+            name="lycee_speciality"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("registerDialog.lyceeSpecialityLabel")}</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue 
+                        placeholder={t("registerDialog.lyceeSpecialityLabel")} 
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LYCEE_SPECIALITIES.map((speciality) => (
+                        <SelectItem key={speciality} value={speciality}>
+                          {t(`registerDialog.lyceeSpecialities.${speciality}` as keyof typeof t)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </>
       );
     }

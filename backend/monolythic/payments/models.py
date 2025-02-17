@@ -26,8 +26,9 @@ class SubscriptionPlan(models.Model):
         return self.name
 
 class Subscription(models.Model):
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subscriptions')
-    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.PROTECT)
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.PROTECT,unique=True)
     start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField()
     auto_renew = models.BooleanField(default=False)
