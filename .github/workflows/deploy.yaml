@@ -9,12 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy Backend using SSH (Main)
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@vmaster
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
           port: ${{ secrets.PORT }}
           script: |
             cd /home/ubuntu/class-connect/backend/monolythic
