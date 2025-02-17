@@ -8,8 +8,11 @@ jobs:
   deploy_main:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Deploy Frontend using SSH (Main)
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@1.0.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
