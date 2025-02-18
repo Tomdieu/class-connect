@@ -23,7 +23,6 @@ function UserTable() {
       setUsers(data);
     }
   }, [data]);
-  console.log({data});
 
   if (isLoading) {
     return <p>Loading...</p>;
