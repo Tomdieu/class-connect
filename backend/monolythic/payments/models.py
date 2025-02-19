@@ -40,7 +40,8 @@ class Subscription(models.Model):
     end_date = models.DateTimeField()
     auto_renew = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)  # New field
-    
+    created_at = models.DateTimeField(auto_now_add=True)
+
     @property
     def status(self):
         if not self.is_active:
@@ -56,8 +57,21 @@ class Subscription(models.Model):
         self.end_date = self.start_date + timezone.timedelta(days=self.plan.duration_days)
         self.save()
     
+    @classmethod
+    def has_active_subscription(cls, user):
+        """Check if user has any active subscription"""
+        now = timezone.now()
+        return cls.objects.filter(
+            user=user,
+            is_active=True,
+            end_date__gt=now
+        ).exists()
+    
     def __str__(self):
         return f'{self.user.email} - {self.plan.name} ({self.status})'
+
+    class Meta:
+        ordering = ['-created_at']  # Add default ordering
 
 class Payment(models.Model):
     PAYMENT_METHODS = [
