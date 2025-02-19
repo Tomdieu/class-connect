@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .models import SubscriptionPlan, Subscription, Payment,Transaction
-from .serializers import SubscriptionPlanSerializer, SubscriptionSerializer, PaymentSerializer, TransactionSerializer
+from .serializers import SubscriptionDetailSerializer, SubscriptionPlanSerializer, SubscriptionSerializer, PaymentSerializer, TransactionSerializer
 from .filters import SubscriptionFilter, PaymentFilter,TransactionFilter
 from .lib.campay import CamPayManager
 from django.urls import reverse
@@ -120,7 +120,15 @@ class PaymentLinkView(APIView):
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
                     properties={
-                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Error message'
+                        ),
+                        'active': openapi.Schema(
+                            type=openapi.TYPE_BOOLEAN,
+                            description='Indicates if error is due to active subscription',
+                            default=False
+                        ),
                     }
                 )
             )
@@ -139,6 +147,16 @@ class PaymentLinkView(APIView):
 
     def post(self, request, plan_id):
         try:
+            # Check if user has active subscription
+            if Subscription.has_active_subscription(request.user):
+                return Response(
+                    {
+                        'error': 'You already have an active subscription. Please wait for it to expire before subscribing to a new plan.',
+                        'active': True
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             # Validate phone number
             phone_number = request.data.get('phone_number')
             if not phone_number:
@@ -231,10 +249,113 @@ class PaymentLinkView(APIView):
                 {'error': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+class CurrentSubscriptionView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    @swagger_auto_schema(
+        operation_description="Get user's current active subscription plan",
+        responses={
+            200: SubscriptionDetailSerializer(),
+            404: openapi.Response(
+                description="No active subscription found",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            )
+        }
+    )
+    def get(self, request):
+        try:
+            # Changed to order by start_date instead of created_at
+            subscription = Subscription.objects.filter(
+                user=request.user,
+                is_active=True,
+                end_date__gt=timezone.now()
+            ).latest('start_date')
+            
+            serializer = SubscriptionDetailSerializer(subscription)
+            return Response(serializer.data)
+            
+        except Subscription.DoesNotExist:
+            return Response(    
+                {'error': 'No active subscription found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+class SubscriptionHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    @swagger_auto_schema(
+        operation_description="Get user's subscription history",
+        manual_parameters=[
+            openapi.Parameter(
+                'page',
+                openapi.IN_QUERY,
+                description="Page number",
+                type=openapi.TYPE_INTEGER
+            ),
+            openapi.Parameter(
+                'page_size',
+                openapi.IN_QUERY,
+                description="Number of results per page",
+                type=openapi.TYPE_INTEGER
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="Success",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'count': openapi.Schema(
+                            type=openapi.TYPE_INTEGER,
+                            description='Total number of items'
+                        ),
+                        'next': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            format=openapi.FORMAT_URI,
+                            description='URL to next page (null if no next page)',
+                            nullable=True
+                        ),
+                        'previous': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            format=openapi.FORMAT_URI,
+                            description='URL to previous page (null if no previous page)',
+                            nullable=True
+                        ),
+                        'results': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=SubscriptionDetailSerializer,
+                            description='List of subscriptions'
+                        )
+                    }
+                )
+            )
+        }
+    )
+    def get(self, request):
+        subscriptions = Subscription.objects.filter(
+            user=request.user
+        ).order_by('-created_at')
+        
+        paginator = CustomPagination()
+        paginated_subscriptions = paginator.paginate_queryset(subscriptions, request)
+        
+        serializer = SubscriptionDetailSerializer(paginated_subscriptions, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
 class SubscriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = SubscriptionSerializer
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = SubscriptionFilter
+    
+    def get_serializer_class(self):
+        if self.action in ['list']:
+            return SubscriptionDetailSerializer
+        return SubscriptionSerializer
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
