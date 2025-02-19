@@ -177,6 +177,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def clean(self):
         from django.core.exceptions import ValidationError
 
+        # Skip validation for superusers and staff
+        if self.is_superuser or self.is_staff:
+            return
+
         # Validate education level specific fields
         if self.education_level == "COLLEGE":
             if not self.college_class:
