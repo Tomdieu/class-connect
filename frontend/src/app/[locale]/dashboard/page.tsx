@@ -30,7 +30,7 @@ function DashboardPage() {
           <div className='bg-sky-100 p-2 rounded-full'>
             <FaCalendarCheck className='size-7 text-neutral-700' />
           </div>
-          <h1 className='font-bold text-xl text-white'>MES OFFRES DE COURS</h1>
+          <h1 className='font-bold text-xl text-white'>MES DISPONIBILITES</h1>
           <Button variant={"outline"}>Actualiser</Button>
         </div>
       </div>
