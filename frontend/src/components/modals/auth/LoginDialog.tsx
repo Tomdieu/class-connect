@@ -149,126 +149,147 @@ function LoginDialog() {
 
   return (
     <Credenza open={isLoginOpen} onOpenChange={closeDialog}>
-      <CredenzaContent className="max-w-sm">
-        <CredenzaHeader>
-          <div className="flex flex-col items-center space-y-4">
-            <div className="p-3 rounded-full bg-blue-100">
-              <BookOpen className="h-8 w-8 text-blue-600" />
-            </div>
-            <DialogTitle className="text-2xl font-bold text-center">
-              {isResettingPassword
-                ? t("loginDialog.resetPasswordTitle")
-                : t("loginDialog.title")}
-            </DialogTitle>
-            {!isResettingPassword && (
-              <p className="text-sm text-gray-500 text-center">
-                {t("loginDialog.subtitle")}
-              </p>
+      <CredenzaContent className="max-w-md p-0 overflow-hidden">
+        <div className="relative pt-5">
+          {/* Decorative background */}
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100/50" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-blue-200/20 rounded-full filter blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-200/20 rounded-full filter blur-3xl" />
+          </div>
+
+          <div className="relative">
+            <CredenzaHeader className="pb-0 text-center space-y-2">
+              <div className="mx-auto w-full max-w-sm space-y-6">
+                <div className="flex flex-col items-center space-y-4 pb-4">
+                  <div className="p-3 rounded-2xl bg-blue-100/80 backdrop-blur-sm">
+                    <BookOpen className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <DialogTitle className="text-2xl font-bold">
+                    {isResettingPassword
+                      ? t("loginDialog.resetPasswordTitle")
+                      : t("loginDialog.title")}
+                  </DialogTitle>
+                  {!isResettingPassword && (
+                    <p className="text-gray-500 text-base max-w-xs">
+                      {t("loginDialog.subtitle")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </CredenzaHeader>
+
+            {isResettingPassword ? (
+              <Form {...forgotPasswordForm}>
+                <form
+                  onSubmit={forgotPasswordForm.handleSubmit(handleForgotPasswordSubmit)}
+                  className="flex flex-col gap-4 p-6"
+                >
+                  <FormField
+                    control={forgotPasswordForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">{t("loginDialog.emailLabel")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="email@example.com"
+                            className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-500" />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={forgotPasswordForm.formState.isSubmitting}
+                    className="bg-default hover:bg-default/90 text-white h-11 rounded-xl font-medium"
+                  >
+                    {t("loginDialog.sendResetLinkButton")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={handleSwitchToLogin}
+                    disabled={forgotPasswordForm.formState.isSubmitting}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    {t("loginDialog.backToLoginButton")}
+                  </Button>
+                </form>
+              </Form>
+            ) : (
+              <Form {...loginForm}>
+                <form
+                  onSubmit={loginForm.handleSubmit(handleLoginSubmit)}
+                  className="flex flex-col gap-4 p-6"
+                >
+                  {errors.root && (
+                    <div className="w-full bg-red-50 border border-red-200 rounded-xl p-3">
+                      <span className="text-red-600 text-sm font-medium">{errors.root.message}</span>
+                    </div>
+                  )}
+                  <FormField
+                    control={loginForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">{t("loginDialog.emailLabel")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="email@example.com"
+                            className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-500" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={loginForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">{t("loginDialog.passwordLabel")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-500" />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={loginForm.formState.isSubmitting || isLoading}
+                    className="bg-default hover:bg-default/90 text-white h-11 rounded-xl font-medium flex items-center justify-center gap-2"
+                  >
+                    {isLoading && <LoaderCircle className="h-4 w-4 animate-spin"/>}
+                    {t("loginDialog.loginButton")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={handleSwitchToForgotPassword}
+                    disabled={loginForm.formState.isSubmitting}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    {t("loginDialog.forgotPasswordButton")}
+                  </Button>
+                </form>
+              </Form>
             )}
           </div>
-        </CredenzaHeader>
-
-        {isResettingPassword ? (
-          <Form {...forgotPasswordForm}>
-            <form
-              onSubmit={forgotPasswordForm.handleSubmit(
-                handleForgotPasswordSubmit
-              )}
-              className="flex flex-col gap-2 px-4"
-            >
-              <FormField
-                control={forgotPasswordForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("loginDialog.emailLabel")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="email@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                disabled={forgotPasswordForm.formState.isSubmitting}
-              >
-                {t("loginDialog.sendResetLinkButton")}
-              </Button>
-              <Button
-                type="button"
-                variant="link"
-                onClick={handleSwitchToLogin}
-                disabled={forgotPasswordForm.formState.isSubmitting}
-              >
-                {t("loginDialog.backToLoginButton")}
-              </Button>
-            </form>
-          </Form>
-        ) : (
-          <Form {...loginForm}>
-            <form
-              onSubmit={loginForm.handleSubmit(handleLoginSubmit)}
-              className="flex flex-col gap-2 px-4"
-            >
-              {errors.root && (
-                <div className="w-full border border-red-500 rounded-md p-2">
-                  <span className="text-red-500 font-semibold">{errors.root.message}</span>
-                </div>
-              )}
-              <FormField
-                control={loginForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("loginDialog.emailLabel")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="email@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={loginForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("loginDialog.passwordLabel")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="••••••••"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={loginForm.formState.isSubmitting}>
-                {t("loginDialog.loginButton")}
-              </Button>
-              <Button
-                type="button"
-                variant="link"
-                onClick={handleSwitchToForgotPassword}
-                disabled={loginForm.formState.isSubmitting}
-              >
-                {isLoading && (<LoaderCircle className="size-4 animate-spin text-white mr-2"/>)}
-                {t("loginDialog.forgotPasswordButton")}
-              </Button>
-            </form>
-          </Form>
-        )}
+        </div>
       </CredenzaContent>
     </Credenza>
   );
