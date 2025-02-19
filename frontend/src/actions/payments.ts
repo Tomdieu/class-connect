@@ -3,7 +3,20 @@
 import api from "@/services/api";
 import { auth } from "@/auth";
 import axios from "axios";
-import { Payments, SubscriptionPlan, TransactionFilterParams, TransactionListResponse } from "@/types";
+import {
+  PaginationType,
+  Payments,
+  Subscription,
+  SubscriptionDetail,
+  SubscriptionPlan,
+  TransactionFilterParams,
+  TransactionListResponse,
+} from "@/types";
+
+interface SubscriptionError {
+  error: string;
+  active?: boolean;
+}
 
 // region Payments
 
@@ -44,10 +57,11 @@ export const subscribeToPlan = async ({
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorized user!");
+
     const response = await api.post(
       `/api/plans/${plan}/payment-link/`,
-      { 
-        success_url, 
+      {
+        success_url,
         failure_url,
         phone_number: `237${phone_number}`,
         payment_method,
@@ -58,9 +72,11 @@ export const subscribeToPlan = async ({
         },
       }
     );
+
     return response.data as { payment_link: string };
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      // Type guard for Axios errors
       if (error.response && error.response.data) {
         throw error.response.data;
       }
@@ -82,7 +98,6 @@ export const getSubscriptionPlan = async () => {
     });
     return response.data as SubscriptionPlan[];
   } catch (error) {
-    console.log(error);
     if (axios.isAxiosError(error)) {
       // Type guard for Axios errors
       if (error.response && error.response.data) {
@@ -173,7 +188,7 @@ export const listSubscriptions = async () => {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
     });
-    return response.data as SubscriptionPlan[];
+    return response.data as SubscriptionDetail[];
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // Type guard for Axios errors
@@ -194,7 +209,49 @@ export const getSubscription = async (id: number) => {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
     });
-    return response.data as SubscriptionPlan;
+    return response.data as Subscription;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // Type guard for Axios errors
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+    }
+    throw error;
+  }
+};
+
+export const getCurrentPlan = async () => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get("/api/current-plan/", {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    });
+    return response.data as SubscriptionDetail;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // Type guard for Axios errors
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+    }
+    throw error;
+  }
+};
+
+export const getSubscriptionHistory = async () => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get(`/api/subscription-history/`, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    });
+    return response.data as PaginationType<SubscriptionDetail>;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // Type guard for Axios errors
@@ -208,7 +265,11 @@ export const getSubscription = async (id: number) => {
 
 // region Transactions
 
-export const listTransactions = async ({params}:{params?:TransactionFilterParams})=>{
+export const listTransactions = async ({
+  params,
+}: {
+  params?: TransactionFilterParams;
+}) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
@@ -216,16 +277,16 @@ export const listTransactions = async ({params}:{params?:TransactionFilterParams
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
-      params
+      params,
     });
     return response.data as TransactionListResponse;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-          // Type guard for Axios errors
-          if (error.response && error.response.data) {
-            throw error.response.data;
-          }
-        }
-        throw error;
+      // Type guard for Axios errors
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+    }
+    throw error;
   }
-}
+};
