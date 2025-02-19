@@ -11,6 +11,8 @@ router.register(r'transactions', views.TransactionViewSet, basename='transaction
 urlpatterns = [
     path('', include(router.urls)),
     path('webhook/', views.payment_webhook, name='payment-webhook'),
-    path('plans/<str:plan_id>/payment-link/', views.PaymentLinkView.as_view(), name='plan-payment'),  # Changed from payment/ to payment-link/
+    path('plans/<str:plan_id>/payment-link/', views.PaymentLinkView.as_view(), name='plan-payment'),
     path('payment-success/', views.payment_success, name='payment-success'),
+    path('current-plan/', views.CurrentSubscriptionView.as_view(), name='current-plan'),
+    path('subscription-history/', views.SubscriptionHistoryView.as_view(), name='subscription-history'),
 ]
