@@ -4,15 +4,16 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useI18n } from '@/locales/client'
-import { Subscriptions } from '@/types'
+import { SubscriptionDetail } from '@/types'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
+import { getUserName } from '@/lib/getUserName'
 
 function SubscriptionsPage() {
   const t = useI18n()
-  const { data: subscriptions, isLoading, error, refetch } = useQuery<Subscriptions[]>({
+  const { data: subscriptions, isLoading, error, refetch } = useQuery<SubscriptionDetail[]>({
     queryKey: ['subscriptions'],
     queryFn: ()=>listSubscriptions()
   })
@@ -67,8 +68,8 @@ function SubscriptionsPage() {
             ) : (
               subscriptions?.map((subscription) => (
                 <TableRow key={subscription.id}>
-                  <TableCell>{subscription.user}</TableCell>
-                  <TableCell>{subscription.plan}</TableCell>
+                  <TableCell>{getUserName(subscription.user)}</TableCell>
+                  <TableCell>{subscription.plan.name}</TableCell>
                   <TableCell>
                     {format(new Date(subscription.start_date), 'PPP')}
                   </TableCell>
