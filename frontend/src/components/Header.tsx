@@ -4,54 +4,72 @@ import Link from "next/link";
 import React from "react";
 import { Button } from "./ui/button";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
-// import { ModeToggle } from './ModeToggle';
 import { useMediaQuery } from "usehooks-ts";
 import ChangeLanguage from "./ChangeLanguage";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
+import { useI18n } from "@/locales/client";
+import { useRouter } from "next/navigation";
 
 function Header({ className }: { className?: string }) {
   const { openLogin, openRegister } = useAuthDialog();
   const isMobile = useMediaQuery("(max-width: 640px)");
   const { data: session } = useSession();
-  return (
-    <div className={cn("flex items-center justify-between py-5", className)}>
-      <Link
-        href={"/"}
-        className="select-none flex items-center gap-1 cursor-pointer text-blue-600"
-      >
-        <BookOpen className="size-6 sm:size-8" />
-        <h1 className="font-black text-base sm:text-lg text-blue-600">
-          ClassConnect
-        </h1>
-      </Link>
-      <div className="flex items-center gap-1 2xl:gap-5">
-        {!session?.user && (
-          <>
-            <Button
-              variant={"outline"}
-              size={isMobile ? "default" : "default"}
-              onClick={openLogin}
-              className="text-black hover:text-blue-600 hover:bg-primary/10 border"
-            >
-              <LogIn className="hidden" />
-              <span className="text-xs sm:text-sm">Se Connecter</span>
-            </Button>
-            <Button
-              size={isMobile ? "default" : "default"}
-              onClick={openRegister}
-              className="bg-default text-sm hover:bg-default/80 text-white"
-            >
-              <UserPlus className="hidden" />
-              <span className="text-xs sm:text-sm">S&apos;inscrire</span>
-            </Button>
-          </>
-        )}
+  const t = useI18n();
+  const router = useRouter()
 
-        {!isMobile && <ChangeLanguage />}
-        {/* <ModeToggle/> */}
+  return (
+    <header className={cn("w-full", className)}>
+      <div className="container mx-auto flex items-center justify-between h-16 px-4">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-default transition-colors hover:opacity-90"
+        >
+          <BookOpen className="h-7 w-7" />
+          <span className="font-bold text-xl hidden sm:inline-block">
+            ClassConnect
+          </span>
+        </Link>
+
+        <div className="flex items-center gap-3 sm:gap-6">
+          {!session?.user ? (
+            <>
+              <Button
+                variant="ghost"
+                size={isMobile ? "sm" : "default"}
+                onClick={openLogin}
+                className="text-gray-700 hover:text-default hover:bg-blue-50"
+              >
+                <LogIn className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline-block">{t("nav.login")}</span>
+              </Button>
+              <Button
+                size={isMobile ? "sm" : "default"}
+                onClick={openRegister}
+                className="bg-default hover:bg-default/90 text-white flex items-center gap-2"
+              >
+                <UserPlus className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline-block">{t("nav.register")}</span>
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="ghost"
+              className="text-gray-700 hover:text-default hover:bg-blue-50"
+              onClick={() => router.push('/dashboard')}
+            >
+              Dashboard
+            </Button>
+          )}
+
+          {!isMobile && (
+            <div className="border-l pl-4 border-gray-200">
+              <ChangeLanguage />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </header>
   );
 }
 
