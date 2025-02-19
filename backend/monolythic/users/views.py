@@ -31,10 +31,17 @@ from django.dispatch import receiver
 from oauth2_provider.models import AccessToken as OAuth2AccessToken
 from .models import UserActiveToken
 from .middleware import get_current_request, SingleSessionMiddleware
+from .tasks.task import send_async_mail
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+from django.db.models.functions import ExtractMonth, ExtractYear
+from django.db.models import Count
+from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -128,29 +135,30 @@ class UserViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = serializer.save()
 
+        # Email verification is wrapped in try-except and won't break user creation
         try:
-            # Generate verification token
             token = generate_signed_token(user.email)
             verification_url = (
                 f"{settings.BACKEND_HOST}{reverse('verify-email', args=[token])}"
             )
 
-            # Send verification email
+            # Prepare email content
             subject = "Verify your email address"
             message_en = f"Hello {user.first_name},\n\nPlease verify your email address by clicking the link below:\n{verification_url}\n\nThank you!"
             message_fr = f"Bonjour {user.first_name},\n\nVeuillez vérifier votre adresse e-mail en cliquant sur le lien ci-dessous:\n{verification_url}\n\nMerci!"
             message = f"{message_en}\n\n{message_fr}"
 
-            send_mail(
+            # Queue email with error handling
+            send_async_mail.delay(
                 subject=subject,
                 message=message,
                 from_email=settings.EMAIL_HOST_USER,
                 recipient_list=[user.email],
-                fail_silently=False,  # Set to False to catch exceptions
+                fail_silently=True
             )
         except Exception as e:
-            # Log the exception
-            print(f"Error sending verification email: {e}")
+            # Just log the error and continue - don't let email issues affect user creation
+            logger.error(f"Error in verification email process: {str(e)}")
 
     def perform_update(self, serializer):
         user = serializer.save()
@@ -295,27 +303,17 @@ class PasswordResetView(generics.CreateAPIView):
         message = f"Bonjour,\n\nVous avez demandé à réinitialiser votre mot de passe pour l'application E-learning. Veuillez copier le code suivant et le coller dans le champ approprié : {user_password_reset_token.code}\n\nVeuillez noter que ce code expirera dans 15 minutes.\n\nSi vous n'avez pas fait cette demande, veuillez ignorer cet e-mail.\n\nCordialement,\nL'équipe Ongolaphone"
 
         try:
-            send_mail(
+            # Queue email with error handling
+            send_async_mail.delay(
                 subject=subject,
                 message=message,
                 from_email=settings.EMAIL_HOST_USER,
                 recipient_list=[email],
-                fail_silently=False,  # Set to False to catch exceptions
-            )
-        except BadHeaderError:
-            return Response(
-                {
-                    "error": "L'envoi de l'e-mail a échoué en raison d'un problème d'en-tête."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                fail_silently=True
             )
         except Exception as e:
-            return Response(
-                {
-                    "error": f"L'envoi de l'e-mail a échoué. Veuillez réessayer plus tard. Détails: {str(e)}"
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            # Just log the error and continue - don't let email issues affect password reset
+            logger.error(f"Error queuing password reset email: {str(e)}")
 
         return Response(
             {
@@ -603,3 +601,78 @@ def update_user_active_token(sender, instance, created, **kwargs):
 def delete_user_active_token(sender, instance, **kwargs):
     if instance.user:
         UserActiveToken.objects.filter(user=instance.user).delete()
+
+
+class UserStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+    swagger_tags = ["Users Stats"]
+
+    @swagger_auto_schema(
+        tags=["Users Stats"],
+        responses={
+            200: openapi.Response(
+                description="Monthly user statistics",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'total_users': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'monthly_stats': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    'month': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'users': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                }
+                            )
+                        )
+                    }
+                )
+            )
+        }
+    )
+    def get(self, request):
+        current_year = datetime.now().year
+        
+        # Get total users count
+        total_users = User.objects.count()
+        
+        # Get user counts by month for the current year
+        monthly_stats = User.objects.filter(
+            date_joined__year=current_year
+        ).annotate(
+            month=ExtractMonth('date_joined')
+        ).values('month').annotate(
+            users=Count('id')
+        ).order_by('month')
+
+        # French month names
+        month_names = {
+            1: 'Jan',
+            2: 'Fév',
+            3: 'Mar',
+            4: 'Avr',
+            5: 'Mai',
+            6: 'Juin',
+            7: 'Juil',
+            8: 'Août',
+            9: 'Sep',
+            10: 'Oct',
+            11: 'Nov',
+            12: 'Déc'
+        }
+
+        # Format the monthly stats
+        monthly_data = [
+            {
+                'month': month_names[stat['month']],
+                'users': stat['users']
+            }
+            for stat in monthly_stats
+        ]
+
+        # Return both total users and monthly stats
+        return Response({
+            'total_users': total_users,
+            'monthly_stats': monthly_data
+        })
