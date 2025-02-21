@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 function LoginDialog() {
@@ -33,7 +33,9 @@ function LoginDialog() {
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const t = useI18n();
   const router = useRouter();
-  const [isLoading,setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   // Create login schema with translations
   const createLoginSchema = (t: (key: string) => string) =>
@@ -72,7 +74,9 @@ function LoginDialog() {
     },
   });
 
-  const {formState:{errors}} = loginForm
+  const {
+    formState: { errors },
+  } = loginForm;
 
   // Initialize forgot password form
   const forgotPasswordForm = useForm<ForgotPasswordFormData>({
@@ -98,16 +102,22 @@ function LoginDialog() {
 
   const handleLoginSubmit = async (values: LoginFormData) => {
     try {
-      setIsLoading(true)
-      const res = await signIn("credentials", { ...values, redirect: false });
-      console.log(res)
-      if(res?.error == "CredentialsSignin"){
-        loginForm.setError("root",{message:t("loginDialog.invalidCredential")})
+      setIsLoading(true);
+      const res = await signIn("credentials", {
+        ...values,
+        redirect: false,
+      });
+      console.log(res);
+      if (res?.error == "CredentialsSignin") {
+        loginForm.setError("root", {
+          message: t("loginDialog.invalidCredential"),
+        });
+        setIsLoading(false)
         return;
       }
       if (res && res.ok && !res.error) {
-        setIsLoading(false)
-        closeDialog(false)
+        setIsLoading(false);
+        closeDialog(false);
         router.refresh();
         toast("Login successfull");
         if (res.url) {
@@ -182,7 +192,9 @@ function LoginDialog() {
             {isResettingPassword ? (
               <Form {...forgotPasswordForm}>
                 <form
-                  onSubmit={forgotPasswordForm.handleSubmit(handleForgotPasswordSubmit)}
+                  onSubmit={forgotPasswordForm.handleSubmit(
+                    handleForgotPasswordSubmit
+                  )}
                   className="flex flex-col gap-4 p-6"
                 >
                   <FormField
@@ -190,7 +202,9 @@ function LoginDialog() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-700">{t("loginDialog.emailLabel")}</FormLabel>
+                        <FormLabel className="text-gray-700">
+                          {t("loginDialog.emailLabel")}
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="email"
@@ -229,7 +243,9 @@ function LoginDialog() {
                 >
                   {errors.root && (
                     <div className="w-full bg-red-50 border border-red-200 rounded-xl p-3">
-                      <span className="text-red-600 text-sm font-medium">{errors.root.message}</span>
+                      <span className="text-red-600 text-sm font-medium">
+                        {errors.root.message}
+                      </span>
                     </div>
                   )}
                   <FormField
@@ -237,7 +253,9 @@ function LoginDialog() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-700">{t("loginDialog.emailLabel")}</FormLabel>
+                        <FormLabel className="text-gray-700">
+                          {t("loginDialog.emailLabel")}
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="email"
@@ -255,7 +273,9 @@ function LoginDialog() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-700">{t("loginDialog.passwordLabel")}</FormLabel>
+                        <FormLabel className="text-gray-700">
+                          {t("loginDialog.passwordLabel")}
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="password"
@@ -273,7 +293,9 @@ function LoginDialog() {
                     disabled={loginForm.formState.isSubmitting || isLoading}
                     className="bg-default hover:bg-default/90 text-white h-11 rounded-xl font-medium flex items-center justify-center gap-2"
                   >
-                    {isLoading && <LoaderCircle className="h-4 w-4 animate-spin"/>}
+                    {isLoading && (
+                      <LoaderCircle className="h-4 w-4 animate-spin" />
+                    )}
                     {t("loginDialog.loginButton")}
                   </Button>
                   <Button
