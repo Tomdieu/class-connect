@@ -86,7 +86,7 @@ export function DataTable<TData, TValue>({
   const [value, setValue] = useState(query);
 
   return (
-    <div className="rounded-md border p-3">
+    <div className="rounded-md border p-3 w-full">
       <div className="flex flex-col sm:flex-row space-y-2 items-center py-4">
         {showInput && (
           <Input
