@@ -1,21 +1,36 @@
-export const EDUCATION_LEVELS = ["LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
-export const LYCEE_CLASSES = ["6eme", "5eme", "4eme", "3eme", "2nde", "1ere", "terminale"] as const;
+export const EDUCATION_LEVELS = [
+  "COLLEGE",
+  "LYCEE",
+  "UNIVERSITY",
+  "PROFESSIONAL",
+] as const;
+export const LYCEE_CLASSES = [
+  "6eme",
+  "5eme",
+  "4eme",
+  "3eme",
+  "2nde",
+  "1ere",
+  "terminale",
+] as const;
 export const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 export const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
 export const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
 export const MASTER_YEARS = ["M1", "M2"] as const;
-export const SECTIONS = ["FRANCOPHONE","ANGLOPHONE"] as const;
+export const SECTIONS = ["FRANCOPHONE", "ANGLOPHONE"] as const;
+export const COLLEGE_CLASSES = ["6eme", "5eme", "4eme", "3eme"] as const;
 
-export type EducationLevel = typeof EDUCATION_LEVELS[number];
-export type LyceeClass = typeof LYCEE_CLASSES[number];
-export type LyceeSpecialities = typeof LYCEE_SPECIALITIES[number];
-export type UniversityLevel = typeof UNIVERSITY_LEVELS[number];
-export type LicenceYear = typeof LICENCE_YEARS[number];
-export type MasterYear = typeof MASTER_YEARS[number];
-export type Section = typeof SECTIONS[number];
+export type EducationLevel = (typeof EDUCATION_LEVELS)[number];
+export type LyceeClass = (typeof LYCEE_CLASSES)[number];
+export type LyceeSpecialities = (typeof LYCEE_SPECIALITIES)[number];
+export type UniversityLevel = (typeof UNIVERSITY_LEVELS)[number];
+export type LicenceYear = (typeof LICENCE_YEARS)[number];
+export type MasterYear = (typeof MASTER_YEARS)[number];
+export type Section = (typeof SECTIONS)[number];
+export type CollegeClass = (typeof COLLEGE_CLASSES)[number];
 
 export const LANGUAGE_CHOICES = ["en", "fr"] as const;
-export type LanguageChoice = typeof LANGUAGE_CHOICES[number];
+export type LanguageChoice = (typeof LANGUAGE_CHOICES)[number];
 
 export declare interface UserCreateType {
   first_name: string;
@@ -30,11 +45,14 @@ export declare interface UserCreateType {
   confirm_password: string;
   // Optional fields based on education level
   lycee_class?: LyceeClass;
-  lycee_speciality?:LyceeSpecialities;
+  lycee_speciality?: LyceeSpecialities;
   university_level?: UniversityLevel;
   university_year?: string;
   enterprise_name?: string;
   platform_usage_reason?: string;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  college_class?: CollegeClass;
 }
 
 export declare interface UserType {
@@ -46,7 +64,7 @@ export declare interface UserType {
   date_of_birth: string | null;
   education_level: EducationLevel;
   lycee_class: LyceeClass | null;
-  lycee_speciality:LyceeSpecialities|null;
+  lycee_speciality: LyceeSpecialities | null;
   university_level: UniversityLevel | null;
   university_year: string | null;
   enterprise_name: string | null;
@@ -57,36 +75,60 @@ export declare interface UserType {
   town: string | null;
   quarter: string | null;
   is_staff: boolean;
+  is_superuser: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;
   date_joined: string;
+  college_class: CollegeClass | null;
 }
 
 export declare interface UserActiveToken {
   user: User;
   token: string;
-  device_type: string | null;  // mobile, tablet, desktop
-  device_name: string | null;  // iPhone 12, Samsung Galaxy S21, etc.
-  os_name: string | null;      // iOS, Android, Windows, macOS
+  device_type: string | null; // mobile, tablet, desktop
+  device_name: string | null; // iPhone 12, Samsung Galaxy S21, etc.
+  os_name: string | null; // iOS, Android, Windows, macOS
   os_version: string | null;
   browser_name: string | null;
   browser_version: string | null;
   ip_address: string | null;
-  last_activity: string;       // ISO date string
-  created_at: string;         // ISO date string
-  updated_at: string;         // ISO date string
+  last_activity: string; // ISO date string
+  created_at: string; // ISO date string
+  updated_at: string; // ISO date string
 }
 
-export const DAYS_OF_WEEK = ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"] as const;
-export const TIME_SLOTS = ["matin", "13h-14h", "14h-15h", "15h-16h", "16h-17h", "17h-18h", "18h-19h", "19h-20h"] as const;
+export const DAYS_OF_WEEK = [
+  "lun",
+  "mar",
+  "mer",
+  "jeu",
+  "ven",
+  "sam",
+  "dim",
+] as const;
+export const TIME_SLOTS = [
+  "matin",
+  "13h-14h",
+  "14h-15h",
+  "15h-16h",
+  "16h-17h",
+  "17h-18h",
+  "18h-19h",
+  "19h-20h",
+] as const;
 export const USER_TYPE_CHOICES = ["TEACHER", "STUDENT"] as const;
-export const COURSE_ACTION_STATUS = ["PENDING", "ACCEPTED", "REJECTED", "CANCELLED"] as const;
+export const COURSE_ACTION_STATUS = [
+  "PENDING",
+  "ACCEPTED",
+  "REJECTED",
+  "CANCELLED",
+] as const;
 
-export type DayOfWeek = typeof DAYS_OF_WEEK[number];
-export type TimeSlot = typeof TIME_SLOTS[number];
-export type UserType = typeof USER_TYPE_CHOICES[number];
-export type ActionStatus = typeof COURSE_ACTION_STATUS[number];
+export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
+export type TimeSlot = (typeof TIME_SLOTS)[number];
+export type UserType = (typeof USER_TYPE_CHOICES)[number];
+export type ActionStatus = (typeof COURSE_ACTION_STATUS)[number];
 export declare interface CourseCategory {
   id: number;
   name: string;
@@ -113,7 +155,7 @@ export declare interface ClassType {
 export declare interface ClassCreateType {
   name: string;
   level: EducationLevel;
-  section:Section;
+  section: Section;
   description?: string;
 }
 
@@ -145,7 +187,7 @@ export declare interface ChapterType {
 export declare interface ChapterCreateType {
   title: string;
   description?: string;
-  subject: number|string;
+  subject: number | string;
   order: number;
 }
 
@@ -161,33 +203,37 @@ export declare interface TopicType {
 
 export declare interface TopicCreateType {
   title: string;
-  chapter: number|string;
+  chapter: number | string;
   description?: string;
   order: number;
 }
 
-export declare interface ResourceType { 
-  id:number,
-  resource:AbstractResourceType
+export declare interface ResourceType {
+  id: number;
+  resource: AbstractResourceType;
 }
 
-
 export declare interface AbstractResourceType {
-id: number;
-topic: number;
-title: string;
-description: string | null;
-created_at: string;
-updated_at: string;
-polymorphic_ctype: number;
-resource_type: 'VideoResource' | 'QuizResource' | 'RevisionResource' | 'PDFResource' | 'ExerciseResource';
+  id: number;
+  topic: number;
+  title: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  polymorphic_ctype: number;
+  resource_type:
+    | "VideoResource"
+    | "QuizResource"
+    | "RevisionResource"
+    | "PDFResource"
+    | "ExerciseResource";
 }
 
 export declare interface AbstractResourceCreateType {
-topic: number;
-title: string;
-description?: string;
-polymorphic_ctype?: number; 
+  topic: number;
+  title: string;
+  description?: string;
+  polymorphic_ctype?: number;
 }
 
 // Quiz Types
@@ -200,14 +246,14 @@ export declare interface QuestionOptionType {
   order: number;
   created_at: string;
   updated_at: string;
- }
- 
- export declare interface QuestionType {
+}
+
+export declare interface QuestionType {
   id: number;
   quiz: number;
   text: string;
   image: string | null;
-  type: 'MULTIPLE_CHOICE' | 'SINGLE_CHOICE' | 'TRUE_FALSE' | 'SHORT_ANSWER';
+  type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
   points: number;
   order: number;
   explanation: string;
@@ -215,9 +261,9 @@ export declare interface QuestionOptionType {
   created_at: string;
   updated_at: string;
   options: QuestionOptionType[];
- }
- 
- export declare interface QuizResourceType extends AbstractResourceType {
+}
+
+export declare interface QuizResourceType extends AbstractResourceType {
   total_questions: number;
   duration_minutes: number;
   passing_score: number;
@@ -227,9 +273,9 @@ export declare interface QuestionOptionType {
   attempts_allowed: number;
   partial_credit: boolean;
   questions: QuestionType[];
- }
- 
- export declare interface QuizAttemptType {
+}
+
+export declare interface QuizAttemptType {
   id: number;
   quiz: number;
   user: number;
@@ -237,9 +283,9 @@ export declare interface QuestionOptionType {
   started_at: string;
   completed_at: string | null;
   is_completed: boolean;
- }
- 
- export declare interface QuestionResponseType {
+}
+
+export declare interface QuestionResponseType {
   id: number;
   attempt: number;
   question: number;
@@ -249,28 +295,29 @@ export declare interface QuestionOptionType {
   points_earned: number;
   created_at: string;
   updated_at: string;
- }
- 
- // Create Types
- export declare interface QuestionOptionCreateType {
+}
+
+// Create Types
+export declare interface QuestionOptionCreateType {
   text: string;
   image?: File;
   is_correct: boolean;
   order: number;
- }
- 
- export declare interface QuestionCreateType {
+}
+
+export declare interface QuestionCreateType {
   text: string;
   image?: File;
-  type: 'MULTIPLE_CHOICE' | 'SINGLE_CHOICE' | 'TRUE_FALSE' | 'SHORT_ANSWER';
+  type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
   points: number;
   order: number;
   explanation: string;
   explanation_image?: File;
   options: QuestionOptionCreateType[];
- }
- 
- export declare interface QuizResourceCreateType extends AbstractResourceCreateType {
+}
+
+export declare interface QuizResourceCreateType
+  extends AbstractResourceCreateType {
   total_questions: number;
   duration_minutes: number;
   passing_score: number;
@@ -280,44 +327,49 @@ export declare interface QuestionOptionType {
   attempts_allowed: number;
   partial_credit: boolean;
   questions: QuestionCreateType[];
- }
- 
- export declare interface PDFResourceCreateType extends AbstractResourceCreateType {
+}
+
+export declare interface PDFResourceCreateType
+  extends AbstractResourceCreateType {
   pdf_file: File;
- }
+}
 
- export declare interface PDFResourceType extends AbstractResourceType {
+export declare interface PDFResourceType extends AbstractResourceType {
   pdf_file: string;
-  pdf_url?:string;
- }
+  pdf_url?: string;
+}
 
- export declare interface VideoResourceCreateType extends AbstractResourceCreateType {
+export declare interface VideoResourceCreateType
+  extends AbstractResourceCreateType {
   video_file: File;
- }
+}
 
- export declare interface VideoResourceType extends AbstractResourceType {
-  video_file:string;
-  video_url?:string;
- }
- 
- export declare interface ExerciseResourceCreateType extends AbstractResourceCreateType {
+export declare interface VideoResourceType extends AbstractResourceType {
+  video_file: string;
+  video_url?: string;
+}
+
+export declare interface ExerciseResourceCreateType
+  extends AbstractResourceCreateType {
   instructions: string;
   solution_file?: File;
   exercise_file: File;
- }
+}
 
- export declare interface ExerciseResourceType extends AbstractResourceCreateType {
+export declare interface ExerciseResourceType
+  extends AbstractResourceCreateType {
   instructions: string;
-  solution_file:string;
-  exercise_file:string;
-  solution_url?:string;
-  exercise_url?:string;
- }
- 
- export declare interface RevisionResourceCreateType extends AbstractResourceCreateType {
+  solution_file: string;
+  exercise_file: string;
+  solution_url?: string;
+  exercise_url?: string;
+}
+
+export declare interface RevisionResourceCreateType
+  extends AbstractResourceCreateType {
   content: string;
- }
- 
+}
+
 export declare interface UserAvailabilityType {
   id: number;
   user: User;
@@ -425,7 +477,6 @@ export declare interface UserProgressType {
   last_accessed: string;
 }
 
-
 export declare interface LoginResponseType {
   access_token: string;
   expires_in: number;
@@ -434,49 +485,165 @@ export declare interface LoginResponseType {
   refresh_token: string;
 }
 
-
- declare interface PaginationType<T> {
-  count:number;
-  next?:string,
-  previous?:string;
-  results:T[]
+declare interface PaginationType<T> {
+  count: number;
+  next?: string;
+  previous?: string;
+  results: T[];
 }
 
 declare interface ChangePasswordType {
-  current_password:string;
-  new_password:string;
-  confirm_password:string;
-
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
 }
 
 declare interface Payments {
-  id:number;
-  amount:number;
-  payment_method:"MTN"|"ORANGE",
-  transaction_id:string;
-  status:"PENDING"|"SUCCESSFUL"|"FAILED",
-  user:string,
-  subscription:string,
-  payment_date:string;
+  id: number;
+  amount: number;
+  payment_method: "MTN" | "ORANGE";
+  transaction_id: string;
+  status: "PENDING" | "SUCCESSFUL" | "FAILED";
+  user: string;
+  subscription: string;
+  payment_date: string;
 }
 
-declare interface SubscriptionPlan{
-  id:number;
-  name:string;
-  price:number;
-  duration_days:number;
-  description:string;
-  features:object;
-  active:boolean;
-  created_at:string;
+declare interface SubscriptionPlan {
+  id: number;
+  name: string;
+  price: number;
+  duration_days: number;
+  description: string;
+  features: object;
+  active: boolean;
+  created_at: string;
 }
 
-declare interface Subscription{
-  id:number;
-  user:string;
-  plan:number;
-  start_date:string;
-  end_date:string;
-  auto_renew:boolean;
-  is_active:boolean;
+declare interface Subscription {
+  id: number;
+  user: string;
+  plan: number;
+  start_date: string;
+  end_date: string;
+  auto_renew: boolean;
+  is_active: boolean;
+}
+
+declare interface SubscriptionDetail {
+  id: number;
+  user: UserType;
+  plan: SubscriptionPlan;
+  start_date: string;
+  end_date: string;
+  auto_renew: boolean;
+  is_active: boolean;
+}
+
+// Enum definitions for choice fields
+enum TransactionType {
+  COLLECT = "collect",
+  WITHDRAW = "withdraw",
+}
+
+enum TransactionStatus {
+  SUCCESSFUL = "SUCCESSFUL",
+  FAILED = "FAILED",
+  PENDING = "PENDING",
+}
+
+enum Operator {
+  MTN = "MTN",
+  ORANGE = "ORANGE",
+}
+
+enum Currency {
+  XAF = "XAF",
+}
+
+// Main Transaction interface
+interface Transaction {
+  // Core transaction fields
+  reference: string; // UUID
+  status: TransactionStatus;
+  amount: number;
+  app_amount: number;
+  currency: Currency;
+  operator: Operator;
+  endpoint: TransactionType;
+
+  // Reference numbers
+  code: string;
+  operator_reference: string;
+  external_reference?: string; // Optional UUID
+
+  // Customer information
+  phone_number: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  email?: string | null;
+  external_user?: string | null;
+
+  // Security and verification
+  signature: string;
+
+  // Metadata
+  created_at: string; // ISO date string
+  updated_at: string; // ISO date string
+
+  // Computed properties
+  transaction_type_display: string;
+  is_successful: boolean;
+  formatted_amount: string;
+}
+
+// Response type for API endpoints
+interface TransactionResponse {
+  data: Transaction;
+  status: "success" | "error";
+  message?: string;
+}
+
+// List response type
+interface TransactionListResponse {
+  results: Transaction[];
+  count: number;
+  next?: string | null;
+  previous?: string | null;
+}
+
+// Date range filter type
+interface DateRangeFilter {
+  after?: string; // ISO date string
+  before?: string; // ISO date string
+}
+
+// Main transaction filter parameters
+interface TransactionFilterParams {
+  // Filter fields from TransactionFilter class
+  status?: "SUCCESSFUL" | "FAILED" | "PENDING";
+  endpoint?: "collect" | "withdraw";
+  operator?: "MTN" | "ORANGE";
+  phone_number?: string;
+  created_at?: DateRangeFilter;
+
+  // Search parameter (from search_fields)
+  search?: string; // Will search in phone_number and reference
+
+  // Ordering parameter (from ordering_fields)
+  ordering?: "created_at" | "-created_at" | "amount" | "-amount";
+
+  // Pagination parameters (from CustomPagination)
+  page?: number;
+  page_size?: number;
+}
+
+interface MonthStat {
+  month: string;
+  users: string;
+}
+
+interface Stats {
+  total_users: number;
+  monthly_stats: MonthStat[];
 }

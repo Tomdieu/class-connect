@@ -1,6 +1,11 @@
 # Utiliser l'image officielle de Python comme image parente
-FROM python:3.11
+FROM python:3.11-slim
 LABEL authors="ivantom"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    netcat-traditional \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -42,3 +47,5 @@ EXPOSE 8001
 
 # Define environment variable
 ENV DJANGO_SETTINGS_MODULE=backend.settings
+
+# Start command will be provided by docker-compose

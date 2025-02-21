@@ -3,11 +3,16 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register(r'plans', views.SubscriptionPlanViewSet)
+router.register(r'plans', views.SubscriptionPlanViewSet, basename='plan')
 router.register(r'subscriptions', views.SubscriptionViewSet, basename='subscription')
 router.register(r'payments', views.PaymentViewSet, basename='payment')
+router.register(r'transactions', views.TransactionViewSet, basename='transaction')
 
 urlpatterns = [
     path('', include(router.urls)),
     path('webhook/', views.payment_webhook, name='payment-webhook'),
+    path('plans/<str:plan_id>/payment-link/', views.PaymentLinkView.as_view(), name='plan-payment'),
+    path('payment-success/', views.payment_success, name='payment-success'),
+    path('current-plan/', views.CurrentSubscriptionView.as_view(), name='current-plan'),
+    path('subscription-history/', views.SubscriptionHistoryView.as_view(), name='subscription-history'),
 ]

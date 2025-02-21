@@ -44,7 +44,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
         const data = (await res.json()) as LoginResponseType;
 
-        console.log(data);
         if (res.ok && !data.access_token) {
           return null;
         }

@@ -164,7 +164,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 USER_S3 = env("USE_S3", default=False)
@@ -350,7 +349,12 @@ CHANNEL_LAYERS = {
     },
 }
 
+# CAMPAY
 
+CAMPAY_APP_USERNAME = env('CAMPAY_APP_USERNAME', default='')
+CAMPAY_APP_PASSWORD = env('CAMPAY_APP_PASSWORD', default='')
+CAMPAY_ENVIRONMENT = env('CAMPAY_ENVIRONMENT', default='DEV')
+CAMPAY_WEBHOOK_SECRET = env('CAMPAY_WEBHOOK_SECRET',default='')
 
 # AWS S3 Configuration
 

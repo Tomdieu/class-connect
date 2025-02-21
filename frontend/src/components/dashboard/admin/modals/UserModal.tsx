@@ -33,20 +33,15 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea";
 import { useUserStore } from "@/hooks/user-store";
+import { Switch } from "@/components/ui/switch";
 
-const EDUCATION_LEVELS = ["LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
-const LYCEE_CLASSES = [
-  "6eme",
-  "5eme",
-  "4eme",
-  "3eme",
-  "2nde",
-  "1ere",
-  "terminale",
-] as const;
+const EDUCATION_LEVELS = ["COLLEGE", "LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
+const COLLEGE_CLASSES = ["6eme", "5eme", "4eme", "3eme"] as const;
+const LYCEE_CLASSES = ["2nde", "1ere", "terminale"] as const;
 const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
 const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
 const MASTER_YEARS = ["M1", "M2"] as const;
+const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 
 function UserDialog() {
   const { isOpen, user, onClose } = useUserStore();
@@ -108,11 +103,25 @@ function UserDialog() {
         .min(2, { message: t("registerDialog.errors.quarterMin") }),
 
       // Dynamic fields
+      is_staff: z.boolean(),
+      is_active: z.boolean(),
+      college_class: z.enum(COLLEGE_CLASSES).optional().nullable(),
       lycee_class: z.enum(LYCEE_CLASSES).optional().nullable(),
+      lycee_speciality: z.enum(LYCEE_SPECIALITIES).optional().nullable(),
       university_level: z.enum(UNIVERSITY_LEVELS).optional().nullable(),
       university_year: z.string().optional().nullable(),
       enterprise_name: z.string().optional().nullable(),
       platform_usage_reason: z.string().optional().nullable(),
+    }).refine((data) => {
+      // Add validation for speciality
+      if (data.education_level === "LYCEE" && 
+          ["2nde", "1ere", "terminale"].includes(data.lycee_class || '')) {
+        return !!data.lycee_speciality;
+      }
+      return true;
+    }, {
+      message: "Speciality is required for this class",
+      path: ["lycee_speciality"],
     });
 
   type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>;
@@ -130,6 +139,9 @@ function UserDialog() {
       email: "",
       town: "",
       quarter: "",
+      is_staff: false,
+      is_active: true,
+      college_class: null,
     },
   });
 
@@ -145,11 +157,15 @@ function UserDialog() {
         email: user.email,
         town: user.town || undefined,
         quarter: user.quarter || undefined,
+        college_class: user.college_class,
         lycee_class: user.lycee_class,
+        lycee_speciality: user.lycee_speciality,
         university_level: user.university_level|| undefined,
         university_year: user.university_year|| undefined,
         enterprise_name: user.enterprise_name|| undefined,
         platform_usage_reason: user.platform_usage_reason|| undefined,
+        is_staff: user.is_staff,
+        is_active: user.is_active,
       });
     }
   }, [form, user]);
@@ -176,31 +192,30 @@ function UserDialog() {
   // Render dynamic fields based on education level
   const renderDynamicFields = () => {
     const educationLevel = form.watch("education_level");
+    const lyceeClass = form.watch("lycee_class");
 
-    if (educationLevel === "LYCEE") {
+    if (educationLevel === "COLLEGE") {
       return (
         <FormField
           control={form.control}
-          name="lycee_class"
+          name="college_class"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("registerDialog.lyceeClassLabel")}</FormLabel>
+              <FormLabel>{t("registerDialog.collegeClassLabel")}</FormLabel>
               <FormControl>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <SelectTrigger>
-                    <SelectValue
-                      placeholder={t("registerDialog.lyceeClassLabel")}
+                    <SelectValue 
+                      placeholder={t("registerDialog.collegeClassLabel")} 
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    {LYCEE_CLASSES.map((lyceeClass) => (
-                      <SelectItem key={lyceeClass} value={lyceeClass}>
-                        {t(
-                          `registerDialog.lyceeClasses.${lyceeClass}` as keyof typeof t
-                        )}
+                    {COLLEGE_CLASSES.map((collegeClass) => (
+                      <SelectItem key={collegeClass} value={collegeClass}>
+                        {t(`registerDialog.collegeClasses.${collegeClass}` as keyof typeof t)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -210,6 +225,71 @@ function UserDialog() {
             </FormItem>
           )}
         />
+      );
+    }
+
+    if (educationLevel === "LYCEE") {
+      return (
+        <>
+          <FormField
+            control={form.control}
+            name="lycee_class"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("registerDialog.lyceeClassLabel")}</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue 
+                        placeholder={t("registerDialog.lyceeClassLabel")} 
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LYCEE_CLASSES.map((lyceeClass) => (
+                        <SelectItem key={lyceeClass} value={lyceeClass}>
+                          {t(`registerDialog.lyceeClasses.${lyceeClass}` as keyof typeof t)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lycee_speciality"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("registerDialog.lyceeSpecialityLabel")}</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue 
+                        placeholder={t("registerDialog.lyceeSpecialityLabel")} 
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LYCEE_SPECIALITIES.map((speciality) => (
+                        <SelectItem key={speciality} value={speciality}>
+                          {t(`registerDialog.lyceeSpecialities.${speciality}` as keyof typeof t)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </>
       );
     }
 
@@ -550,6 +630,46 @@ function UserDialog() {
                           />
                         </FormControl>
                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="is_staff"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 py-2">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">
+                            Admin Access
+                          </FormLabel>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="is_active"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 py-2">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">
+                            Account Active
+                          </FormLabel>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
                       </FormItem>
                     )}
                   />

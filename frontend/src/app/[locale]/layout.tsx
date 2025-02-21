@@ -9,6 +9,7 @@ import localFont from "next/font/local";
 import { SessionProvider } from "next-auth/react";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import React from "react";
+import InactivityProvider from "@/providers/InactivityProvider";
 
 const Inter = localFont({
   src: [
@@ -133,9 +134,11 @@ export default async function RootLayout({
           <SessionProvider>
             <ReactQueryProvider>
               <Providers locale={locale}>
-                {children}
-                <Modals />
-                <Toaster />
+                <InactivityProvider>
+                  {children}
+                  <Modals />
+                  <Toaster />
+                </InactivityProvider>
               </Providers>
             </ReactQueryProvider>
           </SessionProvider>

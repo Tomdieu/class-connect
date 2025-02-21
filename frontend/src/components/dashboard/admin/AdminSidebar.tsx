@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import { getPathAfterLanguage } from "@/lib/utils";
+import Link from "next/link";
 
 const menuItems = [
   {
@@ -53,7 +54,9 @@ export const AdminSidebar = () => {
     <Sidebar>
       <SidebarContent className="bg-white">
         <div className="font-bold text-xl p-5 pb-0 flex items-center justify-between">
+          <Link href="/admin">
           <span>Administrator</span>
+          </Link>
           {openMobile && (
 
             <SidebarTrigger />

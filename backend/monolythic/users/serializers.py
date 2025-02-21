@@ -3,27 +3,51 @@ from .models import User,UserPasswordResetToken
 from django.utils import timezone
 import datetime
 from phonenumber_field.serializerfields import PhoneNumberField
+from django.contrib.auth.models import Permission
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ['id', 'name', 'codename']
 
 class UserSerializer(serializers.ModelSerializer):
+    subscription_status = serializers.ReadOnlyField()
+    class_level = serializers.SerializerMethodField()
+    class_display = serializers.SerializerMethodField()
+    is_superuser = serializers.BooleanField(read_only=True)
+    is_staff = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = User
         fields = [
             'id', 'email', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 
-            'education_level', 'lycee_class', 'university_level', 'university_year', 
-            'enterprise_name', 'platform_usage_reason', 'email_verified', 'profile_picture', 
-            'language', 'town', 'quarter', 'is_staff', 'is_active', 'created_at', 
-            'updated_at', 'date_joined'
+            'education_level', 'college_class', 'lycee_class', 'lycee_speciality',
+            'university_level', 'university_year', 'enterprise_name', 
+            'platform_usage_reason', 'email_verified', 'avatar', 'language', 
+            'town', 'quarter', 'subscription_status', 'class_level', 'class_display',
+            'is_active', 'created_at', 'updated_at', 'date_joined',
+            'is_superuser', 'is_staff'
         ]
+        
+    def get_class_level(self, obj):
+        return obj.get_class_level()
+    
+    def get_class_display(self, obj):
+        return obj.get_class_display()
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    is_superuser = serializers.BooleanField(required=False, default=False)
+    is_staff = serializers.BooleanField(required=False, default=False)
 
     class Meta:
         model = User
         fields = [
-            'email', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 
-            'education_level', 'lycee_class', 'university_level', 'university_year', 
-            'enterprise_name', 'platform_usage_reason', 'password'
+            'email', 'password', 'first_name', 'last_name', 'phone_number', 
+            'date_of_birth', 'education_level', 'college_class', 'lycee_class',
+            'lycee_speciality', 'university_level', 'university_year',
+            'enterprise_name', 'platform_usage_reason', 'avatar', 'language',
+            'town', 'quarter', 'is_superuser', 'is_staff'
         ]
 
     def create(self, validated_data):
@@ -35,11 +59,19 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             phone_number=validated_data.get('phone_number', ''),
             date_of_birth=validated_data.get('date_of_birth', None),
             education_level=validated_data.get('education_level', ''),
+            college_class=validated_data.get('college_class', None),
             lycee_class=validated_data.get('lycee_class', None),
+            lycee_speciality=validated_data.get('lycee_speciality', None),
             university_level=validated_data.get('university_level', None),
             university_year=validated_data.get('university_year', None),
             enterprise_name=validated_data.get('enterprise_name', ''),
             platform_usage_reason=validated_data.get('platform_usage_reason', ''),
+            avatar=validated_data.get('avatar', None),
+            language=validated_data.get('language', 'fr'),
+            town=validated_data.get('town', None),
+            quarter=validated_data.get('quarter', None),
+            is_superuser=validated_data.get('is_superuser', False),
+            is_staff=validated_data.get('is_staff', False)
         )
         return user
 

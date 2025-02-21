@@ -137,8 +137,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     platform_usage_reason = models.TextField(null=True, blank=True)
 
     email_verified = models.BooleanField(default=False)
-    profile_picture = models.ImageField(
-        upload_to="profile_pictures/", null=True, blank=True
+    avatar = models.ImageField(
+        upload_to="avatars/",
+        null=True,
+        blank=True,
+        verbose_name=_("Avatar"),
+        help_text=_("User profile picture")
     )
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default="fr")
     town = models.CharField(max_length=100, blank=True, null=True)
@@ -172,6 +176,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def clean(self):
         from django.core.exceptions import ValidationError
+
+        # Skip validation for superusers and staff
+        if self.is_superuser or self.is_staff:
+            return
 
         # Validate education level specific fields
         if self.education_level == "COLLEGE":
@@ -233,6 +241,125 @@ class User(AbstractBaseUser, PermissionsMixin):
             elif self.university_year:
                 return self.CLASS_LEVELS.get(self.university_year)
         return None
+    
+    def can_access_class_level(self, target_level: int) -> bool:
+        """
+        Determines if the user can access content for a specific class level
+        based on their subscription and current level.
+
+        Premium users can access all previous levels.
+        Standard users can access their current level and 2 previous levels.
+        Basic users can only access their current level.
+        """
+        current_level = self.get_class_level()
+        if not current_level:
+            return False
+
+        # Get user's subscription (implement this based on your subscription model)
+        subscription = self.get_active_subscription()
+        if not subscription:
+            return False
+
+        if subscription.plan == "premium":
+            # Premium users can access all previous levels
+            return target_level <= current_level
+        elif subscription.plan == "standard":
+            # Standard users can access their level and 2 previous levels
+            return current_level - 2 <= target_level <= current_level
+        else:  # Basic plan
+            # Basic users can only access their current level
+            return target_level == current_level
+    
+    def get_accessible_levels(self) -> list[int]:
+        """
+        Returns a list of class levels the user can access based on their
+        subscription and current level.
+        """
+        current_level = self.get_class_level()
+        if not current_level:
+            return []
+
+        subscription = self.get_active_subscription()
+        if not subscription:
+            return []
+
+        if subscription.plan == "premium":
+            # All levels up to current level
+            return list(range(1, current_level + 1))
+        elif subscription.plan == "standard":
+            # Current level and 2 previous levels
+            start_level = max(1, current_level - 2)
+            return list(range(start_level, current_level + 1))
+        else:  # Basic plan
+            # Only current level
+            return [current_level]
+    
+    @property
+    def subscription_status(self):
+        """Returns the current subscription status of the user"""
+        active_sub = self.get_active_subscription()
+        if active_sub:
+            return {
+                'active': True,
+                'plan': active_sub.plan.name,
+                'expires': active_sub.end_date
+            }
+        return {'active': False}
+
+    def get_active_subscription(self):
+        """
+        Returns the user's active subscription.
+        """
+        try:
+            return self.subscriptions.select_related('plan').get(
+                end_date__gt=timezone.now()
+            )
+        except:
+            return None
+
+    def has_active_subscription(self):
+        """Check if user has any active subscription"""
+        return self.get_active_subscription() is not None
+
+    def get_subscription_plan(self):
+        """Returns the current subscription plan name or None"""
+        subscription = self.get_active_subscription()
+        return subscription.plan.name if subscription else None
+
+    def can_access_content(self, content_level=None):
+        """
+        Determines if user can access specific content based on subscription level
+        and education level
+        """
+        subscription = self.get_active_subscription()
+        if not subscription:
+            return False
+
+        if not content_level:
+            return True
+
+        return self.can_access_class_level(content_level)
+    
+    def get_class_display(self) -> str:
+        """
+        Returns a formatted string of the user's education level and class
+        """
+        if not self.education_level:
+            return "No education level set"
+
+        if self.education_level == "COLLEGE":
+            class_name = dict(self.COLLEGE_CLASSES).get(self.college_class, "")
+            return f"{dict(self.EDUCATION_LEVELS)[self.education_level]} - {class_name}"
+        elif self.education_level == "LYCEE":
+            class_name = dict(self.LYCEE_CLASSES).get(self.lycee_class, "")
+            return f"{dict(self.EDUCATION_LEVELS)[self.education_level]} - {class_name}"
+            
+        if self.education_level == "UNIVERSITY":
+            level = dict(self.UNIVERSITY_LEVELS).get(self.university_level, "")
+            year = self.university_year or ""
+            return f"{level} {year}".strip()
+        
+        return dict(self.EDUCATION_LEVELS)[self.education_level]
 
     def save(self, *args, **kwargs):
         self.clean()
