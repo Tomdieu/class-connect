@@ -34,6 +34,10 @@ class ClassFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
     level = django_filters.ChoiceFilter(choices=Class.EDUCATION_LEVELS)
     created_at = django_filters.DateTimeFromToRangeFilter()
+    speciality = django_filters.CharFilter(method='filter_speciality')
+    
+    def filter_speciality(self, queryset, name, value):
+        return queryset.filter(speciality__icontains=value)
     
     class Meta:
         model = Class
