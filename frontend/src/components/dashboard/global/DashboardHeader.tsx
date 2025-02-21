@@ -20,10 +20,14 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useChangeLocale } from "@/locales/client";
+import ChangeLanguage from "@/components/ChangeLanguage";
+
 
 function DashboardHeader() {
   const { toggleSidebar, isMobile } = useSidebar();
   const { data: session } = useSession();
+    const changeLocale =useChangeLocale()
   const getInitials = (name: string) => {
     const [firstName, lastName] = name.split(" ");
     return firstName[0] + lastName[0];
@@ -98,6 +102,7 @@ function DashboardHeader() {
             <Menu />
           </Button>
         )}
+        <ChangeLanguage/>
       </div>
     </div>
   );
