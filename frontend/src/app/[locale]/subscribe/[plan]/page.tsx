@@ -6,17 +6,21 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from '@tanstack/react-query';
 import { CalendarDays, Clock, CreditCard, Loader2, Package } from 'lucide-react';
 import PaymentForm from '@/components/payment/PaymentForm';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { format } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
+import { useAuthDialog } from '@/hooks/use-auth-dialog';
 
 function SubscribePlanPage() {
   const { plan } = useParams<{ plan: string }>();
   const router = useRouter()
 
   const { data: session } = useSession();
+
+  const {openLogin} = useAuthDialog()
+  const pathname = usePathname()
   
   const { data: plans, isLoading } = useQuery({
     queryKey: ['plans'],
@@ -33,7 +37,8 @@ function SubscribePlanPage() {
 
   useEffect(()=>{
     if(!session?.user){
-      router.replace('/')
+      router.push(`/callbackUrl=${pathname}`)
+      openLogin();
     }
   },[router, session])
 
