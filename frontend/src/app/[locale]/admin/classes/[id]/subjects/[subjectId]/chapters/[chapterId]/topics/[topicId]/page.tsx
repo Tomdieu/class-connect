@@ -2,15 +2,18 @@
 
 import React from "react";
 import {useParams} from "next/navigation";
-import {useQuery} from "@tanstack/react-query";
+import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 import {Loader} from "lucide-react";
-import {listResources} from "@/actions/courses";
+import {listResources, deleteResource} from "@/actions/courses";
 import {useExerciseStore, usePDFStore, useQuizStore, useRevisionStore, useVideoStore} from "@/hooks/resources-store";
 import ResourceMenu from "./_components/ResourceMenu";
 import ResourceCard from "./_components/ResourceCard";
 import {AbstractResourceType, PDFResourceType, VideoResourceType} from "@/types";
 import {useViewPDFStore} from "@/hooks/view-pdf-store";
 import {useSelectVideoStore} from "@/hooks/select-video-store";
+import { useI18n } from "@/locales/client";
+import { useDeleteConfirmationStore } from '@/hooks/delete-confirmation-store';
+import { toast } from "sonner";
 
 interface ResourceResponse {
     resource: AbstractResourceType;
@@ -26,7 +29,10 @@ interface PageParams {
 }
 
 const TopicDetailPage: React.FC = () => {
-    const {id, subjectId, chapterId, topicId} = useParams<PageParams>();
+    const t = useI18n();
+    const { id, subjectId, chapterId, topicId } = useParams<PageParams>();
+    const { open } = useDeleteConfirmationStore();
+    const queryClient = useQueryClient();
 
     const {data, isError, error, isLoading} = useQuery({
         queryKey: [
@@ -93,28 +99,50 @@ const TopicDetailPage: React.FC = () => {
                 break;
             case "ExerciseResource":
                 break;
-            case "VideoResource":
-                break;
         }
     };
 
+    const deleteResourceMutation = useMutation({
+        mutationFn: (resource_pk: string) =>
+            deleteResource({
+                class_pk: id,
+                subject_pk: subjectId,
+                chapter_pk: chapterId,
+                topic_pk: topicId,
+                resource_pk,
+            }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [
+                    "class",
+                    id,
+                    "subjects",
+                    subjectId,
+                    "chapters",
+                    chapterId,
+                    "topics",
+                    topicId,
+                    "resources",
+                ],
+            });
+            toast.success(t("resources.delete.success"));
+        },
+        onError: (error) => {
+            toast.error(t("resources.delete.error"), {
+                description: error.message,
+            });
+        },
+    });
+
     const handleDeleteResource = (resource: AbstractResourceType) => {
-        switch (resource.resource_type) {
-            case "PDFResource":
-                break;
-            case "VideoResource":
-                // Implement video delete handling
-                console.log("Deleting video resource:", resource);
-                break;
-            case "QuizResource":
-                break;
-            case "RevisionResource":
-                break;
-            case "ExerciseResource":
-                break;
-            case "VideoResource":
-                break;
-        }
+        open({
+            title: t("resources.delete.title"),
+            description: t("resources.delete.description"),
+            onConfirm: () => {
+                deleteResourceMutation.mutate(resource.id.toString());
+            },
+            isLoading: deleteResourceMutation.isPending
+        });
     };
 
     const handlePDFClick = () => {
@@ -153,15 +181,6 @@ const TopicDetailPage: React.FC = () => {
         });
     };
 
-    const handleQuizClick = () => {
-        quizStore.onOpen({
-            topicId,
-            chapterId,
-            subjectId,
-            classId: id
-        });
-    };
-
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-48">
@@ -182,13 +201,12 @@ const TopicDetailPage: React.FC = () => {
     return (
         <div className="space-y-3 p-4 sm:p-6 h-full">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Resources</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t("resources.title")}</h2>
                 <ResourceMenu
                     onPDFClick={handlePDFClick}
                     onVideoClick={handleVideoClick}
                     onExerciseClick={handleExerciseClick}
                     onRevisionClick={handleRevisionClick}
-                    onQuizClick={handleQuizClick}
 
                 />
             </div>
