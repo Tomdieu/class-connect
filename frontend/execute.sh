@@ -1,1 +1,1 @@
-npm run build && pm2 restart all
+npm install --force && npm run build && pm2 restart all
