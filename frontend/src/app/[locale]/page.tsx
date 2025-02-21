@@ -5,6 +5,7 @@ import { SubscriptionPlans } from "@/components/SubscriptionPlans";
 import Footer from "@/components/Footer";
 import { LottieWrapper } from "@/components/ui/lottie-wrapper";
 import { RevealOnScroll } from "@/components/ui/reveal-on-scroll";
+import { useI18n } from "@/locales/client";
 import React from "react";
 
 // Import your animations
@@ -13,6 +14,8 @@ import teachingAnimation from "@/animations/teaching.json";
 import learningAnimation from "@/animations/learning-process.json";
 
 function LandingPage() {
+  const t = useI18n();
+
   return (
     <div className="relative flex-1 w-full h-full flex flex-col min-h-screen">
       <Header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 px-5 sticky top-0 z-50" />
@@ -36,10 +39,10 @@ function LandingPage() {
                   </div>
                   <div className="text-center mt-2">
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      Learn at Your Own Pace
+                      {t("animatedFeatures.selfPaced.title")}
                     </h3>
                     <p className="text-gray-600">
-                      Access courses anytime, anywhere, and learn at your own speed
+                      {t("animatedFeatures.selfPaced.description")}
                     </p>
                   </div>
                 </div>
@@ -56,10 +59,10 @@ function LandingPage() {
                   </div>
                   <div className="text-center mt-2">
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      Expert Teachers
+                      {t("animatedFeatures.experts.title")}
                     </h3>
                     <p className="text-gray-600">
-                      Learn from experienced educators who are passionate about teaching
+                      {t("animatedFeatures.experts.description")}
                     </p>
                   </div>
                 </div>
@@ -76,10 +79,10 @@ function LandingPage() {
                   </div>
                   <div className="text-center mt-2">
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      Interactive Learning
+                      {t("animatedFeatures.interactive.title")}
                     </h3>
                     <p className="text-gray-600">
-                      Engage with interactive content and real-time feedback
+                      {t("animatedFeatures.interactive.description")}
                     </p>
                   </div>
                 </div>
