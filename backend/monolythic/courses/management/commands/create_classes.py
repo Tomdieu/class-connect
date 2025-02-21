@@ -6,21 +6,55 @@ class Command(BaseCommand):
     help = 'Create all the different Class instances based on the attributes in the User model'
 
     def handle(self, *args, **kwargs):
-        # Create Lycée classes
-        for lycee_class in dict(User.LYCEE_CLASSES).keys():
-            Class.objects.get_or_create(name=lycee_class, level='LYCEE')
+        sections = ['FRANCOPHONE', 'ANGLOPHONE']
+        specialities = ['scientifique', 'litteraire']
 
-        # Create University levels and years
-        for university_level in dict(User.UNIVERSITY_LEVELS).keys():
-            Class.objects.get_or_create(name=university_level, level='UNIVERSITY')
-            if university_level == 'licence':
-                for year in dict(User.LICENCE_YEARS).keys():
-                    Class.objects.get_or_create(name=f"{year}",description=f"{university_level}", level='UNIVERSITY')
-            elif university_level == 'master':
-                for year in dict(User.MASTER_YEARS).keys():
-                    Class.objects.get_or_create(name=f"{year}",description=f"{university_level}", level='UNIVERSITY')
+        # Create College classes
+        for section in sections:
+            for college_class in dict(User.COLLEGE_CLASSES).keys():
+                Class.objects.get_or_create(
+                    name=college_class, 
+                    level='COLLEGE',
+                    section=section
+                )
 
-        # Create Professional level
-        Class.objects.get_or_create(name='Professional', level='PROFESSIONAL')
+        # Create Lycée classes with specialities
+        for section in sections:
+            for lycee_class in dict(User.LYCEE_CLASSES).keys():
+                for speciality in specialities:
+                    Class.objects.get_or_create(
+                        name=lycee_class, 
+                        level='LYCEE',
+                        section=section,
+                        speciality=speciality
+                    )
+
+        # Create University levels
+        for section in sections:
+            # Create Licence years
+            for year in dict(User.LICENCE_YEARS).keys():
+                Class.objects.get_or_create(
+                    name=year,
+                    description='licence',
+                    level='UNIVERSITY',
+                    section=section
+                )
+            
+            # Create Master years
+            for year in dict(User.MASTER_YEARS).keys():
+                Class.objects.get_or_create(
+                    name=year,
+                    description='master',
+                    level='UNIVERSITY',
+                    section=section
+                )
+            
+            # Create Doctorat
+            Class.objects.get_or_create(
+                name='doctorat',
+                description='doctorat',
+                level='UNIVERSITY',
+                section=section
+            )
 
         self.stdout.write(self.style.SUCCESS('Successfully created all Class instances'))
