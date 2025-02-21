@@ -1,13 +1,10 @@
-
 version: '3.8'
-
 networks:
   e_learning_network:
     driver: bridge
-
 services:
   api:
-    build: 
+    build:
       context: .
       dockerfile: ./docker/prod/Dockerfile
     command: /start.sh
@@ -62,10 +59,13 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     networks:
       - e_learning_network
 
 volumes:
   postgres_data:
   rabbitmq_data:
-  static_volume:   # New volume for static files
+  static_volume:  # New volume for static files
+  redis_data:

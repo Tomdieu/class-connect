@@ -11,6 +11,7 @@ import { PDFDialog } from '../dashboard/admin/modals/PDFDialog'
 import { VideoPreviewModal } from "@/components/dashboard/admin/modals/VideoPreviewModal";
 import ClassModal from '../dashboard/admin/modals/ClassModal'
 import PlanModal from '../dashboard/admin/modals/PlanModal'
+import DeleteConfirmationModal from './DeleteConfirmationModal'
 
 function Modals() {
   return (
@@ -29,6 +30,7 @@ function Modals() {
       <RevisionModal />
       <VideoModal />
       <PlanModal/>
+      <DeleteConfirmationModal />
 
       {/*  */}
       <PDFDialog />

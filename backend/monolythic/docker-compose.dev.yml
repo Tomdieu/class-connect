@@ -1,0 +1,62 @@
+version: '3.8'
+
+networks:
+  e_learning_dev_network:
+    driver: bridge
+
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    command: python manage.py runserver 0.0.0.0:8001
+    volumes:
+      - .:/app
+      - web_static_dev:/app/staticfiles
+    ports:
+      - "8001:8001"
+    env_file:
+      - .envs/.dev/.django
+      - .envs/.dev/.backblaze
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+    networks:
+      - e_learning_dev_network
+
+  db:
+    image: postgres:alpine3.20
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    env_file:
+      - .envs/.dev/.postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - e_learning_dev_network
+
+  rabbitmq:
+    image: rabbitmq:3.10-management-alpine
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - .envs/.dev/.rabbitmq
+    volumes:
+      - rabbitmq_data_dev:/var/lib/rabbitmq
+    networks:
+      - e_learning_dev_network
+
+  redis:
+    image: redis:7.4
+    ports:
+      - "6379:6379"
+    networks:
+      - e_learning_dev_network
+
+volumes:
+  postgres_data_dev:
+  rabbitmq_data_dev:
+  web_static_dev:

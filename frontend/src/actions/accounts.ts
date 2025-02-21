@@ -50,11 +50,11 @@ export const registerUser = async (data: UserCreateType) => {
 
 export const getUsers = async ({
   page = 1,
-  params,
+  params = {}  // Add default value
 }: {
   page: string | number;
   params?: UserParams;
-}) => {
+} = {}) => {  // Make the entire parameter object optional with defaults
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
@@ -66,8 +66,10 @@ export const getUsers = async ({
       },
       params,
     });
+    
+    // Ensure we always return an array
     const data = (await res.data) as UserType[];
-    return data;
+    return data.length ? data : [];
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // Type guard for Axios errors

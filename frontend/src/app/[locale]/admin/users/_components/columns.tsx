@@ -17,10 +17,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUserStore } from "@/hooks/user-store";
-// import toast from "react-hot-toast";
-
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+import { useI18n } from '@/locales/client';
+import { useDeleteConfirmationStore } from '@/hooks/delete-confirmation-store';
+import toast from 'react-hot-toast';
+import { deleteUser } from '@/actions/accounts';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const userColumns: ColumnDef<UserType>[] = [
   {
@@ -54,8 +55,10 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "first_name",
     id: "first_name",
-
-    header: "First Name",
+    header: ({ column }) => {
+      const t = useI18n();
+      return t('users.table.columns.firstName');
+    },
     size:500,
     cell: ({ row }) => {
       const user = row.original;
@@ -65,8 +68,10 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "last_name",
     id: "last_name",
-
-    header: "Last name",
+    header: ({ column }) => {
+      const t = useI18n();
+      return t('users.table.columns.lastName');
+    },
     cell: ({ row }) => {
       const user = row.original;
       return <span>{user.last_name}</span>;
@@ -75,8 +80,10 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "email",
     id: "email",
-
-    header: "Email",
+    header: ({ column }) => {
+      const t = useI18n();
+      return t('users.table.columns.email');
+    },
     cell: ({ row }) => {
       const user = row.original;
       return <a href={`mailto:${user.email}`}>{user.email}</a>;
@@ -85,8 +92,10 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "phone_number",
     id: "phone_number",
-
-    header: "Phone Number",
+    header: ({ column }) => {
+      const t = useI18n();
+      return t('users.table.columns.phone');
+    },
     cell: ({ row }) => {
       const user = row.original;
       return <a href={`tel:${user.phone_number}`}>{user.phone_number}</a>;
@@ -95,8 +104,10 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "education_level",
     id: "education_level",
-
-    header: "Education Level",
+    header: ({ column }) => {
+      const t = useI18n();
+      return t('users.table.columns.educationLevel');
+    },
     cell: ({ row }) => {
       const user = row.original;
       return <span>{user.education_level}</span>;
@@ -104,7 +115,10 @@ export const userColumns: ColumnDef<UserType>[] = [
   },
   {
     id: "class",
-    header: "Class",
+    header: ({ column }) => {
+      const t = useI18n();
+      return t('users.table.columns.class');
+    },
     cell: ({ row }) => {
       const user = row.original;
       return <span>{user.lycee_class}</span>;
@@ -113,8 +127,10 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "date_joined",
     id: "date_joined",
-
-    header: "Date Joined",
+    header: ({ column }) => {
+      const t = useI18n();
+      return t('users.table.columns.dateJoined');
+    },
     cell: ({ row }) => {
       const user = row.original;
       return (
@@ -127,12 +143,30 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
+      const t = useI18n();
       const user = row.original;
       const { setUser, onOpen } = useUserStore();
+      const store = useDeleteConfirmationStore();
+      const queryClient = useQueryClient();
+
+      const handleDelete = async () => {
+        try {
+          store.setIsLoading(true);
+          await deleteUser(user.id);
+          await queryClient.invalidateQueries({ queryKey: ['users'] });
+          toast.success(t('users.delete.success'));
+          store.close();
+        } catch (error) {
+          toast.error(t('users.delete.error'));
+        } finally {
+          store.setIsLoading(false);
+        }
+      };
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant={"ghost"} size={"icon"}>
+            <Button variant="ghost" size="icon">
               <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
@@ -143,12 +177,22 @@ export const userColumns: ColumnDef<UserType>[] = [
                 onOpen();
               }}
             >
-              <RefreshCw className="w-4 h-4 mr-2" /> <span>Update</span>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              <span>{t('users.table.actions.update')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-500">
-              <Trash className="w-4 h-4 mr-2" /> Delete
+            <DropdownMenuItem 
+              className="text-red-500"
+              onClick={() => {
+                store.onOpen({
+                  title: t('users.delete.title'),
+                  description: t('users.delete.description'),
+                  onConfirm: handleDelete
+                });
+              }}
+            >
+              <Trash className="w-4 h-4 mr-2" />
+              {t('users.table.actions.delete')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

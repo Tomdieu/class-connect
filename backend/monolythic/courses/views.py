@@ -47,19 +47,194 @@ class ClassViewSet(viewsets.ModelViewSet):
     """
     API endpoint for managing classes.
     """
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]ss
     # pagination_class = CustomPagination
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ClassFilter
     
+    @swagger_auto_schema(
+        method='get',
+        operation_description="Get classes organized by section and level",
+        responses={
+            200: openapi.Response(
+                description="Classes organized hierarchically",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'FRANCOPHONE': openapi.Schema(
+                            type=openapi.TYPE_OBJECT,
+                            properties={
+                                'COLLEGE': openapi.Schema(
+                                    type=openapi.TYPE_OBJECT,
+                                    properties={
+                                        'classes': openapi.Schema(
+                                            type=openapi.TYPE_ARRAY,
+                                            items=openapi.Schema(
+                                                type=openapi.TYPE_OBJECT,
+                                                properties={
+                                                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                    'name': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'level': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'section': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                }
+                                            )
+                                        )
+                                    }
+                                ),
+                                'LYCEE': openapi.Schema(
+                                    type=openapi.TYPE_OBJECT,
+                                    properties={
+                                        'scientifique': openapi.Schema(
+                                            type=openapi.TYPE_ARRAY,
+                                            items=openapi.Schema(
+                                                type=openapi.TYPE_OBJECT,
+                                                properties={
+                                                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                    'name': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'level': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'section': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'speciality': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                }
+                                            )
+                                        ),
+                                        'litteraire': openapi.Schema(
+                                            type=openapi.TYPE_ARRAY,
+                                            items=openapi.Schema(
+                                                type=openapi.TYPE_OBJECT,
+                                                properties={
+                                                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                    'name': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'level': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'section': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'speciality': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                }
+                                            )
+                                        )
+                                    }
+                                ),
+                                'UNIVERSITY': openapi.Schema(
+                                    type=openapi.TYPE_OBJECT,
+                                    properties={
+                                        'licence': openapi.Schema(
+                                            type=openapi.TYPE_ARRAY,
+                                            items=openapi.Schema(
+                                                type=openapi.TYPE_OBJECT,
+                                                properties={
+                                                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                    'name': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'level': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'section': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                }
+                                            )
+                                        ),
+                                        'master': openapi.Schema(
+                                            type=openapi.TYPE_ARRAY,
+                                            items=openapi.Schema(
+                                                type=openapi.TYPE_OBJECT,
+                                                properties={
+                                                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                    'name': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'level': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'section': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                }
+                                            )
+                                        ),
+                                        'doctorat': openapi.Schema(
+                                            type=openapi.TYPE_ARRAY,
+                                            items=openapi.Schema(
+                                                type=openapi.TYPE_OBJECT,
+                                                properties={
+                                                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                    'name': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'level': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'section': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                }
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        ),
+                        'ANGLOPHONE': openapi.Schema(
+                            type=openapi.TYPE_OBJECT,
+                            properties={
+                                'COLLEGE': openapi.Schema(
+                                    type=openapi.TYPE_OBJECT,
+                                    properties={
+                                        'classes': openapi.Schema(
+                                            type=openapi.TYPE_ARRAY,
+                                            items=openapi.Schema(
+                                                type=openapi.TYPE_OBJECT,
+                                                properties={
+                                                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                    'name': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'level': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'section': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                }
+                                            )
+                                        )
+                                    }
+                                ),
+                                # ... rest of ANGLOPHONE structure mirrors FRANCOPHONE
+                            }
+                        )
+                    }
+                )
+            )
+        }
+    )
+    @action(detail=False, methods=['get'])
+    def formatted_classes(self, request):
+        classes = self.get_queryset().exclude(level='PROFESSIONAL')
+        formatted_data = {}
+
+        for class_obj in classes:
+            section = class_obj.section
+            level = class_obj.level
+
+            if section not in formatted_data:
+                formatted_data[section] = {}
+
+            if level not in formatted_data[section]:
+                formatted_data[section][level] = {}
+
+            if level == 'LYCEE':
+                speciality = class_obj.speciality or 'NO_SPECIALITY'
+                if speciality not in formatted_data[section][level]:
+                    formatted_data[section][level][speciality] = []
+                formatted_data[section][level][speciality].append(
+                    self.serializer_class(class_obj).data
+                )
+            elif level == 'UNIVERSITY':
+                univ_level = class_obj.description or 'OTHER'
+                if univ_level not in formatted_data[section][level]:
+                    formatted_data[section][level][univ_level] = []
+                formatted_data[section][level][univ_level].append(
+                    self.serializer_class(class_obj).data
+                )
+            else:
+                if 'classes' not in formatted_data[section][level]:
+                    formatted_data[section][level]['classes'] = []
+                formatted_data[section][level]['classes'].append(
+                    self.serializer_class(class_obj).data
+                )
+
+        return Response(formatted_data)
     
-    method_decorator(cache_page(60*60*2,key_prefix='class_list'))
+    @method_decorator(cache_page(60*60*2,key_prefix='class_list'))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
-    method_decorator(cache_page(60*60*2,key_prefix='class_detail'))
+    @method_decorator(cache_page(60*60*2,key_prefix='class_detail'))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 

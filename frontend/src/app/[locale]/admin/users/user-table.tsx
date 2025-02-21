@@ -7,13 +7,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { userColumns } from "./_components/columns";
+import { useI18n } from '@/locales/client';
+import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 
 function UserTable() {
+  const t = useI18n();
   const searchParams = useSearchParams();
   const page = searchParams.get("page") || "1";
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users", "page", page],
-    queryFn: () => getUsers({ page }),
+    queryFn: () => getUsers({ page, params: {} }),
+    initialData: [], // Provide initial data as empty array
   });
 
   const [users, setUsers] = useState<UserType[]>([]);
@@ -25,11 +29,11 @@ function UserTable() {
   }, [data]);
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <p>{t('users.loading')}</p>;
   }
 
   if (isError) {
-    return <p>Error</p>;
+    return <p>{t('users.error')}</p>;
   }
 
   const handleFilter = (value: string) => {
@@ -50,16 +54,9 @@ function UserTable() {
 
   if (data) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 w-full">
         <DataTable onChange={handleFilter} columns={userColumns} data={users} />
-        {/* {d > 1 && (
-          <CustomPagination
-            onPageChange={() => {}}
-            itemsPerPage={25}
-            currentPage={parseInt(page)}
-            pagination={data}
-          />
-        )} */}
+        <DeleteConfirmationModal />
       </div>
     );
   }

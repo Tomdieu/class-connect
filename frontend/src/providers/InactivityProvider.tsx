@@ -1,9 +1,10 @@
 "use client";
 
 import { signOut, useSession } from "next-auth/react";
-import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useCallback } from "react";
 
-const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes in milliseconds
 
 export default function InactivityProvider({
   children,
@@ -11,28 +12,30 @@ export default function InactivityProvider({
   children: React.ReactNode;
 }) {
   const lastActivityRef = useRef<number>(Date.now());
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { data: session } = useSession();
+  const pathname = usePathname();
+
+  // Memoize the update activity handler
+  const updateLastActivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
+  }, []);
+
+  // Memoize the inactivity check
+  const checkInactivity = useCallback(() => {
+    const now = Date.now();
+    if (now - lastActivityRef.current >= INACTIVITY_TIMEOUT) {
+      if (session?.user) {
+        signOut({
+          callbackUrl: `/?callbackUrl=${encodeURIComponent(pathname)}`,
+        });
+      }
+    }
+  }, [pathname, session?.user]);
 
   useEffect(() => {
-    const updateLastActivity = () => {
-      lastActivityRef.current = Date.now();
-    };
+    if (!session?.user) return; // Only run effect if user is authenticated
 
-    const checkInactivity = () => {
-      const now = Date.now();
-      if (now - lastActivityRef.current >= INACTIVITY_TIMEOUT) {
-        // User has been inactive for 5 minutes
-        if(!session?.user){
-          return;
-        }
-        if (session?.user) {
-          signOut();
-        }
-      }
-    };
-
-    // Add event listeners for user activity
+    // User activity events
     const events = [
       "mousedown",
       "mousemove",
@@ -40,29 +43,24 @@ export default function InactivityProvider({
       "scroll",
       "touchstart",
       "click",
-    ];
+    ] as const;
 
+    // Add event listeners
     events.forEach((event) => {
       window.addEventListener(event, updateLastActivity);
     });
 
     // Set up interval to check inactivity
-    const intervalId = setInterval(checkInactivity, 1000); // Check every second
+    const intervalId = setInterval(checkInactivity, 1000);
 
-    // Store current timeout ref value for cleanup
-    const currentTimeoutRef = timeoutRef.current;
-
+    // Cleanup function
     return () => {
-      // Cleanup
       events.forEach((event) => {
         window.removeEventListener(event, updateLastActivity);
       });
       clearInterval(intervalId);
-      if (currentTimeoutRef) {
-        clearTimeout(currentTimeoutRef);
-      }
     };
-  }, []); // Empty dependency array since we're using refs
+  }, [session?.user, updateLastActivity, checkInactivity]);
 
   return <>{children}</>;
 }

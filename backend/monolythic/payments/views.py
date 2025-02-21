@@ -329,8 +329,20 @@ class SubscriptionHistoryView(APIView):
                         ),
                         'results': openapi.Schema(
                             type=openapi.TYPE_ARRAY,
-                            items=SubscriptionDetailSerializer,
-                            description='List of subscriptions'
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                # Define the subscription properties here
+                                properties={
+                                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'user': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'plan': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'start_date': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME),
+                                    'end_date': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME),
+                                    'auto_renew': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                                    'status': openapi.Schema(type=openapi.TYPE_STRING),
+                                }
+                            )
                         )
                     }
                 )

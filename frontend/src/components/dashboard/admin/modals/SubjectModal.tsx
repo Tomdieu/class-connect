@@ -170,11 +170,10 @@ function SubjectModal() {
       <CredenzaContent>
         <CredenzaHeader>
           <CredenzaTitle>
-            {subject ? "Modifier" : "Ajouter une matier"}
+            {subject ? t("subject.edit") : t("subject.add")}
           </CredenzaTitle>
           <p className="text-sm text-muted-foreground">
-            Remplir les informations pour {subject ? "modifier" : "ajouter"} une
-            matier
+            {subject ? t("subject.form.editDescription") : t("subject.form.addDescription")}
           </p>
         </CredenzaHeader>
         <div>
@@ -188,9 +187,9 @@ function SubjectModal() {
                 name="name"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Nom de la matier</FormLabel>
+                    <FormLabel>{t("subject.form.name")}</FormLabel>
                     <FormControl>
-                      <Input placeholder={"Nom de la matier"} {...field} />
+                      <Input placeholder={t("subject.form.name")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -201,12 +200,12 @@ function SubjectModal() {
                 name="description"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t("subject.form.description")}</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={5}
                         className="resize-none"
-                        placeholder={"Description"}
+                        placeholder={t("subject.form.description")}
                         {...field}
                       />
                     </FormControl>
@@ -221,8 +220,8 @@ function SubjectModal() {
               >
                 {isLoading && (
                   <Loader className="size-4 text-muted-foreground mr-2" />
-                )}{" "}
-                {subject ? "Modifier" : "Ajouter"}
+                )}
+                {subject ? t("subject.form.submit.edit") : t("subject.form.submit.add")}
               </Button>
             </form>
           </Form>

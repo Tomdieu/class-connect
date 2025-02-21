@@ -13,6 +13,7 @@ import {
   PDFResourceCreateType,
   ResourceType,
   RevisionResourceCreateType,
+  SchoolStructure,
   SubjectCreateType,
   SubjectType,
   TopicCreateType,
@@ -47,6 +48,29 @@ export const listClasses = async ({
     });
     const data = await res.data;
     return data as ClassType[];
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // Type guard for Axios errors
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+    }
+    throw error;
+  }
+};
+
+export const getformatedClasses = async () => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const res = await api.get(`/api/classes/formatted_classes/`, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.data;
+    return data as SchoolStructure;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // Type guard for Axios errors
@@ -770,6 +794,45 @@ export const listResources = async ({
   }
 };
 
+
+export const deleteResource = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  resource_pk,
+}: {
+  class_pk: string;
+  subject_pk: string;
+  chapter_pk: string;
+  topic_pk: string;
+  resource_pk: string;
+})=>{
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const res = await api.delete(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/resources/${resource_pk}/`,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await res.data;
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+    }
+    throw error;
+  }
+}
+
 export const addPdfResource = async ({
   class_pk,
   subject_pk,
@@ -777,10 +840,10 @@ export const addPdfResource = async ({
   topic_pk,
   resource,
 }: {
-  class_pk: string|number;
-  subject_pk: string|number;
-  chapter_pk: string|number;
-  topic_pk: string|number;
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
+  topic_pk: string | number;
   resource: PDFResourceCreateType;
 }) => {
   try {
@@ -822,10 +885,10 @@ export const addVideoResource = async ({
   topic_pk,
   resource,
 }: {
-  class_pk: string|number;
-  subject_pk: string|number;
-  chapter_pk: string|number;
-  topic_pk: string|number;
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
+  topic_pk: string | number;
   resource: VideoResourceCreateType;
 }) => {
   try {
@@ -838,8 +901,7 @@ export const addVideoResource = async ({
     formData.append("description", resource.description || "");
     formData.append("video_file", resource.video_file);
 
-
-    console.log(formData.values())
+    console.log(formData.values());
 
     const res = await api.post(
       `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/videos/`,
@@ -863,7 +925,6 @@ export const addVideoResource = async ({
   }
 };
 
-
 export const addExerciseResource = async ({
   class_pk,
   subject_pk,
@@ -871,10 +932,10 @@ export const addExerciseResource = async ({
   topic_pk,
   resource,
 }: {
-  class_pk: string|number;
-  subject_pk: string|number;
-  chapter_pk: string|number;
-  topic_pk: string|number;
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
+  topic_pk: string | number;
   resource: ExerciseResourceCreateType;
 }) => {
   try {
@@ -887,11 +948,9 @@ export const addExerciseResource = async ({
     formData.append("description", resource.description || "");
     formData.append("instructions", resource.instructions);
     formData.append("exercise_file", resource.exercise_file);
-    if(resource.solution_file){
+    if (resource.solution_file) {
       formData.append("solution_file", resource.solution_file);
-
     }
-
 
     const res = await api.post(
       `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/exercises/`,
@@ -922,10 +981,10 @@ export const addRevisionResource = async ({
   topic_pk,
   resource,
 }: {
-  class_pk: string|number;
-  subject_pk: string|number;
-  chapter_pk: string|number;
-  topic_pk: string|number;
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
+  topic_pk: string | number;
   resource: RevisionResourceCreateType;
 }) => {
   try {

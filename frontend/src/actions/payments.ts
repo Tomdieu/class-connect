@@ -138,7 +138,7 @@ export const updateSubscriptionPlan = async (
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
     if (!session.user.is_superuser) throw Error("Unauthorize user!");
-    const response = await api.patch(`/api/plans/${id}`, plan, {
+    const response = await api.patch(`/api/plans/${id}/`, plan, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
@@ -160,7 +160,7 @@ export const deleteSubscriptionPlan = async (id: number) => {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
     if (!session.user.is_superuser) throw Error("Unauthorize user!");
-    const response = await api.delete(`/api/plans/${id}`, {
+    const response = await api.delete(`/api/plans/${id}/`, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
@@ -204,7 +204,7 @@ export const getSubscription = async (id: number) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
-    const response = await api.get(`/api/subscriptions/${id}`, {
+    const response = await api.get(`/api/subscriptions/${id}/`, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },

@@ -18,11 +18,13 @@ class CourseCategory(models.Model):
 
 class Class(models.Model):
 
+    COLLEGE = 'COLLEGE'
     LYCEE = 'LYCEE'
     UNIVERSITY = 'UNIVERSITY'
     PROFESSIONAL = 'PROFESSIONAL'
 
     EDUCATION_LEVELS = [
+        (COLLEGE,"College"),
         (LYCEE, 'Lycée'),
         (UNIVERSITY, 'Université'),
         (PROFESSIONAL, 'Professionnel'),
@@ -36,9 +38,18 @@ class Class(models.Model):
         (ANGLOPHONE,'Anglophone')
     ]
     
+    SCIENTIFIQUE = 'scientifique'
+    LITTERAIRE = 'litteraire'
+    
+    SPECIALITES = [
+        (SCIENTIFIQUE, 'Scientifique'),
+        (LITTERAIRE, 'Litteraire')
+    ]
+    
     name = models.CharField(max_length=100)
     level = models.CharField(max_length=20, choices=EDUCATION_LEVELS)
     section = models.CharField(max_length=20,choices=SECTIONS,default=FRANCOPHONE)
+    speciality = models.CharField(max_length=20,choices=SPECIALITES,blank=True,null=True)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

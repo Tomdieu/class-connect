@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import api from "@/services/api";
 import { useSession } from "next-auth/react";
+import { useI18n } from "@/locales/client";
 
 // -------------------------
 // Form Schemas
@@ -113,256 +114,11 @@ const revisionSchema = baseResourceSchema.extend({
 });
 
 // -------------------------
-// Quiz Modal
-// -------------------------
-
-// export const QuizModal = () => {
-//   const { isOpen, onClose, classId, subjectId, chapterId, topicId } =
-//     useQuizStore();
-//   const [isFullscreen, setIsFullscreen] = useState(false);
-
-//   const form = useForm({
-//     resolver: zodResolver(quizSchema),
-//     defaultValues: {
-//       title: "",
-//       description: "",
-//       topic: 0,
-//       polymorphic_ctype: 0,
-//       duration_minutes: 1,
-//       passing_score: 50,
-//       show_correct_answers: true,
-//       show_explanation: true,
-//       shuffle_questions: false,
-//       attempts_allowed: 1,
-//       partial_credit: false,
-//       questions: [],
-//     },
-//   });
-
-//   const {
-//     fields: questionFields,
-//     append: appendQuestion,
-//     remove: removeQuestion,
-//   } = useFieldArray({
-//     control: form.control,
-//     name: "questions",
-//   });
-
-//   const handleAddQuestion = () => {
-//     appendQuestion({
-//       text: "",
-//       type: "MULTIPLE_CHOICE",
-//       points: 1,
-//       order: questionFields.length + 1,
-//       explanation: "",
-//       options: [
-//         { text: "", is_correct: false, order: 1 },
-//         { text: "", is_correct: false, order: 2 },
-//       ],
-//     });
-//   };
-
-//   const onSubmit = async (data) => {
-//     try {
-//       console.log("Quiz form submitted:", data);
-//       onClose();
-//     } catch (error) {
-//       console.error("Error submitting quiz form:", error);
-//     }
-//   };
-
-//   const modalClasses = isFullscreen
-//     ? "max-w-full w-full h-full"
-//     : "sm:max-w-[800px]";
-
-//   return (
-//     <Credenza open={isOpen} onOpenChange={onClose}>
-//       <CredenzaContent
-//         showIcon={false}
-//         className={`${modalClasses} p-6 transition-all duration-300 flex flex-col`}
-//       >
-//         <div className="flex justify-between items-center">
-//           <CredenzaTitle>Create Quiz Resource</CredenzaTitle>
-//           <Button
-//             variant="ghost"
-//             size="icon"
-//             onClick={() => setIsFullscreen(!isFullscreen)}
-//           >
-//             {isFullscreen ? <Minimize2 /> : <Maximize2 />}
-//           </Button>
-//         </div>
-
-//         <Form {...form}>
-//           <form
-//             onSubmit={form.handleSubmit(onSubmit)}
-//             className="flex flex-1 flex-col"
-//           >
-//             <Tabs defaultValue="quiz-info" className="w-full flex-1">
-//               <TabsList className="gap-1 bg-transparent">
-//                 <TabsTrigger
-//                   value="quiz-info"
-//                   className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-//                 >
-//                   Quiz Information
-//                 </TabsTrigger>
-//                 <TabsTrigger
-//                   value="questions"
-//                   className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-//                 >
-//                   Questions
-//                 </TabsTrigger>
-//               </TabsList>
-
-//               <TabsContent value="quiz-info" className="p-4">
-//                 <div className="space-y-6 h-full">
-//                   <FormField
-//                     control={form.control}
-//                     name="title"
-//                     render={({ field }) => (
-//                       <FormItem>
-//                         <FormLabel>Title</FormLabel>
-//                         <FormControl>
-//                           <Input {...field} placeholder="Quiz Title" />
-//                         </FormControl>
-//                       </FormItem>
-//                     )}
-//                   />
-//                   <FormField
-//                     control={form.control}
-//                     name="description"
-//                     render={({ field }) => (
-//                       <FormItem>
-//                         <FormLabel>Description</FormLabel>
-//                         <FormControl>
-//                           <Textarea {...field} placeholder="Quiz Description" />
-//                         </FormControl>
-//                       </FormItem>
-//                     )}
-//                   />
-
-//                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    
-//                     <FormField
-//                       control={form.control}
-//                       name="duration_minutes"
-//                       render={({ field }) => (
-//                         <FormItem>
-//                           <FormLabel>Duration (minutes)</FormLabel>
-//                           <FormControl>
-//                             <Input {...field} type="number" />
-//                           </FormControl>
-//                         </FormItem>
-//                       )}
-//                     />
-//                     <FormField
-//                       control={form.control}
-//                       name="passing_score"
-//                       render={({ field }) => (
-//                         <FormItem>
-//                           <FormLabel>Passing Score</FormLabel>
-//                           <FormControl>
-//                             <Input {...field} type="number" />
-//                           </FormControl>
-//                         </FormItem>
-//                       )}
-//                     />
-//                   </div>
-
-//                   <div className="grid grid-cols-2 items-center sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-                    
-//                     <FormField
-//                       control={form.control}
-//                       name="show_correct_answers"
-//                       render={({ field }) => (
-//                         <FormItem className="flex items-center space-x-2">
-//                           <FormLabel>Show Answers</FormLabel>
-//                           <FormControl>
-//                             <Switch
-//                               checked={field.value}
-//                               onCheckedChange={field.onChange}
-//                             />
-//                           </FormControl>
-//                         </FormItem>
-//                       )}
-//                     />
-//                     <FormField
-//                       control={form.control}
-//                       name="show_explanation"
-//                       render={({ field }) => (
-//                         <FormItem className="flex items-center space-x-2">
-//                           <FormLabel>Show Explanation</FormLabel>
-//                           <FormControl>
-//                             <Switch
-//                               checked={field.value}
-//                               onCheckedChange={field.onChange}
-//                             />
-//                           </FormControl>
-//                         </FormItem>
-//                       )}
-//                     />
-//                     <FormField
-//                       control={form.control}
-//                       name="shuffle_questions"
-//                       render={({ field }) => (
-//                         <FormItem className="flex items-center space-x-2">
-//                           <FormLabel>Shuffle</FormLabel>
-//                           <FormControl>
-//                             <Switch
-//                               checked={field.value}
-//                               onCheckedChange={field.onChange}
-//                             />
-//                           </FormControl>
-//                         </FormItem>
-//                       )}
-//                     />
-//                   </div>
-
-//                 </div>
-//               </TabsContent>
-
-//               <TabsContent value="questions" className="min-h-96">
-//                 <ScrollArea
-//                   className={cn(
-//                     "space-y-6 overflow-y-auto",
-//                     isFullscreen ? "max-h-[680px]" : "max-h-[400px]"
-//                   )}
-//                 >
-//                   {questionFields.map((_, index) => (
-//                     <QuestionField
-//                       key={questionFields[index].id}
-//                       questionIndex={index}
-//                       control={form.control}
-//                       removeQuestion={removeQuestion}
-//                     />
-//                   ))}
-//                   <Button
-//                     onClick={handleAddQuestion}
-//                     className="w-full"
-//                     size={"sm"}
-//                   >
-//                     Add Question
-//                   </Button>
-//                 </ScrollArea>
-//               </TabsContent>
-//             </Tabs>
-
-//             <div className="bg-background pt-4 border-t">
-//               <Button type="submit" className="w-full">
-//                 Create Quiz
-//               </Button>
-//             </div>
-//           </form>
-//         </Form>
-//       </CredenzaContent>
-//     </Credenza>
-//   );
-// };
-
-// -------------------------
 // PDF Modal
 // -------------------------
 
 export const PDFModal = () => {
+  const t = useI18n();
   const { isOpen, onClose, chapterId, classId, topicId, subjectId } =
     usePDFStore();
   const [isLoading, setIsLoading] = useState(false);
@@ -456,7 +212,7 @@ export const PDFModal = () => {
     <Credenza open={isOpen} onOpenChange={handleClose}>
       <CredenzaContent className="sm:max-w-[600px] p-6 pb-16 transition-all duration-300">
         <CredenzaHeader className="mt-5">
-          <CredenzaTitle>Create PDF Resource</CredenzaTitle>
+          <CredenzaTitle>{t("resource.modal.pdf.title")}</CredenzaTitle>
         </CredenzaHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -466,10 +222,11 @@ export const PDFModal = () => {
               name="title"
               render={({ field }) => (
                 <FormItem className="transition-all duration-300">
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t("resource.modal.title")}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="PDF Title" />
+                    <Input placeholder={t("resource.modal.title")} {...field} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -478,10 +235,14 @@ export const PDFModal = () => {
               name="description"
               render={({ field }) => (
                 <FormItem className="transition-all duration-300">
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("resource.modal.description")}</FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="PDF Description" />
+                    <Textarea 
+                      placeholder={t("resource.modal.description")}
+                      {...field} 
+                    />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -490,14 +251,14 @@ export const PDFModal = () => {
               name="pdf_file"
               render={() => (
                 <FormItem className="transition-all duration-300">
-                  <FormLabel>PDF File</FormLabel>
+                  <FormLabel>{t("resource.modal.file.pdf")}</FormLabel>
                   <FormControl>
                     <FileDropzone
                       onDrop={handleDrop}
                       accept={{
                         "application/pdf": [".pdf"],
                       }}
-                      label="Drop PDF here or click to select"
+                      label={t("resource.modal.file.dropzone.pdf")}
                     />
                   </FormControl>
                   <FormMessage />
@@ -508,7 +269,7 @@ export const PDFModal = () => {
               {isLoading && (
                 <Loader2 className="size-4 mr-2 text-white animate-spin" />
               )}
-              Upload PDF
+              {t("resource.modal.submit.pdf")}
             </Button>
           </form>
         </Form>
@@ -522,6 +283,7 @@ export const PDFModal = () => {
 // -------------------------
 
 export const ExerciseModal = () => {
+  const t = useI18n();
   const { isOpen, onClose, classId, subjectId, chapterId, topicId } =
     useExerciseStore();
 
@@ -617,7 +379,7 @@ export const ExerciseModal = () => {
       <CredenzaContent className="sm:max-w-[500px] h-full sm:h-auto max-h-screen sm:max-h-[90vh]">
         <div className="space-y-6 overflow-y-auto">
           <CredenzaHeader>
-            <CredenzaTitle>Create Exercise Resource</CredenzaTitle>
+            <CredenzaTitle>{t("resource.modal.exercise.title")}</CredenzaTitle>
           </CredenzaHeader>
           
           <Form {...form}>
@@ -627,10 +389,11 @@ export const ExerciseModal = () => {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>{t("resource.modal.title")}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Exercise Title" />
+                      <Input placeholder={t("resource.modal.title")} {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -640,13 +403,13 @@ export const ExerciseModal = () => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t("resource.modal.description")}</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={5}
                         className="resize-none"
                         {...field}
-                        placeholder="Exercise Description"
+                        placeholder={t("resource.modal.description")}
                       />
                     </FormControl>
                   </FormItem>
@@ -658,13 +421,13 @@ export const ExerciseModal = () => {
                 name="instructions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Instructions</FormLabel>
+                    <FormLabel>{t("resource.modal.instructions")}</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={5}
                         className="resize-none"
                         {...field}
-                        placeholder="Exercise instructions"
+                        placeholder={t("resource.modal.instructions")}
                       />
                     </FormControl>
                   </FormItem>
@@ -676,11 +439,11 @@ export const ExerciseModal = () => {
                 name="exercise_file"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Exercise File</FormLabel>
+                    <FormLabel>{t("resource.modal.file.exercise")}</FormLabel>
                     <FormControl>
                       <FileDropzone
                         onDrop={handleDrop("exercise_file")}
-                        label="Drop exercise file here or click to select"
+                        label={t("resource.modal.file.dropzone.exercise")}
                         accept={{
                           'application/pdf': ['.pdf'],
                           'application/msword': ['.doc'],
@@ -699,11 +462,11 @@ export const ExerciseModal = () => {
                 name="solution_file"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Solution File (optional)</FormLabel>
+                    <FormLabel>{t("resource.modal.file.solution")}</FormLabel>
                     <FormControl>
                       <FileDropzone
                         onDrop={handleDrop("solution_file")}
-                        label="Drop solution file here or click to select"
+                        label={t("resource.modal.file.dropzone.solution")}
                         accept={{
                           'application/pdf': ['.pdf'],
                           'application/msword': ['.doc'],
@@ -725,10 +488,10 @@ export const ExerciseModal = () => {
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <Loader2 className="size-4 mr-2 text-white animate-spin" />
-                    <span>Creating Exercise...</span>
+                    <span>{t("resource.modal.submit.exercise")}</span>
                   </div>
                 ) : (
-                  "Create Exercise"
+                  t("resource.modal.submit.exercise")
                 )}
               </Button>
             </form>
@@ -744,6 +507,7 @@ export const ExerciseModal = () => {
 // -------------------------
 
 export const RevisionModal = () => {
+  const t = useI18n();
   const { isOpen, onClose, classId, subjectId, chapterId, topicId } =
     useRevisionStore();
 
@@ -831,7 +595,7 @@ export const RevisionModal = () => {
       <CredenzaContent className="sm:max-w-[600px] p-5 pb-5 transition-all duration-300">
       <div className="space-y-4 overflow-y-auto">
         <CredenzaHeader className="mt-5">
-          <CredenzaTitle>Create Revision Resource</CredenzaTitle>
+          <CredenzaTitle>{t("resource.modal.revision.title")}</CredenzaTitle>
         </CredenzaHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -841,9 +605,9 @@ export const RevisionModal = () => {
               name="title"
               render={({ field }) => (
                 <FormItem className="transition-all duration-300">
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t("resource.modal.title")}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Revision Title" />
+                    <Input {...field} placeholder={t("resource.modal.title")} />
                   </FormControl>
                 </FormItem>
               )}
@@ -853,9 +617,9 @@ export const RevisionModal = () => {
               name="description"
               render={({ field }) => (
                 <FormItem className="transition-all duration-300">
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("resource.modal.description")}</FormLabel>
                   <FormControl>
-                    <Textarea rows={4} {...field} placeholder="Revision Description" />
+                    <Textarea rows={4} {...field} placeholder={t("resource.modal.description")} />
                   </FormControl>
                 </FormItem>
               )}
@@ -865,9 +629,9 @@ export const RevisionModal = () => {
               name="content"
               render={({ field }) => (
                 <FormItem className="transition-all duration-300">
-                  <FormLabel>Content</FormLabel>
+                  <FormLabel>{t("resource.modal.content")}</FormLabel>
                   <FormControl>
-                    <Textarea rows={7} {...field} placeholder="Revision content" />
+                    <Textarea rows={7} {...field} placeholder={t("resource.modal.content")} />
                     {/* <MdEditor value={field.value} onChange={field.onChange}/> */}
                   </FormControl>
                 </FormItem>
@@ -877,10 +641,10 @@ export const RevisionModal = () => {
               {isLoading ? (
                   <div className="flex items-center justify-center">
                     <Loader2 className="size-4 mr-2 text-white animate-spin" />
-                    <span>Creating Revision...</span>
+                    <span>{t("resource.modal.submit.revision")}</span>
                   </div>
                 ) : (
-                  "Create Revision"
+                  t("resource.modal.submit.revision")
                 )}
             </Button>
           </form>
@@ -896,6 +660,7 @@ export const RevisionModal = () => {
 // -------------------------
 
 export const VideoModal = () => {
+  const t = useI18n();
   const { isOpen, onClose, classId, subjectId, chapterId, topicId } =
     useVideoStore();
 
@@ -1027,7 +792,7 @@ export const VideoModal = () => {
       <CredenzaContent showIcon={!isLoading} className="p-4 sm:max-w-[500px]">
         <div className="">
           <CredenzaHeader>
-            <CredenzaTitle>Create Video Resource</CredenzaTitle>
+            <CredenzaTitle>{t("resource.modal.video.title")}</CredenzaTitle>
           </CredenzaHeader>
 
           <Form {...form}>
@@ -1040,9 +805,9 @@ export const VideoModal = () => {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>{t("resource.modal.title")}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Video Title" />
+                      <Input placeholder={t("resource.modal.title")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1054,9 +819,9 @@ export const VideoModal = () => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t("resource.modal.description")}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Video Description" />
+                      <Textarea {...field} placeholder={t("resource.modal.description")} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -1067,14 +832,14 @@ export const VideoModal = () => {
                 name="video_file"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Video File</FormLabel>
+                    <FormLabel>{t("resource.modal.file.video")}</FormLabel>
                     <FormControl>
                       <FileDropzone
                         onDrop={handleDrop}
                         accept={{
                           "video/*": [".mp4", ".webm", ".mov", ".avi"],
                         }}
-                        label="Drop video file here or click to select"
+                        label={t("resource.modal.file.dropzone.video")}
                       />
                     </FormControl>
                     <FormMessage />
@@ -1095,10 +860,10 @@ export const VideoModal = () => {
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <Loader2 className="size-4 mr-2 text-white animate-spin" />
-                    <span>Uploading... {uploadProgress}%</span>
+                    <span>{t("resource.modal.submit.video")} {uploadProgress}%</span>
                   </div>
                 ) : (
-                  "Upload Video"
+                  t("resource.modal.submit.video")
                 )}
               </Button>
             </form>

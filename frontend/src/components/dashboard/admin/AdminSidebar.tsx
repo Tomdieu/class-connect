@@ -1,12 +1,5 @@
 "use client";
-import {
-  Users,
-  BookOpen,
-  BarChart3,
-  Settings,
-  CreditCard,
-  Bell,
-} from "lucide-react";
+import { Users, BookOpen, BarChart3, Settings, CreditCard, Bell } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -22,45 +15,45 @@ import {
 import { usePathname } from "next/navigation";
 import { getPathAfterLanguage } from "@/lib/utils";
 import Link from "next/link";
-
-const menuItems = [
-  {
-    label: "Gestion",
-    items: [
-      { title: "Utilisateurs", icon: Users, url: "/admin/users" },
-      { title: "Cours", icon: BookOpen, url: "/admin/classes" },
-      { title: "Paiements", icon: CreditCard, url: "/admin/payments" },
-    ],
-  },
-  {
-    label: "Analyse",
-    items: [
-      { title: "Statistiques", icon: BarChart3, url: "/admin/statistics" },
-      { title: "Notifications", icon: Bell, url: "/admin/notifications" },
-    ],
-  },
-  {
-    label: "Configuration",
-    items: [{ title: "Paramètres", icon: Settings, url: "/admin/settings" }],
-  },
-];
+import { useI18n } from "@/locales/client";
 
 export const AdminSidebar = () => {
   const pathname = usePathname();
-  const { toggleSidebar, isMobile, openMobile } = useSidebar();
+  const { openMobile } = useSidebar();
+  const t = useI18n();
+
+  const menuItems = [
+    {
+      label: t("adminSidebar.management"),
+      items: [
+        { title: t("adminSidebar.items.users"), icon: Users, url: "/admin/users" },
+        { title: t("adminSidebar.items.courses"), icon: BookOpen, url: "/admin/classes" },
+        { title: t("adminSidebar.items.payments"), icon: CreditCard, url: "/admin/payments" },
+      ],
+    },
+    {
+      label: t("adminSidebar.analytics"),
+      items: [
+        { title: t("adminSidebar.items.statistics"), icon: BarChart3, url: "/admin/statistics" },
+        { title: t("adminSidebar.items.notifications"), icon: Bell, url: "/admin/notifications" },
+      ],
+    },
+    {
+      label: t("adminSidebar.configuration"),
+      items: [{ title: t("adminSidebar.items.settings"), icon: Settings, url: "/admin/settings" }],
+    },
+  ];
 
   const correctPath = getPathAfterLanguage(pathname);
+
   return (
     <Sidebar>
       <SidebarContent className="bg-white">
         <div className="font-bold text-xl p-5 pb-0 flex items-center justify-between">
           <Link href="/admin">
-          <span>Administrator</span>
+            <span>{t("adminSidebar.title")}</span>
           </Link>
-          {openMobile && (
-
-            <SidebarTrigger />
-          )}
+          {openMobile && <SidebarTrigger />}
         </div>
         {menuItems.map((group) => (
           <SidebarGroup key={group.label}>
