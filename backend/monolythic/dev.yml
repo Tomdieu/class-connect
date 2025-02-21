@@ -1,31 +1,31 @@
 version: '3.8'
-
 services:
-  web:
-    build: 
-      context: .
-      dockerfile: ./docker/dev/Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
-      - web_static:/app/staticfiles
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-      - rabbitmq
-      - redis
-    networks:
-      - e_learning_network
+  # web:
+  # build:
+  #   context: .
+  #   dockerfile: ./docker/dev/Dockerfile
+  # command: python manage.py runserver 0.0.0.0:8000
+  # volumes:
+  #   - .:/app
+  #   - web_static:/app/staticfiles
+  # ports:
+  #   - "8000:8000"
+  # depends_on:
+  #   - db
+  #   - rabbitmq
+  #   - redis
+  # networks:
+  #   - e_learning_network
+
   db:
     image: postgres:alpine3.20
     restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: e_learning
-      POSTGRES_USER: e_learning_user
-      POSTGRES_PASSWORD: e_learning_password
+      - POSTGRES_DB=e_learning
+      - POSTGRES_USER=e_learning_user
+      - POSTGRES_PASSWORD=e_learning_password
     ports:
       - "5432:5432"
     networks:
@@ -39,8 +39,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: classconnect
-      RABBITMQ_DEFAULT_PASS: classconnect
+      - RABBITMQ_DEFAULT_USER=classconnect
+      - RABBITMQ_DEFAULT_PASS=classconnect
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
@@ -51,12 +51,19 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    sysctls:
+      - vm.overcommit_memory=1
     networks:
       - e_learning_network
 
 networks:
-  default:
-    name: e_learning_network
+  e_learning_network:
+    driver: bridge
 
 volumes:
   postgres_data:
+  rabbitmq_data:
+  web_static:
+  redis_data:
