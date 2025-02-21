@@ -31,7 +31,10 @@ wheels/
 share/python-wheels/
 *.egg-info/
 venv
-**/migrations/
+**/migrations/__pycache__/
+**/migrations/*.pyc
+!*/migrations/
+!*/migrations/*.py
 .installed.cfg
 *.egg
 MANIFEST
