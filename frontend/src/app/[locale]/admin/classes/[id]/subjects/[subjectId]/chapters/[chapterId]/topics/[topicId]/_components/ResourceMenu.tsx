@@ -15,7 +15,6 @@ type ResourceMenuProps = {
   onVideoClick: () => void;
   onExerciseClick: () => void;
   onRevisionClick: () => void;
-  onQuizClick: () => void;
 };
 
 const menuVariants = {
@@ -58,7 +57,6 @@ const ResourceMenu: React.FC<ResourceMenuProps> = ({
   onVideoClick,
   onExerciseClick,
   onRevisionClick,
-  onQuizClick,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -83,11 +81,11 @@ const ResourceMenu: React.FC<ResourceMenuProps> = ({
       label: "Revision",
       onClick: onRevisionClick,
     },
-    {
-      icon: <FileQuestion className="h-5 w-5 text-purple-500" />,
-      label: "Quiz",
-      onClick: onQuizClick,
-    },
+    // {
+    //   icon: <FileQuestion className="h-5 w-5 text-purple-500" />,
+    //   label: "Quiz",
+    //   onClick: onQuizClick,
+    // },
   ];
 
   const handleItemClick = (callback: () => void) => {
