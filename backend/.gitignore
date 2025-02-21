@@ -31,10 +31,12 @@ wheels/
 share/python-wheels/
 *.egg-info/
 venv
-**/migrations/__pycache__/
-**/migrations/*.pyc
-!*/migrations/
-!*/migrations/*.py
+# Ignore all migrations files
+**/migrations/*
+
+# Allow only __init__.py in migrations folders
+!*/migrations/__init__.py
+
 .installed.cfg
 *.egg
 MANIFEST
