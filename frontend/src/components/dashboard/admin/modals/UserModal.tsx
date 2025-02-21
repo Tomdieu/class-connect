@@ -47,9 +47,9 @@ function UserDialog() {
   const { isOpen, user, onClose } = useUserStore();
   const t = useI18n();
 
-  // Create registration schema with translations
-  const createRegisterSchema = (t: (key: string) => string) =>
-    z.object({
+  // Create registration schema with translations and conditional validation
+  const createRegisterSchema = (t: (key: string) => string) => {
+    const baseSchema = z.object({
       id: z.string(),
       first_name: z
         .string()
@@ -68,61 +68,70 @@ function UserDialog() {
           message: t("registerDialog.errors.phoneInvalid"),
         }),
 
-      date_of_birth: z
-        .string()
-        .min(1, { message: t("registerDialog.errors.dateRequired") })
-        .refine(
-          (date) => {
-            const birthDate = new Date(date);
-            const today = new Date();
-            const age = today.getFullYear() - birthDate.getFullYear();
-            return age >= 13;
-          },
-          { message: t("registerDialog.errors.dateMinAge") }
-        ),
-
-      education_level: z.enum(EDUCATION_LEVELS, {
-        errorMap: () => ({
-          message: t("registerDialog.errors.educationLevelRequired"),
-        }),
-      }),
-
       email: z
         .string()
         .min(1, { message: t("registerDialog.errors.emailRequired") })
         .email({ message: t("registerDialog.errors.emailInvalid") }),
 
-      town: z
-        .string()
-        .min(1, { message: t("registerDialog.errors.townRequired") })
-        .min(2, { message: t("registerDialog.errors.townMin") }),
-
-      quarter: z
-        .string()
-        .min(1, { message: t("registerDialog.errors.quarterRequired") })
-        .min(2, { message: t("registerDialog.errors.quarterMin") }),
-
-      // Dynamic fields
       is_staff: z.boolean(),
       is_active: z.boolean(),
-      college_class: z.enum(COLLEGE_CLASSES).optional().nullable(),
-      lycee_class: z.enum(LYCEE_CLASSES).optional().nullable(),
-      lycee_speciality: z.enum(LYCEE_SPECIALITIES).optional().nullable(),
-      university_level: z.enum(UNIVERSITY_LEVELS).optional().nullable(),
-      university_year: z.string().optional().nullable(),
-      enterprise_name: z.string().optional().nullable(),
-      platform_usage_reason: z.string().optional().nullable(),
-    }).refine((data) => {
-      // Add validation for speciality
-      if (data.education_level === "LYCEE" && 
-          ["2nde", "1ere", "terminale"].includes(data.lycee_class || '')) {
-        return !!data.lycee_speciality;
-      }
-      return true;
-    }, {
-      message: "Speciality is required for this class",
-      path: ["lycee_speciality"],
     });
+
+    // Add conditional validation based on is_staff
+    return z.discriminatedUnion("is_staff", [
+      // Schema for staff/admin users
+      baseSchema.extend({
+        is_staff: z.literal(true),
+        date_of_birth: z.string().optional().nullable(),
+        education_level: z.enum(EDUCATION_LEVELS).optional().nullable(),
+        town: z.string().optional().nullable(),
+        quarter: z.string().optional().nullable(),
+        college_class: z.enum(COLLEGE_CLASSES).optional().nullable(),
+        lycee_class: z.enum(LYCEE_CLASSES).optional().nullable(),
+        lycee_speciality: z.enum(LYCEE_SPECIALITIES).optional().nullable(),
+        university_level: z.enum(UNIVERSITY_LEVELS).optional().nullable(),
+        university_year: z.string().optional().nullable(),
+        enterprise_name: z.string().optional().nullable(),
+        platform_usage_reason: z.string().optional().nullable(),
+      }),
+      // Schema for regular users (with all validations)
+      baseSchema.extend({
+        is_staff: z.literal(false),
+        date_of_birth: z
+          .string()
+          .min(1, { message: t("registerDialog.errors.dateRequired") })
+          .refine(
+            (date) => {
+              const birthDate = new Date(date);
+              const today = new Date();
+              const age = today.getFullYear() - birthDate.getFullYear();
+              return age >= 13;
+            },
+            { message: t("registerDialog.errors.dateMinAge") }
+          ),
+        education_level: z.enum(EDUCATION_LEVELS, {
+          errorMap: () => ({
+            message: t("registerDialog.errors.educationLevelRequired"),
+          }),
+        }),
+        town: z
+          .string()
+          .min(1, { message: t("registerDialog.errors.townRequired") })
+          .min(2, { message: t("registerDialog.errors.townMin") }),
+        quarter: z
+          .string()
+          .min(1, { message: t("registerDialog.errors.quarterRequired") })
+          .min(2, { message: t("registerDialog.errors.quarterMin") }),
+        college_class: z.enum(COLLEGE_CLASSES).optional().nullable(),
+        lycee_class: z.enum(LYCEE_CLASSES).optional().nullable(),
+        lycee_speciality: z.enum(LYCEE_SPECIALITIES).optional().nullable(),
+        university_level: z.enum(UNIVERSITY_LEVELS).optional().nullable(),
+        university_year: z.string().optional().nullable(),
+        enterprise_name: z.string().optional().nullable(),
+        platform_usage_reason: z.string().optional().nullable(),
+      })
+    ]);
+  };
 
   type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>;
 
@@ -134,11 +143,11 @@ function UserDialog() {
       first_name: "",
       last_name: "",
       phone_number: "",
-      date_of_birth: "",
-      education_level: undefined,
+      date_of_birth: null,
+      education_level: null,
       email: "",
-      town: "",
-      quarter: "",
+      town: null,
+      quarter: null,
       is_staff: false,
       is_active: true,
       college_class: null,
@@ -152,18 +161,18 @@ function UserDialog() {
         first_name: user.first_name,
         last_name: user.last_name,
         phone_number: user.phone_number,
-        date_of_birth: user.date_of_birth||undefined,
-        education_level: user.education_level,
+        date_of_birth: user.date_of_birth || null,
+        education_level: user.education_level || null,
         email: user.email,
-        town: user.town || undefined,
-        quarter: user.quarter || undefined,
+        town: user.town || null,
+        quarter: user.quarter || null,
         college_class: user.college_class,
         lycee_class: user.lycee_class,
         lycee_speciality: user.lycee_speciality,
-        university_level: user.university_level|| undefined,
-        university_year: user.university_year|| undefined,
-        enterprise_name: user.enterprise_name|| undefined,
-        platform_usage_reason: user.platform_usage_reason|| undefined,
+        university_level: user.university_level|| null,
+        university_year: user.university_year|| null,
+        enterprise_name: user.enterprise_name|| null,
+        platform_usage_reason: user.platform_usage_reason|| null,
         is_staff: user.is_staff,
         is_active: user.is_active,
       });
@@ -179,6 +188,20 @@ function UserDialog() {
       form.trigger();
     }
   }, [form, t]);
+
+  // Update useEffect to handle is_staff changes
+  useEffect(() => {
+    const isStaff = form.watch("is_staff");
+    if (isStaff) {
+      // Clear validation errors for optional fields when user becomes staff
+      form.clearErrors([
+        "date_of_birth",
+        "education_level",
+        "town",
+        "quarter"
+      ]);
+    }
+  }, [form.watch("is_staff")]);
 
   const handleRegisterSubmit = async (values: RegisterFormData) => {
     try {
@@ -675,7 +698,7 @@ function UserDialog() {
                   />
                 </div>
                 <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {t("registerDialog.submitButton")}
+                  {t("userDialog.submitButton")}
                 </Button>
               </form>
             </Form>
