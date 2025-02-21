@@ -5,10 +5,6 @@ export const EDUCATION_LEVELS = [
   "PROFESSIONAL",
 ] as const;
 export const LYCEE_CLASSES = [
-  "6eme",
-  "5eme",
-  "4eme",
-  "3eme",
   "2nde",
   "1ere",
   "terminale",
@@ -147,9 +143,41 @@ export declare interface ClassType {
   name: string;
   level: EducationLevel;
   secion: Section;
+  speciality?: LyceeSpecialities;
   description: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// College structure
+interface CollegeStructure {
+  classes: ClassType[];
+}
+
+// Lycee structure
+interface LyceeStructure {
+  scientifique: ClassType[];
+  litteraire: ClassType[];
+}
+
+// University structure
+interface UniversityStructure {
+  licence: ClassType[];
+  master: ClassType[];
+  doctorat: ClassType[];
+}
+
+// Section structure combining all levels
+interface SectionStructure {
+  COLLEGE: CollegeStructure;
+  LYCEE: LyceeStructure;
+  UNIVERSITY: UniversityStructure;
+}
+
+// Root type
+interface SchoolStructure {
+  FRANCOPHONE: SectionStructure;
+  ANGLOPHONE: SectionStructure;
 }
 
 export declare interface ClassCreateType {
