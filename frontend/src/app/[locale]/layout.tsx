@@ -10,6 +10,7 @@ import { SessionProvider } from "next-auth/react";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import React from "react";
 import InactivityProvider from "@/providers/InactivityProvider";
+import HelmetWrapper from "@/providers/HelmetWrapperProvider";
 
 const Inter = localFont({
   src: [
@@ -147,13 +148,54 @@ export default async function RootLayout({
     "sameAs": [
       "https://www.linkedin.com/in/tomdieuivan",
       "https://twitter.com/classconnect",
+      // Add other social media profiles if available
     ],
-    "description":
-      "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+    "description": "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "CM",
+      "addressRegion": "Littoral", // Add if applicable
+      "addressLocality": "Douala", // Add if applicable
     },
+    "foundingDate": "2025", // Add actual founding date
+    "founder": {
+      "@type": "Person",
+      "name": "Tomdieu Ivan",
+      "sameAs": "https://www.linkedin.com/in/tomdieuivan"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Cameroon"
+    },
+    "teaches": [
+      "High School Education",
+      "Middle School Education",
+      "University Level Education",
+      "Professional Development"
+    ],
+    "educationalLevel": [
+      "Middle School",
+      "High School",
+      "University",
+      "Professional Development"
+    ],
+    "availableLanguage": [
+      "French",
+      "English"
+    ],
+    "offers": {
+      "@type": "Offer",
+      "category": "Online Education",
+      "availabilityStarts": new Date().toString(), // Add actual date
+      "educationalProgramMode": "online",
+      "educationalUse": "Online Learning Platform"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "availableLanguage": ["French", "English"],
+      "email": "contact@classconnect.cm" // Add actual contact email
+    }
   };
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -173,9 +215,12 @@ export default async function RootLayout({
             <ReactQueryProvider>
               <Providers locale={locale}>
                 <InactivityProvider>
-                  {children}
-                  <Modals />
-                  <Toaster />
+                  <HelmetWrapper>
+
+                    {children}
+                    <Modals />
+                    <Toaster />
+                  </HelmetWrapper>
                 </InactivityProvider>
               </Providers>
             </ReactQueryProvider>
