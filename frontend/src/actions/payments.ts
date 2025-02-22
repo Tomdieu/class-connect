@@ -230,7 +230,7 @@ export const getCurrentPlan = async () => {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
     });
-    return response.data as SubscriptionDetail;
+    return response.data as {subscription?:SubscriptionDetail,has_active_subscription:boolean};
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // Type guard for Axios errors
