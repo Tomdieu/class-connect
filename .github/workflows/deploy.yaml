@@ -9,9 +9,12 @@ jobs:
   deploy_main:
     runs-on: self-hosted
     steps:
+      - name: Debug Password (Optional)
+        run: echo "Password length: ${#secrets.PASSWORD}" # Check if the password is retrieved correctly
+
       - name: Run execute.sh in frontend directory as root
         run: |
-          echo '${{ secrets.PASSWORD }}' | sudo -S su -c '
+          printf '%s\n' "${{ secrets.PASSWORD }}" | sudo -S su -c '
             cd /home/ubuntu/class-connect/frontend &&
             chmod +x ./execute.sh &&
             ./execute.sh || echo "Failed to execute frontend script"
@@ -19,7 +22,7 @@ jobs:
 
       - name: Run Docker Compose in backend directory as root
         run: |
-          echo '${{ secrets.PASSWORD }}' | sudo -S su -c '
+          printf '%s\n' "${{ secrets.PASSWORD }}" | sudo -S su -c '
             cd /home/ubuntu/class-connect/backend/monolythic &&
             docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
           '
