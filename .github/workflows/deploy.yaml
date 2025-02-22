@@ -9,13 +9,17 @@ jobs:
   deploy_main:
     runs-on: self-hosted
     steps:
-      - name: Run execute.sh in frontend directory
+      - name: Run execute.sh in frontend directory as root
         run: |
-          cd /home/ubuntu/class-connect/frontend &&
-          chmod +x ./execute.sh &&
-          ./execute.sh || echo "Failed to execute frontend script"
+          echo '${{ secrets.PASSWORD }}' | sudo -S su -c '
+            cd /home/ubuntu/class-connect/frontend &&
+            chmod +x ./execute.sh &&
+            ./execute.sh || echo "Failed to execute frontend script"
+          '
 
-      - name: Run Docker Compose in backend directory
+      - name: Run Docker Compose in backend directory as root
         run: |
-          cd /home/ubuntu/class-connect/backend/monolythic &&
-          docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
+          echo '${{ secrets.PASSWORD }}' | sudo -S su -c '
+            cd /home/ubuntu/class-connect/backend/monolythic &&
+            docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
+          '
