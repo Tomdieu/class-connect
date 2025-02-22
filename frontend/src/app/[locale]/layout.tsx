@@ -121,11 +121,11 @@ export const metadata: Metadata = {
     google: "google1a036d19159746c1.html",
   },
   alternates: {
-    canonical: "https://www.classconnect.cm",
     languages: {
-      'fr-CM': 'https://www.classconnect.cm/fr',
-      'en-CM': 'https://www.classconnect.cm/en',
+      'fr': '/fr',
+      'en': '/en',
     },
+    canonical: '/fr', // Set French as canonical version
   },
   icons: {
     icon: [
@@ -140,14 +140,11 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params,
+  params: { locale },
 }: {
   children: React.ReactNode;
-  params: {
-    locale: string;
-  };
+  params: { locale: string };
 }) {
-  const { locale } = await params;
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
@@ -209,6 +206,10 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        {/* Add hreflang tags */}
+        <link rel="alternate" hrefLang="fr" href="https://www.classconnect.cm/fr" />
+        <link rel="alternate" hrefLang="en" href="https://www.classconnect.cm/en" />
+        <link rel="alternate" hrefLang="x-default" href="https://www.classconnect.cm/fr" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
       </head>
       <body

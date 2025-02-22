@@ -1,55 +1,36 @@
 import type { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: 'https://www.classconnect.cm',
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: 'https://www.classconnect.cm/faq',
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: 'https://www.classconnect.cm/help',
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: 'https://www.classconnect.cm/privacy',
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: 'https://www.classconnect.cm/pricing',
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: 'https://www.classconnect.cm/contact',
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    // Language specific routes
-    {
-      url: 'https://www.classconnect.cm/fr',
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: 'https://www.classconnect.cm/en',
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-  ]
+  const baseUrl = 'https://www.classconnect.cm';
+  const languages = ['fr', 'en'];
+  const routes = [
+    '',
+    'faq',
+    'help',
+    'privacy',
+    'pricing',
+    'contact',
+  ];
+
+  const sitemap: MetadataRoute.Sitemap = [];
+
+  // Generate entries for all language versions of each route
+  languages.forEach(lang => {
+    routes.forEach(route => {
+      sitemap.push({
+        url: `${baseUrl}/${lang}${route ? `/${route}` : ''}`,
+        lastModified: new Date(),
+        changeFrequency: route === '' ? 'daily' : 'weekly',
+        priority: route === '' ? 1.0 : 0.8,
+        alternateRefs: languages
+          .filter(l => l !== lang)
+          .map(l => ({
+            href: `${baseUrl}/${l}${route ? `/${route}` : ''}`,
+            hreflang: l
+          }))
+      });
+    });
+  });
+
+  return sitemap;
 }
