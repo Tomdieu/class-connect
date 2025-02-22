@@ -1,4 +1,5 @@
 name: CI/CD auth-app
+
 on:
   push:
     branches:
@@ -10,15 +11,15 @@ jobs:
     steps:
       - name: Run execute.sh in frontend directory as root
         run: |
-          printf '%s\n' "classCONNECT1234?" | sudo -S su -c "
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/frontend &&
             chmod +x ./execute.sh &&
-            ./execute.sh || echo 'Failed to execute frontend script'
-          "
+            ./execute.sh || echo "Failed to execute frontend script"
+          '
 
       - name: Run Docker Compose in backend directory as root
         run: |
-          printf '%s\n' "classCONNECT1234?" | sudo -S su -c "
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/backend/monolythic &&
-            docker compose -f prod.yml up -d || echo 'Failed to start Docker containers'
-          "
+            docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
+          '
