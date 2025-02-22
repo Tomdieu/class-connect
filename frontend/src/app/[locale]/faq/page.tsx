@@ -3,28 +3,55 @@ import { useState } from 'react';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useI18n } from "@/locales/client";
+import { Helmet } from 'react-helmet-async';
 
 const FAQPage = () => {
   const t = useI18n();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const faqs = [
-    {
-      question: t("faq.question1"),
-      answer: t("faq.answer1")
-    },
-    {
-      question: t("faq.question2"),
-      answer: t("faq.answer2")
-    },
-    {
-      question: t("faq.question3"),
-      answer: t("faq.answer3")
-    }
-  ];
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": t("faq.question1"),
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": t("faq.answer1")
+        }
+      },
+      {
+        "@type": "Question",
+        "name": t("faq.question2"),
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": t("faq.answer2")
+        }
+      },
+      {
+        "@type": "Question",
+        "name": t("faq.question3"),
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": t("faq.answer3")
+        }
+      }
+    ]
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{t("faq.title")} | ClassConnect</title>
+        <meta name="description" content="Trouvez des réponses à vos questions sur ClassConnect, la plateforme d'apprentissage en ligne leader au Cameroun." />
+        <link rel="canonical" href="https://www.classconnect.cm/faq" />
+        <meta property="og:title" content={`${t("faq.title")} | ClassConnect`} />
+        <meta property="og:description" content="Trouvez des réponses à vos questions sur ClassConnect." />
+        <meta property="og:url" content="https://www.classconnect.cm/faq" />
+        <meta property="og:type" content="website" />
+        <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
+      </Helmet>
       <Header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 px-5 sticky top-0 z-50" />
       <main className="flex-1 container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-center mb-12">{t("faq.title")}</h1>
