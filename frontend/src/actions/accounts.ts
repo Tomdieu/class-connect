@@ -135,7 +135,7 @@ export const updateUser = async ({
   }
 };
 
-export const deleteUser = async (id: number) => {
+export const deleteUser = async (id: number|string) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
