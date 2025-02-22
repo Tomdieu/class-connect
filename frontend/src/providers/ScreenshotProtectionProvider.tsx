@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect } from "react";
 
 export default function ScreenshotProtectionProvider({
@@ -9,35 +8,25 @@ export default function ScreenshotProtectionProvider({
 }) {
   useEffect(() => {
     // ⛔ Prevent right-click
-    const disableRightClick = (event: MouseEvent) => event.preventDefault();
+    const disableRightClick = (event: MouseEvent) => {
+      event.preventDefault();
+      console.warn("Right-click is disabled.");
+    };
     document.addEventListener("contextmenu", disableRightClick);
 
-    // 🛑 Block "Print Screen" key
-    const blockPrintScreen = (event: KeyboardEvent) => {
-      if (event.key === "PrintScreen") {
-        event.preventDefault();
-        alert("Screenshots are disabled!");
-      }
-    };
-    document.addEventListener("keydown", blockPrintScreen);
-
-    // 🔍 Detect DevTools / Screen Capture
-    const detectDevTools = () => {
-      if (window.outerHeight - window.innerHeight > 200 || window.outerWidth - window.innerWidth > 200) {
-        document.body.innerHTML = "Screenshot detection triggered!";
-      }
-    };
-    const interval = setInterval(detectDevTools, 1000);
-
     // 🖥️ Prevent text selection & copying
-    document.addEventListener("selectstart", (e) => e.preventDefault());
-    document.addEventListener("copy", (e) => e.preventDefault());
+    const preventCopy = (event: Event) => {
+      event.preventDefault();
+      console.warn("Copying is disabled.");
+    };
+    document.addEventListener("selectstart", preventCopy);
+    document.addEventListener("copy", preventCopy);
 
     // Cleanup on unmount
     return () => {
       document.removeEventListener("contextmenu", disableRightClick);
-      document.removeEventListener("keydown", blockPrintScreen);
-      clearInterval(interval);
+      document.removeEventListener("selectstart", preventCopy);
+      document.removeEventListener("copy", preventCopy);
     };
   }, []);
 
