@@ -16,7 +16,7 @@ function UserTable() {
   const page = searchParams.get("page") || "1";
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users", "page", page],
-    queryFn: () => getUsers({ page, params: {} }),
+    queryFn: () => getUsers({ params: {page} }),
     initialData: [], // Provide initial data as empty array
   });
 
