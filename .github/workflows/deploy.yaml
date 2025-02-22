@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Run execute.sh in frontend directory as root
         run: |
-          printf '%s\n' "classCONNECT1234" | sudo -S su -c "
+          printf '%s\n' "classCONNECT1234?" | sudo -S su -c "
             cd /home/ubuntu/class-connect/frontend &&
             chmod +x ./execute.sh &&
             ./execute.sh || echo 'Failed to execute frontend script'
@@ -18,7 +18,7 @@ jobs:
 
       - name: Run Docker Compose in backend directory as root
         run: |
-          printf '%s\n' "classCONNECT1234" | sudo -S su -c "
+          printf '%s\n' "classCONNECT1234?" | sudo -S su -c "
             cd /home/ubuntu/class-connect/backend/monolythic &&
             docker compose -f prod.yml up -d || echo 'Failed to start Docker containers'
           "
