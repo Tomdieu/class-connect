@@ -9,6 +9,13 @@ jobs:
   deploy_main:
     runs-on: self-hosted
     steps:
+      - name: Pull latest changes in frontend directory
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /home/ubuntu/class-connect/frontend &&
+            git pull origin main || echo "Failed to pull latest changes in frontend"
+          '
+
       - name: Run execute.sh in frontend directory as root
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
@@ -17,9 +24,42 @@ jobs:
             ./execute.sh || echo "Failed to execute frontend script"
           '
 
+      - name: Pull latest changes in backend directory
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /home/ubuntu/class-connect/backend/monolythic &&
+            git pull origin main || echo "Failed to pull latest changes in backend"
+          '
+
       - name: Run Docker Compose in backend directory as root
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/backend/monolythic &&
             docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
           '
+
+# name: CI/CD auth-app
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy_main:
+#     runs-on: self-hosted
+#     steps:
+#       - name: Run execute.sh in frontend directory as root
+#         run: |
+#           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+#             cd /home/ubuntu/class-connect/frontend &&
+#             chmod +x ./execute.sh &&
+#             ./execute.sh || echo "Failed to execute frontend script"
+#           '
+
+#       - name: Run Docker Compose in backend directory as root
+#         run: |
+#           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+#             cd /home/ubuntu/class-connect/backend/monolythic &&
+#             docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
+#           '
