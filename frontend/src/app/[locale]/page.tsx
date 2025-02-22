@@ -70,7 +70,7 @@ function LandingPage() {
         
         {/* Animated Features Section */}
         <section className="py-24 bg-gradient-to-b from-white to-blue-50">
-          <div className="container mx-auto px-4"></div>
+          <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {/* Feature 1 */}
               <RevealOnScroll direction="up" delay={0.2}>
