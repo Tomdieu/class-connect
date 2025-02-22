@@ -135,6 +135,12 @@ export const metadata: Metadata = {
     apple: [
       { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
     ],
+    
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ClassConnect",
   },
 };
 
@@ -206,6 +212,9 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <meta name="theme-color" content="#2563eb" />
         {/* Add hreflang tags */}
         <link rel="alternate" hrefLang="fr" href="https://www.classconnect.cm/fr" />
         <link rel="alternate" hrefLang="en" href="https://www.classconnect.cm/en" />
