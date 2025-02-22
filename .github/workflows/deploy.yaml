@@ -9,5 +9,12 @@ jobs:
   deploy_main:
     runs-on: self-hosted
     steps:
-      - name: Run ls on self-hosted runner
-        run: ls -la
+      - name: Run execute.sh in frontend directory
+        run: |
+          cd /home/classconnect/class-connect/frontend &&
+          ./execute.sh
+
+      - name: Run Docker Compose in backend directory
+        run: |
+          cd /home/classconnect/class-connect/backend/monolythic &&
+          docker compose -f prod.yml up -d
