@@ -138,8 +138,28 @@ export default async function RootLayout({
   };
 }) {
   const { locale } = await params;
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "ClassConnect",
+    "url": "https://www.classconnect.cm",
+    "logo": "https://www.classconnect.cm/logo.png",
+    "sameAs": [
+      "https://www.linkedin.com/in/tomdieuivan",
+      "https://twitter.com/classconnect",
+    ],
+    "description":
+      "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "CM",
+    },
+  };
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
+      </head>
       <body
         className={`antialiased overflow-y-auto flex flex-col ${Inter.variable} font-inter`}
         suppressHydrationWarning
