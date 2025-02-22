@@ -257,12 +257,13 @@ class CurrentSubscriptionView(APIView):
         operation_description="Get user's current active subscription plan",
         responses={
             200: SubscriptionDetailSerializer(),
-            404: openapi.Response(
-                description="No active subscription found",
+            200: openapi.Response(
+                description="Response when no active subscription",
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
                     properties={
-                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                        'subscription': openapi.Schema(type=openapi.TYPE_OBJECT, nullable=True),
+                        'has_active_subscription': openapi.Schema(type=openapi.TYPE_BOOLEAN)
                     }
                 )
             )
@@ -270,21 +271,21 @@ class CurrentSubscriptionView(APIView):
     )
     def get(self, request):
         try:
-            # Changed to order by start_date instead of created_at
             subscription = Subscription.objects.filter(
                 user=request.user,
                 is_active=True,
                 end_date__gt=timezone.now()
             ).latest('start_date')
-            
             serializer = SubscriptionDetailSerializer(subscription)
-            return Response(serializer.data)
-            
+            return Response({
+                'subscription': serializer.data,
+                'has_active_subscription': True
+            })
         except Subscription.DoesNotExist:
-            return Response(    
-                {'error': 'No active subscription found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({
+                'subscription': None,
+                'has_active_subscription': False
+            }, status=status.HTTP_200_OK)
 
 class SubscriptionHistoryView(APIView):
     permission_classes = [IsAuthenticated]
