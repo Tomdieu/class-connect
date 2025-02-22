@@ -24,12 +24,14 @@ function Header({ className }: { className?: string }) {
         <Link
           href="/"
           className="flex items-center gap-2 text-default transition-colors hover:opacity-90"
+          aria-label="Home"
         >
           <BookOpen className="h-7 w-7" />
           <span className="font-bold text-xl hidden sm:inline-block">
             ClassConnect
           </span>
         </Link>
+
 
         <div className="flex items-center gap-3 sm:gap-6">
           {!session?.user ? (
