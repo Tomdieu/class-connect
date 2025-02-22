@@ -34,7 +34,7 @@ import { addClass, updateClass } from "@/actions/courses";
 import { toast } from "sonner";
 import { Loader, TriangleAlert } from "lucide-react";
 import { useClassStore } from "@/hooks/class-store";
-import { EDUCATION_LEVELS, SECTIONS } from "@/constants";
+import { EDUCATION_LEVELS, SECTIONS, LYCEE_SPECIALITIES } from "@/constants";
 
 function ClassModal() {
   const t = useI18n();
@@ -48,6 +48,17 @@ function ClassModal() {
       description: z.string().optional(),
       level: z.enum(EDUCATION_LEVELS),
       section: z.enum(SECTIONS),
+      speciality: z.enum(LYCEE_SPECIALITIES).optional().refine(
+        (val, ctx) => {
+          if (ctx.parent.level === "LYCEE" && !val) {
+            return false;
+          }
+          return true;
+        },
+        {
+          message: "Speciality is required for LYCEE level",
+        }
+      ),
     });
 
   type ClassFormData = z.infer<ReturnType<typeof createClassSchema>>;
@@ -60,6 +71,7 @@ function ClassModal() {
       description: "",
       level: "LYCEE",
       section: "FRANCOPHONE",
+      speciality: undefined,
     },
   });
 
@@ -84,7 +96,8 @@ function ClassModal() {
         description: classData.description || "",
         id: classData.id,
         level: classData.level,
-        section: classData.secion,
+        section: classData.section,
+        speciality: classData.speciality,
       });
     }
   }, [form, classData]);
@@ -96,6 +109,7 @@ function ClassModal() {
       description: "",
       level: "LYCEE",
       section: "FRANCOPHONE",
+      speciality: undefined,
     });
   }, [form]);
 
@@ -116,6 +130,7 @@ function ClassModal() {
             description: data.description || "",
             level: data.level,
             section: data.section,
+            speciality: data.speciality,
           },
         },
         {
@@ -146,6 +161,7 @@ function ClassModal() {
             description: data.description || "",
             level: data.level,
             section: data.section,
+            speciality: data.speciality,
           },
         },
         {
@@ -226,7 +242,12 @@ function ClassModal() {
                   <FormItem className="w-full">
                     <FormLabel>Niveau</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        if (value !== "LYCEE") {
+                          form.setValue("speciality", undefined);
+                        }
+                      }}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -246,6 +267,35 @@ function ClassModal() {
                   </FormItem>
                 )}
               />
+              {form.watch("level") === "LYCEE" && (
+                <FormField
+                  control={form.control}
+                  name="speciality"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Spécialité</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner une spécialité" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {LYCEE_SPECIALITIES.map((speciality) => (
+                            <SelectItem key={speciality} value={speciality}>
+                              {speciality}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <FormField
                 control={form.control}
                 name="section"
