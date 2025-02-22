@@ -49,17 +49,15 @@ export const registerUser = async (data: UserCreateType) => {
 };
 
 export const getUsers = async ({
-  page = 1,
-  params = {}  // Add default value
+  params
 }: {
-  page: string | number;
   params?: UserParams;
 } = {}) => {  // Make the entire parameter object optional with defaults
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
 
-    const res = await api.get(`/api/accounts/users/?page=${page}`, {
+    const res = await api.get(`/api/accounts/users/`, {
       headers: {
         Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",

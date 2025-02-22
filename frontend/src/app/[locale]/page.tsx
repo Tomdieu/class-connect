@@ -7,6 +7,7 @@ import { LottieWrapper } from "@/components/ui/lottie-wrapper";
 import { RevealOnScroll } from "@/components/ui/reveal-on-scroll";
 import { useI18n } from "@/locales/client";
 import React from "react";
+import { Helmet } from 'react-helmet-async';
 
 // Import your animations
 import studentAnimation from "@/animations/student-learning.json";
@@ -16,8 +17,51 @@ import learningAnimation from "@/animations/learning-process.json";
 function LandingPage() {
   const t = useI18n();
 
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "ClassConnect - Online Learning Platform",
+    "description": "Learn at your own pace with quality courses and personalized monitoring",
+    "provider": {
+      "@type": "Organization",
+      "name": "ClassConnect",
+      "sameAs": ["https://www.classconnect.cm"]
+    },
+    "offers": {
+      "@type": "AggregateOffer",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Basic Plan",
+          "description": "Access to basic courses and community forum"
+        },
+        {
+          "@type": "Offer",
+          "name": "Standard Plan",
+          "description": "Access to more courses and weekly Q&A sessions"
+        },
+        {
+          "@type": "Offer",
+          "name": "Premium Plan",
+          "description": "Full access to all features and priority support"
+        }
+      ]
+    }
+  };
+
   return (
     <div className="relative flex-1 w-full h-full flex flex-col min-h-screen">
+      <Helmet>
+        <title>ClassConnect | Plateforme E-learning N°1 au Cameroun</title>
+        <meta name="description" content="Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés." />
+        <meta name="keywords" content="e-learning, education en ligne, cours en ligne, Cameroun, apprentissage en ligne" />
+        <link rel="canonical" href="https://www.classconnect.cm" />
+        <meta property="og:title" content="ClassConnect | Plateforme E-learning N°1 au Cameroun" />
+        <meta property="og:description" content="Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun." />
+        <meta property="og:url" content="https://www.classconnect.cm" />
+        <meta property="og:type" content="website" />
+        <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
+      </Helmet>
       <Header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 px-5 sticky top-0 z-50" />
       <main className="flex-1">
         <RevealOnScroll>

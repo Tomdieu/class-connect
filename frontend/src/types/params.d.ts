@@ -7,5 +7,6 @@ declare interface UserParams {
     is_active?:boolean,
     date_joined?:string,
     language?:string,
-    email_verified?:boolean
+    email_verified?:boolean,
+    page?:string|number;
 }

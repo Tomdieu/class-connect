@@ -1,26 +1,65 @@
 name: CI/CD auth-app
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy_main:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: unnecessary
-          if_key_exists: replace
-
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy Backend using SSH
+      - name: Pull latest changes in frontend directory
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} '
-            cd /home/ubuntu/class-connect/backend/monolythic &&
-            git pull --all &&
-            docker compose -f prod.yml up --build -d
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /home/ubuntu/class-connect/frontend &&
+            git pull origin main || echo "Failed to pull latest changes in frontend"
           '
+
+      - name: Run execute.sh in frontend directory as root
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /home/ubuntu/class-connect/frontend &&
+            chmod +x ./execute.sh &&
+            ./execute.sh || echo "Failed to execute frontend script"
+          '
+
+      - name: Pull latest changes in backend directory
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /home/ubuntu/class-connect/backend/monolythic &&
+            git pull origin main || echo "Failed to pull latest changes in backend"
+          '
+
+      - name: Run Docker Compose in backend directory as root
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /home/ubuntu/class-connect/backend/monolythic &&
+            docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
+          '
+
+# name: CI/CD auth-app
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy_main:
+#     runs-on: self-hosted
+#     steps:
+#       - name: Run execute.sh in frontend directory as root
+#         run: |
+#           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+#             cd /home/ubuntu/class-connect/frontend &&
+#             chmod +x ./execute.sh &&
+#             ./execute.sh || echo "Failed to execute frontend script"
+#           '
+
+#       - name: Run Docker Compose in backend directory as root
+#         run: |
+#           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+#             cd /home/ubuntu/class-connect/backend/monolythic &&
+#             docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
+#           '

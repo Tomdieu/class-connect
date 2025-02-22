@@ -10,6 +10,7 @@ import { SessionProvider } from "next-auth/react";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import React from "react";
 import InactivityProvider from "@/providers/InactivityProvider";
+import HelmetWrapper from "@/providers/HelmetWrapperProvider";
 
 const Inter = localFont({
   src: [
@@ -120,26 +121,106 @@ export const metadata: Metadata = {
     google: "google1a036d19159746c1.html",
   },
   alternates: {
-    canonical: "https://www.classconnect.cm",
     languages: {
-      'fr-CM': 'https://www.classconnect.cm/fr',
-      'en-CM': 'https://www.classconnect.cm/en',
+      'fr': '/fr',
+      'en': '/en',
     },
-  }
+    canonical: '/fr', // Set French as canonical version
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '32x32' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ClassConnect",
+  },
 };
 
 export default async function RootLayout({
   children,
-  params,
+  params: { locale },
 }: {
   children: React.ReactNode;
-  params: {
-    locale: string;
-  };
+  params: { locale: string };
 }) {
-  const { locale } = await params;
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "ClassConnect",
+    "url": "https://www.classconnect.cm",
+    "logo": "https://www.classconnect.cm/logo.png",
+    "sameAs": [
+      "https://www.linkedin.com/in/tomdieuivan",
+      "https://twitter.com/classconnect",
+      // Add other social media profiles if available
+    ],
+    "description": "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "CM",
+      "addressRegion": "Littoral", // Add if applicable
+      "addressLocality": "Douala", // Add if applicable
+    },
+    "foundingDate": "2025", // Add actual founding date
+    "founder": {
+      "@type": "Person",
+      "name": "Tomdieu Ivan",
+      "sameAs": "https://www.linkedin.com/in/tomdieuivan"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Cameroon"
+    },
+    "teaches": [
+      "High School Education",
+      "Middle School Education",
+      "University Level Education",
+      "Professional Development"
+    ],
+    "educationalLevel": [
+      "Middle School",
+      "High School",
+      "University",
+      "Professional Development"
+    ],
+    "availableLanguage": [
+      "French",
+      "English"
+    ],
+    "offers": {
+      "@type": "Offer",
+      "category": "Online Education",
+      "availabilityStarts": new Date().toString(), // Add actual date
+      "educationalProgramMode": "online",
+      "educationalUse": "Online Learning Platform"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "availableLanguage": ["French", "English"],
+      "email": "contact@classconnect.cm" // Add actual contact email
+    }
+  };
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <meta name="theme-color" content="#2563eb" />
+        {/* Add hreflang tags */}
+        <link rel="alternate" hrefLang="fr" href="https://www.classconnect.cm/fr" />
+        <link rel="alternate" hrefLang="en" href="https://www.classconnect.cm/en" />
+        <link rel="alternate" hrefLang="x-default" href="https://www.classconnect.cm/fr" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
+      </head>
       <body
         className={`antialiased overflow-y-auto flex flex-col ${Inter.variable} font-inter`}
         suppressHydrationWarning
@@ -153,9 +234,12 @@ export default async function RootLayout({
             <ReactQueryProvider>
               <Providers locale={locale}>
                 <InactivityProvider>
-                  {children}
-                  <Modals />
-                  <Toaster />
+                  <HelmetWrapper>
+
+                    {children}
+                    <Modals />
+                    <Toaster />
+                  </HelmetWrapper>
                 </InactivityProvider>
               </Providers>
             </ReactQueryProvider>

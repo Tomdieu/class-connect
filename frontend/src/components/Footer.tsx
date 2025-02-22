@@ -32,12 +32,21 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">{t("footer.connect")}</h3>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white"><FaFacebook size={24} /></a>
-              <a href="#" className="text-gray-400 hover:text-white"><FaTwitter size={24} /></a>
-              <a href="#" className="text-gray-400 hover:text-white"><FaInstagram size={24} /></a>
-              <a href="#" className="text-gray-400 hover:text-white"><FaLinkedin size={24} /></a>
+              <a href="#" aria-label="Facebook" className="text-gray-400 hover:text-white">
+                <FaFacebook size={24} />
+              </a>
+              <a href="#" aria-label="Twitter" className="text-gray-400 hover:text-white">
+                <FaTwitter size={24} />
+              </a>
+              <a href="#" aria-label="Instagram" className="text-gray-400 hover:text-white">
+                <FaInstagram size={24} />
+              </a>
+              <a href="#" aria-label="LinkedIn" className="text-gray-400 hover:text-white">
+                <FaLinkedin size={24} />
+              </a>
             </div>
           </div>
+
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">&copy; {new Date().getFullYear()} ClassConnect. {t("footer.rights")}</p>
