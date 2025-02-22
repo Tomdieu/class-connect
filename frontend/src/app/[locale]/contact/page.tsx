@@ -3,9 +3,28 @@ import { useState } from 'react';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useI18n } from "@/locales/client";
+import { Helmet } from 'react-helmet-async';
 
 const ContactPage = () => {
   const t = useI18n();
+  
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contact ClassConnect",
+    "description": "Get in touch with ClassConnect support team",
+    "publisher": {
+      "@type": "Organization",
+      "name": "ClassConnect",
+      "sameAs": ["https://www.classconnect.cm"]
+    },
+    "mainEntity": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "availableLanguage": ["English", "French"]
+    }
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -21,6 +40,16 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{t("contact.title")} | ClassConnect</title>
+        <meta name="description" content="Contactez l'équipe ClassConnect pour toute question ou assistance." />
+        <link rel="canonical" href="https://www.classconnect.cm/contact" />
+        <meta property="og:title" content={`${t("contact.title")} | ClassConnect`} />
+        <meta property="og:description" content="Contactez l'équipe ClassConnect" />
+        <meta property="og:url" content="https://www.classconnect.cm/contact" />
+        <meta property="og:type" content="website" />
+        <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
+      </Helmet>
       <Header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 px-5 sticky top-0 z-50" />
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
