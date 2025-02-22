@@ -1,26 +1,13 @@
 name: CI/CD auth-app
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy_main:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: unnecessary
-          if_key_exists: replace
-
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy Backend using SSH
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} '
-            cd /home/ubuntu/class-connect/backend/monolythic &&
-            git pull --all &&
-            docker compose -f prod.yml up --build -d
-          '
+      - name: Run ls on self-hosted runner
+        run: ls -la
