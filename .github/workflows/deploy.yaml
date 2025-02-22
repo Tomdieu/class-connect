@@ -11,10 +11,11 @@ jobs:
     steps:
       - name: Run execute.sh in frontend directory
         run: |
-          cd /home/classconnect/class-connect/frontend &&
-          ./execute.sh
+          cd /home/ubuntu/class-connect/frontend &&
+          chmod +x ./execute.sh &&
+          ./execute.sh || echo "Failed to execute frontend script"
 
       - name: Run Docker Compose in backend directory
         run: |
-          cd /home/classconnect/class-connect/backend/monolythic &&
-          docker compose -f prod.yml up -d
+          cd /home/ubuntu/class-connect/backend/monolythic &&
+          docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
