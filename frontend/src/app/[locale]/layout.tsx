@@ -151,6 +151,7 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
+  
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
