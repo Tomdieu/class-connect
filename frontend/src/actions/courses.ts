@@ -49,13 +49,11 @@ export const listClasses = async ({
     const data = await res.data;
     return data as ClassType[];
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -72,13 +70,11 @@ export const getformatedClasses = async () => {
     const data = await res.data;
     return data as SchoolStructure;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -96,13 +92,11 @@ export const getClass = async (id: string) => {
     const data = (await res.data) as ClassType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -120,13 +114,11 @@ export const addClass = async ({ body }: { body: ClassCreateType }) => {
     const data = (await res.data) as ClassType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -150,13 +142,11 @@ export const updateClass = async ({
     const data = (await res.data) as ClassType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -174,13 +164,11 @@ export const deleteClass = async (id: number) => {
     const data = await res.data;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -214,13 +202,11 @@ export const listSubjects = async ({
     const data = (await res.data) as SubjectType[];
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -244,13 +230,11 @@ export const addSubject = async ({
     const data = (await res.data) as SubjectType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -277,13 +261,11 @@ export const getSubject = async ({
     const data = (await res.data) as SubjectType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -313,13 +295,11 @@ export const updateSubject = async ({
     const data = (await res.data) as SubjectType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -346,13 +326,11 @@ export const deleteSubject = async ({
     const data = await res.data;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -391,13 +369,11 @@ export const listChapters = async ({
     const data = (await res.data) as ChapterType[];
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -427,13 +403,11 @@ export const addChapter = async ({
     const data = (await res.data) as ChapterType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -462,13 +436,11 @@ export const getChapter = async ({
     const data = (await res.data) as ChapterType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -500,13 +472,11 @@ export const updateChapter = async ({
     const data = (await res.data) as ChapterType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -535,13 +505,11 @@ export const deleteChapter = async ({
     const data = await res.data;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -582,13 +550,11 @@ export const listTopics = async ({
     const data = (await res.data) as TopicType[];
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -620,13 +586,11 @@ export const addTopic = async ({
     const data = (await res.data) as TopicType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -657,13 +621,11 @@ export const getTopic = async ({
     const data = (await res.data) as TopicType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -697,13 +659,11 @@ export const updateTopic = async ({
     const data = (await res.data) as TopicType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -734,13 +694,11 @@ export const deleteTopic = async ({
     const data = await res.data;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -784,13 +742,11 @@ export const listResources = async ({
     const data = (await res.data) as ResourceType[];
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -868,13 +824,11 @@ export const addPdfResource = async ({
     const data = (await res.data) as AbstractResourceType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -915,13 +869,11 @@ export const addVideoResource = async ({
     const data = (await res.data) as AbstractResourceType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -964,13 +916,11 @@ export const addExerciseResource = async ({
     const data = (await res.data) as AbstractResourceType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -1009,12 +959,10 @@ export const addRevisionResource = async ({
     const data = (await res.data) as AbstractResourceType;
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
