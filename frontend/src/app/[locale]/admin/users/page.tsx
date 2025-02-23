@@ -3,7 +3,7 @@ import UserTable from "./user-table";
 
 async function UsersPage() {
   return (
-    <div className="flex flex-col gap-5 px-2 sm:container pt-10 w-full overflow-x-auto">
+    <div className="flex flex-col gap-5 px-2 sm:container pt-10 overflow-x-auto">
       
       <UserTable />
     </div>
