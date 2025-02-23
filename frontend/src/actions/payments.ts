@@ -31,13 +31,11 @@ export const getPayments = async () => {
     });
     return response.data as Payments[];
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -75,13 +73,11 @@ export const subscribeToPlan = async ({
 
     return response.data as { payment_link: string };
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -98,13 +94,11 @@ export const getSubscriptionPlan = async () => {
     });
     return response.data as SubscriptionPlan[];
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -120,13 +114,11 @@ export const addSubscriptionPlan = async (plan: SubscriptionPlan) => {
     });
     return response.data as SubscriptionPlan;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -145,13 +137,11 @@ export const updateSubscriptionPlan = async (
     });
     return response.data as SubscriptionPlan;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -167,13 +157,11 @@ export const deleteSubscriptionPlan = async (id: number) => {
     });
     return response.data as SubscriptionPlan;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -190,13 +178,11 @@ export const listSubscriptions = async () => {
     });
     return response.data as SubscriptionDetail[];
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -211,13 +197,11 @@ export const getSubscription = async (id: number) => {
     });
     return response.data as Subscription;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -232,13 +216,28 @@ export const getCurrentPlan = async () => {
     });
     return response.data as {subscription?:SubscriptionDetail,has_active_subscription:boolean};
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const getUserPlan = async (accessToken:string) => {
+  try {
+    const response = await api.get("/api/current-plan/", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data as {subscription?:SubscriptionDetail,has_active_subscription:boolean};
+  } catch (error) {
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -253,13 +252,11 @@ export const getSubscriptionHistory = async () => {
     });
     return response.data as PaginationType<SubscriptionDetail>;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
@@ -281,12 +278,10 @@ export const listTransactions = async ({
     });
     return response.data as TransactionListResponse;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
