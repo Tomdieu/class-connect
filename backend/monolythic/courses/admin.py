@@ -5,21 +5,16 @@ from .models import (
     AbstractResource, VideoResource,
     RevisionResource, PDFResource, ExerciseResource,
     UserProgress, CourseCategory, UserAvailability, DailyTimeSlot,
-    CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,
+    CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,UserClass
     # Question, QuestionOption, QuizAttempt, QuestionResponse
 )
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'education_level')
-    search_fields = ('email', 'first_name', 'last_name')
-    list_filter = ('education_level', 'is_active')
-    
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
+@admin.register(UserClass)
+class UserClassAdmin(admin.ModelAdmin):
+    list_display = ('user', 'class_level', 'created_at')
+    search_fields = ('user__email', 'class_level__name')
+    list_filter = ('class_level',)
+    ordering = ('-created_at',)
 
 @admin.register(Class)
 class ClassAdmin(admin.ModelAdmin):
