@@ -1,46 +1,60 @@
 "use client";
-import { getCurrentPlan, getSubscriptionPlan } from '@/actions/payments';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { getCurrentPlan, getSubscriptionPlan } from "@/actions/payments";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from '@tanstack/react-query';
-import { CalendarDays, Clock, CreditCard, Loader2, Package } from 'lucide-react';
-import PaymentForm from '@/components/payment/PaymentForm';
-import { useParams, usePathname, useRouter } from 'next/navigation';
-import Header from '@/components/Header';
-import { format } from 'date-fns';
-import { useSession } from 'next-auth/react';
-import { useEffect } from 'react';
-import { useAuthDialog } from '@/hooks/use-auth-dialog';
+import { useQuery } from "@tanstack/react-query";
+import {
+  CalendarDays,
+  Clock,
+  CreditCard,
+  Loader2,
+  Package,
+} from "lucide-react";
+import PaymentForm from "@/components/payment/PaymentForm";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import Header from "@/components/Header";
+import { format } from "date-fns";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { useAuthDialog } from "@/hooks/use-auth-dialog";
 
 function SubscribePlanPage() {
   const { plan } = useParams<{ plan: string }>();
-  const router = useRouter()
+  const router = useRouter();
 
   const { data: session } = useSession();
 
-  const {openLogin} = useAuthDialog()
-  const pathname = usePathname()
-  
+  const { openLogin } = useAuthDialog();
+  const pathname = usePathname();
+
   const { data: plans, isLoading } = useQuery({
-    queryKey: ['plans'],
-    queryFn: getSubscriptionPlan
-  });
-  
-  const selectedPlan = plans?.find(p => p.name.toLowerCase() === plan.toLowerCase());
-  
-  const hasCurrentPlan = useQuery({
-    queryKey: ['currentPlan'],
-    queryFn: getCurrentPlan,
-    enabled: selectedPlan !== undefined
+    queryKey: ["plans"],
+    queryFn: getSubscriptionPlan,
   });
 
-  useEffect(()=>{
-    if(!session?.user){
-      router.push(`/callbackUrl=${pathname}`)
+  const selectedPlan = plans?.find(
+    (p) => p.name.toLowerCase() === plan.toLowerCase()
+  );
+
+  const hasCurrentPlan = useQuery({
+    queryKey: ["currentPlan"],
+    queryFn: getCurrentPlan,
+    enabled: selectedPlan !== undefined,
+  });
+
+  useEffect(() => {
+    if (!session?.user) {
+      router.push(`/callbackUrl=${pathname}`);
       openLogin();
     }
-  },[router, session])
+  }, [openLogin, pathname, router, session]);
 
   if (isLoading) {
     return (
@@ -56,7 +70,8 @@ function SubscribePlanPage() {
         <Alert variant="destructive">
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
-            The requested subscription plan could not be found. Please select a valid plan.
+            The requested subscription plan could not be found. Please select a
+            valid plan.
           </AlertDescription>
         </Alert>
       </div>
@@ -66,11 +81,15 @@ function SubscribePlanPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 p-5">
       <Header />
-      
+
       <main className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Subscribe to {selectedPlan.name}</h1>
-          <p className="mt-2 text-sm text-gray-600">Complete your subscription to access premium features.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            Subscribe to {selectedPlan.name}
+          </h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Complete your subscription to access premium features.
+          </p>
         </div>
 
         <div className="grid gap-8 md:grid-cols-2">
@@ -78,24 +97,30 @@ function SubscribePlanPage() {
           <Card className="bg-white shadow-sm h-fit">
             <CardHeader className="space-y-1">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold">Plan Details</CardTitle>
+                <CardTitle className="text-2xl font-bold">
+                  Plan Details
+                </CardTitle>
                 <Badge variant="secondary" className="font-medium">
                   {selectedPlan.name}
                 </Badge>
               </div>
-              <CardDescription>Review your selected plan details</CardDescription>
+              <CardDescription>
+                Review your selected plan details
+              </CardDescription>
             </CardHeader>
-            
+
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center space-x-4 text-sm">
                   <CreditCard className="h-4 w-4 text-gray-500" />
                   <div className="flex justify-between w-full">
                     <span className="font-medium text-gray-700">Price</span>
-                    <span className="font-bold text-primary">{selectedPlan.price.toLocaleString()} XAF</span>
+                    <span className="font-bold text-primary">
+                      {selectedPlan.price.toLocaleString()} XAF
+                    </span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4 text-sm">
                   <Clock className="h-4 w-4 text-gray-500" />
                   <div className="flex justify-between w-full">
@@ -103,12 +128,14 @@ function SubscribePlanPage() {
                     <span>{selectedPlan.duration_days} days</span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-4 text-sm">
                   <Package className="h-4 w-4 text-gray-500 mt-1" />
                   <div className="space-y-1 flex-1">
                     <span className="font-medium text-gray-700">Features</span>
-                    <p className="text-gray-600 leading-relaxed">{selectedPlan.description}</p>
+                    <p className="text-gray-600 leading-relaxed">
+                      {selectedPlan.description}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -116,18 +143,24 @@ function SubscribePlanPage() {
           </Card>
 
           {/* Current Plan or Payment Form */}
-          {hasCurrentPlan.data ? (
+          {hasCurrentPlan.data &&
+          hasCurrentPlan.data.subscription!==undefined ? (
             <Card className="bg-white shadow-sm h-fit">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold">Current Subscription</CardTitle>
-                <CardDescription>You already have an active subscription</CardDescription>
+                <CardTitle className="text-2xl font-bold">
+                  Current Subscription
+                </CardTitle>
+                <CardDescription>
+                  You already have an active subscription
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <Alert className="bg-primary/5 border-primary/10">
                   <Package className="h-4 w-4" />
                   <AlertTitle>Active Plan</AlertTitle>
                   <AlertDescription>
-                    You currently have an active subscription. You&apos;ll need to wait for it to expire before subscribing to a new plan.
+                    You currently have an active subscription. You&apos;ll need
+                    to wait for it to expire before subscribing to a new plan.
                   </AlertDescription>
                 </Alert>
 
@@ -135,24 +168,39 @@ function SubscribePlanPage() {
                   <div className="flex items-center space-x-4 text-sm">
                     <Package className="h-4 w-4 text-gray-500" />
                     <div className="flex justify-between w-full">
-                      <span className="font-medium text-gray-700">Current Plan</span>
-                      <Badge variant="outline">{hasCurrentPlan.data.plan.name}</Badge>
+                      <span className="font-medium text-gray-700">
+                        Current Plan
+                      </span>
+                      <Badge variant="outline">
+                        {hasCurrentPlan.data.subscription.plan.name}
+                      </Badge>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-4 text-sm">
                     <CalendarDays className="h-4 w-4 text-gray-500" />
                     <div className="flex justify-between w-full">
-                      <span className="font-medium text-gray-700">Start Date</span>
-                      <span>{format(new Date(hasCurrentPlan.data.start_date), 'PPP')}</span>
+                      <span className="font-medium text-gray-700">
+                        Start Date
+                      </span>
+                      <span>
+                        {format(
+                          new Date(hasCurrentPlan.data.subscription.start_date),
+                          "PPP"
+                        )}
+                      </span>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-4 text-sm">
                     <CalendarDays className="h-4 w-4 text-gray-500" />
                     <div className="flex justify-between w-full">
-                      <span className="font-medium text-gray-700">End Date</span>
-                      <span>{format(new Date(hasCurrentPlan.data.end_date), 'PPP')}</span>
+                      <span className="font-medium text-gray-700">
+                        End Date
+                      </span>
+                      <span>
+                        {format(new Date(hasCurrentPlan.data.subscription.end_date), "PPP")}
+                      </span>
                     </div>
                   </div>
                 </div>
