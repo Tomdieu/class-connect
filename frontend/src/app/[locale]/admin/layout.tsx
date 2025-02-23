@@ -31,13 +31,13 @@ export default function AdminLayout({ children }: React.PropsWithChildren) {
   return (
     <SidebarProvider
       aria-describedby="dashboard-layout"
-      className="min-h-screen flex"
+      className="h-full flex w-full"
     >
-      <div className="flex flex-1 h-screen ">
+      <div className="flex flex-1 w-full">
         <AdminSidebar />
-        <main className="flex flex-col flex-1 h-full ">
+        <main className="flex flex-col flex-1 h-full w-full">
           <DashboardHeader />
-          <div className="flex-1 overflow-y-auto ">{children}</div>
+          <div className="flex-1 overflow-auto">{children}</div>
         </main>
       </div>
     </SidebarProvider>
