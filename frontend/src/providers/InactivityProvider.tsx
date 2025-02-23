@@ -1,6 +1,6 @@
 "use client";
 
-import { signOut, useSession } from "next-auth/react";
+import { getCsrfToken, signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useCallback } from "react";
 
@@ -23,11 +23,19 @@ export default function InactivityProvider({
   // Memoize the inactivity check
   const checkInactivity = useCallback(() => {
     const now = Date.now();
-    if (now - lastActivityRef.current >= INACTIVITY_TIMEOUT) {
-      if (session?.user) {
+    
+    const logout = async ()=>{
+      const csrfToken = await getCsrfToken();
+      if(csrfToken){
         signOut({
-          callbackUrl: `/?callbackUrl=${encodeURIComponent(pathname)}`,
+          redirectTo: `/?callbackUrl=${encodeURIComponent(pathname)}`,
+          redirect:true,
         });
+      }
+    }
+    if (now - lastActivityRef.current >= INACTIVITY_TIMEOUT) {
+      if (session?.user!==undefined) {
+        logout();
       }
     }
   }, [pathname, session?.user]);
