@@ -222,7 +222,7 @@ export default async function RootLayout({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
       </head>
       <body
-        className={`antialiased overflow-y-auto flex flex-col ${Inter.variable} font-inter`}
+        className={`antialiased overflow-y-auto flex flex-col ${Inter.variable} font-inter h-screen w-full`}
         suppressHydrationWarning
       >
         <ThemeProvider
