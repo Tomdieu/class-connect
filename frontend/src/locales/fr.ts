@@ -2,6 +2,8 @@ export default {
   "nav.login": "Connexion",
   "nav.register": "S'inscrire",
   "nav.language": "Langue",
+  "nav.logout": "Déconnexion",
+  "nav.profile": "Profil",
   "hero.title": "Apprenez à votre rythme avec ClassConnect",
   "hero.subtitle": "Une plateforme d'apprentissage en ligne adaptée à vos besoins, avec des cours de qualité et un suivi personnalisé.",
   "hero.start": "Commencer",
