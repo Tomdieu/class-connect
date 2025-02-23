@@ -7,6 +7,7 @@ declare module 'next-auth' {
       refreshToken: string;
       expiresAt: number;
       emailVerified?: Date | null;
+      role: "admin" | "teacher" | "student";
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
