@@ -9,6 +9,21 @@ const FAQPage = () => {
   const t = useI18n();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
+  const faqs = [
+    {
+      question: t("faq.question1"),
+      answer: t("faq.answer1")
+    },
+    {
+      question: t("faq.question2"),
+      answer: t("faq.answer2")
+    },
+    {
+      question: t("faq.question3"),
+      answer: t("faq.answer3")
+    }
+  ];
+
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -63,7 +78,7 @@ const FAQPage = () => {
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
               >
                 {faq.question}
-                <span>{openIndex === index ? '−' : '+'}</span>
+                <span>{openIndex === index ? '-' : '+'}</span>
               </button>
               {openIndex === index && (
                 <div className="px-6 py-4 text-gray-600">
