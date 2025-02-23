@@ -8,7 +8,7 @@ import {
 import { DialogTitle } from "@/components/ui/dialog";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 import { BookOpen, LoaderCircle } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useI18n } from "@/locales/client";
@@ -33,6 +33,11 @@ import {
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { registerUser } from "@/actions/accounts";
+import { UserCreateType } from "@/types";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 
 const EDUCATION_LEVELS = [
   "COLLEGE",
@@ -50,6 +55,8 @@ const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 function RegisterDialog() {
   const { isRegisterOpen, closeDialog } = useAuthDialog();
   const t = useI18n();
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   // Create registration schema with translations
   const createRegisterSchema = (t: (key: string) => string) =>
@@ -113,12 +120,11 @@ function RegisterDialog() {
           .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
             message: t("registerDialog.errors.passwordComplexity"),
           }),
-        confirm_password: z
-          .string()
-          .min(1, {
-            message: t("registerDialog.errors.confirmPasswordRequired"),
-          }),
+        confirm_password: z.string().min(1, {
+          message: t("registerDialog.errors.confirmPasswordRequired"),
+        }),
         // Dynamic fields
+        college_class: z.enum(COLLEGE_CLASSES).optional(),
         lycee_class: z.enum(LYCEE_CLASSES).optional(),
         lycee_speciality: z.enum(LYCEE_SPECIALITIES).optional(),
         university_level: z.enum(UNIVERSITY_LEVELS).optional(),
@@ -162,8 +168,21 @@ function RegisterDialog() {
       town: "",
       quarter: "",
       password: "",
+      confirm_password: "",
+      // Initialize all optional fields
+      college_class: undefined,
+      lycee_class: undefined,
+      lycee_speciality: undefined,
+      university_level: undefined,
+      university_year: "",
+      enterprise_name: "",
+      platform_usage_reason: "",
     },
   });
+
+  const { errors } = form.formState;
+
+  console.log({ errors });
 
   // Add state for university level
   const [universityLevel, setUniversityLevel] = React.useState<string>("");
@@ -175,24 +194,88 @@ function RegisterDialog() {
     }
   }, [form, t]);
 
-  const handleRegisterSubmit = async (values: RegisterFormData) => {
-    try {
-      console.log(values);
-    } catch (error) {
-      console.error("Registration error:", error);
+  const registerMutation = useMutation({
+    mutationFn: (data: UserCreateType) => registerUser(data),
+    onSuccess: () => {
+      toast.success("Registration successful! Please login to continue.");
+      closeDialog(false);
+      router.refresh();
+    },
+    onError: (error: any) => {
+      try {
+        const errorData = JSON.parse(error.message || "{}");
+        
+        // Handle field-specific errors
+        if (errorData.email) {
+          form.setError("email", { 
+            message: Array.isArray(errorData.email) ? errorData.email[0] : errorData.email 
+          });
+        }
+        
+        if (errorData.phone_number) {
+          form.setError("phone_number", { 
+            message: Array.isArray(errorData.phone_number) ? errorData.phone_number[0] : errorData.phone_number 
+          });
+        }
+        
+        // Show error toast with all error messages
+        const errorMessages = Object.entries(errorData)
+          .filter(([key]) => key !== 'message') // Exclude the generic message
+          .map(([key, value]) => {
+            const messages = Array.isArray(value) ? value.join(', ') : value;
+            return `${key}: ${messages}`;
+          });
+
+        if (errorMessages.length > 0) {
+          toast.error("Registration failed. Please try again.", {
+            description: errorMessages.join('\n')
+          });
+        } else {
+          toast.error("Registration failed. Please try again.", {
+            description: errorData.message || "Something went wrong. Please check your input and try again."
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing error response:", error);
+        toast.error("Registration failed. Please try again.", {
+          description: "An unexpected error occurred"
+        });
+      }
     }
+  });
+
+  const handleRegisterSubmit = async (values: RegisterFormData) => {
+    const formData: UserCreateType = {
+      first_name: values.first_name,
+      last_name: values.last_name,
+      phone_number: values.phone_number,
+      date_of_birth: values.date_of_birth,
+      education_level: values.education_level,
+      email: values.email,
+      town: values.town,
+      quarter: values.quarter,
+      password: values.password,
+      college_class: values.college_class,
+      lycee_class: values.lycee_class,
+      lycee_speciality: values.lycee_speciality,
+      university_level: values.university_level,
+      university_year: values.university_year,
+      enterprise_name: values.enterprise_name,
+      platform_usage_reason: values.platform_usage_reason,
+    };
+
+    registerMutation.mutate(formData);
   };
 
   // Render dynamic fields based on education level
   const renderDynamicFields = () => {
     const educationLevel = form.watch("education_level");
-    const lyceeClass = form.watch("lycee_class");
 
     if (educationLevel === "COLLEGE") {
       return (
         <FormField
           control={form.control}
-          name="lycee_class"
+          name="college_class"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("registerDialog.collegeClassLabel")}</FormLabel>
@@ -531,6 +614,25 @@ function RegisterDialog() {
                         )}
                       />
                     </div>
+                    <FormField
+                      control={form.control}
+                      name="date_of_birth"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-700">
+                            {t("registerDialog.dateOfBirthLabel")}
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-500" />
+                        </FormItem>
+                      )}
+                    />
                   </div>
 
                   {/* Education Information Section */}
@@ -721,16 +823,17 @@ function RegisterDialog() {
                         type="button"
                         variant="destructive"
                         className="w-32 h-11 border-gray-200 text-white hover:bg-red-500/70 hover:text-white font-medium rounded-xl"
+                        disabled={registerMutation.isPending}
                       >
                         {t("registerDialog.closeButton")}
                       </Button>
                     </CredenzaClose>
                     <Button
                       type="submit"
-                      disabled={form.formState.isSubmitting}
+                      disabled={registerMutation.isPending}
                       className="flex-1 h-11 bg-default hover:bg-default/90 text-white font-medium rounded-xl"
                     >
-                      {form.formState.isSubmitting && (
+                      {registerMutation.isPending && (
                         <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                       )}
                       {t("registerDialog.submitButton")}
