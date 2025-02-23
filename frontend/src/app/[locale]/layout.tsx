@@ -45,7 +45,8 @@ const Inter = localFont({
 
 export const metadata: Metadata = {
   title: "ClassConnect | Plateforme E-learning N°1 au Cameroun",
-  description: "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+  description:
+    "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
   keywords: [
     "ClassConnect",
     "e learning Cameroun",
@@ -58,13 +59,13 @@ export const metadata: Metadata = {
     "formation en ligne Cameroun",
     "meilleure plateforme e-learning Cameroun",
     "ClassConnect Cameroun",
-    "education numérique Afrique"
+    "education numérique Afrique",
   ].join(", "),
   authors: [
     {
       name: "Tomdieu Ivan",
       url: "https://www.linkedin.com/in/tomdieuivan", // Add your actual LinkedIn URL
-    }
+    },
   ],
   creator: "Tomdieu Ivan",
   publisher: "ClassConnect",
@@ -86,7 +87,8 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: "https://www.classconnect.cm",
     title: "ClassConnect | Meilleure Plateforme E-learning au Cameroun",
-    description: "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés et une expérience d'apprentissage unique.",
+    description:
+      "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés et une expérience d'apprentissage unique.",
     images: [
       {
         url: "https://www.classconnect.cm/og-image.jpg",
@@ -102,7 +104,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ClassConnect | E-learning Cameroun",
-    description: "La meilleure plateforme d'apprentissage en ligne au Cameroun. Une éducation accessible à tous.",
+    description:
+      "La meilleure plateforme d'apprentissage en ligne au Cameroun. Une éducation accessible à tous.",
     site: "@classconnect",
     creator: "@tomdieuivan",
     images: [
@@ -122,20 +125,17 @@ export const metadata: Metadata = {
   },
   alternates: {
     languages: {
-      'fr': '/fr',
-      'en': '/en',
+      fr: "/fr",
+      en: "/en",
     },
-    canonical: '/fr', // Set French as canonical version
+    canonical: "/fr", // Set French as canonical version
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/icon.png', type: 'image/png', sizes: '32x32' },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
     ],
-    apple: [
-      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-    
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
   appleWebApp: {
     capable: true,
@@ -146,69 +146,67 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  
+  const {locale} = await params;
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
-    "name": "ClassConnect",
-    "url": "https://www.classconnect.cm",
-    "logo": "https://www.classconnect.cm/logo.png",
-    "sameAs": [
+    name: "ClassConnect",
+    url: "https://www.classconnect.cm",
+    logo: "https://www.classconnect.cm/logo.png",
+    sameAs: [
       "https://www.linkedin.com/in/tomdieuivan",
       "https://twitter.com/classconnect",
       // Add other social media profiles if available
     ],
-    "description": "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
-    "address": {
+    description:
+      "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+    address: {
       "@type": "PostalAddress",
-      "addressCountry": "CM",
-      "addressRegion": "Littoral", // Add if applicable
-      "addressLocality": "Douala", // Add if applicable
+      addressCountry: "CM",
+      addressRegion: "Littoral", // Add if applicable
+      addressLocality: "Douala", // Add if applicable
     },
-    "foundingDate": "2025", // Add actual founding date
-    "founder": {
+    foundingDate: "2025", // Add actual founding date
+    founder: {
       "@type": "Person",
-      "name": "Tomdieu Ivan",
-      "sameAs": "https://www.linkedin.com/in/tomdieuivan"
+      name: "Tomdieu Ivan",
+      sameAs: "https://www.linkedin.com/in/tomdieuivan",
     },
-    "areaServed": {
+    areaServed: {
       "@type": "Country",
-      "name": "Cameroon"
+      name: "Cameroon",
     },
-    "teaches": [
+    teaches: [
       "High School Education",
       "Middle School Education",
       "University Level Education",
-      "Professional Development"
+      "Professional Development",
     ],
-    "educationalLevel": [
+    educationalLevel: [
       "Middle School",
       "High School",
       "University",
-      "Professional Development"
+      "Professional Development",
     ],
-    "availableLanguage": [
-      "French",
-      "English"
-    ],
-    "offers": {
+    availableLanguage: ["French", "English"],
+    offers: {
       "@type": "Offer",
-      "category": "Online Education",
-      "availabilityStarts": new Date().toString(), // Add actual date
-      "educationalProgramMode": "online",
-      "educationalUse": "Online Learning Platform"
+      category: "Online Education",
+      availabilityStarts: new Date().toString(), // Add actual date
+      educationalProgramMode: "online",
+      educationalUse: "Online Learning Platform",
     },
-    "contactPoint": {
+    contactPoint: {
       "@type": "ContactPoint",
-      "contactType": "customer support",
-      "availableLanguage": ["French", "English"],
-      "email": "contact@classconnect.cm" // Add actual contact email
-    }
+      contactType: "customer support",
+      availableLanguage: ["French", "English"],
+      email: "contact@classconnect.cm", // Add actual contact email
+    },
   };
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -217,10 +215,25 @@ export default async function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico" />
         <meta name="theme-color" content="#2563eb" />
         {/* Add hreflang tags */}
-        <link rel="alternate" hrefLang="fr" href="https://www.classconnect.cm/fr" />
-        <link rel="alternate" hrefLang="en" href="https://www.classconnect.cm/en" />
-        <link rel="alternate" hrefLang="x-default" href="https://www.classconnect.cm/fr" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
+        <link
+          rel="alternate"
+          hrefLang="fr"
+          href="https://www.classconnect.cm/fr"
+        />
+        <link
+          rel="alternate"
+          hrefLang="en"
+          href="https://www.classconnect.cm/en"
+        />
+        <link
+          rel="alternate"
+          hrefLang="x-default"
+          href="https://www.classconnect.cm/fr"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
+        />
       </head>
       <body
         className={`antialiased overflow-y-auto flex flex-col ${Inter.variable} font-inter h-screen w-full`}
@@ -236,7 +249,6 @@ export default async function RootLayout({
               <Providers locale={locale}>
                 <InactivityProvider>
                   <HelmetWrapper>
-
                     {children}
                     <Modals />
                     <Toaster />
