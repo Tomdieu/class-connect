@@ -1,8 +1,8 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
-import { BookOpen, ChevronDown, LogOut, Menu, MenuIcon } from "lucide-react";
+import { useSidebar } from "@/components/ui/sidebar";
+import { BookOpen, Menu, Settings, User, LogOut, Globe } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
@@ -12,99 +12,98 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useChangeLocale } from "@/locales/client";
-import ChangeLanguage from "@/components/ChangeLanguage";
-
+import { useChangeLocale, useI18n } from "@/locales/client";
 
 function DashboardHeader() {
   const { toggleSidebar, isMobile } = useSidebar();
   const { data: session } = useSession();
-    const changeLocale =useChangeLocale()
+  const changeLocale = useChangeLocale();
+  const t = useI18n();
+
   const getInitials = (name: string) => {
     const [firstName, lastName] = name.split(" ");
-    return firstName[0] + lastName[0];
+    return firstName?.[0] + lastName?.[0];
   };
 
   return (
-    <div className="sticky top-0 z-50 shadow-lg w-full flex items-center justify-between p-3 bg-white">
-      <Link
-        href={"/dashboard"}
-        className="select-none flex items-center gap-1 cursor-pointer text-blue-600"
-      >
-        <BookOpen className="size-5 sm:size-8" />
-        <h1 className="font-black text-sm sm:text-lg">ClassConnect</h1>
-      </Link>
-      <div className="flex items-center gap-2">
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>
-            {getInitials(
-              `${session?.user.first_name} ${session?.user.last_name}`
-            )}
-          </AvatarFallback>
-        </Avatar>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="flex flex-col gap-0.5 cursor-pointer select-none">
-              <span className="text-muted-foreground text-xs">Bonjour</span>
-              <div className="flex items-center gap-1">
-                <span className="text-sm/3">{session?.user.first_name}</span>
-                <ChevronDown className="size-4" />
-              </div>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                Profile
-                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                Billing
-                <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                Settings
-                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-              </DropdownMenuItem>
-              {session?.user.is_staff && (
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <div className="flex h-16 items-center justify-between px-4">
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-2 text-blue-600 transition-colors hover:text-blue-700"
+        >
+          <BookOpen className="h-6 w-6" />
+          <span className="font-bold text-lg hidden sm:inline-block">ClassConnect</span>
+        </Link>
+
+        <div className="flex items-center gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src="https://github.com/shadcn.png" alt={session?.user.first_name} />
+                  <AvatarFallback>
+                    {getInitials(`${session?.user.first_name} ${session?.user.last_name}`)}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium">{session?.user.first_name} {session?.user.last_name}</p>
+                  <p className="text-xs text-muted-foreground">{session?.user.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
                 <DropdownMenuItem>
-                  <Link href={"/admin"}>Admin Dashboard</Link>
+                  <User className="mr-2 h-4 w-4" />
+                  {t("nav.profile")}
                 </DropdownMenuItem>
-              )}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>GitHub</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
-            <DropdownMenuItem disabled>API</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut()}>
-              Log out
-              <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {isMobile && (
-
-          <Button onClick={toggleSidebar} size={"icon"} variant={"ghost"}>
-            <Menu />
-          </Button>
-        )}
-        <ChangeLanguage/>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  {t("dashboardPage.settings")}
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Globe className="mr-2 h-4 w-4" />
+                  <span>{t("nav.language")}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => changeLocale("en")}>
+                    <span className="mr-2">🇺🇸</span>
+                    <span>English</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => changeLocale("fr")}>
+                    <span className="mr-2">🇫🇷</span>
+                    <span>Français</span>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => signOut()}>
+                <LogOut className="mr-2 h-4 w-4" />
+                {t("nav.logout")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {isMobile && (
+            <Button onClick={toggleSidebar} size="icon" variant="ghost">
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
+    </header>
   );
 }
 
