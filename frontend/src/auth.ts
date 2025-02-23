@@ -1,6 +1,6 @@
 import NextAuth, { User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { LoginResponseType } from "./types";
+import { LoginResponseType, UserType } from "./types";
 import { getAccountInfor } from "./actions/accounts";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
@@ -54,12 +54,24 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           const expiresAt = Date.now() + expires_in * 1000; // convert to milliseconds
 
           const user = await getAccountInfor(data.access_token);
+          
+          const getUserRole = (user:UserType)=>{
+            if(user.is_superuser || user.is_staff){
+              return "admin";
+            }
+            if(user.education_level === "PROFESSIONAL"){
+              return "teacher";
+            }
+            return "student";
+          }
+          const role = getUserRole(user);
 
           return {
             ...user,
             email_verified:user.email_verified,
             accessToken: data.access_token,
             refreshToken: data.refresh_token,
+            role,
             expiresAt,
           } as User;
         }
@@ -70,6 +82,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
+        
         token = { ...token, ...user };
       }
       return token;
