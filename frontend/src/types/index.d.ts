@@ -38,8 +38,8 @@ export declare interface UserCreateType {
   town: string;
   quarter: string;
   password: string;
-  confirm_password: string;
   // Optional fields based on education level
+  college_class?: CollegeClass;
   lycee_class?: LyceeClass;
   lycee_speciality?: LyceeSpecialities;
   university_level?: UniversityLevel;
@@ -48,7 +48,6 @@ export declare interface UserCreateType {
   platform_usage_reason?: string;
   is_staff?: boolean;
   is_superuser?: boolean;
-  college_class?: CollegeClass;
 }
 
 export declare interface UserType {
