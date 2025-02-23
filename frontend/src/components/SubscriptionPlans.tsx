@@ -42,6 +42,7 @@ export const SubscriptionPlans = () => {
       period: "month",
       gradient: "from-blue-50 to-blue-100/50",
       popular: false,
+      keyName:"basic"
     },
     {
       name: t("subscriptionPlans.standard.name"),
@@ -56,6 +57,7 @@ export const SubscriptionPlans = () => {
       period: "month",
       gradient: "from-blue-100 to-blue-200/50",
       popular: true,
+      keyName:"standard"
     },
     {
       name: t("subscriptionPlans.premium.name"),
@@ -71,6 +73,7 @@ export const SubscriptionPlans = () => {
       period: "month",
       gradient: "from-blue-200 to-blue-300/50",
       popular: false,
+      keyName:"premium"
     },
   ];
 
@@ -142,7 +145,7 @@ export const SubscriptionPlans = () => {
                   }`}
                   onClick={() =>
                     handleSubscribe(
-                      plan.name.toLowerCase() as
+                      plan.keyName.toLowerCase() as
                         | "basic"
                         | "standard"
                         | "premium"
