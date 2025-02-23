@@ -61,24 +61,47 @@ export default function DashboardSidebar() {
   ];
 
   return (
-    <Sidebar collapsible="offcanvas" aria-describedby="dashboard-sidebar" className="bg-white border-none outline-none shadow-lg">
-      <SidebarContent aria-labelledby="x" aria-describedby="dashboard-sidebar" className="bg-white border-none outline-none">
+    <Sidebar 
+      collapsible="offcanvas" 
+      className="bg-white border-none outline-none shadow-lg min-h-screen"
+    >
+      <SidebarContent className="flex flex-col h-full p-4">
         <SidebarGroup>
-          <div className="flex items-center justify-between mb-4">
-            <SidebarGroupLabel className="font-bold text-xl">{t("dashboardSidebar.menu")}</SidebarGroupLabel>
-            <div onClick={toggleSidebar} className="cursor-pointer sm:hidden">
-              <X className="text-muted-foreground size-6"/>
+          <div className="flex items-center justify-between mb-8">
+            <SidebarGroupLabel className="text-xl font-semibold text-gray-800">
+              {t("dashboardSidebar.menu")}
+            </SidebarGroupLabel>
+            <div 
+              onClick={toggleSidebar} 
+              className="cursor-pointer sm:hidden hover:bg-gray-100 p-2 rounded-full transition-colors"
+            >
+              <X className="text-gray-500 size-5"/>
             </div>
           </div>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-2">
               {items.map((item) => (
-                <SidebarMenuItem key={item.title} className={`rounded-md hover:bg-default/15 ${correctPath === item.url ? "bg-indigo-500 text-white" : ""}`}>
+                <SidebarMenuItem 
+                  key={item.title} 
+                  className={`
+                    rounded-xl transition-all duration-200 
+                    ${correctPath === item.url 
+                      ? "bg-default text-white shadow-md shadow-default/25 hover:bg-default/90" 
+                      : "hover:bg-gray-100/80 text-gray-600 hover:text-gray-900"
+                    }
+                  `}
+                >
                   <SidebarMenuButton asChild>
-                  {/* className="w-full flex items-center gap-2 p-2 text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-default/15" */}
-                    <a href={item.url} >
-                      <item.icon className="size-8"/>
-                      <span className="text-base">{item.title}</span>
+                    <a 
+                      href={item.url} 
+                      className="flex items-center gap-3 px-4 py-3"
+                    >
+                      <item.icon className={`size-5 ${
+                        correctPath === item.url 
+                          ? "text-white" 
+                          : "text-gray-500"
+                      }`}/>
+                      <span className="font-medium">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -86,6 +109,15 @@ export default function DashboardSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Footer - You can add this optionally */}
+        <div className="mt-auto pt-4 border-t border-gray-100">
+          <div className="px-4 py-3">
+            <p className="text-xs text-gray-500">
+              © 2024 ClassConnect
+            </p>
+          </div>
+        </div>
       </SidebarContent>
     </Sidebar>
   )
