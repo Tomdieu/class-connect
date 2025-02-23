@@ -15,12 +15,10 @@ export const getStats = async () => {
     });
     return response.data as Stats;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Type guard for Axios errors
-      if (error.response && error.response.data) {
-        throw error.response.data;
-      }
+    // Extract error details from the Axios error response
+    if (error.response?.data) {
+      throw JSON.stringify(error.response.data);
     }
-    throw error;
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
