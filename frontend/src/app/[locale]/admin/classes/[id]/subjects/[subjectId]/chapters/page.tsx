@@ -1,5 +1,5 @@
 "use client";
-import { getSubject, listChapters, updateChapter } from "@/actions/courses";
+import { getSubject, listChapters, updateChapter, deleteChapter } from "@/actions/courses";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -50,18 +50,21 @@ import { useChapterStore } from "@/hooks/chapter-store";
 import { cn } from "@/lib/utils";
 import { ChapterType } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import DeleteConfirmationModal from "@/components/modals/DeleteConfirmationModal";
 
 
 function SortableCard({
   chapter,
   classId,
   setChapter,
-  onView
+  onView,
+  onDelete
 }: {
   chapter: ChapterType;
   classId: string | number;
   setChapter: (chapter: ChapterType, classId: string | number) => void;
   onView?: (chapterId: number | string) => void;
+  onDelete?: (chapterId: number | string) => void;
 }) {
   const {
     attributes,
@@ -129,7 +132,7 @@ function SortableCard({
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button size="icon" variant="destructive">
+                <Button size="icon" variant="destructive" onClick={() => onDelete && onDelete(chapter.id)}>
                   <Trash2 size={20} />
                 </Button>
               </TooltipTrigger>
@@ -171,6 +174,36 @@ function SubjectChapters() {
       });
     },
   });
+
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    chapterId: null,
+  });
+  
+  const deleteChapterMutation = useMutation({
+    mutationFn: deleteChapter,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["class", id, "subjects", subjectId, "chapters"],
+      });
+      toast.success("Chapter deleted successfully");
+    },
+  });
+
+  const handleDelete = (chapterId: number) => {
+    setDeleteModal({ isOpen: true, chapterId });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteModal.chapterId) {
+      deleteChapterMutation.mutate({
+        class_pk: id,
+        subject_pk: subjectId,
+        chapter_pk: deleteModal.chapterId.toString(),
+      });
+    }
+    setDeleteModal({ isOpen: false, chapterId: null });
+  };
 
   useEffect(() => {
     if (data) {
@@ -240,63 +273,75 @@ function SubjectChapters() {
   }
 
   return (
-    <div className="container py-10 flex flex-col gap-5">
-      <div className="grid 2xl:grid-cols-12 gap-5">
-        <div className="col-span-3">
-          <div>
-            <Link
-              className="flex items-center gap-1"
-              href={`/admin/classes/${id}/subjects/${subjectId}/`}
-            >
-              <BackButton />
-            </Link>
+    <>
+      <div className="container py-10 flex flex-col gap-5">
+        <div className="grid 2xl:grid-cols-12 gap-5">
+          <div className="col-span-3">
+            <div>
+              <Link
+                className="flex items-center gap-1"
+                href={`/admin/classes/${id}/subjects/${subjectId}/`}
+              >
+                <BackButton />
+              </Link>
+            </div>
+            <h1 className="text-3xl font-medium">Subject</h1>
+            <div>
+              {subjectQuery.data && (
+                <div className="flex flex-col gap-4">
+                  <h2 className="text-lg font-medium">
+                    {subjectQuery.data?.name}
+                  </h2>
+                  <p className="text-muted-foreground text-sm">
+                    {subjectQuery.data?.description}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-          <h1 className="text-3xl font-medium">Subject</h1>
-          <div>
-            {subjectQuery.data && (
-              <div className="flex flex-col gap-4">
-                <h2 className="text-lg font-medium">
-                  {subjectQuery.data?.name}
-                </h2>
-                <p className="text-muted-foreground text-sm">
-                  {subjectQuery.data?.description}
-                </p>
-              </div>
+          <div className="col-span-9">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-medium">Chapters</h1>
+              <Button onClick={() => onAdd(id, subjectId)}>
+                Ajouter un chapitre
+              </Button>
+            </div>
+
+            {chapters && (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext items={chapters} strategy={rectSortingStrategy}>
+                  <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+                    {chapters.map((chapter) => (
+                      <SortableCard
+                        key={chapter.id}
+                        chapter={chapter}
+                        classId={id}
+                        setChapter={setChapter}
+                        onDelete={() => handleDelete(chapter.id)}
+                        onView={(chapterId) => router.push(`/admin/classes/${id}/subjects/${subjectId}/chapters/${chapterId}`)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         </div>
-        <div className="col-span-9">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-medium">Chapters</h1>
-            <Button onClick={() => onAdd(id, subjectId)}>
-              Ajouter un chapitre
-            </Button>
-          </div>
-
-          {chapters && (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext items={chapters} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
-                  {chapters.map((chapter) => (
-                    <SortableCard
-                      key={chapter.id}
-                      chapter={chapter}
-                      classId={id}
-                      setChapter={setChapter}
-                      onView={(chapterId) => router.push(`/admin/classes/${id}/subjects/${subjectId}/chapters/${chapterId}`)}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-          )}
-        </div>
       </div>
-    </div>
+
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, chapterId: null })}
+        onConfirm={handleConfirmDelete}
+        title="Delete Chapter"
+        description="Are you sure you want to delete this chapter? This action cannot be undone."
+        isLoading={deleteChapterMutation.isPending}
+      />
+    </>
   );
 }
 
