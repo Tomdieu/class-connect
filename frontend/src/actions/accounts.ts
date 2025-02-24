@@ -95,7 +95,7 @@ export const updateUser = async ({
   body,
 }: {
   id: number | string;
-  body: UserCreateType;
+  body: Partial<UserCreateType>;
 }) => {
   try {
     const session = await auth();
