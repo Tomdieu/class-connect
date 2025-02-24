@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {useParams} from "next/navigation";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 import {Loader} from "lucide-react";
@@ -14,6 +14,7 @@ import {useSelectVideoStore} from "@/hooks/select-video-store";
 import { useI18n } from "@/locales/client";
 import { useDeleteConfirmationStore } from '@/hooks/delete-confirmation-store';
 import { toast } from "sonner";
+import DeleteConfirmationModal from "@/components/modals/DeleteConfirmationModal";
 
 interface ResourceResponse {
     resource: AbstractResourceType;
@@ -86,18 +87,26 @@ const TopicDetailPage: React.FC = () => {
     };
 
     const handleUpdateResource = (resource: AbstractResourceType) => {
+        const editData = {
+            classId: id,
+            subjectId,
+            chapterId,
+            topicId,
+            resource
+        };
+
         switch (resource.resource_type) {
             case "PDFResource":
+                pdfStore.onEdit(editData);
                 break;
-            case "VideoResource":
-                // Implement video update handling
-                console.log("Updating video resource:", resource);
-                break;
-            case "QuizResource":
-                break;
-            case "RevisionResource":
+            case "VideoResource": 
+                videoStore.onEdit(editData);
                 break;
             case "ExerciseResource":
+                exerciseStore.onEdit(editData);
+                break;
+            case "RevisionResource":
+                revisionStore.onEdit(editData);
                 break;
         }
     };
@@ -134,15 +143,23 @@ const TopicDetailPage: React.FC = () => {
         },
     });
 
+    const [deleteResourceModal, setDeleteResourceModal] = useState({
+        isOpen: false,
+        resourceId: null as string | null
+    });
+
     const handleDeleteResource = (resource: AbstractResourceType) => {
-        open({
-            title: t("resources.delete.title"),
-            description: t("resources.delete.description"),
-            onConfirm: () => {
-                deleteResourceMutation.mutate(resource.id.toString());
-            },
-            isLoading: deleteResourceMutation.isPending
+        setDeleteResourceModal({
+            isOpen: true,
+            resourceId: resource.id.toString()
         });
+    };
+
+    const handleConfirmDelete = () => {
+        if (deleteResourceModal.resourceId) {
+            deleteResourceMutation.mutate(deleteResourceModal.resourceId);
+        }
+        setDeleteResourceModal({ isOpen: false, resourceId: null });
     };
 
     const handlePDFClick = () => {
@@ -223,6 +240,15 @@ const TopicDetailPage: React.FC = () => {
                     />
                 ))}
             </div>
+
+            <DeleteConfirmationModal
+                isOpen={deleteResourceModal.isOpen}
+                onClose={() => setDeleteResourceModal({ isOpen: false, resourceId: null })}
+                onConfirm={handleConfirmDelete}
+                title={t("resources.delete.title")}
+                description={t("resources.delete.description")}
+                isLoading={deleteResourceMutation.isPending}
+            />
         </div>
     );
 };
