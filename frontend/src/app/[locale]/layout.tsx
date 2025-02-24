@@ -125,10 +125,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     languages: {
-      fr: "/fr",
-      en: "/en",
+      'fr-FR': 'https://www.classconnect.cm/fr',
+      'en-US': 'https://www.classconnect.cm/en',
     },
-    canonical: "/fr", // Set French as canonical version
+    canonical: 'https://www.classconnect.cm', // Remove locale-specific canonical
   },
   icons: {
     icon: [
@@ -151,7 +151,7 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const {locale} = await params;
+  const { locale } = await params;
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
@@ -214,21 +214,25 @@ export default async function RootLayout({
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <meta name="theme-color" content="#2563eb" />
-        {/* Add hreflang tags */}
-        <link
-          rel="alternate"
-          hrefLang="fr"
-          href="https://www.classconnect.cm/fr"
+        {/* Update hreflang tags */}
+        <link 
+          rel="alternate" 
+          hrefLang="fr-FR" 
+          href="https://www.classconnect.cm/fr" 
         />
-        <link
-          rel="alternate"
-          hrefLang="en"
-          href="https://www.classconnect.cm/en"
+        <link 
+          rel="alternate" 
+          hrefLang="en-US" 
+          href="https://www.classconnect.cm/en" 
+        />
+        <link 
+          rel="canonical" 
+          href={`https://www.classconnect.cm/${locale}`}
         />
         <link
           rel="alternate"
           hrefLang="x-default"
-          href="https://www.classconnect.cm/fr"
+          href="https://www.classconnect.cm"
         />
         <script
           type="application/ld+json"
