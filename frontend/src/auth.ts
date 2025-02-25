@@ -112,4 +112,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     strategy: "jwt",
   },
   secret: process.env.AUTH_SECRET || "CLASSCONNECT",
+  events:{
+    signIn(message) {
+      console.log("signIn",message);
+    },
+  }
 });
