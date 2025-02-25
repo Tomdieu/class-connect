@@ -29,12 +29,15 @@ import {
 // import { QuestionField } from "./QuestionField";
 import { FileDropzone } from "@/components/FileDropzone";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   addExerciseResource,
   addPdfResource,
   addRevisionResource,
+  updateExerciseResource,
+  updatePdfResource,
+  updateRevisionResource,
 } from "@/actions/courses";
 import { toast } from "sonner";
 import axios from "axios";
@@ -119,12 +122,16 @@ const revisionSchema = baseResourceSchema.extend({
 
 export const PDFModal = () => {
   const t = useI18n();
-  const { isOpen, onClose, chapterId, classId, topicId, subjectId } =
+  const { isOpen, onClose, chapterId, classId, topicId, subjectId, resource } =
     usePDFStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const addPdfMutation = useMutation({
     mutationFn: addPdfResource,
+  });
+
+  const updatePdfMutation = useMutation({
+    mutationFn: updatePdfResource,
   });
 
   const queryClient = useQueryClient();
@@ -142,6 +149,16 @@ export const PDFModal = () => {
   });
 
   useEffect(() => {
+    if (resource) {
+      form.reset({
+        title: resource.title,
+        description: resource.description || "",
+        topic: Number(topicId),
+      });
+    }
+  }, [form, resource, topicId]);
+
+  useEffect(() => {
     form.setValue("topic", Number(topicId));
   }, [form, topicId]);
 
@@ -153,22 +170,25 @@ export const PDFModal = () => {
     try {
       console.log(form.formState.errors);
       console.log(!data.pdf_file);
-      if (!data.pdf_file) {
-        form.setError("pdf_file", { message: "Pdf file is required" });
+      if (!data.pdf_file && !resource) {
+        form.setError("pdf_file", { message: "PDF file is required" });
         return;
       }
-      if (chapterId && classId && subjectId && topicId) {
-        addPdfMutation.mutate(
+
+      if (resource) {
+        // Update existing PDF
+        updatePdfMutation.mutate(
           {
+            class_pk: classId!,
+            subject_pk: subjectId!,
             chapter_pk: chapterId!,
-            class_pk: classId,
+            topic_pk: topicId!,
+            resource_pk: resource.id,
             resource: data,
-            subject_pk: subjectId,
-            topic_pk: topicId,
           },
           {
             onSuccess() {
-              toast.success("Resource added successfully");
+              toast.success("Resource updated successfully");
               queryClient.invalidateQueries({
                 queryKey: [
                   "class",
@@ -184,11 +204,48 @@ export const PDFModal = () => {
               });
               handleClose();
             },
-            onError(error, variables, context) {
-              console.log({ error, variables, context });
+            onError(error) {
+              toast.error("Failed to update resource", {
+                description: error.message,
+              });
             },
           }
         );
+      } else {
+        // Create new PDF
+        if (chapterId && classId && subjectId && topicId) {
+          addPdfMutation.mutate(
+            {
+              chapter_pk: chapterId!,
+              class_pk: classId,
+              resource: data,
+              subject_pk: subjectId,
+              topic_pk: topicId,
+            },
+            {
+              onSuccess() {
+                toast.success("Resource added successfully");
+                queryClient.invalidateQueries({
+                  queryKey: [
+                    "class",
+                    classId,
+                    "subjects",
+                    subjectId,
+                    "chapters",
+                    chapterId,
+                    "topics",
+                    topicId,
+                    "resources",
+                  ],
+                });
+                handleClose();
+              },
+              onError(error, variables, context) {
+                console.log({ error, variables, context });
+              },
+            }
+          );
+        }
       }
 
       console.log("PDF form submitted:", data);
@@ -212,7 +269,9 @@ export const PDFModal = () => {
     <Credenza open={isOpen} onOpenChange={handleClose}>
       <CredenzaContent className="sm:max-w-[600px] p-6 pb-16 transition-all duration-300">
         <CredenzaHeader className="mt-5">
-          <CredenzaTitle>{t("resource.modal.pdf.title")}</CredenzaTitle>
+          <CredenzaTitle>
+            {resource ? t("resource.modal.pdf.edit") : t("resource.modal.pdf.title")}
+          </CredenzaTitle>
         </CredenzaHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -237,9 +296,9 @@ export const PDFModal = () => {
                 <FormItem className="transition-all duration-300">
                   <FormLabel>{t("resource.modal.description")}</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <Textarea
                       placeholder={t("resource.modal.description")}
-                      {...field} 
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -252,6 +311,16 @@ export const PDFModal = () => {
               render={() => (
                 <FormItem className="transition-all duration-300">
                   <FormLabel>{t("resource.modal.file.pdf")}</FormLabel>
+                  {resource && (
+                    <a 
+                      href={resource.pdf_file}
+                      target="_blank"
+                      rel="noopener noreferrer" 
+                      className="text-sm text-blue-600 hover:underline block mb-2"
+                    >
+                      {t("resource.modal.file.current")}
+                    </a>
+                  )}
                   <FormControl>
                     <FileDropzone
                       onDrop={handleDrop}
@@ -284,7 +353,7 @@ export const PDFModal = () => {
 
 export const ExerciseModal = () => {
   const t = useI18n();
-  const { isOpen, onClose, classId, subjectId, chapterId, topicId } =
+  const { isOpen, onClose, classId, subjectId, chapterId, topicId, resource } =
     useExerciseStore();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -293,9 +362,14 @@ export const ExerciseModal = () => {
     mutationFn: addExerciseResource,
   });
 
+  const updateExerciceMutation = useMutation({
+    mutationFn: updateExerciseResource,
+  });
+
   useEffect(() => {
-    setIsLoading(addExerciceMutation.isPending);
-  }, [addExerciceMutation.isPending]);
+    setIsLoading(addExerciceMutation.isPending || updateExerciceMutation.isPending);
+  }, [addExerciceMutation.isPending, updateExerciceMutation.isPending]);
+  
 
   const queryClient = useQueryClient();
 
@@ -311,6 +385,17 @@ export const ExerciseModal = () => {
   });
 
   useEffect(() => {
+    if (resource) {
+      form.reset({
+        title: resource.title,
+        description: resource.description || "",
+        instructions: resource.instructions || "",
+        topic: Number(topicId),
+      });
+    }
+  }, [form, resource, topicId]);
+
+  useEffect(() => {
     form.setValue("topic", Number(topicId));
   }, [form, topicId]);
 
@@ -321,19 +406,34 @@ export const ExerciseModal = () => {
   const onSubmit = async (data: z.infer<typeof exerciseSchema>) => {
     try {
       console.log("Exercise form submitted:", data);
-      if (chapterId && classId && subjectId && topicId) {
-        addExerciceMutation.mutate(
+      if (resource) {
+        // Update existing exercise
+        const formData = new FormData();
+        formData.append("topic", `${topicId}`);
+        formData.append("title", data.title);
+        formData.append("description", data.description || "");
+        formData.append("instructions", data.instructions);
+        if (data.exercise_file) {
+          formData.append("exercise_file", data.exercise_file);
+        }
+        if (data.solution_file) {
+          formData.append("solution_file", data.solution_file);
+        }
+
+        updateExerciceMutation.mutate(
           {
+            class_pk: classId!,
+            subject_pk: subjectId!,
             chapter_pk: chapterId!,
-            class_pk: classId,
+            topic_pk: topicId!,
+            resource_pk: resource.id,
             resource: data,
-            subject_pk: subjectId,
-            topic_pk: topicId,
           },
           {
-            onSuccess() {
-              toast.success("Resource added successfully", {
-                description: "exercise added successfully",
+            onSuccess(data) {
+              console.log(data);
+              toast.success("Resource updated successfully", {
+                description: "exercise updated successfully",
               });
               queryClient.invalidateQueries({
                 queryKey: [
@@ -355,6 +455,43 @@ export const ExerciseModal = () => {
             },
           }
         );
+      } else {
+        // Create new exercise
+        if (chapterId && classId && subjectId && topicId) {
+          addExerciceMutation.mutate(
+            {
+              chapter_pk: chapterId!,
+              class_pk: classId,
+              resource: data,
+              subject_pk: subjectId,
+              topic_pk: topicId,
+            },
+            {
+              onSuccess() {
+                toast.success("Resource added successfully", {
+                  description: "exercise added successfully",
+                });
+                queryClient.invalidateQueries({
+                  queryKey: [
+                    "class",
+                    classId,
+                    "subjects",
+                    subjectId,
+                    "chapters",
+                    chapterId,
+                    "topics",
+                    topicId,
+                    "resources",
+                  ],
+                });
+                handleClose();
+              },
+              onError(error, variables, context) {
+                console.log({ error, variables, context });
+              },
+            }
+          );
+        }
       }
     } catch (error) {
       console.error("Error submitting exercise form:", error);
@@ -379,9 +516,11 @@ export const ExerciseModal = () => {
       <CredenzaContent className="sm:max-w-[500px] h-full sm:h-auto max-h-screen sm:max-h-[90vh]">
         <div className="space-y-6 overflow-y-auto">
           <CredenzaHeader>
-            <CredenzaTitle>{t("resource.modal.exercise.title")}</CredenzaTitle>
+            <CredenzaTitle>
+              {resource ? t("resource.modal.exercise.edit") : t("resource.modal.exercise.title")}
+            </CredenzaTitle>
           </CredenzaHeader>
-          
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -391,13 +530,16 @@ export const ExerciseModal = () => {
                   <FormItem>
                     <FormLabel>{t("resource.modal.title")}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("resource.modal.title")} {...field} />
+                      <Input
+                        placeholder={t("resource.modal.title")}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="description"
@@ -415,7 +557,7 @@ export const ExerciseModal = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="instructions"
@@ -433,22 +575,33 @@ export const ExerciseModal = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="exercise_file"
                 render={() => (
                   <FormItem>
                     <FormLabel>{t("resource.modal.file.exercise")}</FormLabel>
+                    {resource && (
+                      <a 
+                        href={resource.exercise_file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:underline block mb-2"
+                      >
+                        {t("resource.modal.file.current")}
+                      </a>
+                    )}
                     <FormControl>
                       <FileDropzone
                         onDrop={handleDrop("exercise_file")}
                         label={t("resource.modal.file.dropzone.exercise")}
                         accept={{
-                          'application/pdf': ['.pdf'],
-                          'application/msword': ['.doc'],
-                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-                          'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+                          "application/pdf": [".pdf"],
+                          "application/msword": [".doc"],
+                          "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                            [".docx"],
+                          "image/*": [".png", ".jpg", ".jpeg", ".gif"],
                         }}
                       />
                     </FormControl>
@@ -463,15 +616,26 @@ export const ExerciseModal = () => {
                 render={() => (
                   <FormItem>
                     <FormLabel>{t("resource.modal.file.solution")}</FormLabel>
+                    {resource?.solution_file && (
+                      <a 
+                        href={resource.solution_file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:underline block mb-2"
+                      >
+                        {t("resource.modal.file.current")}
+                      </a>
+                    )}
                     <FormControl>
                       <FileDropzone
                         onDrop={handleDrop("solution_file")}
                         label={t("resource.modal.file.dropzone.solution")}
                         accept={{
-                          'application/pdf': ['.pdf'],
-                          'application/msword': ['.doc'],
-                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-                          'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+                          "application/pdf": [".pdf"],
+                          "application/msword": [".doc"],
+                          "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                            [".docx"],
+                          "image/*": [".png", ".jpg", ".jpeg", ".gif"],
                         }}
                       />
                     </FormControl>
@@ -480,11 +644,7 @@ export const ExerciseModal = () => {
                 )}
               />
 
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <Loader2 className="size-4 mr-2 text-white animate-spin" />
@@ -508,18 +668,29 @@ export const ExerciseModal = () => {
 
 export const RevisionModal = () => {
   const t = useI18n();
-  const { isOpen, onClose, classId, subjectId, chapterId, topicId } =
-    useRevisionStore();
+  const {
+    isOpen,
+    onClose,
+    classId,
+    subjectId,
+    chapterId,
+    topicId,
+    resource,
+  } = useRevisionStore();
 
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const addRevisionMutation = useMutation({
     mutationFn: addRevisionResource,
   });
 
+  const updateRevisionMutation = useMutation({
+      mutationFn: updateRevisionResource,
+    });
+
   useEffect(() => {
-    setIsLoading(addRevisionMutation.isPending);
-  }, [addRevisionMutation.isPending]);
+    setIsLoading(addRevisionMutation.isPending || updateRevisionMutation.isPending);
+  }, [addRevisionMutation.isPending, updateRevisionMutation.isPending]);
 
   const queryClient = useQueryClient();
 
@@ -535,6 +706,17 @@ export const RevisionModal = () => {
   });
 
   useEffect(() => {
+    if (resource) {
+      form.reset({
+        title: resource.title,
+        description: resource.description || "",
+        content: resource.content || "",
+        topic: Number(topicId),
+      });
+    }
+  }, [form, resource, topicId]);
+
+  useEffect(() => {
     form.setValue("topic", Number(topicId));
   }, [form, topicId]);
 
@@ -545,40 +727,79 @@ export const RevisionModal = () => {
   const onSubmit = async (data: z.infer<typeof revisionSchema>) => {
     try {
       console.log("Revision form submitted:", data);
-      if (chapterId && classId && subjectId && topicId) {
-        addRevisionMutation.mutate(
-          {
-            chapter_pk: chapterId!,
-            class_pk: classId,
-            resource: data,
-            subject_pk: subjectId,
-            topic_pk: topicId,
+      if (resource) {
+        // Update existing revision
+        updateRevisionMutation.mutate({
+          class_pk: classId!,
+          subject_pk: subjectId!,
+          chapter_pk: chapterId!,
+          topic_pk: topicId!,
+          resource_pk: resource.id,
+          resource: data,
+        },{
+          onSuccess(data) {
+            console.log(data);
+            toast.success("Resource updated successfully", {
+              description: "revision updated successfully",
+            });
+            queryClient.invalidateQueries({
+              queryKey: [
+                "class",
+                classId,
+                "subjects",
+                subjectId,
+                "chapters",
+                chapterId,
+                "topics",
+                topicId,
+                "resources",
+              ],
+            });
+            resetForm();
+            handleClose();
           },
-          {
-            onSuccess() {
-              toast.success("Resource added successfully", {
-                description: "revision added successfully",
-              });
-              queryClient.invalidateQueries({
-                queryKey: [
-                  "class",
-                  classId,
-                  "subjects",
-                  subjectId,
-                  "chapters",
-                  chapterId,
-                  "topics",
-                  topicId,
-                  "resources",
-                ],
-              });
-              handleClose();
-            },
-            onError(error, variables, context) {
-              console.log({ error, variables, context });
-            },
+          onError(error, variables, context) {
+            console.log({ error, variables, context });
           }
-        );
+        })
+      } else {
+        // Create new revision
+        if (chapterId && classId && subjectId && topicId) {
+          addRevisionMutation.mutate(
+            {
+              chapter_pk: chapterId!,
+              class_pk: classId,
+              resource: data,
+              subject_pk: subjectId,
+              topic_pk: topicId,
+            },
+            {
+              onSuccess() {
+                toast.success("Resource added successfully", {
+                  description: "revision added successfully",
+                });
+                queryClient.invalidateQueries({
+                  queryKey: [
+                    "class",
+                    classId,
+                    "subjects",
+                    subjectId,
+                    "chapters",
+                    chapterId,
+                    "topics",
+                    topicId,
+                    "resources",
+                  ],
+                });
+                resetForm();
+                handleClose();
+              },
+              onError(error, variables, context) {
+                console.log({ error, variables, context });
+              },
+            }
+          );
+        }
       }
     } catch (error) {
       console.error("Error submitting revision form:", error);
@@ -593,52 +814,65 @@ export const RevisionModal = () => {
   return (
     <Credenza open={isOpen} onOpenChange={handleClose}>
       <CredenzaContent className="sm:max-w-[600px] p-5 pb-5 transition-all duration-300">
-      <div className="space-y-4 overflow-y-auto">
-        <CredenzaHeader className="mt-5">
-          <CredenzaTitle>{t("resource.modal.revision.title")}</CredenzaTitle>
-        </CredenzaHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Base fields */}
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem className="transition-all duration-300">
-                  <FormLabel>{t("resource.modal.title")}</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder={t("resource.modal.title")} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem className="transition-all duration-300">
-                  <FormLabel>{t("resource.modal.description")}</FormLabel>
-                  <FormControl>
-                    <Textarea rows={4} {...field} placeholder={t("resource.modal.description")} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem className="transition-all duration-300">
-                  <FormLabel>{t("resource.modal.content")}</FormLabel>
-                  <FormControl>
-                    <Textarea rows={7} {...field} placeholder={t("resource.modal.content")} />
-                    {/* <MdEditor value={field.value} onChange={field.onChange}/> */}
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full">
-              {isLoading ? (
+        <div className="space-y-4 overflow-y-auto">
+          <CredenzaHeader className="mt-5">
+            <CredenzaTitle>
+              {resource ? t("resource.modal.revision.edit") : t("resource.modal.revision.title")}
+            </CredenzaTitle>
+          </CredenzaHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Base fields */}
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem className="transition-all duration-300">
+                    <FormLabel>{t("resource.modal.title")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder={t("resource.modal.title")}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="transition-all duration-300">
+                    <FormLabel>{t("resource.modal.description")}</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        rows={4}
+                        {...field}
+                        placeholder={t("resource.modal.description")}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem className="transition-all duration-300">
+                    <FormLabel>{t("resource.modal.content")}</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        rows={7}
+                        {...field}
+                        placeholder={t("resource.modal.content")}
+                      />
+                      {/* <MdEditor value={field.value} onChange={field.onChange}/> */}
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full">
+                {isLoading ? (
                   <div className="flex items-center justify-center">
                     <Loader2 className="size-4 mr-2 text-white animate-spin" />
                     <span>{t("resource.modal.submit.revision")}</span>
@@ -646,9 +880,9 @@ export const RevisionModal = () => {
                 ) : (
                   t("resource.modal.submit.revision")
                 )}
-            </Button>
-          </form>
-        </Form>
+              </Button>
+            </form>
+          </Form>
         </div>
       </CredenzaContent>
     </Credenza>
@@ -661,12 +895,31 @@ export const RevisionModal = () => {
 
 export const VideoModal = () => {
   const t = useI18n();
-  const { isOpen, onClose, classId, subjectId, chapterId, topicId } =
-    useVideoStore();
+  const {
+    isOpen,
+    onClose,
+    classId,
+    subjectId,
+    chapterId,
+    topicId,
+    resource,
+  } = useVideoStore();
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
 
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const { data: session } = useSession();
+
+  // Move form initialization before any useEffect that uses it
+  const form = useForm<z.infer<typeof videoSchema>>({
+    resolver: zodResolver(videoSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      topic: 0,
+      polymorphic_ctype: 0,
+    },
+  });
 
   const addVideoMutation = useMutation({
     mutationFn: async (data: z.infer<typeof videoSchema>) => {
@@ -708,35 +961,108 @@ export const VideoModal = () => {
   });
 
   useEffect(() => {
+    if (resource) {
+      form.reset({
+        title: resource.title,
+        description: resource.description || "",
+        topic: Number(topicId),
+      });
+    }
+  }, [form, resource, topicId]);
+
+  useEffect(() => {
     setIsLoading(addVideoMutation.isPending);
   }, [addVideoMutation.isPending]);
-
-  const queryClient = useQueryClient();
-
-  const form = useForm<z.infer<typeof videoSchema>>({
-    resolver: zodResolver(videoSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      topic: 0,
-      polymorphic_ctype: 0,
-    },
-  });
 
   useEffect(() => {
     form.setValue("topic", Number(topicId));
   }, [form, topicId]);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     form.reset({});
     setUploadProgress(0);
-  };
+  },[form]);
+
+  useEffect(()=>{
+    if(!isOpen){
+      resetForm()
+    }
+  },[isOpen, resetForm])
 
   const onSubmit = async (data: z.infer<typeof videoSchema>) => {
     try {
-      addVideoMutation.mutate(data, {
-        onSuccess(data) {
-          console.log({ data });
+      if (!data.video_file && !resource) {
+        form.setError("video_file", { message: "Video file is required" });
+        return;
+      }
+
+      if (resource) {
+        // Update existing video
+        const formData = new FormData();
+        formData.append("topic", `${topicId}`);
+        formData.append("title", data.title);
+        formData.append("description", data.description || "");
+        if (data.video_file) {
+          formData.append("video_file", data.video_file);
+        }
+
+        const res = await api.patch(
+          `/api/classes/${classId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/videos/${resource.id}/`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${session?.user.accessToken}`,
+            },
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total!
+              );
+              setUploadProgress(percentCompleted);
+            },
+          }
+        );
+        // Handle success
+        toast.success("Video updated successfully");
+        queryClient.invalidateQueries({
+          queryKey: [
+            "class",
+            classId,
+            "subjects",
+            subjectId,
+            "chapters",
+            chapterId,
+            "topics",
+            topicId,
+            "resources",
+          ],
+        });
+        resetForm()
+        handleClose();
+      } else {
+        // Create new video
+        try {
+          const formData = new FormData();
+          formData.append("topic", `${topicId}`);
+          formData.append("title", data.title);
+          formData.append("description", data.description || "");
+          formData.append("video_file", data.video_file);
+
+          const res = await api.post(
+            `/api/classes/${classId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/videos/`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${session?.user.accessToken}`,
+              },
+              onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total!
+                );
+                setUploadProgress(percentCompleted);
+              },
+            }
+          );
+
           toast.success("Resource added successfully", {
             description: "Video added successfully",
           });
@@ -753,15 +1079,15 @@ export const VideoModal = () => {
               "resources",
             ],
           });
+          resetForm()
           handleClose();
-        },
-        onError(error) {
+        } catch (error) {
           console.error("Error:", error);
           toast.error("Failed to upload video", {
             description: "Please try again",
           });
-        },
-      });
+        }
+      }
     } catch (error) {
       console.error("Error submitting video form:", error);
     }
@@ -792,7 +1118,9 @@ export const VideoModal = () => {
       <CredenzaContent showIcon={!isLoading} className="p-4 sm:max-w-[500px]">
         <div className="">
           <CredenzaHeader>
-            <CredenzaTitle>{t("resource.modal.video.title")}</CredenzaTitle>
+            <CredenzaTitle>
+              {resource ? t("resource.modal.video.edit") : t("resource.modal.video.title")}
+            </CredenzaTitle>
           </CredenzaHeader>
 
           <Form {...form}>
@@ -807,7 +1135,10 @@ export const VideoModal = () => {
                   <FormItem>
                     <FormLabel>{t("resource.modal.title")}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("resource.modal.title")} {...field} />
+                      <Input
+                        placeholder={t("resource.modal.title")}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -821,7 +1152,10 @@ export const VideoModal = () => {
                   <FormItem>
                     <FormLabel>{t("resource.modal.description")}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t("resource.modal.description")} />
+                      <Textarea
+                        {...field}
+                        placeholder={t("resource.modal.description")}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -833,6 +1167,16 @@ export const VideoModal = () => {
                 render={() => (
                   <FormItem>
                     <FormLabel>{t("resource.modal.file.video")}</FormLabel>
+                    {resource && (
+                      <a 
+                        href={resource.video_file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:underline block mb-2"
+                      >
+                        {t("resource.modal.file.current")}
+                      </a>
+                    )}
                     <FormControl>
                       <FileDropzone
                         onDrop={handleDrop}
@@ -860,7 +1204,9 @@ export const VideoModal = () => {
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <Loader2 className="size-4 mr-2 text-white animate-spin" />
-                    <span>{t("resource.modal.submit.video")} {uploadProgress}%</span>
+                    <span>
+                      {t("resource.modal.submit.video")} {uploadProgress}%
+                    </span>
                   </div>
                 ) : (
                   t("resource.modal.submit.video")
