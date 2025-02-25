@@ -33,14 +33,14 @@ function DashboardHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="flex h-16 items-center justify-between px-4">
-        <Link
+      <div className="flex h-16 items-center justify-end px-4">
+        {/* <Link
           href="/dashboard"
           className="flex items-center gap-2 text-blue-600 transition-colors hover:text-blue-700"
         >
           <BookOpen className="h-6 w-6" />
           <span className="font-bold text-lg hidden sm:inline-block">ClassConnect</span>
-        </Link>
+        </Link> */}
 
         <div className="flex items-center gap-4">
           <DropdownMenu>
