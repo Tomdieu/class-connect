@@ -6,14 +6,14 @@ from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import (
-    CourseCategory, Class, Subject, Chapter, Topic,
+    CourseCategory, Class, SchoolYear, Subject, Chapter, Topic,
     AbstractResource, UserProgress,UserAvailability,DailyTimeSlot,
     CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,
     # QuizResource, Question, QuestionOption, QuizAttempt, QuestionResponse,
     VideoResource, RevisionResource, PDFResource, ExerciseResource
 )
 from .serializers import (
-    CourseCategorySerializer, ClassSerializer, SubjectSerializer,
+    CourseCategorySerializer, ClassSerializer, SchoolYearSerializer, SubjectSerializer,
     ChapterSerializer, TopicSerializer, PolymorphicResourceSerializer,
     UserProgressSerializer,UserAvailabilitySerializer,
     CourseOfferingSerializer, CourseOfferingActionSerializer,
@@ -457,6 +457,15 @@ class CourseOfferingActionViewSet(viewsets.ModelViewSet):
             teacher=self.request.user,
             offering_id=self.kwargs['offering_pk']
         )
+        
+class SchoolYearViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint to list school year
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = SchoolYear.objects.all()
+    serializer_class = SchoolYearSerializer
+    
 
 class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
     """
@@ -468,7 +477,15 @@ class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
     serializer_class = TeacherStudentEnrollmentSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = TeacherStudentEnrollmentFilter
-
+    
+    @action(detail=True,methods=['post'])
+    def complete(self,request):
+        instance = self.get_object()
+        instance.status = TeacherStudentEnrollment.COMPLETED
+        instance.save()
+        
+        return Response(TeacherStudentEnrollmentSerializer(instance).data)
+        
     @swagger_auto_schema(
         method='get',
         responses={200: TeacherStudentEnrollmentSerializer(many=True)}
