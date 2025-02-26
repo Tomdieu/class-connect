@@ -447,8 +447,16 @@ class CourseOfferingActionViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = CourseOfferingActionFilter
 
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CourseOfferingAction.objects.none()
+        return CourseOfferingAction.objects.filter(offering=self.kwargs['offering_pk'])
+
     def perform_create(self, serializer):
-        serializer.save(teacher=self.request.user)
+        serializer.save(
+            teacher=self.request.user,
+            offering_id=self.kwargs['offering_pk']
+        )
 
 class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
     """
