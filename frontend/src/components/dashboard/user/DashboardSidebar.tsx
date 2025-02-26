@@ -65,9 +65,10 @@ export default function DashboardSidebar() {
   return (
     <Sidebar
       collapsible="offcanvas"
-      className="bg-white border-none outline-none shadow-lg min-h-screen"
+      variant="sidebar"
+      className="border-none outline-none shadow-lg min-h-screen"
     >
-      <SidebarContent className="flex flex-col h-full p-4">
+      <SidebarContent className="bg-white flex flex-col h-full">
         <SidebarGroup>
           <div className="flex items-center justify-between mb-8">
             {/* <SidebarGroupLabel className="text-xl font-semibold text-gray-800">
@@ -75,10 +76,10 @@ export default function DashboardSidebar() {
             </SidebarGroupLabel> */}
             <Link
               href="/dashboard"
-              className="flex items-center gap-2 text-blue-600 transition-colors hover:text-blue-700"
+              className="flex items-center gap-2 px-1 text-blue-600 transition-colors hover:text-blue-700"
             >
-              <BookOpen className="h-6 w-6" />
-              <span className="font-bold text-lg hidden sm:inline-block">
+              <BookOpen className="h-8 w-8" />
+              <span className="font-bold text-2xl inline-block">
                 ClassConnect
               </span>
             </Link>
@@ -98,7 +99,7 @@ export default function DashboardSidebar() {
                     rounded-xl transition-all duration-200 
                     ${
                       correctPath === item.url
-                        ? "bg-default text-white shadow-md shadow-default/25 hover:bg-default/90"
+                        ? "bg-primary rounded-sm text-white shadow-md shadow-default/25 hover:bg-primary/90"
                         : "hover:bg-gray-100/80 text-gray-600 hover:text-gray-900"
                     }
                   `}
