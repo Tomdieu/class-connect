@@ -531,4 +531,8 @@ export default {
   "plan.modal.delete.confirm": "Supprimer",
   "plan.modal.delete.success": "Plan supprimé avec succès",
   "plan.modal.delete.error": "Échec de la suppression du plan",
+  "timeout.title": "Session Expirée",
+  "timeout.description": "Votre session est sur le point d'expirer en raison d'inactivité. Vous serez automatiquement déconnecté dans {seconds} secondes.",
+  "timeout.staySignedIn": "Rester Connecté",
+  "timeout.signOut": "Se Déconnecter Maintenant",
 } as const;

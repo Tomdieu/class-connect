@@ -520,11 +520,14 @@ export default {
   "plan.modal.errors.durationRequired": "Duration is required",
   "plan.modal.errors.durationMin": "Duration must be at least 1 day",
   "plan.modal.errors.descriptionRequired": "Description is required",
-  "plan.modal.active": "Active Status",
   "plan.modal.delete.title": "Delete Plan",
   "plan.modal.delete.description": "Are you sure you want to delete {name}? This action cannot be undone.",
   "plan.modal.delete.cancel": "Cancel",
   "plan.modal.delete.confirm": "Delete",
   "plan.modal.delete.success": "Plan deleted successfully",
-  "plan.modal.delete.error": "Failed to delete plan"
+  "plan.modal.delete.error": "Failed to delete plan",
+  "timeout.title": "Session Timeout",
+  "timeout.description": "Your session is about to expire due to inactivity. You will be automatically signed out in {seconds} seconds.",
+  "timeout.staySignedIn": "Stay Signed In",
+  "timeout.signOut": "Sign Out Now"
 } as const;
