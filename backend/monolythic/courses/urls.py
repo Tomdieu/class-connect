@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework_nested import routers
 from .views import (
-    CourseCategoryViewSet, ClassViewSet, SubjectViewSet,
+    CourseCategoryViewSet, ClassViewSet, SchoolYearViewSet, SubjectViewSet,
     ChapterViewSet, TopicViewSet, ResourceViewSet,
     UserProgressViewSet,
     UserAvailabilityViewSet,
@@ -22,6 +22,7 @@ router.register(r'user-progress', UserProgressViewSet)
 router.register(r'user-availability', UserAvailabilityViewSet)
 router.register(r'course-offerings', CourseOfferingViewSet)
 # Remove the offering-actions registration since it will be nested
+router.register(r'school-year',SchoolYearViewSet)
 router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
 router.register(r'declarations', CourseDeclarationViewSet)
 # router.register(r'quizzes', QuizResourceViewSet)
