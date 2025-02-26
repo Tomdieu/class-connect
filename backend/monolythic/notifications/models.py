@@ -1,6 +1,9 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
 # Create your models here.
+
+User = get_user_model()
 
 class Notification(models.Model):
     NOTIFICATION_TYPES = [
@@ -10,7 +13,7 @@ class Notification(models.Model):
         ('SYSTEM', 'System Notification'),
     ]
     
-    user_id = models.IntegerField()  # Reference to User service
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     message = models.TextField()
     notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
@@ -24,7 +27,7 @@ class EmailNotification(models.Model):
         ('FAILED', 'Failed'),
     ]
     
-    user_id = models.IntegerField()  # Reference to User service
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     subject = models.CharField(max_length=200)
     content = models.TextField()
     status = models.CharField(max_length=20, choices=EMAIL_STATUS, default='PENDING')
