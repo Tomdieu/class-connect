@@ -122,12 +122,23 @@ class CourseOfferingActionFilter(django_filters.FilterSet):
         fields = ['teacher', 'offer', 'action']
 
 class TeacherStudentEnrollmentFilter(django_filters.FilterSet):
+    school_year = django_filters.CharFilter(method='filter_by_school_year')
     created_at = django_filters.DateTimeFromToRangeFilter()
     has_class_end = django_filters.BooleanFilter()
 
     class Meta:
         model = TeacherStudentEnrollment
-        fields = ['teacher', 'offer', 'has_class_end']
+        fields = ['teacher', 'has_class_end']
+        
+    def filter_by_school_year(self, queryset, name, value):
+        """
+        Filters the enrollments based on a school year string 'YYYY-YYYY'.
+        """
+        try:
+            start_year, end_year = map(int, value.split('-'))
+            return queryset.filter(school_year__start_year=start_year, school_year__end_year=end_year)
+        except ValueError:
+            return queryset.none()
 
 class CourseDeclarationFilter(django_filters.FilterSet):
     status = django_filters.ChoiceFilter(choices=CourseDeclaration.ACTIONS)
