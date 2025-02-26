@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "notifications",
     "payments",
     "streamings",
+    "forum",
     # third party adds
     "rest_framework",
     "phonenumber_field",
