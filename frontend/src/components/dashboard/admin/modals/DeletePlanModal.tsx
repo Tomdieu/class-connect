@@ -32,11 +32,11 @@ function DeletePlanModal({ isOpen, onClose, plan }: DeletePlanModalProps) {
     mutationFn: deleteSubscriptionPlan,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plans'] })
-      toast.success(t('plans.delete.success'))
+      toast.success(t('plan.modal.delete.success'))
       onClose()
     },
     onError: (error) => {
-      toast.error(t('plans.delete.error'), {
+      toast.error(t('plan.modal.delete.error'), {
         description: error.message
       })
     }
@@ -52,14 +52,14 @@ function DeletePlanModal({ isOpen, onClose, plan }: DeletePlanModalProps) {
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('plans.delete.title')}</AlertDialogTitle>
+          <AlertDialogTitle>{t('plan.modal.delete.title')}</AlertDialogTitle>
           <AlertDialogDescription>
-            {t('plans.delete.description', { name: plan?.name })}
+            {t('plan.modal.delete.description', { name: plan?.name })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={deletePlanMutation.isPending}>
-            {t('plans.delete.cancel')}
+            {t('plan.modal.delete.cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
             asChild
@@ -72,7 +72,7 @@ function DeletePlanModal({ isOpen, onClose, plan }: DeletePlanModalProps) {
               {deletePlanMutation.isPending && (
                 <Loader className="mr-2 h-4 w-4 animate-spin" />
               )}
-              {t('plans.delete.confirm')}
+              {t('plan.modal.delete.confirm')}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>
