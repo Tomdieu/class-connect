@@ -18,6 +18,7 @@ from .models import (
     CourseOfferingAction,
     TeacherStudentEnrollment,
     CourseDeclaration,
+    SchoolYear
     # Question, QuestionOption, QuizAttempt, QuestionResponse
 )
 from users.serializers import UserSerializer
@@ -235,6 +236,12 @@ class CourseOfferingActionSerializer(serializers.ModelSerializer):
         model = CourseOfferingAction
         fields = '__all__'
 
+class SchoolYearSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = SchoolYear
+        fields = ['id','start_year','end_year','is_active','formatted_year']
+
 class TeacherStudentEnrollmentSerializer(serializers.ModelSerializer):
     offer = CourseOfferingSerializer(read_only=True)
     offer_id = serializers.PrimaryKeyRelatedField(
@@ -248,10 +255,11 @@ class TeacherStudentEnrollmentSerializer(serializers.ModelSerializer):
         write_only=True,
         source='teacher'
     )
+    school_year = SchoolYearSerializer(read_only=True)
 
     class Meta:
         model = TeacherStudentEnrollment
-        fields = ['id', 'teacher','teacher_id', 'offer', 'offer_id', 'created_at', 'has_class_end']
+        fields = ['id', 'teacher','teacher_id', 'offer', 'offer_id', 'created_at', 'has_class_end','school_year']
 
     def create(self, validated_data):
         return TeacherStudentEnrollment.objects.create(**validated_data)
