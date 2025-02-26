@@ -21,7 +21,7 @@ router.register(r'classes', ClassViewSet)
 router.register(r'user-progress', UserProgressViewSet)
 router.register(r'user-availability', UserAvailabilityViewSet)
 router.register(r'course-offerings', CourseOfferingViewSet)
-router.register(r'offering-actions', CourseOfferingActionViewSet)
+# Remove the offering-actions registration since it will be nested
 router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
 router.register(r'declarations', CourseDeclarationViewSet)
 # router.register(r'quizzes', QuizResourceViewSet)
@@ -48,10 +48,15 @@ topic_router.register(r'revisions', RevisionResourceViewSet, basename='topic-rev
 topic_router.register(r'pdfs', PDFResourceViewSet, basename='topic-pdfs')
 topic_router.register(r'exercises', ExerciseResourceViewSet, basename='topic-exercises')
 
+# Add nested router for course offering actions
+offering_router = routers.NestedDefaultRouter(router, r'course-offerings', lookup='offering')
+offering_router.register(r'actions', CourseOfferingActionViewSet, basename='offering-actions')
+
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(class_router.urls)),
     path('', include(subject_router.urls)),
     path('', include(chapter_router.urls)),
     path('', include(topic_router.urls)),
+    path('', include(offering_router.urls)),
 ]
