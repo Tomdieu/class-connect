@@ -110,12 +110,6 @@ const AvailabilityPage = () => {
           </table>
         </div>
       </section>
-
-      <section>
-        <h2 className="text-xl font-semibold">
-          Mes disponibilités pendant les vacances scolaires
-        </h2>
-      </section>
     </div>
   );
 };
