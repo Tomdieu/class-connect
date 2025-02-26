@@ -4,11 +4,7 @@ export const EDUCATION_LEVELS = [
   "UNIVERSITY",
   "PROFESSIONAL",
 ] as const;
-export const LYCEE_CLASSES = [
-  "2nde",
-  "1ere",
-  "terminale",
-] as const;
+export const LYCEE_CLASSES = ["2nde", "1ere", "terminale"] as const;
 export const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 export const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
 export const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
@@ -76,6 +72,10 @@ export declare interface UserType {
   updated_at: string;
   date_joined: string;
   college_class: CollegeClass | null;
+  subscription_status:
+    | { active: boolean; plan: string; expires_at: string }
+    | { active: boolean };
+    class_display: string;
 }
 
 export declare interface UserActiveToken {
@@ -673,4 +673,21 @@ interface MonthStat {
 interface Stats {
   total_users: number;
   monthly_stats: MonthStat[];
+}
+
+
+
+export const NOTICATION_TYPES = ["PAYMENT", "COURSE","SESSION", "SYSTEM"] as const;
+
+export type NOTICATION_TYPE = (typeof NOTICATION_TYPES)[number];
+
+
+declare interface NotificationType {
+  id: number;
+  user_id: string;
+  title: string;
+  message: string;
+  notification_type:NOTICATION_TYPE ;
+  read: boolean;
+  created_at: string;
 }
