@@ -1,13 +1,19 @@
 from django.contrib import admin
 from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin
 from .models import (
-    User, Topic, Class, Subject, Chapter,
+    SchoolYear, User, Topic, Class, Subject, Chapter,
     AbstractResource, VideoResource,
     RevisionResource, PDFResource, ExerciseResource,
     UserProgress, CourseCategory, UserAvailability, DailyTimeSlot,
     CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,UserClass
     # Question, QuestionOption, QuizAttempt, QuestionResponse
 )
+
+@admin.register(SchoolYear)
+class SchoolYearAdmin(admin.ModelAdmin):
+    list_display = ('start_year','end_year','formatted_year')
+    search_fields = ('start_year','end_year',)
+    list_filter= ('start_year','end_year',)
 
 @admin.register(UserClass)
 class UserClassAdmin(admin.ModelAdmin):
