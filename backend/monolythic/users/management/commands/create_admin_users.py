@@ -18,7 +18,7 @@ class Command(BaseCommand):
                 'password': '1234',
                 'first_name': 'Admin',
                 'last_name': 'User',
-                'phone_number': '+237699999999',
+                'phone_number': '+237699999990',
             },
             {
                 'email': 'stevenoudo@yahoo.fr',
