@@ -87,12 +87,12 @@ function PlanModal() {
   useEffect(() => {
     if (plan) {
       form.reset({
-        name:plan.name,
+        name: plan.name,
         price: plan.price,
         duration_days: plan.duration_days,
         description: plan.description,
         active: plan.active,
-        features: plan.features,
+        features: plan.features
       })
     }
   }, [form, plan])

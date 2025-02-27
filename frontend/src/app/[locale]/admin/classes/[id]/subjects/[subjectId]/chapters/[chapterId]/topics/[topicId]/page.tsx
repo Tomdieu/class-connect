@@ -218,7 +218,7 @@ const TopicDetailPage: React.FC = () => {
     return (
         <div className="space-y-3 p-4 sm:p-6 h-full">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">{t("resources.title")}</h2>
+                <h2 className="text-lg 2xl:text-2xl font-bold text-gray-900">{t("resources.title")}</h2>
                 <ResourceMenu
                     onPDFClick={handlePDFClick}
                     onVideoClick={handleVideoClick}

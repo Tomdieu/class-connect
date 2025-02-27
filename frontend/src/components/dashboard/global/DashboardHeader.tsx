@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useChangeLocale, useI18n } from "@/locales/client";
+import { cn } from "@/lib/utils";
 
 function DashboardHeader() {
   const { toggleSidebar, isMobile } = useSidebar();
@@ -33,7 +34,7 @@ function DashboardHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="flex h-16 items-center justify-end px-4">
+      <div className={cn("flex h-16 items-center justify-end px-4",isMobile && "justify-between")}>
         {/* <Link
           href="/dashboard"
           className="flex items-center gap-2 text-blue-600 transition-colors hover:text-blue-700"
@@ -41,6 +42,11 @@ function DashboardHeader() {
           <BookOpen className="h-6 w-6" />
           <span className="font-bold text-lg hidden sm:inline-block">ClassConnect</span>
         </Link> */}
+        {isMobile && (
+            <Button onClick={toggleSidebar} size="icon" variant="ghost">
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
 
         <div className="flex items-center gap-4">
           <DropdownMenu>
@@ -96,11 +102,7 @@ function DashboardHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {isMobile && (
-            <Button onClick={toggleSidebar} size="icon" variant="ghost">
-              <Menu className="h-5 w-5" />
-            </Button>
-          )}
+          
         </div>
       </div>
     </header>

@@ -6,8 +6,8 @@ import {
 } from "@/components/ui/credenza";
 import { DialogTitle } from "@/components/ui/dialog";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
-import { BookOpen } from "lucide-react";
-import React, { useEffect } from "react";
+import { BookOpen, Loader } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useI18n } from "@/locales/client";
@@ -34,8 +34,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea";
 import { useUserStore } from "@/hooks/user-store";
 import { Switch } from "@/components/ui/switch";
+import { updateUser } from "@/actions/accounts";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-const EDUCATION_LEVELS = ["COLLEGE", "LYCEE", "UNIVERSITY", "PROFESSIONAL"] as const;
+const EDUCATION_LEVELS = [
+  "COLLEGE",
+  "LYCEE",
+  "UNIVERSITY",
+  "PROFESSIONAL",
+] as const;
 const COLLEGE_CLASSES = ["6eme", "5eme", "4eme", "3eme"] as const;
 const LYCEE_CLASSES = ["2nde", "1ere", "terminale"] as const;
 const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
@@ -46,6 +55,8 @@ const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 function UserDialog() {
   const { isOpen, user, onClose } = useUserStore();
   const t = useI18n();
+  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Create registration schema with translations and conditional validation
   const createRegisterSchema = (t: (key: string) => string) => {
@@ -129,7 +140,7 @@ function UserDialog() {
         university_year: z.string().optional().nullable(),
         enterprise_name: z.string().optional().nullable(),
         platform_usage_reason: z.string().optional().nullable(),
-      })
+      }),
     ]);
   };
 
@@ -143,14 +154,20 @@ function UserDialog() {
       first_name: "",
       last_name: "",
       phone_number: "",
-      date_of_birth: null,
-      education_level: null,
+      date_of_birth: "", // Changed from null to empty string
+      education_level: undefined, // Changed from null to undefined
       email: "",
-      town: null,
-      quarter: null,
+      town: "", // Changed from null to empty string
+      quarter: "", // Changed from null to empty string
       is_staff: false,
       is_active: true,
-      college_class: null,
+      college_class: undefined, // Changed from null to undefined
+      lycee_class: undefined,
+      lycee_speciality: undefined,
+      university_level: undefined,
+      university_year: "",
+      enterprise_name: "",
+      platform_usage_reason: "",
     },
   });
 
@@ -161,21 +178,26 @@ function UserDialog() {
         first_name: user.first_name,
         last_name: user.last_name,
         phone_number: user.phone_number,
-        date_of_birth: user.date_of_birth || null,
-        education_level: user.education_level || null,
+        date_of_birth: user.date_of_birth || "", // Changed from null to empty string
+        education_level: user.education_level || undefined, // Changed from null to undefined
         email: user.email,
-        town: user.town || null,
-        quarter: user.quarter || null,
-        college_class: user.college_class,
-        lycee_class: user.lycee_class,
-        lycee_speciality: user.lycee_speciality,
-        university_level: user.university_level|| null,
-        university_year: user.university_year|| null,
-        enterprise_name: user.enterprise_name|| null,
-        platform_usage_reason: user.platform_usage_reason|| null,
+        town: user.town || "", // Changed from null to empty string
+        quarter: user.quarter || "", // Changed from null to empty string
+        college_class: user.college_class || undefined, // Changed from null to undefined
+        lycee_class: user.lycee_class || undefined,
+        lycee_speciality: user.lycee_speciality || undefined,
+        university_level: user.university_level || undefined,
+        university_year: user.university_year || "",
+        enterprise_name: user.enterprise_name || "",
+        platform_usage_reason: user.platform_usage_reason || "",
         is_staff: user.is_staff,
         is_active: user.is_active,
       });
+      
+      // Set university level state if it exists
+      if (user.university_level) {
+        setUniversityLevel(user.university_level);
+      }
     }
   }, [form, user]);
 
@@ -194,21 +216,68 @@ function UserDialog() {
     const isStaff = form.watch("is_staff");
     if (isStaff) {
       // Clear validation errors for optional fields when user becomes staff
-      form.clearErrors([
-        "date_of_birth",
-        "education_level",
-        "town",
-        "quarter"
-      ]);
+      form.clearErrors(["date_of_birth", "education_level", "town", "quarter"]);
     }
   }, [form.watch("is_staff")]);
 
+  // Add update user mutation
+  const updateUserMutation = useMutation({
+    mutationFn: updateUser,
+  });
+
+  const router = useRouter()
+
   const handleRegisterSubmit = async (values: RegisterFormData) => {
     try {
-      console.log(values);
-      // Handle registration logic here
-    } catch (error) {
-      console.error("Registration error:", error);
+      setError(null);
+      // Remove id from values before sending to API
+      const { id, ...updateData } = values;
+
+      // Call the updateUser mutation
+      updateUserMutation.mutate(
+        {
+          id: user?.id ||id|| "",
+          body: updateData,
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+            toast.success("User updated successfully");
+            router.refresh()
+            onClose();
+          },
+          onError: (error: any) => {
+            let errorMessage = "Failed to update user";
+            console.log(error);
+            try {
+              const parsedError = JSON.parse(error.message);
+              errorMessage = parsedError.message || errorMessage;
+              // If there are field-specific errors, set them on the form
+              if (
+                parsedError.detail &&
+                typeof parsedError.detail === "object"
+              ) {
+                Object.entries(parsedError.detail).forEach(
+                  ([field, message]) => {
+                    form.setError(field as any, {
+                      type: "manual",
+                      message: Array.isArray(message)
+                        ? message[0]
+                        : (message as string),
+                    });
+                  }
+                );
+              }
+            } catch (e) {
+              // If parsing fails, use the original error message
+            }
+            setError(errorMessage);
+            toast.error(errorMessage);
+          },
+        }
+      );
+    } catch (error: any) {
+      setError(error.message);
     }
   };
 
@@ -231,14 +300,16 @@ function UserDialog() {
                   defaultValue={field.value}
                 >
                   <SelectTrigger>
-                    <SelectValue 
-                      placeholder={t("registerDialog.collegeClassLabel")} 
+                    <SelectValue
+                      placeholder={t("registerDialog.collegeClassLabel")}
                     />
                   </SelectTrigger>
                   <SelectContent>
                     {COLLEGE_CLASSES.map((collegeClass) => (
                       <SelectItem key={collegeClass} value={collegeClass}>
-                        {t(`registerDialog.collegeClasses.${collegeClass}` as keyof typeof t)}
+                        {t(
+                          `registerDialog.collegeClasses.${collegeClass}` as keyof typeof t
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -266,14 +337,16 @@ function UserDialog() {
                     defaultValue={field.value}
                   >
                     <SelectTrigger>
-                      <SelectValue 
-                        placeholder={t("registerDialog.lyceeClassLabel")} 
+                      <SelectValue
+                        placeholder={t("registerDialog.lyceeClassLabel")}
                       />
                     </SelectTrigger>
                     <SelectContent>
                       {LYCEE_CLASSES.map((lyceeClass) => (
                         <SelectItem key={lyceeClass} value={lyceeClass}>
-                          {t(`registerDialog.lyceeClasses.${lyceeClass}` as keyof typeof t)}
+                          {t(
+                            `registerDialog.lyceeClasses.${lyceeClass}` as keyof typeof t
+                          )}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -288,21 +361,25 @@ function UserDialog() {
             name="lycee_speciality"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("registerDialog.lyceeSpecialityLabel")}</FormLabel>
+                <FormLabel>
+                  {t("registerDialog.lyceeSpecialityLabel")}
+                </FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <SelectTrigger>
-                      <SelectValue 
-                        placeholder={t("registerDialog.lyceeSpecialityLabel")} 
+                      <SelectValue
+                        placeholder={t("registerDialog.lyceeSpecialityLabel")}
                       />
                     </SelectTrigger>
                     <SelectContent>
                       {LYCEE_SPECIALITIES.map((speciality) => (
                         <SelectItem key={speciality} value={speciality}>
-                          {t(`registerDialog.lyceeSpecialities.${speciality}` as keyof typeof t)}
+                          {t(
+                            `registerDialog.lyceeSpecialities.${speciality}` as keyof typeof t
+                          )}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -485,6 +562,13 @@ function UserDialog() {
             </div>
           </CredenzaHeader>
           <div className="overflow-y-auto px-2 pb-8 flex flex-col items-center justify-center custom-scrollbar">
+            {error && (
+              <div className="w-full mb-4 bg-red-50 border border-red-200 rounded-xl p-3">
+                <span className="text-red-600 text-sm font-medium">
+                  {error}
+                </span>
+              </div>
+            )}
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleRegisterSubmit)}
@@ -560,7 +644,10 @@ function UserDialog() {
                             type="date"
                             placeholder={t("registerDialog.dateOfBirthLabel")}
                             className="w-full"
-                            {...field}
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
                           />
                         </FormControl>
                         <FormMessage />
@@ -697,7 +784,17 @@ function UserDialog() {
                     )}
                   />
                 </div>
-                <Button type="submit" disabled={form.formState.isSubmitting}>
+                <Button
+                  type="submit"
+                  disabled={
+                    form.formState.isSubmitting || updateUserMutation.isPending
+                  }
+                  className="flex items-center justify-center gap-2"
+                >
+                  {(form.formState.isSubmitting ||
+                    updateUserMutation.isPending) && (
+                    <Loader className="size-4 animate-spin" />
+                  )}
                   {t("userDialog.submitButton")}
                 </Button>
               </form>

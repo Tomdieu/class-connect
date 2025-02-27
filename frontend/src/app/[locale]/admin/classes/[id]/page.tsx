@@ -33,6 +33,7 @@ import {
 import Link from "next/link";
 import DeleteConfirmationModal from "@/components/modals/DeleteConfirmationModal";
 import { toast } from "sonner";
+import { SubjectType } from "@/types";
 
 function ClassDetail() {
   const { id } = useParams<{ id: string }>();

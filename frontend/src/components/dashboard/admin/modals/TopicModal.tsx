@@ -119,6 +119,9 @@ function TopicModal() {
                 "chapters",
               ],
             });
+            queryClient.invalidateQueries({
+              queryKey: ["chapter", chapterId, "topics"],
+            })
             resetForm();
             onClose();
             toast.success("Updated topic", {
@@ -160,6 +163,9 @@ function TopicModal() {
                   "chapters",
                 ],
               });
+              queryClient.invalidateQueries({
+                queryKey: ["chapter", chapterId, "topics"],
+              })
               resetForm();
               toast.success("Added Topic", {
                 description: "Topic added successfully",

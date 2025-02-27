@@ -119,6 +119,9 @@ function ChapterModal() {
                 "chapters",
               ],
             });
+            queryClient.invalidateQueries({
+              queryKey: ["class",classId.toString(), "subjects", subjectId?.toString()],
+            })
             resetForm();
             onClose();
             toast.success("Updated Chapter", {
@@ -159,6 +162,9 @@ function ChapterModal() {
                   "chapters",
                 ],
               });
+              queryClient.invalidateQueries({
+                queryKey: ["class",classId.toString(), "subjects", subjectId?.toString()],
+              })
               resetForm();
               toast.success("Added Chapter", {
                 description: "Chapter added successfully",

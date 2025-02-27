@@ -462,12 +462,36 @@ export declare interface CourseOfferingActionCreateType {
   action: ActionStatus;
 }
 
+export declare interface SchoolYearType {
+  start_year:number;
+  end_year:number;
+  is_active:boolean;
+  formatted_year:string;
+}
+
 export declare interface TeacherStudentEnrollmentType {
   id: number;
   teacher: User;
+  teacher_id:string;
   offer: CourseOffering;
+  offer_id:number;
+  school_year: SchoolYearType;
   created_at: string;
   has_class_end: boolean;
+}
+
+export declare interface EnhaceTeacherStudentEnrollmentType {
+  id: number;
+  teacher: User;
+  teacher_id:string;
+  offer: CourseOffering;
+  offer_id:number;
+  school_year: SchoolYearType;
+  created_at: string;
+  has_class_end: boolean;
+  subject:string;
+  class_level:string;
+  hourly_rate: number;
 }
 
 export declare interface TeacherStudentEnrollmentCreateType {
