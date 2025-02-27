@@ -128,7 +128,7 @@ class TeacherStudentEnrollmentFilter(django_filters.FilterSet):
 
     class Meta:
         model = TeacherStudentEnrollment
-        fields = ['teacher', 'has_class_end']
+        fields = ['teacher', 'has_class_end','status']
         
     def filter_by_school_year(self, queryset, name, value):
         """
