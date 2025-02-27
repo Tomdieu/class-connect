@@ -109,7 +109,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_("last name"), max_length=150)
     phone_number = PhoneNumberField(unique=True, region="CM")
     date_of_birth = models.DateField(null=True, blank=True)
-    education_level = models.CharField(max_length=20, choices=EDUCATION_LEVELS)
+    education_level = models.CharField(
+        max_length=20, 
+        choices=EDUCATION_LEVELS,
+        blank=True,  # Allow empty in forms/validation
+        null=True,
+    )
 
     # Education level specific fields
     college_class = models.CharField(
@@ -180,6 +185,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         # Skip validation for superusers and staff
         if self.is_superuser or self.is_staff:
             return
+
+        # Validate education level for regular users
+        if not self.education_level:
+            raise ValidationError(_("Education level is required for regular users"))
 
         # Validate education level specific fields
         if self.education_level == "COLLEGE":
