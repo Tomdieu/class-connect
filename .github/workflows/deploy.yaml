@@ -41,7 +41,7 @@ jobs:
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/backend/monolythic &&
-            docker compose -f prod.yml logs
+            docker compose -f prod.yml logs --tail=500 --no-log-prefix
           '
 
 # name: CI/CD auth-app
