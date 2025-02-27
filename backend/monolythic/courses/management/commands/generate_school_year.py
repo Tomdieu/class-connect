@@ -11,7 +11,6 @@ class Command(BaseCommand):
         current_year = today.year
         start_year = current_year if today.month >= 9 else current_year - 1  # Assume school starts in September
         end_year = start_year + 1
-        print(f"Year : {start_year}-{end_year} current-year : {current_year}")
         
         if not SchoolYear.objects.filter(start_year=start_year, end_year=end_year).exists():
             SchoolYear.objects.create(start_year=start_year, end_year=end_year)
