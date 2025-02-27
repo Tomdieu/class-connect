@@ -40,8 +40,8 @@ jobs:
       - name: Run Docker Logs  as root
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
-            cd /home/ubuntu/class-connect/ &&
-            docker compose logs
+            cd /home/ubuntu/class-connect/backend/monolythic &&
+            docker compose -f prod.yml logs
           '
 
 # name: CI/CD auth-app
