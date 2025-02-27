@@ -259,10 +259,28 @@ class TeacherStudentEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TeacherStudentEnrollment
-        fields = ['id', 'teacher','teacher_id', 'offer', 'offer_id', 'created_at', 'has_class_end','school_year']
+        fields = ['id', 'teacher','teacher_id','status', 'offer', 'offer_id', 'created_at', 'has_class_end','school_year']
 
     def create(self, validated_data):
         return TeacherStudentEnrollment.objects.create(**validated_data)
+
+class EnhancedTeacherEnrollmentSerializer(TeacherStudentEnrollmentSerializer):
+    subject = serializers.SerializerMethodField()
+    class_level = serializers.SerializerMethodField()
+    hourly_rate = serializers.SerializerMethodField()
+
+    class Meta(TeacherStudentEnrollmentSerializer.Meta):
+        model = TeacherStudentEnrollment
+        fields = TeacherStudentEnrollmentSerializer.Meta.fields + ['subject', 'class_level', 'hourly_rate']
+
+    def get_subject(self, obj):
+        return obj.offer.subject if obj.offer else None
+
+    def get_class_level(self, obj):
+        return obj.offer.class_level if obj.offer else None
+
+    def get_hourly_rate(self, obj):
+        return obj.offer.hourly_rate if obj.offer else None
 
 class CourseDeclarationSerializer(serializers.ModelSerializer):
     accepted_by = UserSerializer(read_only=True)
