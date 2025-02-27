@@ -19,6 +19,7 @@ from .serializers import (
     CourseOfferingSerializer, CourseOfferingActionSerializer,
     TeacherStudentEnrollmentSerializer, CourseDeclarationSerializer,DailyTimeSlotSerializer,DailyTimeSlotUpdateSerializer,
     VideoResourceSerializer, RevisionResourceSerializer, PDFResourceSerializer, ExerciseResourceSerializer,
+    EnhancedTeacherEnrollmentSerializer,
 )
 from .pagination import CustomPagination
 from .filters import (
@@ -499,8 +500,8 @@ class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         method='get',
-        responses={200: TeacherStudentEnrollmentSerializer(many=True)},
-        operation_description="Get all teachers for the current student"
+        responses={200: EnhancedTeacherEnrollmentSerializer(many=True)},
+        operation_description="Get all teachers associated with the current student"
     )
     @action(detail=False, methods=['get'],url_path='my-teachers')
     def my_teachers(self, request):
@@ -509,18 +510,8 @@ class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
             offer__student=request.user,
             has_class_end=False  # Only get active enrollments
         )
-        serializer = self.get_serializer(queryset, many=True)
-        
-        # Enhance response with additional teacher details
-        response_data = []
-        for enrollment in serializer.data:
-            teacher_data = enrollment.copy()
-            teacher_data['subject'] = enrollment['offer']['subject']
-            teacher_data['class_level'] = enrollment['offer']['class_level']
-            teacher_data['hourly_rate'] = enrollment['offer']['hourly_rate']
-            response_data.append(teacher_data)
-            
-        return Response(response_data)
+        serializer = EnhancedTeacherEnrollmentSerializer(queryset, many=True)
+        return Response(serializer.data)
     
     @swagger_auto_schema(
         method='get',
