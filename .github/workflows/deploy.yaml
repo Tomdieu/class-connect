@@ -1,4 +1,4 @@
-name: CI/CD auth-app
+name: CI/CD Deploy
 
 on:
   push:
@@ -36,6 +36,12 @@ jobs:
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/backend/monolythic &&
             docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
+          '
+      - name: Run Docker Logs  as root
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /home/ubuntu/class-connect/ &&
+            docker logs
           '
 
 # name: CI/CD auth-app
