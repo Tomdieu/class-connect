@@ -41,7 +41,7 @@ jobs:
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/ &&
-            docker logs
+            docker compose logs
           '
 
 # name: CI/CD auth-app
