@@ -37,12 +37,3 @@ class SessionParticipant(models.Model):
         
     def __str__(self):
         return f'{self.session_id} - {self.user_id}'
-
-class ChatMessage(models.Model):
-    session = models.ForeignKey(VideoConferenceSession, on_delete=models.CASCADE, related_name='messages')
-    user = models.IntegerField()
-    message = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f'{self.session_id} - {self.user_id}'
