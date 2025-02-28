@@ -1,7 +1,7 @@
 "use client";
 import { BookOpen, X } from "lucide-react";
 import { TiHome } from "react-icons/ti";
-import { FaCalendarCheck } from "react-icons/fa";
+import { FaCalendarCheck, FaTasks } from "react-icons/fa";
 import { FaEuroSign } from "react-icons/fa";
 import { IoLibrarySharp } from "react-icons/io5";
 import { IoChatbubbles } from "react-icons/io5";
@@ -22,6 +22,7 @@ import { usePathname } from "next/navigation";
 import { getPathAfterLanguage } from "@/lib/utils";
 import { useI18n } from "@/locales/client";
 import Link from "next/link";
+import { url } from "inspector";
 
 export default function DashboardSidebar() {
   const { toggleSidebar } = useSidebar();
@@ -39,6 +40,11 @@ export default function DashboardSidebar() {
       title: t("dashboardSidebar.myStudents"),
       url: "/dashboard/my-students",
       icon: FaGraduationCap,
+    },
+    {
+      title: t("dashboardSidebar.myCourseOfferings"),
+      url: "/dashboard/course-offering",
+      icon: FaTasks
     },
     {
       title: t("dashboardSidebar.myAvailabilities"),
