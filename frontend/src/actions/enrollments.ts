@@ -2,7 +2,8 @@
 import { auth } from "@/auth";
 import api from "@/services/api";
 import {
-    CourseDeclarationType,
+  ActionStatus,
+  CourseDeclarationType,
   PaginationType,
   SchoolYearType,
   TeacherStudentEnrollmentType,
@@ -123,7 +124,7 @@ export const updateEnrollment = async ({
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
-    const response = await api.patch(`/api/enrollments/${id}/`,data, {
+    const response = await api.patch(`/api/enrollments/${id}/`, data, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
@@ -138,41 +139,123 @@ export const updateEnrollment = async ({
   }
 };
 
+export const completeEnrollment = async (id: number) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.post(`/api/enrollments/${id}/`, null, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    });
+    return response.data as TeacherStudentEnrollmentType;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
 
-export const completeEnrollment = async (id:number)=>{
-    try {
-        const session = await auth();
-        if (!session?.user) throw Error("Unauthorize user!");
-        const response = await api.post(`/api/enrollments/${id}/`,null, {
-          headers: {
-            Authorization: `Bearer ${session.user.accessToken}`,
-          },
-        });
-        return response.data as TeacherStudentEnrollmentType;
-      } catch (error: unknown) {
-        const axiosError = error as AxiosError;
-        if (axiosError.response?.data) {
-          throw JSON.stringify(axiosError.response.data);
-        }
-        throw JSON.stringify({ message: "An unexpected error occurred" });
+export const listEnrollmentDeclarations = async (id: number) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get(`/enrollments/${id}/declarations/`, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    });
+    return response.data as CourseDeclarationType[];
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const getEnrollmentDeclaration = async (
+  id: number,
+  declarationId: number
+) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get(
+      `/enrollments/${id}/declarations/${declarationId}/`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.user.accessToken}`,
+        },
       }
+    );
+    return response.data as CourseDeclarationType;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+
+export const updateEnrollmentDeclaration = async ({id,declarationId,data}:{id:number,declarationId:number,data:Partial<CourseDeclarationCreateType>})=>{
+  try{
+    const session = await auth();
+    if(!session?.user) throw Error("Unauthorize user!");
+    const response = await api.patch(`/enrollments/${id}/declarations/${declarationId}/`,data,{
+      headers:{
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    });
+    return response.data as CourseDeclarationType;
+  }catch(error:unknown){
+    const axiosError = error as AxiosError;
+    if(axiosError.response?.data){
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({message:"An unexpected error occurred"});
+  }
 }
 
-export const listEnrollmentDeclarations = async (id:number)=>{
-    try {
-        const session = await auth();
-        if (!session?.user) throw Error("Unauthorize user!");
-        const response = await api.get(`/enrollments/${id}/cource-declaration/`, {
-          headers: {
-            Authorization: `Bearer ${session.user.accessToken}`,
-          },
-        });
-        return response.data as CourseDeclarationType;
-    } catch (error: unknown) {
-        const axiosError = error as AxiosError;
-        if (axiosError.response?.data) {
-          throw JSON.stringify(axiosError.response.data);
-        }
-        throw JSON.stringify({ message: "An unexpected error occurred" });
-      }
+export const deleteEnrollmentDeclaration = async (id:number,declarationId:number)=>{
+  try{
+    const session = await auth();
+    if(!session?.user) throw Error("Unauthorize user!");
+    const response = await api.delete(`/enrollments/${id}/declarations/${declarationId}/`,{
+      headers:{
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    });
+    return response.data as CourseDeclarationType;
+  }catch(error:unknown){
+    const axiosError = error as AxiosError;
+    if(axiosError.response?.data){
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({message:"An unexpected error occurred"});
+  }
+}
+
+export const updateEnrollmentDeclarationStatus = async (id:number,declarationId:number,data:{status:Omit<ActionStatus, "CANCELLED">})=>{
+  try{
+    const session = await auth();
+    if(!session?.user) throw Error("Unauthorize user!");
+    const response = await api.patch(`/enrollments/${id}/declarations/${declarationId}/status/`,data,{
+      headers:{
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    });
+    return response.data as CourseDeclarationType;
+  }catch(error:unknown){
+    const axiosError = error as AxiosError;
+    if(axiosError.response?.data){
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({message:"An unexpected error occurred"});
+  }
 }
