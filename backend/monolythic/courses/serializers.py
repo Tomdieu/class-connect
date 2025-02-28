@@ -188,12 +188,19 @@ class DailyTimeSlotUpdateSerializer(serializers.ModelSerializer):
         fields = ['slot_id','is_available']
 
 
+class UserAvailabilityCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAvailability
+        fields = ['is_available']
+
 class UserAvailabilitySerializer(serializers.ModelSerializer):
     daily_slots = DailyTimeSlotSerializer(many=True, read_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = UserAvailability
-        fields = ['id', 'user', 'is_available', 'last_updated', 'daily_slots']
+        fields = '__all__'
+        read_only_fields = ["user", "user_type", "created_at", 'last_updated']
 
 class CourseOfferingSerializer(serializers.ModelSerializer):
     student = UserSerializer(read_only=True)
