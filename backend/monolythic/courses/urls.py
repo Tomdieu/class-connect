@@ -21,10 +21,10 @@ router.register(r'classes', ClassViewSet)
 router.register(r'user-progress', UserProgressViewSet)
 router.register(r'user-availability', UserAvailabilityViewSet)
 router.register(r'course-offerings', CourseOfferingViewSet)
-# Remove the offering-actions registration since it will be nested
-router.register(r'school-year',SchoolYearViewSet)
+router.register(r'school-year', SchoolYearViewSet)
 router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
-router.register(r'declarations', CourseDeclarationViewSet)
+# Remove the standalone declaration registration
+# router.register(r'declarations', CourseDeclarationViewSet)
 # router.register(r'quizzes', QuizResourceViewSet)
 # router.register(r'questions', QuestionViewSet)
 # router.register(r'question-options', QuestionOptionViewSet)
@@ -53,6 +53,10 @@ topic_router.register(r'exercises', ExerciseResourceViewSet, basename='topic-exe
 offering_router = routers.NestedDefaultRouter(router, r'course-offerings', lookup='offering')
 offering_router.register(r'actions', CourseOfferingActionViewSet, basename='offering-actions')
 
+# Create nested router for course declarations under enrollments
+enrollment_router = routers.NestedDefaultRouter(router, r'enrollments', lookup='enrollment')
+enrollment_router.register(r'declarations', CourseDeclarationViewSet, basename='enrollment-declarations')
+
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(class_router.urls)),
@@ -60,4 +64,5 @@ urlpatterns = [
     path('', include(chapter_router.urls)),
     path('', include(topic_router.urls)),
     path('', include(offering_router.urls)),
+    path('', include(enrollment_router.urls)),  # Add the enrollment router
 ]
