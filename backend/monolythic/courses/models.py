@@ -415,6 +415,8 @@ class CourseOfferingAction(models.Model):
     offer = models.ForeignKey(CourseOffering, on_delete=models.CASCADE)
     action = models.CharField(max_length=20,choices=ACTIONS,default=PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return f"{self.teacher} - {self.offer} - {self.action}"
@@ -426,6 +428,8 @@ class SchoolYear(models.Model):
 
     class Meta:
         unique_together = ('start_year', 'end_year')
+        ordering = ['-start_year']
+
 
     def __str__(self):
         return f"{self.start_year}-{self.end_year}"
