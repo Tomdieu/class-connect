@@ -39,7 +39,7 @@ export const registerUser = async (data: UserCreateType) => {
 export const getUsers = async ({
   params,
 }: {
-  params?: UserParams;
+  params?: Partial<UserParams>;
 } = {}) => {
   // Make the entire parameter object optional with defaults
   try {
@@ -66,7 +66,7 @@ export const getUsers = async ({
   }
 };
 
-export const getUser = async (id: number) => {
+export const getUser = async (id: string) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
