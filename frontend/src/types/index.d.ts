@@ -399,6 +399,7 @@ export declare interface RevisionResourceCreateType
 
 export declare interface UserAvailabilityType {
   id: number;
+  daily_slots: DailyTimeSlotType[];
   user: User;
   user_type: UserType;
   is_available: boolean;
@@ -406,14 +407,11 @@ export declare interface UserAvailabilityType {
 }
 
 export declare interface UserAvailabilityCreateType {
-  user: string; // UUID
-  user_type: UserType;
   is_available: boolean;
 }
 
 export declare interface DailyTimeSlotType {
   id: number;
-  availability: UserAvailability;
   day: DayOfWeek;
   time_slot: TimeSlot;
   is_available: boolean;
@@ -436,6 +434,8 @@ export declare interface CourseOfferingType {
   start_date: string;
   hourly_rate: number;
   is_available: boolean;
+  created_at:string;
+  updated_at:string;
 }
 
 export declare interface CourseOfferingCreateType {
@@ -515,7 +515,7 @@ export declare interface CourseDeclarationCreateType {
   duration: number;
   declaration_date: string;
   accepted_by?: string; // UUID
-  status: ActionStatus;
+  status: Omit<ActionStatus, "CANCELLED">;
 }
 
 export declare interface UserProgressType {
@@ -714,4 +714,11 @@ declare interface NotificationType {
   notification_type:NOTICATION_TYPE ;
   read: boolean;
   created_at: string;
+}
+
+
+
+declare interface VideoConferenceSessionType {
+  id:number;
+  title:string;
 }
