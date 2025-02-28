@@ -32,6 +32,7 @@ from oauth2_provider.models import AccessToken as OAuth2AccessToken
 from .models import UserActiveToken
 from .middleware import get_current_request, SingleSessionMiddleware
 from .tasks.task import send_async_mail
+from django_filters.rest_framework import DjangoFilterBackend
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -50,6 +51,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filterset_class = UserFilter
+    filter_backends = [DjangoFilterBackend]
     swagger_tags = ["Users"]
 
     def get_permissions(self):
