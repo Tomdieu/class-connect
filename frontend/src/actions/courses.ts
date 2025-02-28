@@ -30,6 +30,7 @@ interface ClassFilterParams {
   level?: string;
 }
 
+// Add enhanced error handling to listClasses function
 export const listClasses = async ({
   params,
 }: {
@@ -37,23 +38,28 @@ export const listClasses = async ({
 } = {}) => {
   try {
     const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
+    if (!session?.user) throw Error("Unauthorized user!");
+
+    console.log("Fetching classes with params:", params); // Debug log
 
     const res = await api.get(`/api/classes/`, {
       headers: {
         Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",
       },
-      params,
+      params: params || {}, // Ensure params is always defined
     });
-    const data = await res.data;
+    
+    const data = await res.data as ClassType[];
+    console.log("Classes retrieved:", data.length); // Debug log
     return data as ClassType[];
   } catch (error: unknown) {
+    console.error("Error in listClasses:", error); // Detailed error logging
     const axiosError = error as AxiosError;
     if (axiosError.response?.data) {
       throw JSON.stringify(axiosError.response.data);
     }
-    throw JSON.stringify({ message: "An unexpected error occurred" });
+    throw JSON.stringify({ message: "An unexpected error occurred while fetching classes" });
   }
 };
 
