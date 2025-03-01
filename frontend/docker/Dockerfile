@@ -8,8 +8,8 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
  
 # Install dependencies
-COPY package.json pnpm-lock.yaml* ./
-RUN corepack enable pnpm && pnpm i --frozen-lockfile
+COPY package.json package-lock.json  ./
+RUN npm i --force
  
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -22,7 +22,7 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
  
-RUN corepack enable pnpm && pnpm build
+RUN npm run build
  
 # Production image, copy all the files and run next
 FROM base AS runner
