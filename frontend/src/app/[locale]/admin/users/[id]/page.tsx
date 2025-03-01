@@ -58,7 +58,6 @@ export default function UserDetailPage() {
   } = useQuery({
     queryKey: ["user", id],
     queryFn: () => getUser(id),
-    enabled: !isNaN(id),
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 1,
   });
