@@ -1,9 +1,13 @@
-version: '3.9'
+version: '3.8'
 
 services:
-  classc-connect-frontend:
-    container_name: classc-connect-frontend
-    image: classconnect/frontend
-    build: .
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: classconnect_frontend
     ports:
       - "3000:3000"
+    restart: unless-stopped
+    env_file:
+      - ../.env  # Make sure the path is correct
