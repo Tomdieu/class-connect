@@ -52,15 +52,12 @@ import { listClasses, listSubjects } from "@/actions/courses";
 import { getUsers } from "@/actions/accounts";
 import {
   ClassType,
-  CourseOfferingCreateType,
-  SubjectType,
-  UserType,
+  CourseOfferingCreateType
 } from "@/types";
 
 import { 
   formatClassName, 
-  groupClassesByHierarchy, 
-  createClassSelectOptions 
+  groupClassesByHierarchy
 } from "@/lib/utils";
 
 import { Slider } from "@/components/ui/slider";
@@ -102,9 +99,6 @@ export default function CreateCourseOfferPage() {
       invalid_type_error: "Hourly rate must be a number",
     }).nonnegative("Hourly rate cannot be negative")
       .min(1000, "Hourly rate must be at least 1000 XAF"),
-  }).refine(data => {
-    // Add any custom validation here if needed
-    return true;
   });
 
   // Create form
@@ -118,19 +112,21 @@ export default function CreateCourseOfferPage() {
   });
 
   // Query for fetching classes - updated to use listClasses instead of getClasses
-  const { data: classes, isLoading: classesLoading } = useQuery({
+  const { data: classes, isLoading: classesLoading,error,isError } = useQuery({
     queryKey: ["classes"],
     queryFn: () => listClasses({params: {}}), // Using listClasses instead of getClasses
-    onError: (error) => {
-      console.error("Error fetching classes:", error);
-      toast.error("Failed to load class data");
-    }
   });
+
+  useEffect(()=>{
+    if(isError){
+      toast.error( error.message ||"Error fetching classes");
+    }
+  },[error?.message, isError]);
 
   // Query for fetching students
   const { data: students, isLoading: studentsLoading } = useQuery({
     queryKey: ["students"],
-    queryFn: () => getUsers({ params: { is_student: "true" } }),
+    queryFn: () => getUsers({ params: { is_student: true} }),
   });
 
   // Query for fetching subjects based on selected class
@@ -175,7 +171,7 @@ export default function CreateCourseOfferPage() {
             }
           }
         } catch (e) {
-          errorMessage = error.message;
+          errorMessage = (e as Error).message;
         }
       }
       
