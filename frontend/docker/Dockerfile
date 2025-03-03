@@ -1,58 +1,63 @@
 # syntax=docker/dockerfile:1
-FROM node:20-alpine AS base
- 
-# Install dependencies only when needed
+FROM node:22.14.0-bullseye AS base
+
+# Install system dependencies needed for native modules (e.g. canvas)
 FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+RUN apt-get update && apt-get install -y \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    build-essential \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
- 
-# Install dependencies
+
+RUN npm install -g npm@latest
+
+# Install app dependencies
 COPY package.json package-lock.json  ./
-RUN npm i --force
- 
-# Rebuild the source code only when needed
+RUN npm install --force
+
+# Build the application
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
- 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
+
+# Optionally disable Next.js telemetry if desired:
 # ENV NEXT_TELEMETRY_DISABLED 1
- 
+
+RUN npm install -g npm@11.1.0
 RUN npm run build
- 
-# Production image, copy all the files and run next
+
+# Production image: copy built files and run Next.js
 FROM base AS runner
 WORKDIR /app
- 
+
 ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED 1
- 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
- 
+
+# Create system users
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs --ingroup nodejs
+
 COPY --from=builder /app/public ./public
- 
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
- 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
+
+# Create cache folder for prerender and set proper permissions
+RUN mkdir .next && chown nextjs:nodejs .next
+
+# Copy Next.js standalone output (with output file tracing)
+COPY --from=builder --chown=nextjs:nodejs /app/public /app/.next/standalone/
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static /app/.next/standalone/.next/
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
- 
+# COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
 USER nextjs
- 
+
 EXPOSE 3000
- 
+
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
- 
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
+
 CMD ["node", "server.js"]
+
