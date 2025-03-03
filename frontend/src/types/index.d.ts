@@ -54,6 +54,7 @@ export declare interface UserType {
   phone_number: string;
   date_of_birth: string | null;
   education_level: EducationLevel;
+  class_level:number|null;
   lycee_class: LyceeClass | null;
   lycee_speciality: LyceeSpecialities | null;
   university_level: UniversityLevel | null;
@@ -68,6 +69,7 @@ export declare interface UserType {
   is_staff: boolean;
   is_superuser: boolean;
   is_active: boolean;
+  last_login:string|null;
   created_at: string;
   updated_at: string;
   date_joined: string;
