@@ -394,6 +394,7 @@ export default {
   "adminSidebar.items.statistics": "Statistiques",
   "adminSidebar.items.notifications": "Notifications",
   "adminSidebar.items.settings": "Paramètres",
+  "adminSidebar.items.courseOfferings": "Offres de Cours",
   "resources.title": "Ressources d'Apprentissage",
   "resources.empty": "Aucune ressource disponible",
   "resources.loading": "Chargement des ressources...",
