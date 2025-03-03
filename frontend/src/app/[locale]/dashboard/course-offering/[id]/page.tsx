@@ -26,14 +26,13 @@ import { ArrowLeft, CalendarIcon, Edit, Loader2, MapPin, Trash, UserCircle } fro
 import { useParams, useRouter } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { UserType } from "@/types";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import {UserType} from "@/types"
 
 export default function CourseOfferingDetailPage() {
   const t = useI18n();
   const params = useParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const id = Number(params.id);
 
   // Query for fetching course offering details
@@ -54,9 +53,6 @@ export default function CourseOfferingDetailPage() {
   const deleteMutation = useMutation({
     mutationFn: (offeringId: number) => deleteCourseOffering(offeringId),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey:["courseOffering"]
-      })
       toast.success(t("courseOfferings.success.deleted"));
       router.push("/dashboard/course-offering");
     },
