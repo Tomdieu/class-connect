@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
             'university_level', 'university_year', 'enterprise_name', 
             'platform_usage_reason', 'email_verified', 'avatar', 'language', 
             'town', 'quarter', 'subscription_status', 'class_level', 'class_display',
-            'is_active', 'created_at', 'updated_at', 'date_joined',
+            'is_active', 'created_at', 'updated_at', 'date_joined','last_login',
             'is_superuser', 'is_staff'
         ]
         
