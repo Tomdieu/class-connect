@@ -282,7 +282,7 @@ export default function UserDetailPage() {
                             {user.class_level && (
                               <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Class</p>
-                                <p>{user.class_level.name}</p>
+                                <p>{user.class_display}</p>
                               </div>
                             )}
                           </div>
@@ -295,7 +295,7 @@ export default function UserDetailPage() {
                 </CardContent>
               </Card>
 
-              {user.is_teacher && (
+              {/* {user.education_level==="PROFESSIONAL" && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Teacher Information</CardTitle>
@@ -323,7 +323,7 @@ export default function UserDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
-              )}
+              )} */}
             </div>
 
             {/* Sidebar */}
@@ -377,7 +377,7 @@ export default function UserDetailPage() {
                   <CardTitle>Quick Stats</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {user.is_teacher ? (
+                  {/* {user.education_level==="PROFESSIONAL" ? (
                     <>
                       <div className="flex justify-between items-center">
                         <p className="text-sm">Course Offerings</p>
@@ -407,7 +407,7 @@ export default function UserDetailPage() {
                   <div className="flex justify-between items-center">
                     <p className="text-sm">Payments Made</p>
                     <p className="font-bold">{user.payments_count || 0}</p>
-                  </div>
+                  </div> */}
                 </CardContent>
               </Card>
             </div>
@@ -418,10 +418,10 @@ export default function UserDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                {user.is_teacher ? "Teaching Courses" : "Enrolled Courses"}
+                {user.education_level==="PROFESSIONAL" ? "Teaching Courses" : "Enrolled Courses"}
               </CardTitle>
               <CardDescription>
-                {user.is_teacher
+                {user.education_level==="PROFESSIONAL"
                   ? "Courses that this teacher offers"
                   : "Courses that this student is enrolled in"}
               </CardDescription>
@@ -437,7 +437,7 @@ export default function UserDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle>Payment History</CardTitle>
-              <CardDescription>Record of user's payments</CardDescription>
+              <CardDescription>Record of user&apos;s payments</CardDescription>
             </CardHeader>
             <CardContent>
               {/* Payments history would go here */}
@@ -450,7 +450,7 @@ export default function UserDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle>Recent Activities</CardTitle>
-              <CardDescription>User's activities on the platform</CardDescription>
+              <CardDescription>User&apos;s activities on the platform</CardDescription>
             </CardHeader>
             <CardContent>
               {/* Activity log would go here */}
