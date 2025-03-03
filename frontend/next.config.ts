@@ -20,7 +20,7 @@ export default {
     ignoreBuildErrors: true,
   },
   // pageExtensions: ['ts', 'tsx'],
-  // output: 'standalone',
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
