@@ -22,18 +22,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useI18n } from "@/locales/client";
-import { CourseOfferingType, User } from "@/types";
 import { ArrowLeft, CalendarIcon, Edit, Loader2, MapPin, Trash, UserCircle } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { UserType } from "@/types";
 
 export default function CourseOfferingDetailPage() {
   const t = useI18n();
   const params = useParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const id = Number(params.id);
 
   // Query for fetching course offering details
@@ -94,7 +93,7 @@ export default function CourseOfferingDetailPage() {
   }
 
   // Extract student from course offering
-  const student: User | null = offering.student || null;
+  const student: UserType | null = offering.student || null;
 
   return (
     <div className="container py-6 space-y-6">
@@ -195,7 +194,7 @@ export default function CourseOfferingDetailPage() {
                     <div>
                       <p className="text-sm font-medium">{t("courseOfferings.detail.location")}</p>
                       <p className="text-sm text-muted-foreground">
-                        {offering.location || "Online"}
+                        {"Online"}
                       </p>
                     </div>
                   </div>
