@@ -1,6 +1,9 @@
 "use client";
 
-import { getCourseOffering, updateCourseOffering } from "@/actions/course-offerings";
+import {
+  getCourseOffering,
+  updateCourseOffering,
+} from "@/actions/course-offerings";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import {
@@ -35,7 +38,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
@@ -49,16 +52,9 @@ import {
 } from "@/components/ui/command";
 import { listClasses, listSubjects } from "@/actions/courses";
 import { getUsers } from "@/actions/accounts";
-import {
-  ClassType,
-  CourseOfferingCreateType,
-  SubjectType,
-} from "@/types";
+import { ClassType, CourseOfferingCreateType } from "@/types";
 
-import { 
-  formatClassName, 
-  groupClassesByHierarchy
-} from "@/lib/utils";
+import { formatClassName, groupClassesByHierarchy } from "@/lib/utils";
 
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -68,7 +64,7 @@ export default function EditCourseOfferingPage() {
   const router = useRouter();
   const params = useParams();
   const id = Number(params.id);
-  
+
   const [selectedClass, setSelectedClass] = useState<ClassType | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [subjectOpen, setSubjectOpen] = useState<boolean>(false);
@@ -85,23 +81,29 @@ export default function EditCourseOfferingPage() {
     class_level: z.number({
       required_error: "Please select a class level",
     }),
-    duration: z.coerce.number({
-      required_error: "Duration is required",
-      invalid_type_error: "Duration must be a number",
-    }).min(1, "Duration must be at least 1 hour"),
-    frequency: z.coerce.number({
-      required_error: "Frequency is required",
-      invalid_type_error: "Frequency must be a number",
-    }).nonnegative("Frequency cannot be negative")
+    duration: z.coerce
+      .number({
+        required_error: "Duration is required",
+        invalid_type_error: "Duration must be a number",
+      })
+      .min(1, "Duration must be at least 1 hour"),
+    frequency: z.coerce
+      .number({
+        required_error: "Frequency is required",
+        invalid_type_error: "Frequency must be a number",
+      })
+      .nonnegative("Frequency cannot be negative")
       .min(1, "Frequency must be at least 1 time per week")
       .max(7, "Frequency cannot be more than 7 times per week"),
     start_date: z.date({
       required_error: "Start date is required",
     }),
-    hourly_rate: z.coerce.number({
-      required_error: "Hourly rate is required",
-      invalid_type_error: "Hourly rate must be a number",
-    }).nonnegative("Hourly rate cannot be negative")
+    hourly_rate: z.coerce
+      .number({
+        required_error: "Hourly rate is required",
+        invalid_type_error: "Hourly rate must be a number",
+      })
+      .nonnegative("Hourly rate cannot be negative")
       .min(1000, "Hourly rate must be at least 1000 XAF"),
     is_available: z.boolean().default(true),
   });
@@ -119,55 +121,63 @@ export default function EditCourseOfferingPage() {
 
   // Fetch the course offering data
   const { data: offering, isLoading: offeringLoading } = useQuery({
-    queryKey: ['courseOffering', id],
+    queryKey: ["courseOffering", id],
     queryFn: () => getCourseOffering(id),
     enabled: !isNaN(id),
-    onSuccess: (data) => {
-      // Set the form values from the fetched data
-      if (data) {
-        form.setValue("student", data.student.id);
-        form.setValue("subject", data.subject.id);
-        form.setValue("class_level", data.class_level.id);
-        form.setValue("duration", data.duration);
-        form.setValue("frequency", data.frequency);
-        form.setValue("hourly_rate", data.hourly_rate);
-        form.setValue("is_available", data.is_available);
-
-        // Parse the date string into a Date object
-        if (data.start_date) {
-          const startDate = new Date(data.start_date);
-          form.setValue("start_date", startDate);
-        }
-
-        // Set the selected class for the dropdown
-        setSelectedClass(data.class_level);
-      }
-    }
   });
+
+  useEffect(() => {
+    if (offering) {
+      form.setValue("student", offering.student.id);
+      form.setValue("subject", offering.subject.id);
+      form.setValue("class_level", offering.class_level.id);
+      form.setValue("duration", offering.duration);
+      form.setValue("frequency", offering.frequency);
+      form.setValue("hourly_rate", offering.hourly_rate);
+      form.setValue("is_available", offering.is_available);
+
+      // Parse the date string into a Date object
+      if (offering.start_date) {
+        const startDate = new Date(offering.start_date);
+        form.setValue("start_date", startDate);
+      }
+
+      // Set the selected class for the dropdown
+      setSelectedClass(offering.class_level);
+    }
+  }, [form, offering]);
 
   // Query for fetching classes
-  const { data: classes, isLoading: classesLoading } = useQuery({
+  const {
+    data: classes,
+    isLoading: classesLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["classes"],
-    queryFn: () => listClasses({params: {}}),
-    onError: (error) => {
-      console.error("Error fetching classes:", error);
-      toast.error("Failed to load class data");
-    }
+    queryFn: () => listClasses({ params: {} }),
   });
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message || "Error fetching classes");
+    }
+  }, [error?.message, isError]);
 
   // Query for fetching students
   const { data: students, isLoading: studentsLoading } = useQuery({
     queryKey: ["students"],
-    queryFn: () => getUsers({ params: { is_student: "true" } }),
+    queryFn: () => getUsers({ params: { is_student: true } }),
   });
 
   // Query for fetching subjects based on selected class
   const { data: subjects, isLoading: subjectsLoading } = useQuery({
     queryKey: ["subjects", form.watch("class_level")],
-    queryFn: () => listSubjects({ 
-      class_pk: form.watch("class_level").toString(), 
-      params: {} 
-    }),
+    queryFn: () =>
+      listSubjects({
+        class_pk: form.watch("class_level").toString(),
+        params: {},
+      }),
     enabled: !!form.watch("class_level"),
   });
 
@@ -180,7 +190,8 @@ export default function EditCourseOfferingPage() {
 
   // Update course offering mutation
   const mutation = useMutation({
-    mutationFn: (values: Partial<CourseOfferingCreateType>) => updateCourseOffering(id, values),
+    mutationFn: (values: Partial<CourseOfferingCreateType>) =>
+      updateCourseOffering(id, values),
     onSuccess: () => {
       toast.success(t("courseOfferings.edit.success"));
       router.push("/admin/course-offerings");
@@ -188,25 +199,25 @@ export default function EditCourseOfferingPage() {
     onError: (error: Error | AxiosError) => {
       console.error("Error updating course offering:", error);
       let errorMessage = t("courseOfferings.edit.error");
-      
+
       if (error instanceof Error) {
         try {
           const parsedError = JSON.parse(error.message);
-          if (typeof parsedError === 'object') {
+          if (typeof parsedError === "object") {
             // Handle structured API error responses
             const firstErrorKey = Object.keys(parsedError)[0];
             const firstError = parsedError[firstErrorKey];
             if (Array.isArray(firstError) && firstError.length > 0) {
               errorMessage = `${firstErrorKey}: ${firstError[0]}`;
-            } else if (typeof firstError === 'string') {
+            } else if (typeof firstError === "string") {
               errorMessage = firstError;
             }
           }
-        } catch (e) {
-          errorMessage = error.message;
+        } catch (error) {
+          errorMessage = (error as Error).message;
         }
       }
-      
+
       toast.error(errorMessage);
     },
   });
@@ -214,12 +225,12 @@ export default function EditCourseOfferingPage() {
   // Form submission handler
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const formattedDate = format(values.start_date, "yyyy-MM-dd");
-    
+
     const offeringData: Partial<CourseOfferingCreateType> = {
       ...values,
       start_date: formattedDate,
     };
-    
+
     mutation.mutate(offeringData);
   };
 
@@ -235,18 +246,20 @@ export default function EditCourseOfferingPage() {
     return (
       <div className="container py-6">
         <div className="text-center py-10">
-          <h2 className="text-xl font-semibold">Course offering not found</h2>
-          <Button 
+          <h2 className="text-xl font-semibold">
+            {t("courseOfferings.edit.notFound")}
+          </h2>
+          <Button
             className="mt-4"
             onClick={() => router.push("/admin/course-offerings")}
           >
-            Back to Course Offerings
+            {t("courseOfferings.create.back")}
           </Button>
         </div>
       </div>
     );
   }
-  
+
   return (
     <div className="container py-6 space-y-6">
       {/* Header with back button */}
@@ -261,8 +274,12 @@ export default function EditCourseOfferingPage() {
         </Button>
       </div>
 
-      <h1 className="text-3xl font-bold tracking-tight">{t("courseOfferings.edit.title")}</h1>
-      <p className="text-muted-foreground">{t("courseOfferings.edit.description")}</p>
+      <h1 className="text-3xl font-bold tracking-tight">
+        {t("courseOfferings.edit.title")}
+      </h1>
+      <p className="text-muted-foreground">
+        {t("courseOfferings.edit.description")}
+      </p>
 
       <Card>
         <CardHeader>
@@ -273,10 +290,7 @@ export default function EditCourseOfferingPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Class Level Selection */}
                 <FormField
@@ -284,7 +298,9 @@ export default function EditCourseOfferingPage() {
                   name="class_level"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>{t("courseOfferings.create.classLevel")}</FormLabel>
+                      <FormLabel>
+                        {t("courseOfferings.create.classLevel")}
+                      </FormLabel>
                       <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -306,37 +322,57 @@ export default function EditCourseOfferingPage() {
                         <PopoverContent className="w-full p-0" align="start">
                           <Command>
                             <CommandInput
-                              placeholder={t("courseOfferings.create.searchClass")}
+                              placeholder={t(
+                                "courseOfferings.create.searchClass"
+                              )}
                               className="h-9"
                             />
                             <CommandList>
-                              <CommandEmpty>{t("courseOfferings.create.noClassFound")}</CommandEmpty>
-                              {!classesLoading && classes && 
-                                Object.entries(groupClassesByHierarchy(classes)).map(([sectionKey, sectionData]) => (
+                              <CommandEmpty>
+                                {t("courseOfferings.create.noClassFound")}
+                              </CommandEmpty>
+                              {!classesLoading &&
+                                classes &&
+                                Object.entries(
+                                  groupClassesByHierarchy(classes)
+                                ).map(([sectionKey, sectionData]) => (
                                   <div key={sectionKey}>
                                     <CommandGroup heading={sectionData.section}>
-                                      {Object.entries(sectionData.levels).map(([levelKey, levelData]) => (
-                                        <div key={levelKey}>
-                                          <CommandGroup heading={levelData.level} className="pl-2">
-                                            {levelData.classes.map((classItem) => (
-                                              <CommandItem
-                                                key={classItem.id}
-                                                value={classItem.name + (classItem.speciality ? ` ${classItem.speciality}` : '')}
-                                                onSelect={() => {
-                                                  setSelectedClass(classItem);
-                                                  setOpen(false); // Close the popover when a class is selected
-                                                }}
-                                              >
-                                                {formatClassName(classItem)}
-                                              </CommandItem>
-                                            ))}
-                                          </CommandGroup>
-                                        </div>
-                                      ))}
+                                      {Object.entries(sectionData.levels).map(
+                                        ([levelKey, levelData]) => (
+                                          <div key={levelKey}>
+                                            <CommandGroup
+                                              heading={levelData.level}
+                                              className="pl-2"
+                                            >
+                                              {levelData.classes.map(
+                                                (classItem) => (
+                                                  <CommandItem
+                                                    key={classItem.id}
+                                                    value={
+                                                      classItem.name +
+                                                      (classItem.speciality
+                                                        ? ` ${classItem.speciality}`
+                                                        : "")
+                                                    }
+                                                    onSelect={() => {
+                                                      setSelectedClass(
+                                                        classItem
+                                                      );
+                                                      setOpen(false); // Close the popover when a class is selected
+                                                    }}
+                                                  >
+                                                    {formatClassName(classItem)}
+                                                  </CommandItem>
+                                                )
+                                              )}
+                                            </CommandGroup>
+                                          </div>
+                                        )
+                                      )}
                                     </CommandGroup>
                                   </div>
-                                ))
-                              }
+                                ))}
                             </CommandList>
                           </Command>
                         </PopoverContent>
@@ -355,7 +391,9 @@ export default function EditCourseOfferingPage() {
                   name="subject"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>{t("courseOfferings.create.subject")}</FormLabel>
+                      <FormLabel>
+                        {t("courseOfferings.create.subject")}
+                      </FormLabel>
                       <Popover open={subjectOpen} onOpenChange={setSubjectOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -380,11 +418,15 @@ export default function EditCourseOfferingPage() {
                         <PopoverContent className="w-full p-0" align="start">
                           <Command>
                             <CommandInput
-                              placeholder={t("courseOfferings.create.searchSubject")}
+                              placeholder={t(
+                                "courseOfferings.create.searchSubject"
+                              )}
                               className="h-9"
                             />
                             <CommandList>
-                              <CommandEmpty>{t("courseOfferings.create.noSubjectFound")}</CommandEmpty>
+                              <CommandEmpty>
+                                {t("courseOfferings.create.noSubjectFound")}
+                              </CommandEmpty>
                               <CommandGroup>
                                 {!subjectsLoading &&
                                   subjects?.map((subject) => (
@@ -418,7 +460,9 @@ export default function EditCourseOfferingPage() {
                   name="student"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>{t("courseOfferings.create.student")}</FormLabel>
+                      <FormLabel>
+                        {t("courseOfferings.create.student")}
+                      </FormLabel>
                       <Popover open={studentOpen} onOpenChange={setStudentOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -442,11 +486,15 @@ export default function EditCourseOfferingPage() {
                         <PopoverContent className="w-full p-0" align="start">
                           <Command>
                             <CommandInput
-                              placeholder={t("courseOfferings.create.searchStudent")}
+                              placeholder={t(
+                                "courseOfferings.create.searchStudent"
+                              )}
                               className="h-9"
                             />
                             <CommandList>
-                              <CommandEmpty>{t("courseOfferings.create.noStudentFound")}</CommandEmpty>
+                              <CommandEmpty>
+                                {t("courseOfferings.create.noStudentFound")}
+                              </CommandEmpty>
                               <CommandGroup>
                                 {!studentsLoading &&
                                   students?.map((student) => (
@@ -458,7 +506,8 @@ export default function EditCourseOfferingPage() {
                                         setStudentOpen(false); // Close the popover when a student is selected
                                       }}
                                     >
-                                      {student.first_name} {student.last_name} ({student.email})
+                                      {student.first_name} {student.last_name} (
+                                      {student.email})
                                     </CommandItem>
                                   ))}
                               </CommandGroup>
@@ -480,7 +529,9 @@ export default function EditCourseOfferingPage() {
                   name="start_date"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>{t("courseOfferings.create.startDate")}</FormLabel>
+                      <FormLabel>
+                        {t("courseOfferings.create.startDate")}
+                      </FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -494,7 +545,9 @@ export default function EditCourseOfferingPage() {
                               {field.value ? (
                                 format(field.value, "PPP")
                               ) : (
-                                <span>{t("courseOfferings.create.pickDate")}</span>
+                                <span>
+                                  {t("courseOfferings.create.pickDate")}
+                                </span>
                               )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
@@ -523,7 +576,9 @@ export default function EditCourseOfferingPage() {
                   name="duration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("courseOfferings.create.duration")}</FormLabel>
+                      <FormLabel>
+                        {t("courseOfferings.create.duration")}
+                      </FormLabel>
                       <FormControl>
                         <div className="space-y-3">
                           <Slider
@@ -531,7 +586,9 @@ export default function EditCourseOfferingPage() {
                             max={5}
                             step={0.5}
                             value={[field.value]}
-                            onValueChange={(values) => field.onChange(values[0])}
+                            onValueChange={(values) =>
+                              field.onChange(values[0])
+                            }
                             className="w-full"
                           />
                           <div className="flex justify-between text-xs text-muted-foreground px-1">
@@ -543,8 +600,14 @@ export default function EditCourseOfferingPage() {
                           </div>
                           <div className="text-center font-medium">
                             {field.value === Math.floor(field.value)
-                              ? `${field.value} ${field.value === 1 ? t("courseOfferings.create.hour") : t("courseOfferings.create.hours")}`
-                              : `${Math.floor(field.value)}h ${Math.round((field.value % 1) * 60)}min`}
+                              ? `${field.value} ${
+                                  field.value === 1
+                                    ? t("courseOfferings.create.hour")
+                                    : t("courseOfferings.create.hours")
+                                }`
+                              : `${Math.floor(field.value)}h ${Math.round(
+                                  (field.value % 1) * 60
+                                )}min`}
                           </div>
                         </div>
                       </FormControl>
@@ -562,7 +625,9 @@ export default function EditCourseOfferingPage() {
                   name="frequency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("courseOfferings.create.frequency")}</FormLabel>
+                      <FormLabel>
+                        {t("courseOfferings.create.frequency")}
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -571,15 +636,23 @@ export default function EditCourseOfferingPage() {
                           placeholder={t("courseOfferings.create.frequency")}
                           onKeyDown={(e) => {
                             // Prevent negative values by blocking the minus key and non-numeric keys
-                            if (e.key === '-' || 
-                                !/^[0-9]$/.test(e.key) && 
-                                !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                            if (
+                              e.key === "-" ||
+                              (!/^[0-9]$/.test(e.key) &&
+                                ![
+                                  "Backspace",
+                                  "Delete",
+                                  "ArrowLeft",
+                                  "ArrowRight",
+                                  "Tab",
+                                ].includes(e.key))
+                            ) {
                               e.preventDefault();
                             }
                           }}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, '');
-                            field.onChange(value ? parseInt(value, 10) : '');
+                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            field.onChange(value ? parseInt(value, 10) : "");
                           }}
                           value={field.value}
                         />
@@ -598,7 +671,9 @@ export default function EditCourseOfferingPage() {
                   name="hourly_rate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("courseOfferings.create.hourlyRate")}</FormLabel>
+                      <FormLabel>
+                        {t("courseOfferings.create.hourlyRate")}
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -606,15 +681,23 @@ export default function EditCourseOfferingPage() {
                           placeholder={t("courseOfferings.create.hourlyRate")}
                           onKeyDown={(e) => {
                             // Prevent negative values by blocking the minus key and non-numeric keys
-                            if (e.key === '-' || 
-                                !/^[0-9]$/.test(e.key) && 
-                                !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                            if (
+                              e.key === "-" ||
+                              (!/^[0-9]$/.test(e.key) &&
+                                ![
+                                  "Backspace",
+                                  "Delete",
+                                  "ArrowLeft",
+                                  "ArrowRight",
+                                  "Tab",
+                                ].includes(e.key))
+                            ) {
                               e.preventDefault();
                             }
                           }}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, '');
-                            field.onChange(value ? parseInt(value, 10) : '');
+                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            field.onChange(value ? parseInt(value, 10) : "");
                           }}
                           value={field.value}
                         />
@@ -626,7 +709,7 @@ export default function EditCourseOfferingPage() {
                     </FormItem>
                   )}
                 />
-                
+
                 {/* Is Available toggle */}
                 <FormField
                   control={form.control}
@@ -634,7 +717,9 @@ export default function EditCourseOfferingPage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                       <div className="space-y-0.5">
-                        <FormLabel>{t("courseOfferings.edit.availability")}</FormLabel>
+                        <FormLabel>
+                          {t("courseOfferings.edit.availability")}
+                        </FormLabel>
                         <FormDescription>
                           {t("courseOfferings.edit.availabilityDescription")}
                         </FormDescription>
@@ -658,10 +743,7 @@ export default function EditCourseOfferingPage() {
                 >
                   {t("courseOfferings.create.cancel")}
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={mutation.isPending}
-                >
+                <Button type="submit" disabled={mutation.isPending}>
                   {mutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
