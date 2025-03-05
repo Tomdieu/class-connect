@@ -23,6 +23,7 @@ import { deleteUser } from "@/actions/accounts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import DeleteConfirmationModal from "@/components/modals/DeleteConfirmationModal";
+import { useSession } from "next-auth/react";
 
 export const userColumns: ColumnDef<UserType>[] = [
   {
@@ -150,6 +151,7 @@ export const userColumns: ColumnDef<UserType>[] = [
       const queryClient = useQueryClient();
       const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(false);
+      const { data: session } = useSession();
 
       const handleDelete = async () => {
         try {
@@ -183,18 +185,31 @@ export const userColumns: ColumnDef<UserType>[] = [
                 <RefreshCw className="w-4 h-4 mr-2" />
                 <span>{t("users.table.actions.update")}</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-red-500"
-                onClick={() => setIsDeleteModalOpen(true)}
+                onClick={() => {
+                  setUser(user);
+                  onOpen();
+                }}
               >
-                <Trash className="w-4 h-4 mr-2" />
-                {t("users.table.actions.delete")}
+                <RefreshCw className="w-4 h-4 mr-2" />
+                <span>{t("users.table.actions.detail")}</span>
               </DropdownMenuItem>
+              {session?.user?.id !== user.id && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-red-500"
+                    onClick={() => setIsDeleteModalOpen(true)}
+                  >
+                    <Trash className="w-4 h-4 mr-2" />
+                    {t("users.table.actions.delete")}
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DeleteConfirmationModal 
+          <DeleteConfirmationModal
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
             onConfirm={handleDelete}
