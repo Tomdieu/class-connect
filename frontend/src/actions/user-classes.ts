@@ -1,0 +1,156 @@
+"use server";
+import { auth } from "@/auth";
+import api from "@/services/api";
+import { SubjectType, UserClassCreateType, UserClassType } from "@/types";
+import { AxiosError } from "axios";
+
+// region User Classes
+
+export const listUserClasses = async () => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get("/api/user-classes/", {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data as UserClassType[];
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const createUserClass = async (data: UserClassCreateType) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.post("/api/user-classes/", data, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data as UserClassType;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const getUserClass = async (id: number) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get(`/api/user-classes/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data as UserClassType;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const updateUserClass = async (
+  id: number,
+  data: UserClassCreateType
+) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.put(`/api/user-classes/${id}/`, data, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data as UserClassType;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const deleteUserClass = async (id: number) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    await api.delete(`/api/user-classes/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const getMyClass = async () => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get("/api/user-classes/my-class/", {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data as UserClassType[];
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const getClassSubject = async ({
+  params,
+}: {
+  params: { class_id: number };
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get(`/api/user-classes/class-subjects/`, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+      params:params
+    });
+    return response.data as SubjectType[];
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+// endregion User Classes
