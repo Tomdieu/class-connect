@@ -10,7 +10,7 @@ from .models import (
     AbstractResource, UserProgress,UserAvailability,DailyTimeSlot,
     CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,
     # QuizResource, Question, QuestionOption, QuizAttempt, QuestionResponse,
-    VideoResource, RevisionResource, PDFResource, ExerciseResource
+    VideoResource, RevisionResource, PDFResource, ExerciseResource, UserClass
 )
 from .serializers import (
     CourseCategorySerializer, ClassSerializer, SchoolYearSerializer, SubjectSerializer,
@@ -19,7 +19,7 @@ from .serializers import (
     CourseOfferingSerializer, CourseOfferingActionSerializer,
     TeacherStudentEnrollmentSerializer, CourseDeclarationSerializer,DailyTimeSlotSerializer,DailyTimeSlotUpdateSerializer,
     VideoResourceSerializer, RevisionResourceSerializer, PDFResourceSerializer, ExerciseResourceSerializer,
-    EnhancedTeacherEnrollmentSerializer,
+    EnhancedTeacherEnrollmentSerializer, UserClassSerializer,
 )
 from .pagination import CustomPagination
 from .filters import (
@@ -762,3 +762,76 @@ class ExerciseResourceViewSet(viewsets.ModelViewSet):
 #     serializer_class = QuestionResponseSerializer
 #     filter_backends = [DjangoFilterBackend]
 #     filterset_fields = ['attempt', 'question', 'is_correct']
+
+class UserClassViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing user classes.
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = UserClass.objects.all()
+    serializer_class = UserClassSerializer
+    
+    def perform_create(self, serializer):
+        """
+        If school_year is not provided, use the current school year
+        """
+        if not serializer.validated_data.get('school_year'):
+            serializer.validated_data['school_year'] = SchoolYear.current_year()
+        serializer.save()
+    
+    @swagger_auto_schema(
+        method='get',
+        responses={200: UserClassSerializer(many=True)},
+        operation_description="Get current student's class information"
+    )
+    @action(detail=False, methods=['get'], url_path='my-class')
+    def my_class(self, request):
+        """Get the current user's class if they are a student."""
+        user = request.user
+        
+        # Check if user is not a professional (thus a student)
+        if user.education_level != 'PROFESSIONAL':
+            user_classes = UserClass.objects.filter(
+                user=user,
+                school_year=SchoolYear.current_year()
+            )
+            
+            serializer = self.get_serializer(user_classes, many=True)
+            return Response(serializer.data)
+        else:
+            return Response(
+                {"error": "Only students can access this endpoint"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+    
+    @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter('class_id', openapi.IN_QUERY, 
+                             description="Class ID to filter subjects", 
+                             type=openapi.TYPE_INTEGER, required=True),
+        ],
+        responses={200: SubjectSerializer(many=True)},
+        operation_description="Get subjects for a specific class"
+    )
+    @action(detail=False, methods=['get'], url_path='class-subjects')
+    def class_subjects(self, request):
+        """Get all subjects for a specific class."""
+        class_id = request.query_params.get('class_id')
+        
+        if not class_id:
+            return Response(
+                {"error": "class_id parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            class_obj = Class.objects.get(id=class_id)
+            subjects = Subject.objects.filter(class_level=class_obj)
+            serializer = SubjectSerializer(subjects, many=True)
+            return Response(serializer.data)
+        except Class.DoesNotExist:
+            return Response(
+                {"error": "Class not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
