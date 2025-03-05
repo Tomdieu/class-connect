@@ -44,13 +44,13 @@ class ClassFilter(django_filters.FilterSet):
         fields = ['name', 'level']
 
 class SubjectFilter(django_filters.FilterSet):
+    class_name = django_filters.CharFilter(field_name='class_level__name', lookup_expr='iexact')
     name = django_filters.CharFilter(lookup_expr='icontains')
-    class_level = django_filters.ModelChoiceFilter(queryset=Class.objects.all())
-    created_at = django_filters.DateTimeFromToRangeFilter()
-    
+    class_id = django_filters.NumberFilter(field_name='class_level__id')
+
     class Meta:
         model = Subject
-        fields = ['name', 'class_level']
+        fields = ['name', 'class_level', 'class_id', 'class_name']
 
 class ChapterFilter(django_filters.FilterSet):
     title = django_filters.CharFilter(lookup_expr='icontains')
