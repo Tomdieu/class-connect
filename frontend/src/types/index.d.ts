@@ -1,3 +1,4 @@
+import { User } from 'next-auth';
 export const EDUCATION_LEVELS = [
   "COLLEGE",
   "LYCEE",
@@ -143,7 +144,7 @@ export declare interface ClassType {
   id: number;
   name: string;
   level: EducationLevel;
-  secion: Section;
+  section: Section;
   speciality?: LyceeSpecialities;
   description: string | null;
   created_at: string;
@@ -252,7 +253,6 @@ export declare interface AbstractResourceType {
   polymorphic_ctype: number;
   resource_type:
     | "VideoResource"
-    | "QuizResource"
     | "RevisionResource"
     | "PDFResource"
     | "ExerciseResource";
@@ -265,98 +265,98 @@ export declare interface AbstractResourceCreateType {
   polymorphic_ctype?: number;
 }
 
-// Quiz Types
-export declare interface QuestionOptionType {
-  id: number;
-  question: number;
-  text: string;
-  image: string | null;
-  is_correct: boolean;
-  order: number;
-  created_at: string;
-  updated_at: string;
-}
+// // Quiz Types
+// export declare interface QuestionOptionType {
+//   id: number;
+//   question: number;
+//   text: string;
+//   image: string | null;
+//   is_correct: boolean;
+//   order: number;
+//   created_at: string;
+//   updated_at: string;
+// }
 
-export declare interface QuestionType {
-  id: number;
-  quiz: number;
-  text: string;
-  image: string | null;
-  type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
-  points: number;
-  order: number;
-  explanation: string;
-  explanation_image: string | null;
-  created_at: string;
-  updated_at: string;
-  options: QuestionOptionType[];
-}
+// export declare interface QuestionType {
+//   id: number;
+//   quiz: number;
+//   text: string;
+//   image: string | null;
+//   type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
+//   points: number;
+//   order: number;
+//   explanation: string;
+//   explanation_image: string | null;
+//   created_at: string;
+//   updated_at: string;
+//   options: QuestionOptionType[];
+// }
 
-export declare interface QuizResourceType extends AbstractResourceType {
-  total_questions: number;
-  duration_minutes: number;
-  passing_score: number;
-  show_correct_answers: boolean;
-  show_explanation: boolean;
-  shuffle_questions: boolean;
-  attempts_allowed: number;
-  partial_credit: boolean;
-  questions: QuestionType[];
-}
+// export declare interface QuizResourceType extends AbstractResourceType {
+//   total_questions: number;
+//   duration_minutes: number;
+//   passing_score: number;
+//   show_correct_answers: boolean;
+//   show_explanation: boolean;
+//   shuffle_questions: boolean;
+//   attempts_allowed: number;
+//   partial_credit: boolean;
+//   questions: QuestionType[];
+// }
 
-export declare interface QuizAttemptType {
-  id: number;
-  quiz: number;
-  user: number;
-  score: number;
-  started_at: string;
-  completed_at: string | null;
-  is_completed: boolean;
-}
+// export declare interface QuizAttemptType {
+//   id: number;
+//   quiz: number;
+//   user: number;
+//   score: number;
+//   started_at: string;
+//   completed_at: string | null;
+//   is_completed: boolean;
+// }
 
-export declare interface QuestionResponseType {
-  id: number;
-  attempt: number;
-  question: number;
-  selected_options: number[];
-  text_response: string;
-  is_correct: boolean;
-  points_earned: number;
-  created_at: string;
-  updated_at: string;
-}
+// export declare interface QuestionResponseType {
+//   id: number;
+//   attempt: number;
+//   question: number;
+//   selected_options: number[];
+//   text_response: string;
+//   is_correct: boolean;
+//   points_earned: number;
+//   created_at: string;
+//   updated_at: string;
+// }
 
-// Create Types
-export declare interface QuestionOptionCreateType {
-  text: string;
-  image?: File;
-  is_correct: boolean;
-  order: number;
-}
+// // Create Types
+// export declare interface QuestionOptionCreateType {
+//   text: string;
+//   image?: File;
+//   is_correct: boolean;
+//   order: number;
+// }
 
-export declare interface QuestionCreateType {
-  text: string;
-  image?: File;
-  type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
-  points: number;
-  order: number;
-  explanation: string;
-  explanation_image?: File;
-  options: QuestionOptionCreateType[];
-}
+// export declare interface QuestionCreateType {
+//   text: string;
+//   image?: File;
+//   type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
+//   points: number;
+//   order: number;
+//   explanation: string;
+//   explanation_image?: File;
+//   options: QuestionOptionCreateType[];
+// }
 
-export declare interface QuizResourceCreateType
-  extends AbstractResourceCreateType {
-  total_questions: number;
-  duration_minutes: number;
-  passing_score: number;
-  show_correct_answers: boolean;
-  show_explanation: boolean;
-  shuffle_questions: boolean;
-  attempts_allowed: number;
-  partial_credit: boolean;
-  questions: QuestionCreateType[];
-}
+// export declare interface QuizResourceCreateType
+//   extends AbstractResourceCreateType {
+//   total_questions: number;
+//   duration_minutes: number;
+//   passing_score: number;
+//   show_correct_answers: boolean;
+//   show_explanation: boolean;
+//   shuffle_questions: boolean;
+//   attempts_allowed: number;
+//   partial_credit: boolean;
+//   questions: QuestionCreateType[];
+// }
 
 export declare interface PDFResourceCreateType
   extends AbstractResourceCreateType {
@@ -386,7 +386,7 @@ export declare interface ExerciseResourceCreateType
 }
 
 export declare interface ExerciseResourceType
-  extends AbstractResourceCreateType {
+  extends AbstractResourceType {
   instructions: string;
   solution_file: string;
   exercise_file: string;
@@ -396,6 +396,11 @@ export declare interface ExerciseResourceType
 
 export declare interface RevisionResourceCreateType
   extends AbstractResourceCreateType {
+  content: string;
+}
+
+export declare interface RevisionResourceType
+  extends AbstractResourceType {
   content: string;
 }
 
@@ -723,4 +728,20 @@ declare interface NotificationType {
 declare interface VideoConferenceSessionType {
   id:number;
   title:string;
+}
+
+
+declare interface UserClassType {
+  id: number;
+  user: User;
+  class_level: ClassType;
+  school_year: SchoolYearType;
+  created_at: string;
+  updated_at: string;
+}
+
+declare interface UserClassCreateType {
+  user_id: string;
+  class_level_id: number;
+  school_year_id: number;
 }
