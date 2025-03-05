@@ -11,7 +11,8 @@ from .views import (
     CourseDeclarationViewSet,
     # QuizResourceViewSet, QuestionViewSet, QuestionOptionViewSet,
     # QuizAttemptViewSet, QuestionResponseViewSet,
-    VideoResourceViewSet, RevisionResourceViewSet, PDFResourceViewSet, ExerciseResourceViewSet
+    VideoResourceViewSet, RevisionResourceViewSet, PDFResourceViewSet, ExerciseResourceViewSet,
+    UserClassViewSet
 )
 
 # Create main router
@@ -23,6 +24,7 @@ router.register(r'user-availability', UserAvailabilityViewSet)
 router.register(r'course-offerings', CourseOfferingViewSet)
 router.register(r'school-year', SchoolYearViewSet)
 router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
+router.register(r'user-classes', UserClassViewSet)  # Add the new viewset
 # Remove the standalone declaration registration
 # router.register(r'declarations', CourseDeclarationViewSet)
 # router.register(r'quizzes', QuizResourceViewSet)
