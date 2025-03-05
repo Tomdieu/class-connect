@@ -18,7 +18,8 @@ from .models import (
     CourseOfferingAction,
     TeacherStudentEnrollment,
     CourseDeclaration,
-    SchoolYear
+    SchoolYear,
+    UserClass
     # Question, QuestionOption, QuizAttempt, QuestionResponse
 )
 from users.serializers import UserSerializer
@@ -351,3 +352,33 @@ class UserProgressSerializer(serializers.ModelSerializer):
 #             questions.append(question)
             
 #         return questions
+
+class UserClassSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+        source='user'
+    )
+    class_level = ClassSerializer(read_only=True)
+    class_level_id = serializers.PrimaryKeyRelatedField(
+        queryset=Class.objects.all(),
+        write_only=True,
+        source='class_level'
+    )
+    school_year = SchoolYearSerializer(read_only=True)
+    school_year_id = serializers.PrimaryKeyRelatedField(
+        queryset=SchoolYear.objects.all(),
+        write_only=True,
+        source='school_year',
+        required=False
+    )
+    
+    class Meta:
+        model = UserClass
+        fields = [
+            'id', 'user', 'user_id', 
+            'class_level', 'class_level_id', 
+            'school_year', 'school_year_id', 
+            'created_at', 'updated_at'
+        ]
