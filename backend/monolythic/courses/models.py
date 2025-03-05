@@ -61,12 +61,50 @@ class Class(models.Model):
     def __str__(self):
         return f"{self.name} - {self.get_level_display()}"
 
+class SchoolYear(models.Model):
+    start_year = models.PositiveIntegerField()
+    end_year = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('start_year', 'end_year')
+        ordering = ['-start_year']
+
+
+    def __str__(self):
+        return f"{self.start_year}-{self.end_year}"
+    
+    @property
+    def formatted_year(self):
+        """Returns the school year in 'YYYY-YYYY' format."""
+        return f"{self.start_year}-{self.end_year}"
+    
+    @classmethod
+    def current_year(cls):
+        """Gets or creates the current school year based on today's date."""
+        today = now().date()
+        current_year = today.year
+        start_year = current_year if today.month >= 9 else current_year - 1  # Assume school starts in September
+        end_year = start_year + 1
+
+        school_year, created = cls.objects.get_or_create(
+            start_year=start_year,
+            end_year=end_year,
+            defaults={'is_active': True}
+        )
+        return school_year
 
 class UserClass(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     class_level = models.ForeignKey(Class, on_delete=models.CASCADE)
+    school_year = models.ForeignKey(SchoolYear,on_delete=models.CASCADE,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        if self.school_year == None:
+            self.school_year = SchoolYear.current_year()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user} - {self.class_level}"
@@ -421,38 +459,7 @@ class CourseOfferingAction(models.Model):
     def __str__(self):
         return f"{self.teacher} - {self.offer} - {self.action}"
     
-class SchoolYear(models.Model):
-    start_year = models.PositiveIntegerField()
-    end_year = models.PositiveIntegerField()
-    is_active = models.BooleanField(default=True)
 
-    class Meta:
-        unique_together = ('start_year', 'end_year')
-        ordering = ['-start_year']
-
-
-    def __str__(self):
-        return f"{self.start_year}-{self.end_year}"
-    
-    @property
-    def formatted_year(self):
-        """Returns the school year in 'YYYY-YYYY' format."""
-        return f"{self.start_year}-{self.end_year}"
-    
-    @classmethod
-    def current_year(cls):
-        """Gets or creates the current school year based on today's date."""
-        today = now().date()
-        current_year = today.year
-        start_year = current_year if today.month >= 9 else current_year - 1  # Assume school starts in September
-        end_year = start_year + 1
-
-        school_year, created = cls.objects.get_or_create(
-            start_year=start_year,
-            end_year=end_year,
-            defaults={'is_active': True}
-        )
-        return school_year
 
 class TeacherStudentEnrollment(models.Model):
     ACTIVE = "ACTIVE"
