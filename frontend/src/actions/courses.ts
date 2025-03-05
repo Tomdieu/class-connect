@@ -49,8 +49,8 @@ export const listClasses = async ({
       },
       params: params || {}, // Ensure params is always defined
     });
-    
-    const data = await res.data as ClassType[];
+
+    const data = (await res.data) as ClassType[];
     console.log("Classes retrieved:", data.length); // Debug log
     return data as ClassType[];
   } catch (error: unknown) {
@@ -59,7 +59,9 @@ export const listClasses = async ({
     if (axiosError.response?.data) {
       throw JSON.stringify(axiosError.response.data);
     }
-    throw JSON.stringify({ message: "An unexpected error occurred while fetching classes" });
+    throw JSON.stringify({
+      message: "An unexpected error occurred while fetching classes",
+    });
   }
 };
 
@@ -183,6 +185,8 @@ export const deleteClass = async (id: number) => {
 interface SubjectFilterParams {
   name: string;
   class_level: string;
+  class_id: string;
+  class_name: string;
   created_at: string;
   page: string;
 }
