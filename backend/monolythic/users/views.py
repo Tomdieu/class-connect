@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from django.core.mail import BadHeaderError, send_mail
+from django.core.mail import send_mail
 from .models import User, UserPasswordResetToken
 from .serializers import (
     UserSerializer,
@@ -32,14 +32,17 @@ from oauth2_provider.models import AccessToken as OAuth2AccessToken
 from .models import UserActiveToken
 from .middleware import get_current_request, SingleSessionMiddleware
 from .tasks.task import send_async_mail
+from django_filters.rest_framework import DjangoFilterBackend
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.views.decorators.vary import vary_on_cookie, vary_on_headers
-from django.db.models.functions import ExtractMonth, ExtractYear
+from django.db.models.functions import ExtractMonth
 from django.db.models import Count
 from datetime import datetime
 import logging
+
+from django.db.models import Sum, F
+from payments.models import Subscription
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +51,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filterset_class = UserFilter
+    filter_backends = [DjangoFilterBackend]
     swagger_tags = ["Users"]
 
     def get_permissions(self):
@@ -139,7 +143,7 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             token = generate_signed_token(user.email)
             verification_url = (
-                f"{settings.BACKEND_HOST}{reverse('verify-email', args=[token])}"
+                f"{settings.FRONTEND_HOST}{reverse('verify-email', args=[token])}"
             )
 
             # Prepare email content
@@ -499,7 +503,7 @@ class ResendVerificationEmailView(APIView):
             # Generate verification token
             token = generate_signed_token(user.email)
             verification_url = (
-                f"{settings.BACKEND_HOST}{reverse('verify-email', args=[token])}"
+                f"{settings.FRONTEND_HOST}{reverse('verify-email', args=[token])}"
             )
 
             # Send verification email
@@ -611,11 +615,16 @@ class UserStatsView(APIView):
         tags=["Users Stats"],
         responses={
             200: openapi.Response(
-                description="Monthly user statistics",
+                description="Dashboard statistics",
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
                     properties={
                         'total_users': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'user_growth': openapi.Schema(type=openapi.TYPE_STRING),
+                        'monthly_revenue': openapi.Schema(type=openapi.TYPE_NUMBER),
+                        'revenue_growth': openapi.Schema(type=openapi.TYPE_STRING),
+                        'conversion_rate': openapi.Schema(type=openapi.TYPE_NUMBER),
+                        'conversion_growth': openapi.Schema(type=openapi.TYPE_STRING),
                         'monthly_stats': openapi.Schema(
                             type=openapi.TYPE_ARRAY,
                             items=openapi.Schema(
@@ -633,11 +642,78 @@ class UserStatsView(APIView):
     )
     def get(self, request):
         current_year = datetime.now().year
+        current_month = datetime.now().month
+        last_month = (current_month - 1) if current_month > 1 else 12
+        current_time = timezone.now()
         
-        # Get total users count
+        # Users statistics
         total_users = User.objects.count()
+        users_last_month = User.objects.filter(
+            date_joined__year=current_year,
+            date_joined__month=last_month
+        ).count()
+        users_this_month = User.objects.filter(
+            date_joined__year=current_year,
+            date_joined__month=current_month
+        ).count()
+        user_growth = self.calculate_growth(users_last_month, users_this_month)
+
+        # Updated Revenue statistics using subscription plan prices
+        monthly_revenue = Subscription.objects.filter(
+            created_at__year=current_year,
+            created_at__month=current_month,
+            is_active=True,
+            end_date__gt=current_time
+        ).annotate(
+            plan_price=F('plan__price')  # Get price from related SubscriptionPlan
+        ).aggregate(
+            total=Sum('plan_price', default=0)
+        )['total'] or 0
         
-        # Get user counts by month for the current year
+        last_month_revenue = Subscription.objects.filter(
+            created_at__year=current_year,
+            created_at__month=last_month,
+            is_active=True,
+            end_date__gt=current_time
+        ).annotate(
+            plan_price=F('plan__price')  # Get price from related SubscriptionPlan
+        ).aggregate(
+            total=Sum('plan_price', default=0)
+        )['total'] or 0
+        
+        revenue_growth = self.calculate_growth(last_month_revenue, monthly_revenue)  # Calculate revenue growth here
+
+        # Conversion rate statistics
+        visits_this_month = User.objects.filter(
+            last_login__year=current_year,
+            last_login__month=current_month
+        ).count()
+        
+        purchases_this_month = Subscription.objects.filter(
+            created_at__year=current_year,
+            created_at__month=current_month,
+            is_active=True,
+            end_date__gt=current_time
+        ).values('user').distinct().count()
+        
+        # Calculate last month's conversion rate for growth
+        visits_last_month = User.objects.filter(
+            last_login__year=current_year,
+            last_login__month=last_month
+        ).count()
+        
+        purchases_last_month = Subscription.objects.filter(
+            created_at__year=current_year,
+            created_at__month=last_month,
+            is_active=True,
+            end_date__gt=current_time
+        ).values('user').distinct().count()
+        
+        conversion_rate = round((purchases_this_month / visits_this_month * 100) if visits_this_month > 0 else 0, 2)
+        last_month_conversion = (purchases_last_month / visits_last_month * 100) if visits_last_month > 0 else 0
+        conversion_growth = self.calculate_growth(last_month_conversion, conversion_rate)
+
+        # Monthly user statistics (existing code)
         monthly_stats = User.objects.filter(
             date_joined__year=current_year
         ).annotate(
@@ -646,23 +722,13 @@ class UserStatsView(APIView):
             users=Count('id')
         ).order_by('month')
 
-        # French month names
+        # French month names (existing code)
         month_names = {
-            1: 'Jan',
-            2: 'Fév',
-            3: 'Mar',
-            4: 'Avr',
-            5: 'Mai',
-            6: 'Juin',
-            7: 'Juil',
-            8: 'Août',
-            9: 'Sep',
-            10: 'Oct',
-            11: 'Nov',
-            12: 'Déc'
+            1: 'Jan', 2: 'Fév', 3: 'Mar', 4: 'Avr',
+            5: 'Mai', 6: 'Juin', 7: 'Juil', 8: 'Août',
+            9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Déc'
         }
 
-        # Format the monthly stats
         monthly_data = [
             {
                 'month': month_names[stat['month']],
@@ -671,8 +737,18 @@ class UserStatsView(APIView):
             for stat in monthly_stats
         ]
 
-        # Return both total users and monthly stats
         return Response({
             'total_users': total_users,
+            'user_growth': user_growth,
+            'monthly_revenue': float(monthly_revenue),
+            'revenue_growth': revenue_growth,
+            'conversion_rate': conversion_rate,
+            'conversion_growth': conversion_growth,
             'monthly_stats': monthly_data
         })
+
+    def calculate_growth(self, previous, current):
+        if previous == 0:
+            return '+0%' if current == 0 else '+100%'
+        growth = ((current - previous) / previous) * 100
+        return f"{'+' if growth >= 0 else ''}{growth:.1f}%"

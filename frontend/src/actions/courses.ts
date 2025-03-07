@@ -21,7 +21,7 @@ import {
   VideoResourceCreateType,
   VideoResourceType,
 } from "@/types";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 // region Classes
 
@@ -30,6 +30,7 @@ interface ClassFilterParams {
   level?: string;
 }
 
+// Add enhanced error handling to listClasses function
 export const listClasses = async ({
   params,
 }: {
@@ -37,23 +38,30 @@ export const listClasses = async ({
 } = {}) => {
   try {
     const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
+    if (!session?.user) throw Error("Unauthorized user!");
+
+    console.log("Fetching classes with params:", params); // Debug log
 
     const res = await api.get(`/api/classes/`, {
       headers: {
         Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",
       },
-      params,
+      params: params || {}, // Ensure params is always defined
     });
-    const data = await res.data;
+
+    const data = (await res.data) as ClassType[];
+    console.log("Classes retrieved:", data.length); // Debug log
     return data as ClassType[];
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    console.error("Error in listClasses:", error); // Detailed error logging
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
-    throw JSON.stringify({ message: "An unexpected error occurred" });
+    throw JSON.stringify({
+      message: "An unexpected error occurred while fetching classes",
+    });
   }
 };
 
@@ -69,10 +77,10 @@ export const getformatedClasses = async () => {
     });
     const data = await res.data;
     return data as SchoolStructure;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -91,10 +99,10 @@ export const getClass = async (id: string) => {
     });
     const data = (await res.data) as ClassType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -113,10 +121,10 @@ export const addClass = async ({ body }: { body: ClassCreateType }) => {
     });
     const data = (await res.data) as ClassType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -141,10 +149,10 @@ export const updateClass = async ({
     });
     const data = (await res.data) as ClassType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -163,10 +171,10 @@ export const deleteClass = async (id: number) => {
     });
     const data = await res.data;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -177,6 +185,8 @@ export const deleteClass = async (id: number) => {
 interface SubjectFilterParams {
   name: string;
   class_level: string;
+  class_id: string;
+  class_name: string;
   created_at: string;
   page: string;
 }
@@ -201,10 +211,10 @@ export const listSubjects = async ({
     });
     const data = (await res.data) as SubjectType[];
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -229,10 +239,10 @@ export const addSubject = async ({
     });
     const data = (await res.data) as SubjectType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -260,10 +270,10 @@ export const getSubject = async ({
     );
     const data = (await res.data) as SubjectType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -294,10 +304,10 @@ export const updateSubject = async ({
     );
     const data = (await res.data) as SubjectType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -325,10 +335,10 @@ export const deleteSubject = async ({
     );
     const data = await res.data;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -368,10 +378,10 @@ export const listChapters = async ({
     );
     const data = (await res.data) as ChapterType[];
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -402,10 +412,10 @@ export const addChapter = async ({
     );
     const data = (await res.data) as ChapterType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -435,10 +445,10 @@ export const getChapter = async ({
     );
     const data = (await res.data) as ChapterType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -471,10 +481,10 @@ export const updateChapter = async ({
     );
     const data = (await res.data) as ChapterType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -504,10 +514,10 @@ export const deleteChapter = async ({
     );
     const data = await res.data;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -549,10 +559,10 @@ export const listTopics = async ({
     );
     const data = (await res.data) as TopicType[];
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -585,10 +595,10 @@ export const addTopic = async ({
     );
     const data = (await res.data) as TopicType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -620,10 +630,10 @@ export const getTopic = async ({
     );
     const data = (await res.data) as TopicType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -658,10 +668,10 @@ export const updateTopic = async ({
     );
     const data = (await res.data) as TopicType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -693,10 +703,10 @@ export const deleteTopic = async ({
     );
     const data = await res.data;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -741,15 +751,14 @@ export const listResources = async ({
     );
     const data = (await res.data) as ResourceType[];
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
-
 
 export const deleteResource = async ({
   class_pk,
@@ -763,7 +772,7 @@ export const deleteResource = async ({
   chapter_pk: string;
   topic_pk: string;
   resource_pk: string;
-})=>{
+}) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
@@ -787,7 +796,7 @@ export const deleteResource = async ({
     }
     throw error;
   }
-}
+};
 
 export const addPdfResource = async ({
   class_pk,
@@ -823,10 +832,55 @@ export const addPdfResource = async ({
     );
     const data = (await res.data) as AbstractResourceType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const updatePdfResource = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  resource_pk,
+  resource,
+}: {
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
+  topic_pk: string | number;
+  resource_pk: string | number;
+  resource: PDFResourceCreateType;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const formData = new FormData();
+    formData.append("topic", `${topic_pk}`);
+    formData.append("title", resource.title);
+    formData.append("description", resource.description || "");
+    formData.append("pdf_file", resource.pdf_file);
+
+    const res = await api.patch(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/pdfs/${resource_pk}/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        },
+      }
+    );
+    const data = (await res.data) as AbstractResourceType;
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -868,10 +922,57 @@ export const addVideoResource = async ({
     );
     const data = (await res.data) as AbstractResourceType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const updateVideoResource = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  resource_pk,
+  resource,
+}: {
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
+  topic_pk: string | number;
+  resource_pk: string | number;
+  resource: VideoResourceCreateType;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const formData = new FormData();
+    formData.append("topic", `${topic_pk}`);
+    formData.append("title", resource.title);
+    formData.append("description", resource.description || "");
+    formData.append("video_file", resource.video_file);
+
+    console.log(formData.values());
+
+    const res = await api.patch(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/videos/${resource_pk}/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        },
+      }
+    );
+    const data = (await res.data) as AbstractResourceType;
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -915,10 +1016,65 @@ export const addExerciseResource = async ({
     );
     const data = (await res.data) as AbstractResourceType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const updateExerciseResource = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  resource_pk,
+  resource,
+}: {
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
+  topic_pk: string | number;
+  resource_pk: string | number;
+  resource: Partial<ExerciseResourceCreateType>;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const formData = new FormData();
+    formData.append("topic", `${topic_pk}`);
+    if (resource.title) {
+      formData.append("title", resource.title);
+    }
+    formData.append("description", resource.description || "");
+    if (resource.instructions) {
+      formData.append("instructions", resource.instructions);
+    }
+    if (resource.exercise_file) {
+      formData.append("exercise_file", resource.exercise_file);
+    }
+    if (resource.solution_file) {
+      formData.append("solution_file", resource.solution_file);
+    }
+
+    const res = await api.patch(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/exercises/${resource_pk}/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        },
+      }
+    );
+    const data = (await res.data) as AbstractResourceType;
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -958,10 +1114,59 @@ export const addRevisionResource = async ({
     );
     const data = (await res.data) as AbstractResourceType;
     return data;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const updateRevisionResource = async ({
+  class_pk,
+  subject_pk,
+  chapter_pk,
+  topic_pk,
+  resource_pk,
+  resource,
+}: {
+  class_pk: string | number;
+  subject_pk: string | number;
+  chapter_pk: string | number;
+  topic_pk: string | number;
+  resource_pk: string | number;
+  resource: Partial<RevisionResourceCreateType>;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const formData = new FormData();
+    formData.append("topic", `${topic_pk}`);
+    if (resource.title) {
+      formData.append("title", resource.title);
+    }
+    formData.append("description", resource.description || "");
+    if (resource.content) {
+      formData.append("content", resource.content);
+    }
+
+    const res = await api.patch(
+      `/api/classes/${class_pk}/subjects/${subject_pk}/chapters/${chapter_pk}/topics/${topic_pk}/revisions/${resource_pk}/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        },
+      }
+    );
+    const data = (await res.data) as AbstractResourceType;
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }

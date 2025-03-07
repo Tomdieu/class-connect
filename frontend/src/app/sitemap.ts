@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.classconnect.cm';
+  const logoUrl = `${baseUrl}/logo.png`;
   const languages = ['fr', 'en'];
   const routes = [
     '',
@@ -11,24 +12,64 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'pricing',
     'contact',
   ];
+  
+  // Auth routes
+  const authRoutes = [
+    { path: 'auth/login', priority: 0.7 },
+    { path: 'auth/register', priority: 0.7 },
+  ];
 
   const sitemap: MetadataRoute.Sitemap = [];
 
   // Generate entries for all language versions of each route
   languages.forEach(lang => {
     routes.forEach(route => {
-      sitemap.push({
+      // Create the language alternatives object
+      const languageAlternates: Record<string, string> = {};
+      languages.forEach(l => {
+        languageAlternates[l] = `${baseUrl}/${l}${route ? `/${route}` : ''}`;
+      });
+
+      // Create the sitemap entry
+      const entry: MetadataRoute.Sitemap[0] = {
         url: `${baseUrl}/${lang}${route ? `/${route}` : ''}`,
         lastModified: new Date(),
         changeFrequency: route === '' ? 'daily' : 'weekly',
         priority: route === '' ? 1.0 : 0.8,
-        alternateRefs: languages
-          .filter(l => l !== lang)
-          .map(l => ({
-            href: `${baseUrl}/${l}${route ? `/${route}` : ''}`,
-            hreflang: l
-          }))
+        alternates: {
+          languages: languageAlternates
+        }
+      };
+      
+      // Add logo image to all pages
+      entry.images = [logoUrl];
+      
+      sitemap.push(entry);
+    });
+    
+    // Add auth routes for each language
+    authRoutes.forEach(route => {
+      // Create the language alternatives object for auth routes
+      const languageAlternates: Record<string, string> = {};
+      languages.forEach(l => {
+        languageAlternates[l] = `${baseUrl}/${l}/${route.path}`;
       });
+
+      // Create the sitemap entry for auth routes
+      const entry: MetadataRoute.Sitemap[0] = {
+        url: `${baseUrl}/${lang}/${route.path}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly',
+        priority: route.priority,
+        alternates: {
+          languages: languageAlternates
+        }
+      };
+      
+      // Add logo image to auth pages too
+      entry.images = [logoUrl];
+      
+      sitemap.push(entry);
     });
   });
 

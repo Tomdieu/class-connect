@@ -6,6 +6,7 @@ User = get_user_model()
 
 class Forum(models.Model):
     name = models.CharField(max_length=25,unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -14,7 +15,7 @@ class Messages(models.Model):
     forum  = models.ForeignKey(Forum,on_delete=models.CASCADE,related_name='messages')
     sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name='messages')
     content = models.TextField()
-    file = models.FileField(upload_to='/chat-files/files',blank=True,null=True)
+    file = models.FileField(upload_to='chat-files/files',blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

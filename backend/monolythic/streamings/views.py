@@ -6,8 +6,8 @@ from django.conf import settings
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
-from .models import VideoConferenceSession, SessionParticipant, ChatMessage
-from .serializers import VideoConferenceSessionSerializer, SessionParticipantSerializer, ChatMessageSerializer
+from .models import VideoConferenceSession, SessionParticipant
+from .serializers import VideoConferenceSessionSerializer, SessionParticipantSerializer
 from .filters import VideoConferenceSessionFilter, SessionParticipantFilter
 
 class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
@@ -59,15 +59,21 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
         serializer.save(meeting_link=meeting_link)
 
 class SessionParticipantViewSet(viewsets.ModelViewSet):
-    queryset = SessionParticipant.objects.all()
     serializer_class = SessionParticipantSerializer
     filterset_class = SessionParticipantFilter
-
-class ChatMessageViewSet(viewsets.ModelViewSet):
-    queryset = ChatMessage.objects.all()
-    serializer_class = ChatMessageSerializer
-
+    
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
-            return ChatMessage.objects.none()  # Return empty queryset for swagger
-        return ChatMessage.objects.filter(session_id=self.kwargs['session_pk'])
+            return SessionParticipant.objects.none()  # Return empty queryset for swagger
+            
+        session_id = self.kwargs.get('session_pk')
+        if session_id:
+            return SessionParticipant.objects.filter(session_id=session_id)
+        return SessionParticipant.objects.all()
+    
+    def perform_create(self, serializer):
+        session_id = self.kwargs.get('session_pk')
+        if session_id:
+            serializer.save(session_id=session_id)
+        else:
+            serializer.save()

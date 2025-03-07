@@ -6,19 +6,20 @@ from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import (
-    CourseCategory, Class, Subject, Chapter, Topic,
+    CourseCategory, Class, SchoolYear, Subject, Chapter, Topic,
     AbstractResource, UserProgress,UserAvailability,DailyTimeSlot,
     CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,
     # QuizResource, Question, QuestionOption, QuizAttempt, QuestionResponse,
-    VideoResource, RevisionResource, PDFResource, ExerciseResource
+    VideoResource, RevisionResource, PDFResource, ExerciseResource, UserClass
 )
 from .serializers import (
-    CourseCategorySerializer, ClassSerializer, SubjectSerializer,
-    ChapterSerializer, TopicSerializer, PolymorphicResourceSerializer,
+    CourseCategorySerializer, ClassSerializer, SchoolYearSerializer, SubjectSerializer,
+    ChapterSerializer, TopicSerializer, PolymorphicResourceSerializer, UserAvailabilityCreateSerializer,
     UserProgressSerializer,UserAvailabilitySerializer,
     CourseOfferingSerializer, CourseOfferingActionSerializer,
     TeacherStudentEnrollmentSerializer, CourseDeclarationSerializer,DailyTimeSlotSerializer,DailyTimeSlotUpdateSerializer,
     VideoResourceSerializer, RevisionResourceSerializer, PDFResourceSerializer, ExerciseResourceSerializer,
+    EnhancedTeacherEnrollmentSerializer, UserClassSerializer,
 )
 from .pagination import CustomPagination
 from .filters import (
@@ -357,21 +358,31 @@ class UserProgressViewSet(viewsets.ModelViewSet):
 
 
 class UserAvailabilityViewSet(viewsets.ModelViewSet):
-    
-    serializer_class = UserAvailabilitySerializer
     permission_classes = [IsAuthenticated]
     
     queryset = UserAvailability.objects.all()
+    
+    def get_serializer_class(self):
+        if self.action in ['create', 'update','patch']:
+            return UserAvailabilityCreateSerializer
+        return UserAvailabilitySerializer
     
     def perform_create(self, serializer):
         # Determine user type based on the user's role
         user_type = 'TEACHER' if self.request.user.education_level == "PROFESSIONAL" else 'STUDENT'
         serializer.save(user=self.request.user, user_type=user_type)
-        
+    
+    @swagger_auto_schema(
+        method='get',
+        responses={200: UserAvailabilitySerializer(many=False)},
+        operation_description="Get or create current user's availability"
+    )    
     @action(methods=['get'],detail=False)
     def my_availability(self,request):
-        user_type = 'TEACHER' if request.user.education_level == "PROFESSIONAL" else 'STUDENT'
-        availaibility = UserAvailability.objects.get_or_create(user=request.user)
+        availability, created = UserAvailability.objects.get_or_create(user=request.user)
+        serializer = UserAvailabilitySerializer(availability)
+        return Response(serializer.data)
+        
     
     @swagger_auto_schema(
         method='patch',
@@ -402,14 +413,15 @@ class UserAvailabilityViewSet(viewsets.ModelViewSet):
         manual_parameters=[
             openapi.Parameter('user_id', openapi.IN_QUERY, description="USER ID", type=openapi.TYPE_STRING, required=True),
         ],
-        responses={200: UserAvailabilitySerializer(many=True)}
+        responses={200: UserAvailabilitySerializer(many=False)},
+        operation_description="Get or create availability for a specific user"
     )
     @action(detail=False, methods=['get'], url_path='user-availability')
     def get_user_availability(self, request):
         user_id = request.query_params.get('user_id')
         if user_id:
-            queryset = self.queryset.filter(user_id=user_id)
-            serializer = self.get_serializer(queryset, many=True)
+            availability, created = UserAvailability.objects.get_or_create(user_id=user_id)
+            serializer = self.get_serializer(availability)
             return Response(serializer.data)
         return Response({'error': 'user_id is required'}, status=400)
 
@@ -447,8 +459,25 @@ class CourseOfferingActionViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = CourseOfferingActionFilter
 
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CourseOfferingAction.objects.none()
+        return CourseOfferingAction.objects.filter(offering=self.kwargs['offering_pk'])
+
     def perform_create(self, serializer):
-        serializer.save(teacher=self.request.user)
+        serializer.save(
+            teacher=self.request.user,
+            offering_id=self.kwargs['offering_pk']
+        )
+        
+class SchoolYearViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint to list school year
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = SchoolYear.objects.all()
+    serializer_class = SchoolYearSerializer
+    
 
 class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
     """
@@ -460,42 +489,74 @@ class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
     serializer_class = TeacherStudentEnrollmentSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = TeacherStudentEnrollmentFilter
-
+    
+    @action(detail=True,methods=['post'])
+    def complete(self,request):
+        instance = self.get_object()
+        instance.status = TeacherStudentEnrollment.COMPLETED
+        instance.save()
+        
+        return Response(TeacherStudentEnrollmentSerializer(instance).data)
+        
     @swagger_auto_schema(
         method='get',
+        manual_parameters=[
+            openapi.Parameter('school_year', openapi.IN_QUERY, 
+                             description="School Year in format 'YYYY-YYYY' (defaults to current school year if not provided)", 
+                             type=openapi.TYPE_STRING, required=False),
+        ],
         responses={200: TeacherStudentEnrollmentSerializer(many=True)}
     )
     @action(detail=False, methods=['get'],url_path='my-students')
     def my_students(self, request):
-        """Get all students enrolled with the current teacher."""
+        """Get all students enrolled with the current teacher, defaulting to current school year."""
+        school_year = request.query_params.get('school_year')
+        
         queryset = self.queryset.filter(teacher=request.user)
+        
+        # If no school year specified, use the current school year
+        if not school_year:
+            current_school_year = SchoolYear.current_year()
+            school_year = f"{current_school_year.start_year}-{current_school_year.end_year}"
+        
+        # Apply the school_year filter using the existing filter method
+        filterset = self.filterset_class(data={'school_year': school_year}, queryset=queryset)
+        queryset = filterset.qs
+        
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     @swagger_auto_schema(
         method='get',
-        responses={200: TeacherStudentEnrollmentSerializer(many=True)},
-        operation_description="Get all teachers for the current student"
+        manual_parameters=[
+            openapi.Parameter('school_year', openapi.IN_QUERY, 
+                             description="School Year in format 'YYYY-YYYY' (defaults to current school year if not provided)", 
+                             type=openapi.TYPE_STRING, required=False),
+        ],
+        responses={200: EnhancedTeacherEnrollmentSerializer(many=True)},
+        operation_description="Get all teachers associated with the current student"
     )
     @action(detail=False, methods=['get'],url_path='my-teachers')
     def my_teachers(self, request):
-        """Get all teachers associated with the current student."""
+        """Get all teachers associated with the current student, defaulting to current school year."""
+        school_year = request.query_params.get('school_year')
+        
         queryset = self.queryset.filter(
             offer__student=request.user,
             has_class_end=False  # Only get active enrollments
         )
-        serializer = self.get_serializer(queryset, many=True)
         
-        # Enhance response with additional teacher details
-        response_data = []
-        for enrollment in serializer.data:
-            teacher_data = enrollment.copy()
-            teacher_data['subject'] = enrollment['offer']['subject']
-            teacher_data['class_level'] = enrollment['offer']['class_level']
-            teacher_data['hourly_rate'] = enrollment['offer']['hourly_rate']
-            response_data.append(teacher_data)
-            
-        return Response(response_data)
+        # If no school year specified, use the current school year
+        if not school_year:
+            current_school_year = SchoolYear.current_year()
+            school_year = f"{current_school_year.start_year}-{current_school_year.end_year}"
+        
+        # Apply the school_year filter using the existing filter method
+        filterset = self.filterset_class(data={'school_year': school_year}, queryset=queryset)
+        queryset = filterset.qs
+        
+        serializer = EnhancedTeacherEnrollmentSerializer(queryset, many=True)
+        return Response(serializer.data)
     
     @swagger_auto_schema(
         method='get',
@@ -511,14 +572,23 @@ class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
 
 class CourseDeclarationViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for managing course declarations.
+    API endpoint for managing course declarations for a specific teacher-student enrollment.
     """
     permission_classes = [IsAuthenticated]
     pagination_class = CustomPagination
-    queryset = CourseDeclaration.objects.all()
     serializer_class = CourseDeclarationSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = CourseDeclarationFilter
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
+            return CourseDeclaration.objects.none()
+        return CourseDeclaration.objects.filter(
+            teacher_student_enrollment=self.kwargs['enrollment_pk']
+        )
+
+    def perform_create(self, serializer):
+        serializer.save(teacher_student_enrollment_id=self.kwargs['enrollment_pk'])
 
     @action(detail=True, methods=['post'])
     def update_status(self, request, pk=None):
@@ -692,3 +762,76 @@ class ExerciseResourceViewSet(viewsets.ModelViewSet):
 #     serializer_class = QuestionResponseSerializer
 #     filter_backends = [DjangoFilterBackend]
 #     filterset_fields = ['attempt', 'question', 'is_correct']
+
+class UserClassViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing user classes.
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = UserClass.objects.all()
+    serializer_class = UserClassSerializer
+    
+    def perform_create(self, serializer):
+        """
+        If school_year is not provided, use the current school year
+        """
+        if not serializer.validated_data.get('school_year'):
+            serializer.validated_data['school_year'] = SchoolYear.current_year()
+        serializer.save()
+    
+    @swagger_auto_schema(
+        method='get',
+        responses={200: UserClassSerializer(many=True)},
+        operation_description="Get current student's class information"
+    )
+    @action(detail=False, methods=['get'], url_path='my-class')
+    def my_class(self, request):
+        """Get the current user's class if they are a student."""
+        user = request.user
+        
+        # Check if user is not a professional (thus a student)
+        if user.education_level != 'PROFESSIONAL':
+            user_classes = UserClass.objects.filter(
+                user=user,
+                school_year=SchoolYear.current_year()
+            )
+            
+            serializer = self.get_serializer(user_classes, many=True)
+            return Response(serializer.data)
+        else:
+            return Response(
+                {"error": "Only students can access this endpoint"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+    
+    @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter('class_id', openapi.IN_QUERY, 
+                             description="Class ID to filter subjects", 
+                             type=openapi.TYPE_INTEGER, required=True),
+        ],
+        responses={200: SubjectSerializer(many=True)},
+        operation_description="Get subjects for a specific class"
+    )
+    @action(detail=False, methods=['get'], url_path='class-subjects')
+    def class_subjects(self, request):
+        """Get all subjects for a specific class."""
+        class_id = request.query_params.get('class_id')
+        
+        if not class_id:
+            return Response(
+                {"error": "class_id parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            class_obj = Class.objects.get(id=class_id)
+            subjects = Subject.objects.filter(class_level=class_obj)
+            serializer = SubjectSerializer(subjects, many=True)
+            return Response(serializer.data)
+        except Class.DoesNotExist:
+            return Response(
+                {"error": "Class not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )

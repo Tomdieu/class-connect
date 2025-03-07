@@ -12,6 +12,7 @@ import React from "react";
 import InactivityProvider from "@/providers/InactivityProvider";
 import HelmetWrapper from "@/providers/HelmetWrapperProvider";
 
+// Optimize font loading
 const Inter = localFont({
   src: [
     {
@@ -40,7 +41,8 @@ const Inter = localFont({
     },
   ],
   variable: "--font-inter",
-  display: "swap",
+  display: "optional", // Changed from "swap" to "optional"
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -214,11 +216,18 @@ export default async function RootLayout({
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <meta name="theme-color" content="#2563eb" />
-        {/* Update hreflang tags */}
-        <link 
-          rel="alternate" 
-          hrefLang="fr-FR" 
-          href="https://www.classconnect.cm/fr" 
+        <link
+          rel="preconnect"
+          href="https://www.classconnect.cm"
+          crossOrigin="anonymous"
+        />
+        {/* Add preload for critical assets */}
+        <link rel="preload" as="image" href="/logo.png" />
+        {/* Add hreflang tags */}
+        <link
+          rel="alternate"
+          hrefLang="fr"
+          href="https://www.classconnect.cm/fr"
         />
         <link 
           rel="alternate" 

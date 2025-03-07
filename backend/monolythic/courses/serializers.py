@@ -18,6 +18,8 @@ from .models import (
     CourseOfferingAction,
     TeacherStudentEnrollment,
     CourseDeclaration,
+    SchoolYear,
+    UserClass
     # Question, QuestionOption, QuizAttempt, QuestionResponse
 )
 from users.serializers import UserSerializer
@@ -187,12 +189,19 @@ class DailyTimeSlotUpdateSerializer(serializers.ModelSerializer):
         fields = ['slot_id','is_available']
 
 
+class UserAvailabilityCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAvailability
+        fields = ['is_available']
+
 class UserAvailabilitySerializer(serializers.ModelSerializer):
     daily_slots = DailyTimeSlotSerializer(many=True, read_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = UserAvailability
-        fields = ['id', 'user', 'is_available', 'last_updated', 'daily_slots']
+        fields = '__all__'
+        read_only_fields = ["user", "user_type", "created_at", 'last_updated']
 
 class CourseOfferingSerializer(serializers.ModelSerializer):
     student = UserSerializer(read_only=True)
@@ -235,6 +244,12 @@ class CourseOfferingActionSerializer(serializers.ModelSerializer):
         model = CourseOfferingAction
         fields = '__all__'
 
+class SchoolYearSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = SchoolYear
+        fields = ['id','start_year','end_year','is_active','formatted_year']
+
 class TeacherStudentEnrollmentSerializer(serializers.ModelSerializer):
     offer = CourseOfferingSerializer(read_only=True)
     offer_id = serializers.PrimaryKeyRelatedField(
@@ -248,13 +263,32 @@ class TeacherStudentEnrollmentSerializer(serializers.ModelSerializer):
         write_only=True,
         source='teacher'
     )
+    school_year = SchoolYearSerializer(read_only=True)
 
     class Meta:
         model = TeacherStudentEnrollment
-        fields = ['id', 'teacher','teacher_id', 'offer', 'offer_id', 'created_at', 'has_class_end']
+        fields = ['id', 'teacher','teacher_id','status', 'offer', 'offer_id', 'created_at', 'has_class_end','school_year']
 
     def create(self, validated_data):
         return TeacherStudentEnrollment.objects.create(**validated_data)
+
+class EnhancedTeacherEnrollmentSerializer(TeacherStudentEnrollmentSerializer):
+    subject = serializers.SerializerMethodField()
+    class_level = serializers.SerializerMethodField()
+    hourly_rate = serializers.SerializerMethodField()
+
+    class Meta(TeacherStudentEnrollmentSerializer.Meta):
+        model = TeacherStudentEnrollment
+        fields = TeacherStudentEnrollmentSerializer.Meta.fields + ['subject', 'class_level', 'hourly_rate']
+
+    def get_subject(self, obj):
+        return obj.offer.subject if obj.offer else None
+
+    def get_class_level(self, obj):
+        return obj.offer.class_level if obj.offer else None
+
+    def get_hourly_rate(self, obj):
+        return obj.offer.hourly_rate if obj.offer else None
 
 class CourseDeclarationSerializer(serializers.ModelSerializer):
     accepted_by = UserSerializer(read_only=True)
@@ -318,3 +352,33 @@ class UserProgressSerializer(serializers.ModelSerializer):
 #             questions.append(question)
             
 #         return questions
+
+class UserClassSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+        source='user'
+    )
+    class_level = ClassSerializer(read_only=True)
+    class_level_id = serializers.PrimaryKeyRelatedField(
+        queryset=Class.objects.all(),
+        write_only=True,
+        source='class_level'
+    )
+    school_year = SchoolYearSerializer(read_only=True)
+    school_year_id = serializers.PrimaryKeyRelatedField(
+        queryset=SchoolYear.objects.all(),
+        write_only=True,
+        source='school_year',
+        required=False
+    )
+    
+    class Meta:
+        model = UserClass
+        fields = [
+            'id', 'user', 'user_id', 
+            'class_level', 'class_level_id', 
+            'school_year', 'school_year_id', 
+            'created_at', 'updated_at'
+        ]

@@ -1,7 +1,8 @@
 import NextAuth, { User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { LoginResponseType, UserType } from "./types";
+import { LoginResponseType } from "./types";
 import { getAccountInfor } from "./actions/accounts";
+import { getUserRole } from "./lib/utils";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
@@ -55,15 +56,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
           const user = await getAccountInfor(data.access_token);
           
-          const getUserRole = (user:UserType)=>{
-            if(user.is_superuser || user.is_staff){
-              return "admin";
-            }
-            if(user.education_level === "PROFESSIONAL"){
-              return "teacher";
-            }
-            return "student";
-          }
+          
           const role = getUserRole(user);
 
           return {
@@ -112,4 +105,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     strategy: "jwt",
   },
   secret: process.env.AUTH_SECRET || "CLASSCONNECT",
+  events:{
+    signIn(message) {
+      console.log("signIn",message);
+    },
+  }
 });

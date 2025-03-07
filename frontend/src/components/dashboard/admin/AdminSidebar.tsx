@@ -1,5 +1,5 @@
 "use client";
-import { Users, BookOpen, BarChart3, Settings, CreditCard, Bell } from "lucide-react";
+import { Users, BookOpen, BarChart3, Settings, CreditCard, Bell, GraduationCap } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +28,7 @@ export const AdminSidebar = () => {
       items: [
         { title: t("adminSidebar.items.users"), icon: Users, url: "/admin/users" },
         { title: t("adminSidebar.items.courses"), icon: BookOpen, url: "/admin/classes" },
+        { title: t("adminSidebar.items.courseOfferings"), icon: GraduationCap, url: "/admin/course-offerings" },
         { title: t("adminSidebar.items.payments"), icon: CreditCard, url: "/admin/payments" },
       ],
     },

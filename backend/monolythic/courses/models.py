@@ -6,6 +6,7 @@ import uuid
 from polymorphic.models import PolymorphicModel
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
+from django.utils.timezone import now
 
 User = get_user_model()
 class CourseCategory(models.Model):
@@ -60,12 +61,50 @@ class Class(models.Model):
     def __str__(self):
         return f"{self.name} - {self.get_level_display()}"
 
+class SchoolYear(models.Model):
+    start_year = models.PositiveIntegerField()
+    end_year = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('start_year', 'end_year')
+        ordering = ['-start_year']
+
+
+    def __str__(self):
+        return f"{self.start_year}-{self.end_year}"
+    
+    @property
+    def formatted_year(self):
+        """Returns the school year in 'YYYY-YYYY' format."""
+        return f"{self.start_year}-{self.end_year}"
+    
+    @classmethod
+    def current_year(cls):
+        """Gets or creates the current school year based on today's date."""
+        today = now().date()
+        current_year = today.year
+        start_year = current_year if today.month >= 9 else current_year - 1  # Assume school starts in September
+        end_year = start_year + 1
+
+        school_year, created = cls.objects.get_or_create(
+            start_year=start_year,
+            end_year=end_year,
+            defaults={'is_active': True}
+        )
+        return school_year
 
 class UserClass(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     class_level = models.ForeignKey(Class, on_delete=models.CASCADE)
+    school_year = models.ForeignKey(SchoolYear,on_delete=models.CASCADE,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        if self.school_year == None:
+            self.school_year = SchoolYear.current_year()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user} - {self.class_level}"
@@ -414,18 +453,62 @@ class CourseOfferingAction(models.Model):
     offer = models.ForeignKey(CourseOffering, on_delete=models.CASCADE)
     action = models.CharField(max_length=20,choices=ACTIONS,default=PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return f"{self.teacher} - {self.offer} - {self.action}"
+    
+
 
 class TeacherStudentEnrollment(models.Model):
+    ACTIVE = "ACTIVE"
+    COMPLETED = "COMPLETED"
+
+    STATUS_CHOICES = [
+        (ACTIVE, "Active"),
+        (COMPLETED, "Completed"),
+    ]
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='students')
-    offer = models.ForeignKey(CourseOffering, on_delete=models.CASCADE)
+    offer = models.ForeignKey(CourseOffering, on_delete=models.PROTECT)
+    school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     has_class_end = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=ACTIVE)
+    
+    class Meta:
+        unique_together = ("teacher", "offer", "school_year")  # Prevents duplicate enrollments
+        indexes = [
+            models.Index(fields=["teacher", "school_year"]),
+        ]
 
     def __str__(self):
-        return f"{self.teacher} - {self.offer.student}"
+        return f"{self.teacher} - {self.offer.student} ({self.school_year})"
+    
+    @classmethod
+    def enroll(cls, teacher, offer):
+        """
+        Enrolls a teacher to a student's course for the current school year.
+        If the enrollment already exists, return the existing one.
+        """
+        school_year = SchoolYear.current_year()
+        enrollment, created = cls.objects.get_or_create(
+            teacher=teacher,
+            offer=offer,
+            school_year=school_year,
+            defaults={"status": cls.ACTIVE}
+        )
+        return enrollment
+    
+    @classmethod
+    def get_current_year_enrollments(cls, teacher):
+        """Returns all enrollments for the teacher in the current school year."""
+        return cls.objects.filter(teacher=teacher, school_year=SchoolYear.current_year())
+    
+    def complete(self):
+        """Marks the enrollment as completed."""
+        self.status = self.COMPLETED
+        self.save()
     
 class CourseDeclaration(models.Model):
     PENDING = 'PENDING'

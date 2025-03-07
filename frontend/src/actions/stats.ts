@@ -2,7 +2,7 @@
 import { auth } from "@/auth";
 import api from "@/services/api";
 import { Stats } from "@/types";
-import axios from "axios";
+import { AxiosError } from "axios";
 
 export const getStats = async () => {
   try {
@@ -14,10 +14,10 @@ export const getStats = async () => {
       },
     });
     return response.data as Stats;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }

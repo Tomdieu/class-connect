@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import {
   Credenza,
+  CredenzaClose,
   CredenzaContent,
   CredenzaHeader,
   CredenzaTitle,
@@ -45,7 +46,7 @@ function SubjectModal() {
 
   const form = useForm<SubjectFormData>({
     resolver: zodResolver(createSubjectSchema(t)),
-    mode: "all",
+    mode: "onSubmit",
     defaultValues: {
       name: "",
       description: "",
@@ -80,19 +81,18 @@ function SubjectModal() {
   }, [form, subject]);
 
   const resetForm = useCallback(() => {
-      form.reset({
-        id: undefined,
-        name: undefined,
-        description: undefined,
-      });
-    },[form]);
-  
-    useEffect(()=>{
-      if(!isOpen){
-          resetForm()
-      }
-    },[isOpen, resetForm])
+    form.reset({
+      id: undefined,
+      name: undefined,
+      description: undefined,
+    });
+  }, [form]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen, resetForm]);
 
   const handleSubjectSubmit = async (data: SubjectFormData) => {
     console.log(data);
@@ -116,7 +116,7 @@ function SubjectModal() {
             queryClient.invalidateQueries({
               queryKey: ["class", subject.class_level.toString()],
             });
-            resetForm()
+            resetForm();
             onClose();
           },
           onError(error) {
@@ -148,7 +148,7 @@ function SubjectModal() {
               queryClient.invalidateQueries({
                 queryKey: ["class", classId.toString()],
               });
-              resetForm()
+              resetForm();
               toast.success("Added Subject", {
                 description: "Subject added successfully",
               });
@@ -167,13 +167,15 @@ function SubjectModal() {
 
   return (
     <Credenza open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <CredenzaContent>
+      <CredenzaContent showIcon={false}>
         <CredenzaHeader>
           <CredenzaTitle>
             {subject ? t("subject.edit") : t("subject.add")}
           </CredenzaTitle>
           <p className="text-sm text-muted-foreground">
-            {subject ? t("subject.form.editDescription") : t("subject.form.addDescription")}
+            {subject
+              ? t("subject.form.editDescription")
+              : t("subject.form.addDescription")}
           </p>
         </CredenzaHeader>
         <div>
@@ -213,16 +215,23 @@ function SubjectModal() {
                   </FormItem>
                 )}
               />
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="flex items-center"
-              >
-                {isLoading && (
-                  <Loader className="size-4 text-muted-foreground mr-2" />
-                )}
-                {subject ? t("subject.form.submit.edit") : t("subject.form.submit.add")}
-              </Button>
+              <div className="w-full flex items-center gap-2">
+                <CredenzaClose asChild>
+                  <Button type="button" variant={"destructive"}>{t("common.cancel")}</Button>
+                </CredenzaClose>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex items-center w-full"
+                >
+                  {isLoading && (
+                    <Loader className="size-4 text-muted-foreground mr-2" />
+                  )}
+                  {subject
+                    ? t("subject.form.submit.edit")
+                    : t("subject.form.submit.add")}
+                </Button>
+              </div>
             </form>
           </Form>
         </div>

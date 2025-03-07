@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework_nested import routers
 from .views import (
-    CourseCategoryViewSet, ClassViewSet, SubjectViewSet,
+    CourseCategoryViewSet, ClassViewSet, SchoolYearViewSet, SubjectViewSet,
     ChapterViewSet, TopicViewSet, ResourceViewSet,
     UserProgressViewSet,
     UserAvailabilityViewSet,
@@ -11,7 +11,8 @@ from .views import (
     CourseDeclarationViewSet,
     # QuizResourceViewSet, QuestionViewSet, QuestionOptionViewSet,
     # QuizAttemptViewSet, QuestionResponseViewSet,
-    VideoResourceViewSet, RevisionResourceViewSet, PDFResourceViewSet, ExerciseResourceViewSet
+    VideoResourceViewSet, RevisionResourceViewSet, PDFResourceViewSet, ExerciseResourceViewSet,
+    UserClassViewSet
 )
 
 # Create main router
@@ -21,9 +22,11 @@ router.register(r'classes', ClassViewSet)
 router.register(r'user-progress', UserProgressViewSet)
 router.register(r'user-availability', UserAvailabilityViewSet)
 router.register(r'course-offerings', CourseOfferingViewSet)
-router.register(r'offering-actions', CourseOfferingActionViewSet)
+router.register(r'school-year', SchoolYearViewSet)
 router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
-router.register(r'declarations', CourseDeclarationViewSet)
+router.register(r'user-classes', UserClassViewSet)  # Add the new viewset
+# Remove the standalone declaration registration
+# router.register(r'declarations', CourseDeclarationViewSet)
 # router.register(r'quizzes', QuizResourceViewSet)
 # router.register(r'questions', QuestionViewSet)
 # router.register(r'question-options', QuestionOptionViewSet)
@@ -48,10 +51,20 @@ topic_router.register(r'revisions', RevisionResourceViewSet, basename='topic-rev
 topic_router.register(r'pdfs', PDFResourceViewSet, basename='topic-pdfs')
 topic_router.register(r'exercises', ExerciseResourceViewSet, basename='topic-exercises')
 
+# Add nested router for course offering actions
+offering_router = routers.NestedDefaultRouter(router, r'course-offerings', lookup='offering')
+offering_router.register(r'actions', CourseOfferingActionViewSet, basename='offering-actions')
+
+# Create nested router for course declarations under enrollments
+enrollment_router = routers.NestedDefaultRouter(router, r'enrollments', lookup='enrollment')
+enrollment_router.register(r'declarations', CourseDeclarationViewSet, basename='enrollment-declarations')
+
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(class_router.urls)),
     path('', include(subject_router.urls)),
     path('', include(chapter_router.urls)),
     path('', include(topic_router.urls)),
+    path('', include(offering_router.urls)),
+    path('', include(enrollment_router.urls)),  # Add the enrollment router
 ]

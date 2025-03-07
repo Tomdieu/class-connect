@@ -35,7 +35,7 @@ function LoginDialog() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const _callbackUrl = searchParams.get("callbackUrl") || "/redirect";
 
   // Create login schema with translations
   const createLoginSchema = (t: (key: string) => string) =>
@@ -122,13 +122,13 @@ function LoginDialog() {
         toast("Login successfull");
         if (res.url) {
           const url = new URL(res.url);
-          const callbackUrl = url.searchParams.get("callbackUrl");
+          const callbackUrl = url.searchParams.get("callbackUrl") || _callbackUrl;
           if (callbackUrl) {
             const decodedCallbackUrl = decodeURIComponent(callbackUrl);
 
             router.push(decodedCallbackUrl);
           } else {
-            router.push("/dashboard");
+            router.push("/redirect");
           }
         }
       }

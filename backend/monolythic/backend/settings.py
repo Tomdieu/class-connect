@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "notifications",
     "payments",
     "streamings",
+    "forum",
     # third party adds
     "rest_framework",
     "phonenumber_field",
@@ -386,3 +387,6 @@ CAMPAY_WEBHOOK_SECRET = env('CAMPAY_WEBHOOK_SECRET',default='')
 
 # DEFAULT_FILE_STORAGE = 'backend.storage_backends.PrivateMediaStorage'
 # DEFAULT_FILE_STORAGE = 'backend.storage_backends.B2Storage'
+
+
+FRONTEND_HOST=env('FRONTEND_HOST',default='http://localhost:3000')

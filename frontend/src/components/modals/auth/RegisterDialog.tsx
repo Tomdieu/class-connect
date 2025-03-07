@@ -8,7 +8,7 @@ import {
 import { DialogTitle } from "@/components/ui/dialog";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 import { BookOpen, LoaderCircle } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useI18n } from "@/locales/client";
@@ -55,7 +55,6 @@ const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 function RegisterDialog() {
   const { isRegisterOpen, closeDialog } = useAuthDialog();
   const t = useI18n();
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   // Create registration schema with translations
@@ -201,47 +200,53 @@ function RegisterDialog() {
       closeDialog(false);
       router.refresh();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       try {
         const errorData = JSON.parse(error.message || "{}");
-        
+
         // Handle field-specific errors
         if (errorData.email) {
-          form.setError("email", { 
-            message: Array.isArray(errorData.email) ? errorData.email[0] : errorData.email 
+          form.setError("email", {
+            message: Array.isArray(errorData.email)
+              ? errorData.email[0]
+              : errorData.email,
           });
         }
-        
+
         if (errorData.phone_number) {
-          form.setError("phone_number", { 
-            message: Array.isArray(errorData.phone_number) ? errorData.phone_number[0] : errorData.phone_number 
+          form.setError("phone_number", {
+            message: Array.isArray(errorData.phone_number)
+              ? errorData.phone_number[0]
+              : errorData.phone_number,
           });
         }
-        
+
         // Show error toast with all error messages
         const errorMessages = Object.entries(errorData)
-          .filter(([key]) => key !== 'message') // Exclude the generic message
+          .filter(([key]) => key !== "message") // Exclude the generic message
           .map(([key, value]) => {
-            const messages = Array.isArray(value) ? value.join(', ') : value;
+            const messages = Array.isArray(value) ? value.join(", ") : value;
             return `${key}: ${messages}`;
           });
 
         if (errorMessages.length > 0) {
           toast.error("Registration failed. Please try again.", {
-            description: errorMessages.join('\n')
+            description: errorMessages.join("\n"),
           });
         } else {
           toast.error("Registration failed. Please try again.", {
-            description: errorData.message || "Something went wrong. Please check your input and try again."
+            description:
+              errorData.message ||
+              "Something went wrong. Please check your input and try again.",
           });
         }
       } catch (e) {
-        console.error("Error parsing error response:", error);
+        console.error("Error parsing error response:", e);
         toast.error("Registration failed. Please try again.", {
-          description: "An unexpected error occurred"
+          description: "An unexpected error occurred",
         });
-      }
-    }
+      } 
+    },
   });
 
   const handleRegisterSubmit = async (values: RegisterFormData) => {

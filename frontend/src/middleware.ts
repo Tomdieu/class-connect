@@ -8,7 +8,7 @@ const I18nMiddleware = createI18nMiddleware({
 });
 
 // List of routes that require authentication (without locale prefix)
-const protectedRoutes = ["/dashboard", "/admin"];
+const protectedRoutes = ["/dashboard", "/admin","/students"];
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth;

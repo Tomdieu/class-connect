@@ -1,14 +1,11 @@
+import { User } from 'next-auth';
 export const EDUCATION_LEVELS = [
   "COLLEGE",
   "LYCEE",
   "UNIVERSITY",
   "PROFESSIONAL",
 ] as const;
-export const LYCEE_CLASSES = [
-  "2nde",
-  "1ere",
-  "terminale",
-] as const;
+export const LYCEE_CLASSES = ["2nde", "1ere", "terminale"] as const;
 export const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 export const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
 export const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
@@ -58,6 +55,7 @@ export declare interface UserType {
   phone_number: string;
   date_of_birth: string | null;
   education_level: EducationLevel;
+  class_level:number|null;
   lycee_class: LyceeClass | null;
   lycee_speciality: LyceeSpecialities | null;
   university_level: UniversityLevel | null;
@@ -72,10 +70,15 @@ export declare interface UserType {
   is_staff: boolean;
   is_superuser: boolean;
   is_active: boolean;
+  last_login:string|null;
   created_at: string;
   updated_at: string;
   date_joined: string;
   college_class: CollegeClass | null;
+  subscription_status:
+    | { active: boolean; plan: string; expires_at: string }
+    | { active: boolean };
+    class_display: string;
 }
 
 export declare interface UserActiveToken {
@@ -141,7 +144,7 @@ export declare interface ClassType {
   id: number;
   name: string;
   level: EducationLevel;
-  secion: Section;
+  section: Section;
   speciality?: LyceeSpecialities;
   description: string | null;
   created_at: string;
@@ -250,7 +253,6 @@ export declare interface AbstractResourceType {
   polymorphic_ctype: number;
   resource_type:
     | "VideoResource"
-    | "QuizResource"
     | "RevisionResource"
     | "PDFResource"
     | "ExerciseResource";
@@ -263,98 +265,98 @@ export declare interface AbstractResourceCreateType {
   polymorphic_ctype?: number;
 }
 
-// Quiz Types
-export declare interface QuestionOptionType {
-  id: number;
-  question: number;
-  text: string;
-  image: string | null;
-  is_correct: boolean;
-  order: number;
-  created_at: string;
-  updated_at: string;
-}
+// // Quiz Types
+// export declare interface QuestionOptionType {
+//   id: number;
+//   question: number;
+//   text: string;
+//   image: string | null;
+//   is_correct: boolean;
+//   order: number;
+//   created_at: string;
+//   updated_at: string;
+// }
 
-export declare interface QuestionType {
-  id: number;
-  quiz: number;
-  text: string;
-  image: string | null;
-  type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
-  points: number;
-  order: number;
-  explanation: string;
-  explanation_image: string | null;
-  created_at: string;
-  updated_at: string;
-  options: QuestionOptionType[];
-}
+// export declare interface QuestionType {
+//   id: number;
+//   quiz: number;
+//   text: string;
+//   image: string | null;
+//   type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
+//   points: number;
+//   order: number;
+//   explanation: string;
+//   explanation_image: string | null;
+//   created_at: string;
+//   updated_at: string;
+//   options: QuestionOptionType[];
+// }
 
-export declare interface QuizResourceType extends AbstractResourceType {
-  total_questions: number;
-  duration_minutes: number;
-  passing_score: number;
-  show_correct_answers: boolean;
-  show_explanation: boolean;
-  shuffle_questions: boolean;
-  attempts_allowed: number;
-  partial_credit: boolean;
-  questions: QuestionType[];
-}
+// export declare interface QuizResourceType extends AbstractResourceType {
+//   total_questions: number;
+//   duration_minutes: number;
+//   passing_score: number;
+//   show_correct_answers: boolean;
+//   show_explanation: boolean;
+//   shuffle_questions: boolean;
+//   attempts_allowed: number;
+//   partial_credit: boolean;
+//   questions: QuestionType[];
+// }
 
-export declare interface QuizAttemptType {
-  id: number;
-  quiz: number;
-  user: number;
-  score: number;
-  started_at: string;
-  completed_at: string | null;
-  is_completed: boolean;
-}
+// export declare interface QuizAttemptType {
+//   id: number;
+//   quiz: number;
+//   user: number;
+//   score: number;
+//   started_at: string;
+//   completed_at: string | null;
+//   is_completed: boolean;
+// }
 
-export declare interface QuestionResponseType {
-  id: number;
-  attempt: number;
-  question: number;
-  selected_options: number[];
-  text_response: string;
-  is_correct: boolean;
-  points_earned: number;
-  created_at: string;
-  updated_at: string;
-}
+// export declare interface QuestionResponseType {
+//   id: number;
+//   attempt: number;
+//   question: number;
+//   selected_options: number[];
+//   text_response: string;
+//   is_correct: boolean;
+//   points_earned: number;
+//   created_at: string;
+//   updated_at: string;
+// }
 
-// Create Types
-export declare interface QuestionOptionCreateType {
-  text: string;
-  image?: File;
-  is_correct: boolean;
-  order: number;
-}
+// // Create Types
+// export declare interface QuestionOptionCreateType {
+//   text: string;
+//   image?: File;
+//   is_correct: boolean;
+//   order: number;
+// }
 
-export declare interface QuestionCreateType {
-  text: string;
-  image?: File;
-  type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
-  points: number;
-  order: number;
-  explanation: string;
-  explanation_image?: File;
-  options: QuestionOptionCreateType[];
-}
+// export declare interface QuestionCreateType {
+//   text: string;
+//   image?: File;
+//   type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
+//   points: number;
+//   order: number;
+//   explanation: string;
+//   explanation_image?: File;
+//   options: QuestionOptionCreateType[];
+// }
 
-export declare interface QuizResourceCreateType
-  extends AbstractResourceCreateType {
-  total_questions: number;
-  duration_minutes: number;
-  passing_score: number;
-  show_correct_answers: boolean;
-  show_explanation: boolean;
-  shuffle_questions: boolean;
-  attempts_allowed: number;
-  partial_credit: boolean;
-  questions: QuestionCreateType[];
-}
+// export declare interface QuizResourceCreateType
+//   extends AbstractResourceCreateType {
+//   total_questions: number;
+//   duration_minutes: number;
+//   passing_score: number;
+//   show_correct_answers: boolean;
+//   show_explanation: boolean;
+//   shuffle_questions: boolean;
+//   attempts_allowed: number;
+//   partial_credit: boolean;
+//   questions: QuestionCreateType[];
+// }
 
 export declare interface PDFResourceCreateType
   extends AbstractResourceCreateType {
@@ -384,7 +386,7 @@ export declare interface ExerciseResourceCreateType
 }
 
 export declare interface ExerciseResourceType
-  extends AbstractResourceCreateType {
+  extends AbstractResourceType {
   instructions: string;
   solution_file: string;
   exercise_file: string;
@@ -397,8 +399,14 @@ export declare interface RevisionResourceCreateType
   content: string;
 }
 
+export declare interface RevisionResourceType
+  extends AbstractResourceType {
+  content: string;
+}
+
 export declare interface UserAvailabilityType {
   id: number;
+  daily_slots: DailyTimeSlotType[];
   user: User;
   user_type: UserType;
   is_available: boolean;
@@ -406,14 +414,11 @@ export declare interface UserAvailabilityType {
 }
 
 export declare interface UserAvailabilityCreateType {
-  user: string; // UUID
-  user_type: UserType;
   is_available: boolean;
 }
 
 export declare interface DailyTimeSlotType {
   id: number;
-  availability: UserAvailability;
   day: DayOfWeek;
   time_slot: TimeSlot;
   is_available: boolean;
@@ -436,6 +441,8 @@ export declare interface CourseOfferingType {
   start_date: string;
   hourly_rate: number;
   is_available: boolean;
+  created_at:string;
+  updated_at:string;
 }
 
 export declare interface CourseOfferingCreateType {
@@ -462,12 +469,36 @@ export declare interface CourseOfferingActionCreateType {
   action: ActionStatus;
 }
 
+export declare interface SchoolYearType {
+  start_year:number;
+  end_year:number;
+  is_active:boolean;
+  formatted_year:string;
+}
+
 export declare interface TeacherStudentEnrollmentType {
   id: number;
   teacher: User;
+  teacher_id:string;
   offer: CourseOffering;
+  offer_id:number;
+  school_year: SchoolYearType;
   created_at: string;
   has_class_end: boolean;
+}
+
+export declare interface EnhaceTeacherStudentEnrollmentType {
+  id: number;
+  teacher: User;
+  teacher_id:string;
+  offer: CourseOffering;
+  offer_id:number;
+  school_year: SchoolYearType;
+  created_at: string;
+  has_class_end: boolean;
+  subject:string;
+  class_level:string;
+  hourly_rate: number;
 }
 
 export declare interface TeacherStudentEnrollmentCreateType {
@@ -491,7 +522,7 @@ export declare interface CourseDeclarationCreateType {
   duration: number;
   declaration_date: string;
   accepted_by?: string; // UUID
-  status: ActionStatus;
+  status: Omit<ActionStatus, "CANCELLED">;
 }
 
 export declare interface UserProgressType {
@@ -673,4 +704,44 @@ interface MonthStat {
 interface Stats {
   total_users: number;
   monthly_stats: MonthStat[];
+}
+
+
+
+export const NOTICATION_TYPES = ["PAYMENT", "COURSE","SESSION", "SYSTEM"] as const;
+
+export type NOTICATION_TYPE = (typeof NOTICATION_TYPES)[number];
+
+
+declare interface NotificationType {
+  id: number;
+  user_id: string;
+  title: string;
+  message: string;
+  notification_type:NOTICATION_TYPE ;
+  read: boolean;
+  created_at: string;
+}
+
+
+
+declare interface VideoConferenceSessionType {
+  id:number;
+  title:string;
+}
+
+
+declare interface UserClassType {
+  id: number;
+  user: User;
+  class_level: ClassType;
+  school_year: SchoolYearType;
+  created_at: string;
+  updated_at: string;
+}
+
+declare interface UserClassCreateType {
+  user_id: string;
+  class_level_id: number;
+  school_year_id: number;
 }

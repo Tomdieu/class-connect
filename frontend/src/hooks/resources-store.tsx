@@ -2,151 +2,60 @@
 
 import {create} from "zustand";
 
-// Base Store Type
-type BaseResourceStore = {
-    isOpen: boolean;
-    topicId?: number | string;
-    chapterId?: string | number;
-    subjectId?: string | number;
-    classId?: string | number;
-};
-
-// Quiz Store
-type QuizStore = BaseResourceStore & {
-    onOpen: (params: {
-        classId: string | number,
-        subjectId: string | number,
-        chapterId: string | number,
-        topicId: number | string
-    }) => void;
-    onClose: () => void;
-};
-
-export const useQuizStore = create<QuizStore>((set) => ({
-    isOpen: false,
-    topicId: undefined,
-    chapterId: undefined,
-    classId: undefined,
-    subjectId: undefined,
-    onOpen: ({classId, subjectId, chapterId, topicId}) =>
-        set({isOpen: true, classId, subjectId, chapterId, topicId}),
-    onClose: () => set({
-        isOpen: false,
-        topicId: undefined,
-        classId: undefined,
-        subjectId: undefined,
-        chapterId: undefined
-    })
-}));
-
-// PDF Store
-type PDFStore = BaseResourceStore & {
-    onOpen: (params: {
-        classId: string | number,
-        subjectId: string | number,
-        chapterId: string | number,
-        topicId: number | string
-    }) => void;
-    onClose: () => void;
-};
-
-export const usePDFStore = create<PDFStore>((set) => ({
-    isOpen: false,
-    topicId: undefined,
-    chapterId: undefined,
-    classId: undefined,
-    subjectId: undefined,
-    onOpen: ({classId, subjectId, chapterId, topicId}) =>
-        set({isOpen: true, classId, subjectId, chapterId, topicId}),
-    onClose: () => set({
-        isOpen: false,
-        topicId: undefined,
-        classId: undefined,
-        subjectId: undefined,
-        chapterId: undefined
-    })
-}));
-
-// Exercise Store
-type ExerciseStore = BaseResourceStore & {
-    onOpen: (params: {
-        classId: string | number,
-        subjectId: string | number,
-        chapterId: string | number,
-        topicId: number | string
-    }) => void;
-    onClose: () => void;
-};
-
-export const useExerciseStore = create<ExerciseStore>((set) => ({
-    isOpen: false,
-    topicId: undefined,
-    chapterId: undefined,
-    classId: undefined,
-    subjectId: undefined,
-    onOpen: ({classId, subjectId, chapterId, topicId}) =>
-        set({isOpen: true, classId, subjectId, chapterId, topicId}),
-    onClose: () => set({
-        isOpen: false,
-        topicId: undefined,
-        classId: undefined,
-        subjectId: undefined,
-        chapterId: undefined
-    })
-}));
-
-// Revision Store
-type RevisionStore = BaseResourceStore & {
-    onOpen: (params: {
-        classId: string | number,
-        subjectId: string | number,
-        chapterId: string | number,
-        topicId: number | string
-    }) => void;
-    onClose: () => void;
-};
-
-export const useRevisionStore = create<RevisionStore>((set) => ({
-    isOpen: false,
-    topicId: undefined,
-    chapterId: undefined,
-    classId: undefined,
-    subjectId: undefined,
-    onOpen: ({classId, subjectId, chapterId, topicId}) =>
-        set({isOpen: true, classId, subjectId, chapterId, topicId}),
-    onClose: () => set({
-        isOpen: false,
-        topicId: undefined,
-        classId: undefined,
-        subjectId: undefined,
-        chapterId: undefined
-    })
-}));
-
-// Vidoe Store
-type VideoStore = BaseResourceStore & {
-    onOpen: (params: {
-        classId: string | number,
-        subjectId: string | number,
-        chapterId: string | number,
-        topicId: number | string
-    }) => void;
-    onClose: () => void;
+interface ResourceStoreData {
+  classId: string;
+  subjectId: string;
+  chapterId: string;
+  topicId: string;
 }
 
-export const useVideoStore = create<VideoStore>((set) => ({
-    isOpen: false,
-    topicId: undefined,
-    chapterId: undefined,
-    classId: undefined,
-    subjectId: undefined,
-    onOpen: ({classId, subjectId, chapterId, topicId}) =>
-        set({isOpen: true, classId, subjectId, chapterId, topicId}),
-    onClose: () => set({
-        isOpen: false,
-        topicId: undefined,
-        classId: undefined,
-        subjectId: undefined,
-        chapterId: undefined
-    })
+interface ResourceEditData extends ResourceStoreData {
+  resource: any;
+}
+
+interface ResourceStore {
+  isOpen: boolean;
+  classId?: string | number;
+  subjectId?: string | number;
+  chapterId?: string | number;
+  topicId?: string | number;
+  resource?: any;
+  onOpen: (data: ResourceStoreData) => void;
+  onClose: () => void;
+  onEdit: (data: ResourceEditData) => void;
+}
+
+export const usePDFStore = create<ResourceStore>((set) => ({
+  isOpen: false,
+  onOpen: (data) => set({ isOpen: true, ...data }),
+  onClose: () => set({ isOpen: false, classId: undefined, subjectId: undefined, chapterId: undefined, topicId: undefined, resource: undefined }),
+  onEdit: (data) => set({ isOpen: true, ...data }),
+}));
+
+export const useVideoStore = create<ResourceStore>((set) => ({
+  isOpen: false,
+  onOpen: (data) => set({ isOpen: true, ...data }),
+  onClose: () => set({ isOpen: false, classId: undefined, subjectId: undefined, chapterId: undefined, topicId: undefined, resource: undefined }),
+  onEdit: (data) => set({ isOpen: true, ...data }),
+}));
+
+export const useQuizStore = create<ResourceStore>((set) => ({
+  isOpen: false,
+  onOpen: (data) => set({ isOpen: true, ...data }),
+  onClose: () => set({ isOpen: false, classId: undefined, subjectId: undefined, chapterId: undefined, topicId: undefined, resource: undefined }),
+  onEdit: (data) => set({ isOpen: true, ...data }),
+}));
+
+export const useExerciseStore = create<ResourceStore>((set) => ({
+  isOpen: false,
+  onOpen: (data) => set({ isOpen: true, ...data }),
+  onClose: () => set({ isOpen: false, classId: undefined, subjectId: undefined, chapterId: undefined, topicId: undefined, resource: undefined }),
+  onEdit: (data) => set({ isOpen: true, ...data }),
+}));
+
+export const useRevisionStore = create<ResourceStore>((set) => ({
+  isOpen: false,
+  onOpen: (data) => set({ isOpen: true, ...data }),
+  onClose: () => set({ isOpen: false, classId: undefined, subjectId: undefined, chapterId: undefined, topicId: undefined, resource: undefined }),
+  onEdit: (data) => set({ isOpen: true, ...data }),
 }));

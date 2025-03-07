@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import {
   Credenza,
+  CredenzaClose,
   CredenzaContent,
   CredenzaHeader,
   CredenzaTitle,
@@ -30,7 +31,7 @@ import { useChapterStore } from "@/hooks/chapter-store";
 
 function ChapterModal() {
   const t = useI18n();
-  const { isOpen,onClose,chapter,classId,subjectId } = useChapterStore();
+  const { isOpen, onClose, chapter, classId, subjectId } = useChapterStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const createChapterSchema = (t: (key: string) => string) =>
@@ -45,7 +46,7 @@ function ChapterModal() {
 
   const form = useForm<ChapterFormData>({
     resolver: zodResolver(createChapterSchema(t)),
-    mode: "all",
+    mode: "onSubmit",
     defaultValues: {
       title: "",
       description: "",
@@ -84,13 +85,13 @@ function ChapterModal() {
       title: undefined,
       description: undefined,
     });
-  },[form]);
+  }, [form]);
 
-  useEffect(()=>{
-    if(!isOpen){
-        resetForm()
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
     }
-  },[isOpen, resetForm])
+  }, [isOpen, resetForm]);
 
   const handleSubjectSubmit = async (data: ChapterFormData) => {
     console.log(data);
@@ -109,15 +110,23 @@ function ChapterModal() {
         },
         {
           onSuccess() {
-            
             queryClient.invalidateQueries({
-              queryKey: ["class", classId.toString(), "subjects",subjectId.toString(), "chapters"],
+              queryKey: [
+                "class",
+                classId.toString(),
+                "subjects",
+                subjectId.toString(),
+                "chapters",
+              ],
             });
-            resetForm()
+            queryClient.invalidateQueries({
+              queryKey: ["class",classId.toString(), "subjects", subjectId?.toString()],
+            })
+            resetForm();
             onClose();
             toast.success("Updated Chapter", {
-                description: "Chapter updated successfully",
-              });
+              description: "Chapter updated successfully",
+            });
           },
           onError(error) {
             toast.error("An error occur", {
@@ -145,9 +154,18 @@ function ChapterModal() {
             onSuccess() {
               onClose();
               queryClient.invalidateQueries({
-                queryKey: ["class", classId.toString(), "subjects",subjectId?.toString(), "chapters"],
+                queryKey: [
+                  "class",
+                  classId.toString(),
+                  "subjects",
+                  subjectId?.toString(),
+                  "chapters",
+                ],
               });
-              resetForm()
+              queryClient.invalidateQueries({
+                queryKey: ["class",classId.toString(), "subjects", subjectId?.toString()],
+              })
+              resetForm();
               toast.success("Added Chapter", {
                 description: "Chapter added successfully",
               });
@@ -166,14 +184,13 @@ function ChapterModal() {
 
   return (
     <Credenza open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <CredenzaContent>
+      <CredenzaContent showIcon={false}>
         <CredenzaHeader>
           <CredenzaTitle>
-            {chapter ? "Modifier" : "Ajouter un chapitre"}
+            {chapter ? t("chapter.edit") : t("chapter.add")}
           </CredenzaTitle>
           <p className="text-sm text-muted-foreground">
-            Remplir les informations pour {chapter ? "modifier" : "ajouter"} un
-            chapitre
+            {chapter ? t("chapter.form.editDescription") : t("chapter.form.addDescription")}
           </p>
         </CredenzaHeader>
         <div>
@@ -187,9 +204,12 @@ function ChapterModal() {
                 name="title"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Titre</FormLabel>
+                    <FormLabel>{t("chapter.form.title")}</FormLabel>
                     <FormControl>
-                      <Input placeholder={"Titre du chapitre"} {...field} />
+                      <Input 
+                        placeholder={t("chapter.form.titlePlaceholder")} 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -200,12 +220,12 @@ function ChapterModal() {
                 name="description"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t("chapter.form.description")}</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={5}
                         className="resize-none"
-                        placeholder={"Description"}
+                        placeholder={t("chapter.form.descriptionPlaceholder")}
                         {...field}
                       />
                     </FormControl>
@@ -213,16 +233,23 @@ function ChapterModal() {
                   </FormItem>
                 )}
               />
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="flex items-center"
-              >
-                {isLoading && (
-                  <Loader className="size-4 text-muted-foreground mr-2" />
-                )}{" "}
-                {chapter ? "Modifier" : "Ajouter"}
-              </Button>
+              <div className="flex items-center justify-between gap-5">
+                <CredenzaClose asChild>
+                  <Button type="button" variant={"destructive"}>
+                    {t("common.cancel")}
+                  </Button>
+                </CredenzaClose>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex items-center w-full"
+                >
+                  {isLoading && (
+                    <Loader className="size-4 text-muted-foreground mr-2" />
+                  )}
+                  {chapter ? t("chapter.form.submit.edit") : t("chapter.form.submit.add")}
+                </Button>
+              </div>
             </form>
           </Form>
         </div>

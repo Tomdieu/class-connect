@@ -2,7 +2,7 @@
 
 import api from "@/services/api";
 import { auth } from "@/auth";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import {
   PaginationType,
   Payments,
@@ -30,10 +30,10 @@ export const getPayments = async () => {
       },
     });
     return response.data as Payments[];
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -72,10 +72,10 @@ export const subscribeToPlan = async ({
     );
 
     return response.data as { payment_link: string };
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -93,10 +93,10 @@ export const getSubscriptionPlan = async () => {
       },
     });
     return response.data as SubscriptionPlan[];
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -113,10 +113,10 @@ export const addSubscriptionPlan = async (plan: SubscriptionPlan) => {
       },
     });
     return response.data as SubscriptionPlan;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -136,10 +136,10 @@ export const updateSubscriptionPlan = async (
       },
     });
     return response.data as SubscriptionPlan;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -156,10 +156,10 @@ export const deleteSubscriptionPlan = async (id: number) => {
       },
     });
     return response.data as SubscriptionPlan;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -177,10 +177,10 @@ export const listSubscriptions = async () => {
       },
     });
     return response.data as SubscriptionDetail[];
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -196,10 +196,10 @@ export const getSubscription = async (id: number) => {
       },
     });
     return response.data as Subscription;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -214,28 +214,34 @@ export const getCurrentPlan = async () => {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
     });
-    return response.data as {subscription?:SubscriptionDetail,has_active_subscription:boolean};
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+    return response.data as {
+      subscription?: SubscriptionDetail;
+      has_active_subscription: boolean;
+    };
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
-export const getUserPlan = async (accessToken:string) => {
+export const getUserPlan = async (accessToken: string) => {
   try {
     const response = await api.get("/api/current-plan/", {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    return response.data as {subscription?:SubscriptionDetail,has_active_subscription:boolean};
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+    return response.data as {
+      subscription?: SubscriptionDetail;
+      has_active_subscription: boolean;
+    };
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -251,10 +257,10 @@ export const getSubscriptionHistory = async () => {
       },
     });
     return response.data as PaginationType<SubscriptionDetail>;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -277,10 +283,10 @@ export const listTransactions = async ({
       params,
     });
     return response.data as TransactionListResponse;
-  } catch (error) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }

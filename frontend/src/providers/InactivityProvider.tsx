@@ -1,10 +1,10 @@
 "use client";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useCallback, useState } from "react";
 
-import { getCsrfToken, signOut, useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useCallback } from "react";
-
-const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes in milliseconds
+// 10 minutes in milliseconds
+const INACTIVITY_TIMEOUT = 10 * 60 * 1000;
 
 export default function InactivityProvider({
   children,
@@ -12,37 +12,40 @@ export default function InactivityProvider({
   children: React.ReactNode;
 }) {
   const lastActivityRef = useRef<number>(Date.now());
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
+  const [warningShown, setWarningShown] = useState(false);
 
   // Memoize the update activity handler
   const updateLastActivity = useCallback(() => {
     lastActivityRef.current = Date.now();
-  }, []);
+    
+    // If there was a warning shown, hide it when user is active
+    if (warningShown) {
+      setWarningShown(false);
+    }
+  }, [warningShown]);
 
   // Memoize the inactivity check
   const checkInactivity = useCallback(() => {
     const now = Date.now();
+    const timeInactive = now - lastActivityRef.current;
     
-    const logout = async ()=>{
-      const csrfToken = await getCsrfToken();
-      if(csrfToken){
-        signOut({
-          redirectTo: `/?callbackUrl=${encodeURIComponent(pathname)}`,
-          redirect:true,
-        });
+    // If user is inactive for the specified time
+    if (timeInactive >= INACTIVITY_TIMEOUT) {
+      if (session?.user && !warningShown) {
+        // Instead of directly signing out, redirect to a custom sign-out page
+        router.push(`/timeout?returnUrl=${encodeURIComponent(pathname)}`);
+        setWarningShown(true);
       }
     }
-    if (now - lastActivityRef.current >= INACTIVITY_TIMEOUT) {
-      if (session?.user!==undefined) {
-        logout();
-      }
-    }
-  }, [pathname, session?.user]);
+  }, [pathname, session?.user, router, warningShown]);
 
   useEffect(() => {
-    if (!session?.user) return; // Only run effect if user is authenticated
-
+    // Only run effect if user is authenticated
+    if (status !== "authenticated") return;
+    
     // User activity events
     const events = [
       "mousedown",
@@ -52,15 +55,15 @@ export default function InactivityProvider({
       "touchstart",
       "click",
     ] as const;
-
+    
     // Add event listeners
     events.forEach((event) => {
       window.addEventListener(event, updateLastActivity);
     });
-
+    
     // Set up interval to check inactivity
-    const intervalId = setInterval(checkInactivity, 1000);
-
+    const intervalId = setInterval(checkInactivity, 30000); // Check every 30 seconds instead of every second
+    
     // Cleanup function
     return () => {
       events.forEach((event) => {
@@ -68,7 +71,7 @@ export default function InactivityProvider({
       });
       clearInterval(intervalId);
     };
-  }, [session?.user, updateLastActivity, checkInactivity]);
+  }, [status, updateLastActivity, checkInactivity]);
 
   return <>{children}</>;
 }

@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    container_name: classconnect_frontend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    env_file:
+      - ../.env  # Make sure the path is correct

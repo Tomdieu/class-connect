@@ -3,11 +3,8 @@
 import api from "@/services/api";
 import { auth } from "@/auth";
 
-import {
-  UserType,
-  UserCreateType,
-  ChangePasswordType,
-} from "@/types";
+import { UserType, UserCreateType, ChangePasswordType } from "@/types";
+import { AxiosError } from "axios";
 
 export const getAccountInfor = async (token: string) => {
   try {
@@ -17,10 +14,10 @@ export const getAccountInfor = async (token: string) => {
       },
     });
     return response.data as UserType;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -40,10 +37,11 @@ export const registerUser = async (data: UserCreateType) => {
 };
 
 export const getUsers = async ({
-  params
+  params,
 }: {
-  params?: UserParams;
-} = {}) => {  // Make the entire parameter object optional with defaults
+  params?: Partial<UserParams>;
+} = {}) => {
+  // Make the entire parameter object optional with defaults
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
@@ -55,20 +53,20 @@ export const getUsers = async ({
       },
       params,
     });
-    
+
     // Ensure we always return an array
     const data = (await res.data) as UserType[];
     return data.length ? data : [];
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
-export const getUser = async (id: number) => {
+export const getUser = async (id: string) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
@@ -81,10 +79,10 @@ export const getUser = async (id: number) => {
     });
     const data = (await res.data) as UserType;
     return data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -95,13 +93,13 @@ export const updateUser = async ({
   body,
 }: {
   id: number | string;
-  body: UserCreateType;
+  body: Partial<UserCreateType>;
 }) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
 
-    const res = await api.patch(`/api/accounts/users/${id}/`,body, {
+    const res = await api.patch(`/api/accounts/users/${id}/`, body, {
       headers: {
         Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",
@@ -109,16 +107,16 @@ export const updateUser = async ({
     });
     const data = (await res.data) as UserType;
     return data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
-export const deleteUser = async (id: number|string) => {
+export const deleteUser = async (id: number | string) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
@@ -130,10 +128,10 @@ export const deleteUser = async (id: number|string) => {
       },
     });
     return res.data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -150,18 +148,22 @@ export const changePassword = async ({
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
 
-    const res = await api.post(`/api/accounts/users/${id}/change-password/`,body, {
-      headers: {
-        Authorization: `Bearer ${session?.user.accessToken}`,
-        "Content-Type": "application/json",
+    const res = await api.post(
+      `/api/accounts/users/${id}/change-password/`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+          "Content-Type": "application/json",
+        },
       }
-    });
+    );
     const data = (await res.data) as { status: string };
     return data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -185,10 +187,10 @@ export const validatePhoneNumber = async ({
     });
     const data = (await res.data) as { valid: boolean };
     return data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -211,10 +213,10 @@ export const verifyPasword = async ({ password }: { password: string }) => {
     );
     const data = (await res.data) as { valid: boolean };
     return data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -235,15 +237,14 @@ export const checkMail = async ({ email }: { email: string }) => {
     });
     const data = (await res.data) as { exists: boolean };
     return data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
-
 
 export const resentVerificationLink = async ({
   params,
@@ -263,10 +264,10 @@ export const resentVerificationLink = async ({
     });
     const data = (await res.data) as { status: string };
     return data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
@@ -291,15 +292,14 @@ export const confirmResetPassword = async ({
     });
     const data = (await res.data) as { status: string };
     return data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
-
 
 export const sendResetPasswordEmailLinl = async ({
   email,
@@ -322,15 +322,13 @@ export const sendResetPasswordEmailLinl = async ({
     );
     const data = (await res.data) as { exists: boolean };
     return data;
-  } catch (error:any) {
-    // Extract error details from the Axios error response
-    if (error.response?.data) {
-      throw JSON.stringify(error.response.data);
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
     }
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
 
-export const verifyCode = async ({code}:{code:string}) => {
-  
-}
+export const verifyCode = async ({ code }: { code: string }) => {};

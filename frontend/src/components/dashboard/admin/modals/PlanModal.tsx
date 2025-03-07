@@ -35,17 +35,17 @@ function PlanModal() {
   const createPlanSchema = (t: (key: string) => string) =>
     z.object({
       name: z.enum(PLAN_TYPES, {
-        required_error: t('planDialog.errors.nameRequired'),
+        required_error: t('plan.modal.errors.nameRequired'),
       }),
       price: z.number({
-        required_error: t('planDialog.errors.priceRequired'),
-        invalid_type_error: t('planDialog.errors.priceRequired')
-      }).min(0, { message: t('planDialog.errors.priceMin') }),
+        required_error: t('plan.modal.errors.priceRequired'),
+        invalid_type_error: t('plan.modal.errors.priceRequired')
+      }).min(0, { message: t('plan.modal.errors.priceMin') }),
       duration_days: z.number({
-        required_error: t('planDialog.errors.durationRequired'),
-        invalid_type_error: t('planDialog.errors.durationRequired')
-      }).min(1, { message: t('planDialog.errors.durationMin') }),
-      description: z.string().min(1, { message: t('planDialog.errors.descriptionRequired') }),
+        required_error: t('plan.modal.errors.durationRequired'),
+        invalid_type_error: t('plan.modal.errors.durationRequired')
+      }).min(1, { message: t('plan.modal.errors.durationMin') }),
+      description: z.string().min(1, { message: t('plan.modal.errors.descriptionRequired') }),
       active: z.boolean().default(true),
       features: z.record(z.any()).default({})
     })
@@ -145,10 +145,10 @@ function PlanModal() {
       <CredenzaContent>
         <CredenzaHeader>
           <CredenzaTitle>
-            {plan ? t('planDialog.title.edit') : t('planDialog.title.add')}
+            {plan ? t("plan.modal.title.edit") : t("plan.modal.title.add")}
           </CredenzaTitle>
           <p className="text-sm text-muted-foreground">
-            {plan ? t('planDialog.subtitle.edit') : t('planDialog.subtitle.add')}
+            {plan ? t("plan.modal.subtitle.edit") : t("plan.modal.subtitle.add")}
           </p>
         </CredenzaHeader>
         <Form {...form}>
@@ -158,11 +158,11 @@ function PlanModal() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('planDialog.name')}</FormLabel>
+                  <FormLabel>{t('plan.modal.name')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('planDialog.selectPlan')} />
+                        <SelectValue placeholder={t('plan.modal.selectPlan')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -183,7 +183,7 @@ function PlanModal() {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('planDialog.price')}</FormLabel>
+                    <FormLabel>{t('plan.modal.price')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -200,7 +200,7 @@ function PlanModal() {
                 name="duration_days"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('planDialog.duration')}</FormLabel>
+                    <FormLabel>{t('plan.modal.duration')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -218,7 +218,7 @@ function PlanModal() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('planDialog.description')}</FormLabel>
+                  <FormLabel>{t('plan.modal.description')}</FormLabel>
                   <FormControl>
                     <Textarea {...field} />
                   </FormControl>
@@ -233,7 +233,7 @@ function PlanModal() {
                 <FormItem className="flex items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">
-                      {t('planDialog.active')}
+                      {t('plan.modal.active')}
                     </FormLabel>
                   </div>
                   <FormControl>
@@ -247,7 +247,7 @@ function PlanModal() {
             />
             <Button type="submit" disabled={isLoading} className="w-full">
               {isLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-              {plan ? t('planDialog.submit.edit') : t('planDialog.submit.add')}
+              {plan ? t('plan.modal.submit.edit') : t('plan.modal.submit.add')}
             </Button>
           </form>
         </Form>

@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
             'university_level', 'university_year', 'enterprise_name', 
             'platform_usage_reason', 'email_verified', 'avatar', 'language', 
             'town', 'quarter', 'subscription_status', 'class_level', 'class_display',
-            'is_active', 'created_at', 'updated_at', 'date_joined',
+            'is_active', 'created_at', 'updated_at', 'date_joined','last_login',
             'is_superuser', 'is_staff'
         ]
         
@@ -39,6 +39,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     is_superuser = serializers.BooleanField(required=False, default=False)
     is_staff = serializers.BooleanField(required=False, default=False)
+    education_level = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = User
@@ -50,7 +51,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'town', 'quarter', 'is_superuser', 'is_staff'
         ]
 
+    def validate(self, data):
+        # For admin/staff, ensure education_level is at least an empty string
+        if data.get('is_superuser', False) or data.get('is_staff', False):
+            # Set to empty string if not provided or if null
+            if 'education_level' not in data or data['education_level'] is None:
+                data['education_level'] = ''
+        else:
+            # For regular users, education_level is required
+            if not data.get('education_level'):
+                raise serializers.ValidationError({'education_level': 'This field is required for non-admin users.'})
+        
+        return data
+
     def create(self, validated_data):
+        # At this point education_level should always be a string (possibly empty)
         user = User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
