@@ -753,4 +753,18 @@ export default {
   "courseOfferings.detail.startDate": "Date de début",
   "courseOfferings.detail.location": "Lieu",
   "courseOfferings.detail.overview": "Aperçu",
+  
+  // Month translations
+  "months.01": "Janvier",
+  "months.02": "Février",
+  "months.03": "Mars",
+  "months.04": "Avril",
+  "months.05": "Mai",
+  "months.06": "Juin",
+  "months.07": "Juillet",
+  "months.08": "Août",
+  "months.09": "Septembre",
+  "months.10": "Octobre",
+  "months.11": "Novembre",
+  "months.12": "Décembre",
 } as const;
