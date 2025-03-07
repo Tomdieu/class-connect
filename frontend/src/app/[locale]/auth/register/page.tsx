@@ -371,7 +371,7 @@ export default function RegisterPage() {
               {/* Personal Information Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Personal Information
+                  {t("registerDialog.sections.personalInfo")}
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {/* Name fields */}
@@ -471,7 +471,7 @@ export default function RegisterPage() {
               {/* Education Information Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Education Details
+                  {t("registerDialog.sections.educationDetails")}
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
@@ -731,7 +731,7 @@ export default function RegisterPage() {
               {/* Contact Information Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Contact Information
+                  {t("registerDialog.sections.contactInfo")}
                 </h3>
                 <FormField
                   control={form.control}
@@ -792,7 +792,7 @@ export default function RegisterPage() {
               {/* Security Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Security
+                  {t("registerDialog.sections.security")}
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
