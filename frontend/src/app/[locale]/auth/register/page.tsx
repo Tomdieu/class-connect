@@ -1,27 +1,25 @@
 "use client";
 
-import { useI18n } from "@/locales/client";
+import { useI18n, useCurrentLocale } from "@/locales/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, User } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { CalendarIcon, Loader2 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2 } from "lucide-react";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { registerUser } from "@/actions/accounts";
+import { Helmet } from 'react-helmet-async';
+import { useMutation } from "@tanstack/react-query";
+import { UserCreateType } from "@/types";
 
 // Constants from RegisterDialog
 const EDUCATION_LEVELS = [
@@ -40,17 +38,110 @@ const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
 export default function RegisterPage() {
   const t = useI18n();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const locale = useCurrentLocale();
   const [additionalFieldsTab, setAdditionalFieldsTab] = useState<string>("college");
   
+  // Base URL with locale
+  const baseUrl = `https://www.classconnect.cm/${locale}`;
+
+  // JSON-LD structured data for register page - localized
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": t('registerDialog.title'),
+    "description": t('registerDialog.subtitle'),
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": locale === 'fr' ? "Accueil" : "Home",
+          "item": `https://www.classconnect.cm/${locale}`
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": t('nav.register'),
+          "item": `${baseUrl}/auth/register`
+        }
+      ]
+    },
+    "mainEntity": {
+      "@type": "RegisterAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${baseUrl}/auth/register`,
+        "actionPlatform": [
+          "https://schema.org/DesktopWebPlatform",
+          "https://schema.org/MobileWebPlatform"
+        ]
+      },
+      "potentialAction": {
+        "@type": "CreateAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": `${baseUrl}/auth/register`
+        }
+      }
+    }
+  };
+
+  // Generate years from 1940 to current year - 13 years (minimum age)
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1940 + 1 - 13 }, (_, i) => currentYear - 13 - i).map(year => year.toString());
+  
+  // Generate months (1-12) with localized month names
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const monthNumber = (i + 1).toString().padStart(2, '0');
+    return {
+      value: monthNumber,
+      label: locale === 'fr' 
+        ? t(`months.${monthNumber}` as keyof typeof t) || getMonthName(i, 'fr-FR')
+        : t(`months.${monthNumber}` as keyof typeof t) || getMonthName(i, 'en-US')
+    };
+  });
+  
+  // Helper function to get localized month names as fallback
+  function getMonthName(monthIndex: number, localeString: string): string {
+    const date = new Date(2000, monthIndex, 1);
+    return date.toLocaleString(localeString, { month: 'long' });
+  }
+  
+  // States for birth date components
+  const [birthYear, setBirthYear] = useState<string>(years[20] || (currentYear - 20).toString()); // Default to 20 years ago
+  const [birthMonth, setBirthMonth] = useState<string>("01");
+  const [birthDay, setBirthDay] = useState<string>("01");
+  
+  // Generate days based on selected month and year
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month, 0).getDate();
+  };
+  
+  const [daysInMonth, setDaysInMonth] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const year = parseInt(birthYear);
+    const month = parseInt(birthMonth);
+    const totalDays = getDaysInMonth(year, month);
+    const days = Array.from({ length: totalDays }, (_, i) => (i + 1).toString().padStart(2, '0'));
+    setDaysInMonth(days);
+    
+    // Adjust day if it exceeds the maximum days in the selected month
+    if (parseInt(birthDay) > totalDays) {
+      setBirthDay(totalDays.toString().padStart(2, '0'));
+    }
+  }, [birthYear, birthMonth, birthDay]);
+
   // Create form schema with translations
   const RegisterSchema = z.object({
     first_name: z.string().min(2, t('registerDialog.errors.firstNameMin')),
     last_name: z.string().min(2, t('registerDialog.errors.lastNameMin')),
     phone_number: z.string().min(9, t('registerDialog.errors.phoneInvalid')),
-    date_of_birth: z.date({
-      required_error: t('registerDialog.errors.dateRequired'),
-    }),
+    // Remove date_of_birth from the schema as we'll handle it separately
+    birth_year: z.string().nonempty(t('registerDialog.errors.dateRequired')),
+    birth_month: z.string().nonempty(t('registerDialog.errors.dateRequired')),
+    birth_day: z.string().nonempty(t('registerDialog.errors.dateRequired')),
     education_level: z.enum(EDUCATION_LEVELS),
     email: z.string().email(t('registerDialog.errors.emailInvalid')),
     town: z.string().min(2, t('registerDialog.errors.townMin')),
@@ -74,6 +165,24 @@ export default function RegisterPage() {
   }).refine(data => data.password === data.confirm_password, {
     message: t('registerDialog.errors.passwordsMustMatch'),
     path: ['confirm_password'],
+  }).refine(data => {
+    // Validate that the date is valid and user is at least 13 years old
+    try {
+      const birthDate = new Date(`${data.birth_year}-${data.birth_month}-${data.birth_day}`);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        return age - 1 >= 13;
+      }
+      return age >= 13;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      return false;
+    }
+  }, {
+    message: t('registerDialog.errors.dateMinAge'),
+    path: ['birth_year'],
   });
 
   // Form setup
@@ -83,6 +192,9 @@ export default function RegisterPage() {
       first_name: "",
       last_name: "",
       phone_number: "",
+      birth_year: birthYear,
+      birth_month: birthMonth,
+      birth_day: birthDay,
       education_level: "COLLEGE",
       email: "",
       town: "",
@@ -92,6 +204,13 @@ export default function RegisterPage() {
       college_class: "6eme",
     },
   });
+
+  // Update form values when date components change
+  useEffect(() => {
+    form.setValue('birth_year', birthYear);
+    form.setValue('birth_month', birthMonth);
+    form.setValue('birth_day', birthDay);
+  }, [birthYear, birthMonth, birthDay, form]);
 
   // Watch education level to show/hide related fields
   const educationLevel = form.watch('education_level');
@@ -112,16 +231,67 @@ export default function RegisterPage() {
     }
   }, [educationLevel, form]);
 
+  // TanStack Query mutation
+  const registerMutation = useMutation({
+    mutationFn: (data: UserCreateType) => registerUser(data),
+    onSuccess: () => {
+      toast.success("Registration successful! Please check your email to verify your account.");
+      router.push('/auth/login');
+    },
+    onError: (error) => {
+      try {
+        const errorData = JSON.parse(error.message || "{}");
+        
+        // Handle field-specific errors
+        if (errorData.email) {
+          form.setError("email", {
+            message: Array.isArray(errorData.email) ? errorData.email[0] : errorData.email,
+          });
+        }
+        
+        if (errorData.phone_number) {
+          form.setError("phone_number", {
+            message: Array.isArray(errorData.phone_number) ? errorData.phone_number[0] : errorData.phone_number,
+          });
+        }
+        
+        // Show error toast with all error messages
+        const errorMessages = Object.entries(errorData)
+          .filter(([key]) => key !== "message") // Exclude the generic message
+          .map(([key, value]) => {
+            const messages = Array.isArray(value) ? value.join(", ") : value;
+            return `${key}: ${messages}`;
+          });
+        
+        if (errorMessages.length > 0) {
+          toast.error("Registration failed. Please try again.", {
+            description: errorMessages.join("\n"),
+          });
+        } else {
+          toast.error("Registration failed. Please try again.", {
+            description: errorData.message || "Something went wrong. Please check your input and try again.",
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing error response:", e);
+        toast.error("Registration failed. Please try again.", {
+          description: "An unexpected error occurred",
+        });
+      }
+    }
+  });
+
   async function onSubmit(values: z.infer<typeof RegisterSchema>) {
-    setIsLoading(true);
+    // Create a date string in YYYY-MM-DD format
+    const dateOfBirth = `${values.birth_year}-${values.birth_month}-${values.birth_day}`;
     
     try {
       // Create the registration data based on education level
-      const registerData: any = {
+      const registerData: UserCreateType = {
         first_name: values.first_name,
         last_name: values.last_name,
         phone_number: values.phone_number,
-        date_of_birth: format(values.date_of_birth, 'yyyy-MM-dd'),
+        date_of_birth: dateOfBirth,
         education_level: values.education_level,
         email: values.email,
         town: values.town,
@@ -132,19 +302,19 @@ export default function RegisterPage() {
       // Add level-specific fields
       switch (values.education_level) {
         case 'COLLEGE':
-          registerData.class_name = values.college_class;
+          registerData.college_class = values.college_class;
           break;
         case 'LYCEE':
-          registerData.class_name = values.lycee_class;
-          registerData.speciality = values.lycee_speciality;
+          registerData.lycee_class = values.lycee_class;
+          registerData.lycee_speciality = values.lycee_speciality;
           break;
         case 'UNIVERSITY':
           registerData.university_level = values.university_level;
           
           if (values.university_level === 'licence') {
-            registerData.licence_year = values.licence_year;
+            registerData.university_year = values.licence_year;
           } else if (values.university_level === 'master') {
-            registerData.master_year = values.master_year;
+            registerData.university_year = values.master_year;
           }
           break;
         case 'PROFESSIONAL':
@@ -153,23 +323,25 @@ export default function RegisterPage() {
           break;
       }
 
-      // Call the registration API
-      await registerUser(registerData);
-      
-      toast.success("Registration successful! Please check your email to verify your account.");
-      
-      // Redirect to login page
-      router.push('/auth/login');
+      // Call the TanStack mutation
+      registerMutation.mutate(registerData);
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Registration data preparation error:", error);
       toast.error("Registration failed. Please check your details and try again.");
-    } finally {
-      setIsLoading(false);
     }
   }
 
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4">
+      <Helmet>
+        <title>{locale === 'fr' ? 'Inscription | ClassConnect' : 'Register | ClassConnect'}</title>
+        <meta name="description" content={t('registerDialog.subtitle')} />
+        <meta property="og:title" content={locale === 'fr' ? 'Inscription | ClassConnect' : 'Register | ClassConnect'} />
+        <meta property="og:description" content={t('registerDialog.subtitle')} />
+        <link rel="canonical" href={`${baseUrl}/auth/register`} />
+        <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
+      </Helmet>
+
       <div className="mb-6">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/">
@@ -236,47 +408,68 @@ export default function RegisterPage() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="date_of_birth"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>{t('registerDialog.dateOfBirthLabel')}</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
+                {/* Replace date picker with year, month, day selects */}
+                <div className="space-y-2">
+                  <FormLabel htmlFor="date_of_birth">{t('registerDialog.dateOfBirthLabel')}</FormLabel>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Select 
+                        value={birthYear}
+                        onValueChange={(value) => setBirthYear(value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('registerDialog.yearPlaceholder')} />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[200px]">
+                          {years.map((year) => (
+                            <SelectItem key={year} value={year}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Select 
+                        value={birthMonth}
+                        onValueChange={(value) => setBirthMonth(value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('registerDialog.monthPlaceholder')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {months.map((month) => (
+                            <SelectItem key={month.value} value={month.value}>
+                              {month.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Select 
+                        value={birthDay}
+                        onValueChange={(value) => setBirthDay(value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('registerDialog.dayPlaceholder')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {daysInMonth.map((day) => (
+                            <SelectItem key={day} value={day}>
+                              {day}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  {form.formState.errors.birth_year && (
+                    <p className="text-sm font-medium text-destructive">
+                      {form.formState.errors.birth_year.message}
+                    </p>
                   )}
-                />
+                </div>
 
                 <FormField
                   control={form.control}
@@ -310,7 +503,7 @@ export default function RegisterPage() {
                         <SelectContent>
                           {EDUCATION_LEVELS.map((level) => (
                             <SelectItem key={level} value={level}>
-                              {t(`registerDialog.educationLevels.${level.toLowerCase()}`)}
+                              {t(`registerDialog.educationLevels.${level.toLowerCase()}` as keyof typeof t)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -603,8 +796,8 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
+              <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
+                {registerMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     {t('common.loading')}
