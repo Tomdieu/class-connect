@@ -18,7 +18,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 function ResourceDetailPage() {
   const t = useI18n();
   const params = useParams();
-  const router = useRouter();
   
   const { classId, subjectId, chapterId, topicId, resourceId } = params as {
     classId: string;
