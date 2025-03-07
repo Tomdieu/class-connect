@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, BookOpen, FileText, Film, PenTool } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { ExerciseResourceType, PDFResourceType, RevisionResourceType, VideoResourceType } from '@/types';
 import { useI18n } from '@/locales/client';
 import { useQuery } from '@tanstack/react-query';
