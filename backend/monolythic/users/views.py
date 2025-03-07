@@ -143,7 +143,7 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             token = generate_signed_token(user.email)
             verification_url = (
-                f"{settings.BACKEND_HOST}{reverse('verify-email', args=[token])}"
+                f"{settings.FRONTEND_HOST}{reverse('verify-email', args=[token])}"
             )
 
             # Prepare email content
@@ -503,7 +503,7 @@ class ResendVerificationEmailView(APIView):
             # Generate verification token
             token = generate_signed_token(user.email)
             verification_url = (
-                f"{settings.BACKEND_HOST}{reverse('verify-email', args=[token])}"
+                f"{settings.FRONTEND_HOST}{reverse('verify-email', args=[token])}"
             )
 
             # Send verification email
