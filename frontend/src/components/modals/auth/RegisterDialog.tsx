@@ -8,7 +8,7 @@ import {
 import { DialogTitle } from "@/components/ui/dialog";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 import { BookOpen, LoaderCircle } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useI18n } from "@/locales/client";
@@ -241,7 +241,7 @@ function RegisterDialog() {
           });
         }
       } catch (e) {
-        console.error("Error parsing error response:", error);
+        console.error("Error parsing error response:", e);
         toast.error("Registration failed. Please try again.", {
           description: "An unexpected error occurred",
         });
