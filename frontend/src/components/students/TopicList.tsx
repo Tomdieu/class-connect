@@ -1,7 +1,10 @@
+"use client";
+
 import React from 'react';
 import { TopicType } from '@/types';
 import { FileText } from 'lucide-react';
 import Link from 'next/link';
+import { useI18n } from "@/locales/client";
 
 interface TopicListProps {
   topics: TopicType[];
@@ -11,12 +14,14 @@ interface TopicListProps {
 }
 
 const TopicList: React.FC<TopicListProps> = ({ topics, classId, subjectId, chapterId }) => {
+  const t = useI18n();
+  
   // Sort topics by order
   const sortedTopics = [...topics].sort((a, b) => a.order - b.order);
   
   if (sortedTopics.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground py-2">No topics available for this chapter.</p>
+      <p className="text-sm text-muted-foreground py-2">{t('student.chapter.noTopics')}</p>
     );
   }
   
