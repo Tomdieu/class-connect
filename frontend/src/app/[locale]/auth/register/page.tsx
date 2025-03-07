@@ -20,6 +20,7 @@ import { registerUser } from "@/actions/accounts";
 import { Helmet } from 'react-helmet-async';
 import { useMutation } from "@tanstack/react-query";
 import { UserCreateType } from "@/types";
+import { Textarea } from "@/components/ui/textarea";
 
 // Constants from RegisterDialog
 const EDUCATION_LEVELS = [
@@ -331,6 +332,9 @@ export default function RegisterPage() {
     }
   }
 
+  // Add state for university level
+  const [universityLevel, setUniversityLevel] = useState<string>("");
+
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4">
       <Helmet>
@@ -364,51 +368,43 @@ export default function RegisterPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Personal Information */}
-                <FormField
-                  control={form.control}
-                  name="first_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('registerDialog.firstNameLabel')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              {/* Personal Information Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Personal Information
+                </h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Name fields */}
+                  <FormField
+                    control={form.control}
+                    name="first_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('registerDialog.firstNameLabel')}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="last_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('registerDialog.lastNameLabel')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phone_number"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('registerDialog.phoneNumberLabel')}</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. 6XXXXXXXX" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Replace date picker with year, month, day selects */}
+                  <FormField
+                    control={form.control}
+                    name="last_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('registerDialog.lastNameLabel')}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                {/* Date of Birth */}
                 <div className="space-y-2">
                   <FormLabel htmlFor="date_of_birth">{t('registerDialog.dateOfBirthLabel')}</FormLabel>
                   <div className="grid grid-cols-3 gap-2">
@@ -470,7 +466,286 @@ export default function RegisterPage() {
                     </p>
                   )}
                 </div>
+              </div>
 
+              {/* Education Information Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Education Details
+                </h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="education_level"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('registerDialog.educationLevelLabel')}</FormLabel>
+                        <Select
+                          onValueChange={(value) => field.onChange(value)}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {EDUCATION_LEVELS.map((level) => (
+                              <SelectItem key={level} value={level}>
+                                {t(`registerDialog.educationLevels.${level.toLowerCase()}` as keyof typeof t)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                {/* Dynamic Education Fields */}
+                <div className="space-y-4">
+                  <Tabs value={additionalFieldsTab} onValueChange={setAdditionalFieldsTab}>
+                    <TabsContent value="college">
+                      <FormField
+                        control={form.control}
+                        name="college_class"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('registerDialog.collegeClassLabel')}</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select class" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {COLLEGE_CLASSES.map((classItem) => (
+                                  <SelectItem key={classItem} value={classItem}>
+                                    {t(`registerDialog.collegeClasses.${classItem}`)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="lycee" className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="lycee_class"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('registerDialog.lyceeClassLabel')}</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select class" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {LYCEE_CLASSES.map((classItem) => (
+                                  <SelectItem key={classItem} value={classItem}>
+                                    {t(`registerDialog.lyceeClasses.${classItem}`)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="lycee_speciality"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('registerDialog.lyceeSpecialityLabel')}</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select speciality" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {LYCEE_SPECIALITIES.map((speciality) => (
+                                  <SelectItem key={speciality} value={speciality}>
+                                    {t(`registerDialog.lyceeSpecialities.${speciality}`)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="university" className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="university_level"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('registerDialog.universityLevelLabel')}</FormLabel>
+                            <Select
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                setUniversityLevel(value);
+                                if (value === 'licence') {
+                                  form.setValue('licence_year', 'L1');
+                                } else if (value === 'master') {
+                                  form.setValue('master_year', 'M1');
+                                }
+                              }}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select level" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {UNIVERSITY_LEVELS.map((level) => (
+                                  <SelectItem key={level} value={level}>
+                                    {t(`registerDialog.universityLevels.${level}`)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      {universityLevel === 'licence' && (
+                        <FormField
+                          control={form.control}
+                          name="licence_year"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('registerDialog.licenceYearLabel')}</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select year" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {LICENCE_YEARS.map((year) => (
+                                    <SelectItem key={year} value={year}>
+                                      {t(`registerDialog.licenceYears.${year}`)}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                      
+                      {universityLevel === 'master' && (
+                        <FormField
+                          control={form.control}
+                          name="master_year"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('registerDialog.masterYearLabel')}</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select year" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {MASTER_YEARS.map((year) => (
+                                    <SelectItem key={year} value={year}>
+                                      {t(`registerDialog.masterYears.${year}`)}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                    </TabsContent>
+                    
+                    <TabsContent value="professional" className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="enterprise_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('registerDialog.enterpriseNameLabel')}</FormLabel>
+                            <FormControl>
+                              <Input {...field} value={field.value || ''} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="platform_usage_reason"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('registerDialog.platformUsageReasonLabel')}</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                rows={5}
+                                placeholder={t('registerDialog.platformUsageReasonLabel')}
+                                {...field}
+                                value={field.value || ''}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TabsContent>
+                  </Tabs>
+                </div>
+              </div>
+
+              {/* Contact Information Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Contact Information
+                </h3>
+                <FormField
+                  control={form.control}
+                  name="phone_number"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('registerDialog.phoneNumberLabel')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. 6XXXXXXXX" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="email"
@@ -478,322 +753,76 @@ export default function RegisterPage() {
                     <FormItem>
                       <FormLabel>{t('registerDialog.emailLabel')}</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="example@mail.com" {...field} />
+                        <Input type="email" placeholder="email@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="education_level"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('registerDialog.educationLevelLabel')}</FormLabel>
-                      <Select
-                        onValueChange={(value) => field.onChange(value)}
-                        defaultValue={field.value}
-                      >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="town"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('registerDialog.townLabel')}</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select level" />
-                          </SelectTrigger>
+                          <Input {...field} />
                         </FormControl>
-                        <SelectContent>
-                          {EDUCATION_LEVELS.map((level) => (
-                            <SelectItem key={level} value={level}>
-                              {t(`registerDialog.educationLevels.${level.toLowerCase()}` as keyof typeof t)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Education Level Specific Fields */}
-              <div className="bg-muted/30 p-4 rounded-lg">
-                <h3 className="font-medium text-base mb-3">{t(`registerDialog.educationLevels.${educationLevel.toLowerCase()}` as keyof typeof t)}</h3>
-                
-                <Tabs value={additionalFieldsTab} onValueChange={setAdditionalFieldsTab}>
-                  <TabsContent value="college" className="mt-4">
-                    <FormField
-                      control={form.control}
-                      name="college_class"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('registerDialog.collegeClassLabel')}</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select class" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {COLLEGE_CLASSES.map((classItem) => (
-                                <SelectItem key={classItem} value={classItem}>
-                                  {t(`registerDialog.collegeClasses.${classItem}`)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TabsContent>
-                  
-                  <TabsContent value="lycee" className="space-y-4 mt-4">
-                    <FormField
-                      control={form.control}
-                      name="lycee_class"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('registerDialog.lyceeClassLabel')}</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select class" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {LYCEE_CLASSES.map((classItem) => (
-                                <SelectItem key={classItem} value={classItem}>
-                                  {t(`registerDialog.lyceeClasses.${classItem}`)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lycee_speciality"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('registerDialog.lyceeSpecialityLabel')}</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select speciality" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {LYCEE_SPECIALITIES.map((speciality) => (
-                                <SelectItem key={speciality} value={speciality}>
-                                  {t(`registerDialog.lyceeSpecialities.${speciality}`)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TabsContent>
-                  
-                  <TabsContent value="university" className="space-y-4 mt-4">
-                    <FormField
-                      control={form.control}
-                      name="university_level"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('registerDialog.universityLevelLabel')}</FormLabel>
-                          <Select
-                            onValueChange={(value) => {
-                              field.onChange(value);
-                              if (value === 'licence') {
-                                form.setValue('licence_year', 'L1');
-                              } else if (value === 'master') {
-                                form.setValue('master_year', 'M1');
-                              }
-                            }}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select level" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {UNIVERSITY_LEVELS.map((level) => (
-                                <SelectItem key={level} value={level}>
-                                  {t(`registerDialog.universityLevels.${level}`)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    {form.watch('university_level') === 'licence' && (
-                      <FormField
-                        control={form.control}
-                        name="licence_year"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('registerDialog.licenceYearLabel')}</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select year" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {LICENCE_YEARS.map((year) => (
-                                  <SelectItem key={year} value={year}>
-                                    {t(`registerDialog.licenceYears.${year}`)}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                        <FormMessage />
+                      </FormItem>
                     )}
-                    
-                    {form.watch('university_level') === 'master' && (
-                      <FormField
-                        control={form.control}
-                        name="master_year"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('registerDialog.masterYearLabel')}</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select year" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {MASTER_YEARS.map((year) => (
-                                  <SelectItem key={year} value={year}>
-                                    {t(`registerDialog.masterYears.${year}`)}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  />
+                  <FormField
+                    control={form.control}
+                    name="quarter"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('registerDialog.quarterLabel')}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  </TabsContent>
-                  
-                  <TabsContent value="professional" className="space-y-4 mt-4">
-                    <FormField
-                      control={form.control}
-                      name="enterprise_name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('registerDialog.enterpriseNameLabel')}</FormLabel>
-                          <FormControl>
-                            <Input {...field} value={field.value || ''} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="platform_usage_reason"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('registerDialog.platformUsageReasonLabel')}</FormLabel>
-                          <FormControl>
-                            <Input {...field} value={field.value || ''} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TabsContent>
-                </Tabs>
+                  />
+                </div>
               </div>
 
-              {/* Location Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="town"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('registerDialog.townLabel')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              {/* Security Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Security
+                </h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('registerDialog.passwordLabel')}</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="quarter"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('registerDialog.quarterLabel')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Password Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('registerDialog.passwordLabel')}</FormLabel>
-                      <FormControl>
-                        <Input type="password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="confirm_password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('registerDialog.confirmPasswordLabel')}</FormLabel>
-                      <FormControl>
-                        <Input type="password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="confirm_password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('registerDialog.confirmPasswordLabel')}</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
               <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
