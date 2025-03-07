@@ -112,10 +112,10 @@ export default function LoginPage() {
             const decodedCallbackUrl = decodeURIComponent(urlCallbackParam);
             router.push(decodedCallbackUrl);
           } else {
-            router.push(callbackUrl || "/students");
+            router.push(callbackUrl || "/redirect");
           }
         } else {
-          router.push(callbackUrl || "/students");
+          router.push(callbackUrl || "/redirect");
         }
         
         router.refresh();
