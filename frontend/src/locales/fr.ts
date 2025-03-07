@@ -767,4 +767,10 @@ export default {
   "months.10": "Octobre",
   "months.11": "Novembre",
   "months.12": "Décembre",
+
+  // Section headers for registration
+  "registerDialog.sections.personalInfo": "Informations Personnelles",
+  "registerDialog.sections.educationDetails": "Détails de l'Éducation",
+  "registerDialog.sections.contactInfo": "Informations de Contact",
+  "registerDialog.sections.security": "Sécurité",
 } as const;
