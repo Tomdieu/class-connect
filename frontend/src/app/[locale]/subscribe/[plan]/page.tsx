@@ -55,6 +55,7 @@ function SubscribePlanPage() {
       openLogin();
     }
   }, [openLogin, pathname, router, session]);
+  
 
   if (isLoading) {
     return (

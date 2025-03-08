@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BookOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -355,8 +355,11 @@ export default function RegisterPage() {
         </Button>
       </div>
 
-      <Card>
+      <Card className="shadow-none bg-transparent border-none sm:border sm:bg-card sm:shadow">
         <CardHeader className="space-y-1">
+          <div className="text-default text-center w-full flex items-center justify-center">
+            <BookOpen className="h-7 w-7 sm:h-11 sm:w-11" />
+          </div>
           <CardTitle className="text-2xl font-bold text-center">
             {t('registerDialog.title')}
           </CardTitle>

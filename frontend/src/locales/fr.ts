@@ -768,6 +768,18 @@ export default {
   "months.11": "Novembre",
   "months.12": "Décembre",
 
+  // NotFound page translations
+  "notFound.title": "404",
+  "notFound.heading": "Page non trouvée",
+  "notFound.description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+  "notFound.goBack": "Retour",
+  "notFound.returnHome": "Retour à l'accueil",
+  
+  // Plan not found specific translations
+  "planNotFound.title": "404",
+  "planNotFound.heading": "Plan non disponible",
+  "planNotFound.description": "Le plan d'abonnement que vous recherchez n'est pas disponible ou a été supprimé.",
+
   // Section headers for registration
   "registerDialog.sections.personalInfo": "Informations Personnelles",
   "registerDialog.sections.educationDetails": "Détails de l'Éducation",
