@@ -2,24 +2,38 @@
 
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { EyeIcon, EyeOffIcon, LogIn, ArrowLeft, LoaderCircle } from "lucide-react";
+import {
+  EyeIcon,
+  EyeOffIcon,
+  LogIn,
+  ArrowLeft,
+  LoaderCircle,
+  BookOpen,
+} from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { Helmet } from 'react-helmet-async';
+import { Helmet } from "react-helmet-async";
 
 export default function LoginPage() {
   const t = useI18n();
   const router = useRouter();
   const locale = useCurrentLocale();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/students';
-  
+  const callbackUrl = searchParams.get("callbackUrl") || "/students";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -33,77 +47,77 @@ export default function LoginPage() {
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": t('loginDialog.title'),
-    "description": t('loginDialog.subtitle'),
-    "breadcrumb": {
+    name: t("loginDialog.title"),
+    description: t("loginDialog.subtitle"),
+    breadcrumb: {
       "@type": "BreadcrumbList",
-      "itemListElement": [
+      itemListElement: [
         {
           "@type": "ListItem",
-          "position": 1,
-          "name": locale === 'fr' ? "Accueil" : "Home",
-          "item": `https://www.classconnect.cm/${locale}`
+          position: 1,
+          name: locale === "fr" ? "Accueil" : "Home",
+          item: `https://www.classconnect.cm/${locale}`,
         },
         {
           "@type": "ListItem",
-          "position": 2,
-          "name": t('nav.login'),
-          "item": `${baseUrl}/auth/login`
-        }
-      ]
+          position: 2,
+          name: t("nav.login"),
+          item: `${baseUrl}/auth/login`,
+        },
+      ],
     },
-    "mainEntity": {
+    mainEntity: {
       "@type": "LoginAction",
-      "target": {
+      target: {
         "@type": "EntryPoint",
-        "urlTemplate": `${baseUrl}/auth/login`,
-        "actionPlatform": [
+        urlTemplate: `${baseUrl}/auth/login`,
+        actionPlatform: [
           "https://schema.org/DesktopWebPlatform",
-          "https://schema.org/MobileWebPlatform"
-        ]
+          "https://schema.org/MobileWebPlatform",
+        ],
       },
-      "potentialAction": {
+      potentialAction: {
         "@type": "AuthenticateAction",
-        "target": {
+        target: {
           "@type": "EntryPoint",
-          "urlTemplate": `${baseUrl}/auth/login`
-        }
-      }
-    }
+          urlTemplate: `${baseUrl}/auth/login`,
+        },
+      },
+    },
   };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    
+
     if (!email || !password) {
-      setError(t('loginDialog.errors.emailRequired'));
+      setError(t("loginDialog.errors.emailRequired"));
       return;
     }
-    
+
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // This needs to match the parameter names expected by the authorize function
-      const res = await signIn('credentials', {
+      const res = await signIn("credentials", {
         email: email, // Use the same field name as in LoginDialog
         password: password,
         redirect: false,
       });
-      
+
       console.log("Login response:", res); // For debugging
-      
+
       // Handle specific error code like in LoginDialog
       if (res?.error === "CredentialsSignin") {
-        setError(t('loginDialog.invalidCredential'));
+        setError(t("loginDialog.invalidCredential"));
         setIsLoading(false);
         return;
       }
-      
+
       if (res && res.ok && !res.error) {
         setIsLoading(false);
         toast.success("Login successful!");
-        
+
         // Handle URL parsing similar to LoginDialog
         if (res.url) {
           const url = new URL(res.url);
@@ -117,13 +131,13 @@ export default function LoginPage() {
         } else {
           router.push(callbackUrl || "/redirect");
         }
-        
+
         router.refresh();
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError(t('loginDialog.invalidCredential'));
-      toast.error(t('loginDialog.invalidCredential'));
+      setError(t("loginDialog.invalidCredential"));
+      toast.error(t("loginDialog.invalidCredential"));
     } finally {
       setIsLoading(false);
     }
@@ -132,30 +146,44 @@ export default function LoginPage() {
   return (
     <div className="flex items-center justify-center h-full bg-background px-4">
       <Helmet>
-        <title>{locale === 'fr' ? 'Connexion | ClassConnect' : 'Login | ClassConnect'}</title>
-        <meta name="description" content={t('loginDialog.subtitle')} />
-        <meta property="og:title" content={locale === 'fr' ? 'Connexion | ClassConnect' : 'Login | ClassConnect'} />
-        <meta property="og:description" content={t('loginDialog.subtitle')} />
+        <title>
+          {locale === "fr"
+            ? "Connexion | ClassConnect"
+            : "Login | ClassConnect"}
+        </title>
+        <meta name="description" content={t("loginDialog.subtitle")} />
+        <meta
+          property="og:title"
+          content={
+            locale === "fr"
+              ? "Connexion | ClassConnect"
+              : "Login | ClassConnect"
+          }
+        />
+        <meta property="og:description" content={t("loginDialog.subtitle")} />
         <link rel="canonical" href={`${baseUrl}/auth/login`} />
         <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
       </Helmet>
-      
+
       <div className="w-full max-w-md">
         <div className="mb-6">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {t('common.back')}
+              {t("common.back")}
             </Link>
           </Button>
         </div>
-        
+
         <Card className="w-full">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">{t('loginDialog.title')}</CardTitle>
-            <CardDescription>
-              {t('loginDialog.subtitle')}
-            </CardDescription>
+            <div className="text-default text-center w-full flex items-center justify-center">
+              <BookOpen className="h-7 w-7 sm:h-11 sm:w-11" />
+            </div>
+            <CardTitle className="text-2xl font-bold">
+              {t("loginDialog.title")}
+            </CardTitle>
+            <CardDescription>{t("loginDialog.subtitle")}</CardDescription>
           </CardHeader>
 
           <form onSubmit={handleSubmit}>
@@ -165,10 +193,10 @@ export default function LoginPage() {
                   {error}
                 </div>
               )}
-              
+
               <div className="space-y-2">
-                <Label htmlFor="email">{t('loginDialog.emailLabel')}</Label>
-                <Input 
+                <Label htmlFor="email">{t("loginDialog.emailLabel")}</Label>
+                <Input
                   id="email"
                   type="email"
                   placeholder="example@email.com"
@@ -178,12 +206,14 @@ export default function LoginPage() {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">{t('loginDialog.passwordLabel')}</Label>
-                  <Button 
-                    variant="link" 
+                  <Label htmlFor="password">
+                    {t("loginDialog.passwordLabel")}
+                  </Label>
+                  <Button
+                    variant="link"
                     className="p-0 text-xs"
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -196,7 +226,7 @@ export default function LoginPage() {
                     {showPassword ? "Hide" : "Show"}
                   </Button>
                 </div>
-                <Input 
+                <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
@@ -207,13 +237,9 @@ export default function LoginPage() {
                 />
               </div>
             </CardContent>
-            
+
             <CardFooter className="flex-col gap-4">
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <div className="flex items-center">
                     <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
@@ -222,16 +248,19 @@ export default function LoginPage() {
                 ) : (
                   <div className="flex items-center">
                     <LogIn className="mr-2 h-4 w-4" />
-                    {t('loginDialog.loginButton')}
+                    {t("loginDialog.loginButton")}
                   </div>
                 )}
               </Button>
-              
+
               <div className="text-center text-sm mt-4">
                 <p>
-                  {t('registerDialog.closeButton')}{" "}
-                  <Link href="/auth/register" className="text-primary hover:underline">
-                    {t('nav.register')}
+                  {t("registerDialog.closeButton")}{" "}
+                  <Link
+                    href="/auth/register"
+                    className="text-primary hover:underline"
+                  >
+                    {t("nav.register")}
                   </Link>
                 </p>
               </div>
