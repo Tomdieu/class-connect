@@ -19,6 +19,8 @@ function ProtectedPage() {
       if (getUserRole(session?.user as UserType) === "admin") {
         redirect("/admin");
       }
+    } else {
+      redirect("/auth/login");
     }
   }, [session?.user]);
   return <React.Fragment></React.Fragment>;
