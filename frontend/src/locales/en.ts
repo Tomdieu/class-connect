@@ -777,4 +777,22 @@ export default {
   "months.10": "October",
   "months.11": "November",
   "months.12": "December",
+
+  // NotFound page translations
+  "notFound.title": "404",
+  "notFound.heading": "Page not found",
+  "notFound.description": "The page you're looking for doesn't exist or has been moved.",
+  "notFound.goBack": "Go Back",
+  "notFound.returnHome": "Return Home",
+  
+  // Plan not found specific translations
+  "planNotFound.title": "404",
+  "planNotFound.heading": "Plan not available",
+  "planNotFound.description": "The subscription plan you're looking for is not available or has been discontinued.",
+
+  // Section headers for registration
+  "registerDialog.sections.personalInfo": "Personal Information",
+  "registerDialog.sections.educationDetails": "Education Details",
+  "registerDialog.sections.contactInfo": "Contact Information",
+  "registerDialog.sections.security": "Security",
 } as const;
