@@ -785,4 +785,11 @@ export default {
   "registerDialog.sections.educationDetails": "Détails de l'Éducation",
   "registerDialog.sections.contactInfo": "Informations de Contact",
   "registerDialog.sections.security": "Sécurité",
+
+  // Server Error page translations
+  "serverError.title": "Erreur Serveur",
+  "serverError.description": "Un problème est survenu sur nos serveurs. Nous travaillons à résoudre ce problème.",
+  "common.returnHome": "Retour à l'accueil",
+  "common.tryAgain": "Réessayer",
+  "serverError.support": "Si le problème persiste, veuillez contacter le support.",
 } as const;

@@ -795,4 +795,11 @@ export default {
   "registerDialog.sections.educationDetails": "Education Details",
   "registerDialog.sections.contactInfo": "Contact Information",
   "registerDialog.sections.security": "Security",
+
+  // Server Error page translations
+  "serverError.title": "Server Error",
+  "serverError.description": "Something went wrong on our servers. We're working to fix the issue.",
+  "common.returnHome": "Return Home",
+  "common.tryAgain": "Try Again",
+  "serverError.support": "If the problem persists, please contact support.",
 } as const;
