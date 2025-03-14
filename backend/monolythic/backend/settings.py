@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     "social_django",
     "drf_social_oauth2",
     "drf_yasg",
-    "corsheaders",
     "django_celery_beat",
     "django_celery_results",
     "storages",
@@ -227,16 +226,36 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Rest Framework
+# Authentication backends
+AUTHENTICATION_BACKENDS = (
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+    
+    # Custom OAuth2
+    'users.auth_backends.CustomDjangoOAuth2',
+    
+    # drf-social-oauth2
+    'drf_social_oauth2.backends.DjangoOAuth2',
+    
+    # OAuth2
+    'oauth2_provider.backends.OAuth2Backend',
+)
 
+# Make sure OAuth2_PROVIDER settings are properly configured
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 2592000,  # 30 days
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 30 * 24 * 60 * 60,  # 30 days
+    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope'},
+    'OAUTH2_VALIDATOR_CLASS': 'oauth2_provider.oauth2_validators.OAuth2Validator',
+}
+
+# Make sure our custom backend is used first to validate tokens
 REST_FRAMEWORK = {
-    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",  # django-oauth-toolkit >= 1.0.0
-        "drf_social_oauth2.authentication.SocialAuthentication",
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'drf_social_oauth2.authentication.SocialAuthentication',
     ),
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    # 'PAGE_SIZE': 30,
 }
 
 # Cors Configuration
@@ -259,17 +278,6 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
 ]
 
-# Social Auth
-
-AUTHENTICATION_BACKENDS = (
-    # Google  OAuth2
-    "social_core.backends.google.GoogleOAuth2",
-    # drf-social-oauth2
-    "drf_social_oauth2.backends.DjangoOAuth2",
-    # Django
-    "django.contrib.auth.backends.ModelBackend",
-)
-
 # Google configuration
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env("GOOGLE_CLIENT_ID", default="")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env("GOOGLE_CLIENT_SECRET", default="")
@@ -279,12 +287,6 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
 ]
-
-OAUTH2_PROVIDER = {
-    "ACCESS_TOKEN_EXPIRE_SECONDS": 2592000,  # 1 month (30 days)
-    "REFRESH_TOKEN_EXPIRE_SECONDS": 3888000,  # 1 month and 15 days (45 days)
-    "ROTATE_REFRESH_TOKEN": True,
-}
 
 # Email settings (configure according to your email provider)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
