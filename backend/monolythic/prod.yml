@@ -72,6 +72,9 @@ services:
       - api
       - rabbitmq
       - redis
+    entrypoint: /entrypoint.sh
+    volumes:
+      - .:/app
     networks:
       - e_learning_network
   celery_beat:
@@ -88,6 +91,9 @@ services:
       - celery_worker
       - rabbitmq
       - redis
+    entrypoint: /entrypoint.sh
+    volumes:
+      - .:/app
     networks:
       - e_learning_network
 volumes:
@@ -104,116 +110,3 @@ volumes:
   monolythic_redis_data:
     labels:
       - "keep=true"
-
-# networks:
-#   e_learning_network:
-#     driver: bridge
-
-# services:
-#   api:
-#     build:
-#       context: .
-#       dockerfile: ./docker/prod/Dockerfile
-#     command: /start.sh
-#     container_name: classconnect_api
-#     restart: unless-stopped
-#     volumes:
-#       - .:/app
-#       - static_volume:/app/staticfiles  # For static files
-#     ports:
-#       - "8001:8001"
-#     env_file:
-#       - .envs/.prod/django
-#       - .envs/.prod/backblaze
-#     depends_on:
-#       - db
-#       - rabbitmq
-#       - redis
-#     networks:
-#       - e_learning_network
-
-#   db:
-#     image: postgres:14-alpine3.20
-#     restart: unless-stopped
-#     container_name: classconnect_db
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data
-#     env_file:
-#       - .envs/.prod/postgres
-#     ports:
-#       - "5432:5432"
-#     networks:
-#       - e_learning_network
-
-#   rabbitmq:
-#     image: rabbitmq:3.10-management-alpine
-#     hostname: rabbitmq
-#     container_name: classconnect_rabbitmq
-#     restart: unless-stopped
-#     ports:
-#       - "5672:5672"
-#       - "15672:15672"
-#     env_file:
-#       - .envs/.prod/rabbitmq
-#     volumes:
-#       - rabbitmq_data:/var/lib/rabbitmq
-#     networks:
-#       - e_learning_network
-
-#   redis:
-#     image: redis:7.4
-#     container_name: classconnect_redis
-#     restart: unless-stopped
-#     ports:
-#       - "6379:6379"
-#     volumes:
-#       - redis_data:/data
-#     networks:
-#       - e_learning_network
-
-#   celery_worker:
-#     build:
-#       context: .
-#       dockerfile: ./docker/prod/Dockerfile
-#     container_name: classconnect_celery_worker
-#     command: celery -A backend worker --loglevel=info
-#     restart: unless-stopped
-#     env_file:
-#       - .envs/.prod/django
-#     depends_on:
-#       - api
-#       - rabbitmq
-#       - redis
-#     networks:
-#       - e_learning_network
-
-#   celery_beat:
-#     build:
-#       context: .
-#       dockerfile: ./docker/prod/Dockerfile
-#     container_name: classconnect_celery_beat
-#     command: celery -A backend beat --loglevel=info
-#     restart: unless-stopped
-#     env_file:
-#       - .envs/.prod/django
-#     depends_on:
-#       - api
-#       - celery_worker
-#       - rabbitmq
-#       - redis
-#     networks:
-#       - e_learning_network
-
-# volumes:
-#   postgres_data:
-#     labels:
-#       - "keep=true"
-#   rabbitmq_data:
-#     labels:
-#       - "keep=true"
-#   static_volume:
-#     labels:
-#       - "keep=true"
-#   redis_data:
-#     labels:
-#       - "keep=true"
