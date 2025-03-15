@@ -47,6 +47,7 @@ jobs:
       - name: Clean up dangling images and volumes
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+          cd /home/ubuntu/class-connect/backend/monolythic &&
           docker image prune -f &&
           docker volume prune -f --filter "label!=keep" || echo "Cleanup completed with warnings"
 
