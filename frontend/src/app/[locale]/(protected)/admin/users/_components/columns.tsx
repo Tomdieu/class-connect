@@ -24,6 +24,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import DeleteConfirmationModal from "@/components/modals/DeleteConfirmationModal";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export const userColumns: ColumnDef<UserType>[] = [
   {
@@ -152,6 +153,7 @@ export const userColumns: ColumnDef<UserType>[] = [
       const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(false);
       const { data: session } = useSession();
+      const router = useRouter()
 
       const handleDelete = async () => {
         try {
@@ -166,6 +168,10 @@ export const userColumns: ColumnDef<UserType>[] = [
           setIsLoading(false);
         }
       };
+
+      const goToDetail = () => {
+        router.push(`/admin/users/${user.id}`);
+      }
 
       return (
         <>
@@ -187,8 +193,7 @@ export const userColumns: ColumnDef<UserType>[] = [
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setUser(user);
-                  onOpen();
+                  goToDetail()
                 }}
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
