@@ -31,7 +31,7 @@ const PDFDisplay: React.FC<PDFDisplayProps> = ({ pdfUrl }) => {
   });
 
   const renderToolbar = (
-    Toolbar: (props: ToolbarProps) => React.ReactElement
+    Toolbar: (props: ToolbarProps) => ReactreactElement
   ) => <Toolbar>{renderDefaultToolbar(transform)}</Toolbar>;
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     renderToolbar,

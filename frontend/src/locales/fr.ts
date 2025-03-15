@@ -5,20 +5,26 @@ export default {
   "nav.logout": "Déconnexion",
   "nav.profile": "Profil",
   "hero.title": "Apprenez à votre rythme avec ClassConnect",
-  "hero.subtitle": "Une plateforme d'apprentissage en ligne adaptée à vos besoins, avec des cours de qualité et un suivi personnalisé.",
+  "hero.subtitle":
+    "Une plateforme d'apprentissage en ligne adaptée à vos besoins, avec des cours de qualité et un suivi personnalisé.",
   "hero.start": "Commencer",
   "hero.learnMore": "En savoir plus",
   "features.interactive": "Cours Interactifs",
-  "features.interactive.desc": "Apprenez avec du contenu multimédia et des exercices pratiques",
+  "features.interactive.desc":
+    "Apprenez avec du contenu multimédia et des exercices pratiques",
   "features.personalized": "Suivi Personnalisé",
-  "features.personalized.desc": "Progressez à votre rythme avec des recommandations adaptées",
+  "features.personalized.desc":
+    "Progressez à votre rythme avec des recommandations adaptées",
   "features.community": "Communauté Active",
   "features.community.desc": "Échangez avec d'autres apprenants et experts",
   "about.title": "Bienvenue sur ClassConnect",
-  "about.subtitle": "La plateforme d'apprentissage en ligne conçue pour révolutionner l'éducation en Afrique et au-delà.",
+  "about.subtitle":
+    "La plateforme d'apprentissage en ligne conçue pour révolutionner l'éducation en Afrique et au-delà.",
   "about.whatIs.title": "Qu'est-ce que ClassConnect ?",
-  "about.whatIs.desc1": "ClassConnect est une plateforme d'apprentissage en ligne dédiée aux collégiens, lycéens, étudiants universitaires et professionnels. Elle offre des outils modernes pour un apprentissage efficace, le suivi des cours, l'accès à des ressources personnalisées et l'interaction avec des enseignants ou experts dans divers domaines.",
-  "about.whatIs.desc2": "Que vous soyez étudiant préparant un examen ou professionnel souhaitant acquérir de nouvelles compétences, ClassConnect est conçu pour vous accompagner dans votre parcours.",
+  "about.whatIs.desc1":
+    "ClassConnect est une plateforme d'apprentissage en ligne dédiée aux collégiens, lycéens, étudiants universitaires et professionnels. Elle offre des outils modernes pour un apprentissage efficace, le suivi des cours, l'accès à des ressources personnalisées et l'interaction avec des enseignants ou experts dans divers domaines.",
+  "about.whatIs.desc2":
+    "Que vous soyez étudiant préparant un examen ou professionnel souhaitant acquérir de nouvelles compétences, ClassConnect est conçu pour vous accompagner dans votre parcours.",
   "about.features.title": "Fonctionnalités Principales",
   "about.features.courseManagement": "Gestion des Cours",
   "about.features.courseManagement.desc": [
@@ -66,8 +72,10 @@ export default {
     "Accédez à vos cours",
     "Participez aux sessions en direct",
   ],
-  "about.conclusion": "ClassConnect n'est pas qu'une plateforme, c'est une révolution dans l'éducation. Rejoignez-nous pour transformer votre façon d'apprendre et atteindre vos objectifs académiques ou professionnels.",
+  "about.conclusion":
+    "ClassConnect n'est pas qu'une plateforme, c'est une révolution dans l'éducation. Rejoignez-nous pour transformer votre façon d'apprendre et atteindre vos objectifs académiques ou professionnels.",
   "subscriptionPlans.title": "Nos Formules d'Abonnement",
+  "subscriptionPlans.subtitle": "Choisissez un forfait abordable qui comprend les meilleures fonctionnalités pour engager votre audience, créer une fidélité client et stimuler vos ventes.",
   "subscriptionPlans.basic.name": "Basique",
   "subscriptionPlans.basic.description": "Parfait pour commencer",
   "subscriptionPlans.basic.features": [
@@ -93,9 +101,10 @@ export default {
     "Contenu exclusif",
   ],
   "subscriptionPlans.choose": "Choisir ce forfait",
-  "loginDialog.invalidCredential":"Email ou mot de passe incorrect",
+  "loginDialog.invalidCredential": "Email ou mot de passe incorrect",
   "loginDialog.title": "Bienvenue sur ClassConnect",
-  "loginDialog.subtitle": "Connectez-vous pour accéder à votre espace d'apprentissage",
+  "loginDialog.subtitle":
+    "Connectez-vous pour accéder à votre espace d'apprentissage",
   "loginDialog.resetPasswordTitle": "Réinitialiser le Mot de Passe",
   "loginDialog.emailLabel": "Email",
   "loginDialog.passwordLabel": "Mot de passe",
@@ -108,7 +117,8 @@ export default {
   "loginDialog.errors.emailInvalid": "L'email n'est pas valide",
   "loginDialog.alreadyHaveAccount": "Vous avez déjà un compte?",
   "registerDialog.title": "Rejoignez ClassConnect",
-  "registerDialog.subtitle": "Créez votre compte pour commencer votre parcours d'apprentissage",
+  "registerDialog.subtitle":
+    "Créez votre compte pour commencer votre parcours d'apprentissage",
   "registerDialog.firstNameLabel": "Prénom",
   "registerDialog.lastNameLabel": "Nom",
   "registerDialog.phoneNumberLabel": "Numéro de téléphone",
@@ -161,32 +171,43 @@ export default {
   "registerDialog.licenceYearLabel": "Année de licence",
   "registerDialog.masterYearLabel": "Année de master",
   "registerDialog.enterpriseNameLabel": "Nom de l'entreprise",
-  "registerDialog.platformUsageReasonLabel": "Raison d'utilisation de la plateforme",
+  "registerDialog.platformUsageReasonLabel":
+    "Raison d'utilisation de la plateforme",
   "registerDialog.lyceeSpecialityLabel": "Spécialité",
   "registerDialog.lyceeSpecialities": {
-    "scientifique": "Scientifique",
-    "litteraire": "Littéraire"
+    scientifique: "Scientifique",
+    litteraire: "Littéraire",
   },
   "registerDialog.errors.firstNameRequired": "Le prénom est requis",
-  "registerDialog.errors.firstNameMin": "Le prénom doit contenir au moins 2 caractères",
+  "registerDialog.errors.firstNameMin":
+    "Le prénom doit contenir au moins 2 caractères",
   "registerDialog.errors.lastNameRequired": "Le nom est requis",
-  "registerDialog.errors.lastNameMin": "Le nom doit contenir au moins 2 caractères",
+  "registerDialog.errors.lastNameMin":
+    "Le nom doit contenir au moins 2 caractères",
   "registerDialog.errors.phoneRequired": "Le numéro de téléphone est requis",
-  "registerDialog.errors.phoneInvalid": "Format de numéro de téléphone invalide",
+  "registerDialog.errors.phoneInvalid":
+    "Format de numéro de téléphone invalide",
   "registerDialog.errors.dateRequired": "La date de naissance est requise",
   "registerDialog.errors.dateMinAge": "Vous devez avoir au moins 13 ans",
-  "registerDialog.errors.educationLevelRequired": "Le niveau d'études est requis",
+  "registerDialog.errors.educationLevelRequired":
+    "Le niveau d'études est requis",
   "registerDialog.errors.emailRequired": "L'email est requis",
   "registerDialog.errors.emailInvalid": "Adresse email invalide",
   "registerDialog.errors.townRequired": "La ville est requise",
-  "registerDialog.errors.townMin": "La ville doit contenir au moins 2 caractères",
+  "registerDialog.errors.townMin":
+    "La ville doit contenir au moins 2 caractères",
   "registerDialog.errors.quarterRequired": "Le quartier est requis",
-  "registerDialog.errors.quarterMin": "Le quartier doit contenir au moins 2 caractères",
+  "registerDialog.errors.quarterMin":
+    "Le quartier doit contenir au moins 2 caractères",
   "registerDialog.errors.passwordRequired": "Le mot de passe est requis",
-  "registerDialog.errors.passwordMin": "Le mot de passe doit contenir au moins 8 caractères",
-  "registerDialog.errors.passwordComplexity": "Le mot de passe doit contenir des majuscules, des minuscules et des chiffres",
-  "registerDialog.errors.confirmPasswordRequired": "La confirmation du mot de passe est requise",
-  "registerDialog.errors.passwordsMustMatch": "Les mots de passe doivent correspondre",
+  "registerDialog.errors.passwordMin":
+    "Le mot de passe doit contenir au moins 8 caractères",
+  "registerDialog.errors.passwordComplexity":
+    "Le mot de passe doit contenir des majuscules, des minuscules et des chiffres",
+  "registerDialog.errors.confirmPasswordRequired":
+    "La confirmation du mot de passe est requise",
+  "registerDialog.errors.passwordsMustMatch":
+    "Les mots de passe doivent correspondre",
   "registerDialog.closeButton": "Fermer",
   "features.title": "Fonctionnalités Principales",
   "features.courseManagement.title": "Gestion des Cours",
@@ -243,20 +264,20 @@ export default {
   "userDialog.subtitle": "Modifier les détails de l'utilisateur ci-dessous",
   "userDialog.submitButton": "Mettre à jour",
   "class.title": "Classe",
-  "educationLevels": {
+  educationLevels: {
     lycee: "Lycée",
     university: "Université",
     professional: "Professionnel",
-    college: "Collège"
+    college: "Collège",
   },
-  "sections": {
-    "FRANCOPHONE": "Section Francophone",
-    "ANGLOPHONE": "Section Anglophone"
+  sections: {
+    FRANCOPHONE: "Section Francophone",
+    ANGLOPHONE: "Section Anglophone",
   },
   "ui.expand": "Développer",
   "ui.collapse": "Réduire",
   "ui.viewClasses": "Voir les classes",
-  "error": "Erreur",
+  error: "Erreur",
   "plans.title": "Plans d'abonnement",
   "plans.description": "Gérer les plans d'abonnement",
   "plans.loading": "Chargement des plans...",
@@ -295,7 +316,8 @@ export default {
   "planDialog.errors.descriptionRequired": "La description est requise",
   "planDialog.selectPlan": "Sélectionner le type de plan",
   "plans.delete.title": "Supprimer le Plan",
-  "plans.delete.description": "Êtes-vous sûr de vouloir supprimer le plan {name} ? Cette action ne peut pas être annulée.",
+  "plans.delete.description":
+    "Êtes-vous sûr de vouloir supprimer le plan {name} ? Cette action ne peut pas être annulée.",
   "plans.delete.cancel": "Annuler",
   "plans.delete.confirm": "Supprimer",
   "plans.delete.success": "Plan supprimé avec succès",
@@ -317,7 +339,8 @@ export default {
   "subscriptionsPage.autoRenew.enabled": "Activé",
   "subscriptionsPage.autoRenew.disabled": "Désactivé",
   "footer.aboutUs": "À Propos",
-  "footer.aboutText": "Nous nous engageons à fournir une éducation de qualité et à aider les étudiants à atteindre leurs objectifs d'apprentissage.",
+  "footer.aboutText":
+    "Nous nous engageons à fournir une éducation de qualité et à aider les étudiants à atteindre leurs objectifs d'apprentissage.",
   "footer.quickLinks": "Liens Rapides",
   "footer.courses": "Cours",
   "footer.pricing": "Tarifs",
@@ -329,20 +352,26 @@ export default {
   "footer.connect": "Suivez-nous",
   "footer.rights": "Tous droits réservés.",
   "animatedFeatures.selfPaced.title": "Apprenez à Votre Rythme",
-  "animatedFeatures.selfPaced.description": "Accédez aux cours à tout moment, n'importe où, et apprenez à votre rythme",
+  "animatedFeatures.selfPaced.description":
+    "Accédez aux cours à tout moment, n'importe où, et apprenez à votre rythme",
   "animatedFeatures.experts.title": "Enseignants Experts",
-  "animatedFeatures.experts.description": "Apprenez avec des éducateurs expérimentés et passionnés par l'enseignement",
+  "animatedFeatures.experts.description":
+    "Apprenez avec des éducateurs expérimentés et passionnés par l'enseignement",
   "animatedFeatures.interactive.title": "Apprentissage Interactif",
-  "animatedFeatures.interactive.description": "Participez avec du contenu interactif et des retours en temps réel",
+  "animatedFeatures.interactive.description":
+    "Participez avec du contenu interactif et des retours en temps réel",
   "subject.add": "Ajouter une matière",
   "subject.edit": "Modifier la matière",
   "subject.delete": "Supprimer la matière",
   "subject.form.name": "Nom de la matière",
   "subject.form.description": "Description",
-  "subject.form.addDescription": "Remplissez les informations pour ajouter une matière",
-  "subject.form.editDescription": "Remplissez les informations pour modifier la matière",
+  "subject.form.addDescription":
+    "Remplissez les informations pour ajouter une matière",
+  "subject.form.editDescription":
+    "Remplissez les informations pour modifier la matière",
   "subject.delete.title": "Supprimer la matière",
-  "subject.delete.description": "Êtes-vous sûr de vouloir supprimer cette matière ? Cette action est irréversible et supprimera également tous les chapitres, sujets et ressources associés (y compris les PDF, vidéos, exercices et révisions).",
+  "subject.delete.description":
+    "Êtes-vous sûr de vouloir supprimer cette matière ? Cette action est irréversible et supprimera également tous les chapitres, sujets et ressources associés (y compris les PDF, vidéos, exercices et révisions).",
   "subject.form.submit.add": "Ajouter",
   "subject.form.submit.edit": "Mettre à jour",
   "class.detail.title": "Matières",
@@ -358,25 +387,31 @@ export default {
   "chapter.form.name": "Nom du chapitre",
   "chapter.form.description": "Description",
   "chapter.delete.title": "Supprimer le chapitre",
-  "chapter.delete.description": "Êtes-vous sûr de vouloir supprimer ce chapitre ? Cette action est irréversible et supprimera également toutes les leçons associées et leurs ressources (y compris les PDF, vidéos, exercices et révisions).",
+  "chapter.delete.description":
+    "Êtes-vous sûr de vouloir supprimer ce chapitre ? Cette action est irréversible et supprimera également toutes les leçons associées et leurs ressources (y compris les PDF, vidéos, exercices et révisions).",
   "chapter.delete.success": "Chapitre supprimé avec succès",
   "chapter.delete.error": "Échec de la suppression du chapitre",
-  "chapter.form.editDescription": "Remplissez les informations pour modifier le chapitre",
-  "chapter.form.addDescription": "Remplissez les informations pour ajouter un chapitre",
+  "chapter.form.editDescription":
+    "Remplissez les informations pour modifier le chapitre",
+  "chapter.form.addDescription":
+    "Remplissez les informations pour ajouter un chapitre",
   "chapter.form.title": "Titre",
   "chapter.form.titlePlaceholder": "Titre du chapitre",
   "chapter.form.descriptionPlaceholder": "Description du chapitre",
   "chapter.form.submit.add": "Ajouter",
   "chapter.form.submit.edit": "Mettre à jour",
   "chapter.empty": "Aucun chapitre disponible",
-  "chapter.noChapters": "Cette matière n'a pas encore de chapitres. Ajoutez un chapitre pour commencer.",
+  "chapter.noChapters":
+    "Cette matière n'a pas encore de chapitres. Ajoutez un chapitre pour commencer.",
   "chapter.order": "Ordre",
   "topic.dragTooltip": "Glisser pour réorganiser",
   "topic.editTooltip": "Modifier la leçon",
   "topic.deleteTooltip": "Supprimer la leçon",
   "topic.viewTooltip": "Voir la leçon",
-  "topic.form.addDescription": "Remplissez les informations pour ajouter une leçon",
-  "topic.form.editDescription": "Remplissez les informations pour modifier la leçon",
+  "topic.form.addDescription":
+    "Remplissez les informations pour ajouter une leçon",
+  "topic.form.editDescription":
+    "Remplissez les informations pour modifier la leçon",
   "topic.form.title": "Titre",
   "topic.form.titlePlaceholder": "Titre de la leçon",
   "topic.form.description": "Description",
@@ -390,7 +425,7 @@ export default {
   "adminSidebar.analytics": "Analyse",
   "adminSidebar.configuration": "Configuration",
   "adminSidebar.items.users": "Utilisateurs",
-  "adminSidebar.items.courses": "Cours", 
+  "adminSidebar.items.courses": "Cours",
   "adminSidebar.items.payments": "Paiements",
   "adminSidebar.items.statistics": "Statistiques",
   "adminSidebar.items.notifications": "Notifications",
@@ -401,7 +436,8 @@ export default {
   "resources.loading": "Chargement des ressources...",
   "resources.error": "Erreur lors du chargement des ressources",
   "resources.delete.title": "Supprimer la ressource",
-  "resources.delete.description": "Êtes-vous sûr de vouloir supprimer cette ressource ? Cette action ne peut pas être annulée.",
+  "resources.delete.description":
+    "Êtes-vous sûr de vouloir supprimer cette ressource ? Cette action ne peut pas être annulée.",
   "resources.delete.success": "Ressource supprimée avec succès",
   "resources.delete.error": "Échec de la suppression de la ressource",
   "resources.tooltips.delete": "Supprimer la ressource",
@@ -409,20 +445,26 @@ export default {
   "resources.tooltips.edit": "Modifier la ressource",
   "class.modal.title.add": "Ajouter une Classe",
   "class.modal.title.edit": "Modifier la Classe",
-  "class.modal.subtitle.add": "Remplissez les informations pour ajouter une classe",
-  "class.modal.subtitle.edit": "Remplissez les informations pour modifier la classe",
+  "class.modal.subtitle.add":
+    "Remplissez les informations pour ajouter une classe",
+  "class.modal.subtitle.edit":
+    "Remplissez les informations pour modifier la classe",
   "class.modal.name": "Nom",
   "class.modal.description": "Description",
   "class.modal.level": "Niveau",
   "class.modal.section": "Section",
   "chapter.modal.title.add": "Ajouter un Chapitre",
   "chapter.modal.title.edit": "Modifier le Chapitre",
-  "chapter.modal.subtitle.add": "Remplissez les informations pour ajouter un chapitre",
-  "chapter.modal.subtitle.edit": "Remplissez les informations pour modifier le chapitre",
+  "chapter.modal.subtitle.add":
+    "Remplissez les informations pour ajouter un chapitre",
+  "chapter.modal.subtitle.edit":
+    "Remplissez les informations pour modifier le chapitre",
   "topic.modal.title.add": "Ajouter une Leçon",
   "topic.modal.title.edit": "Modifier la Leçon",
-  "topic.modal.subtitle.add": "Remplissez les informations pour ajouter une leçon",
-  "topic.modal.subtitle.edit": "Remplissez les informations pour modifier la leçon",
+  "topic.modal.subtitle.add":
+    "Remplissez les informations pour ajouter une leçon",
+  "topic.modal.subtitle.edit":
+    "Remplissez les informations pour modifier la leçon",
   "resource.modal.pdf.title": "Créer une Ressource PDF",
   "resource.modal.pdf.edit": "Modifier la Ressource PDF",
   "resource.modal.video.title": "Créer une Ressource Vidéo",
@@ -439,10 +481,14 @@ export default {
   "resource.modal.file.video": "Fichier Vidéo",
   "resource.modal.file.exercise": "Fichier d'Exercice",
   "resource.modal.file.solution": "Fichier de Solution (optionnel)",
-  "resource.modal.file.dropzone.pdf": "Déposez le PDF ici ou cliquez pour sélectionner",
-  "resource.modal.file.dropzone.video": "Déposez la vidéo ici ou cliquez pour sélectionner",
-  "resource.modal.file.dropzone.exercise": "Déposez l'exercice ici ou cliquez pour sélectionner",
-  "resource.modal.file.dropzone.solution": "Déposez la solution ici ou cliquez pour sélectionner",
+  "resource.modal.file.dropzone.pdf":
+    "Déposez le PDF ici ou cliquez pour sélectionner",
+  "resource.modal.file.dropzone.video":
+    "Déposez la vidéo ici ou cliquez pour sélectionner",
+  "resource.modal.file.dropzone.exercise":
+    "Déposez l'exercice ici ou cliquez pour sélectionner",
+  "resource.modal.file.dropzone.solution":
+    "Déposez la solution ici ou cliquez pour sélectionner",
   "resource.modal.submit.pdf": "Télécharger le PDF",
   "resource.modal.submit.video": "Télécharger la Vidéo",
   "resource.modal.submit.exercise": "Créer l'Exercice",
@@ -457,22 +503,27 @@ export default {
   "users.table.actions.update": "Mettre à jour",
   "users.table.actions.delete": "Supprimer",
   "users.delete.title": "Supprimer l'utilisateur",
-  "users.delete.description": "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action ne peut pas être annulée.",
+  "users.delete.description":
+    "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action ne peut pas être annulée.",
   "users.delete.success": "Utilisateur supprimé avec succès",
   "users.delete.error": "Échec de la suppression de l'utilisateur",
   "users.loading": "Chargement des utilisateurs...",
   "users.error": "Erreur lors du chargement des utilisateurs",
   "faq.title": "Questions Fréquemment Posées",
   "faq.question1": "Qu'est-ce que ClassConnect ?",
-  "faq.answer1": "ClassConnect est une plateforme d'apprentissage en ligne conçue pour fournir une éducation de qualité aux étudiants de différents niveaux d'études.",
+  "faq.answer1":
+    "ClassConnect est une plateforme d'apprentissage en ligne conçue pour fournir une éducation de qualité aux étudiants de différents niveaux d'études.",
   "faq.question2": "Comment commencer ?",
-  "faq.answer2": "Il suffit de créer un compte, de choisir votre niveau d'études et de sélectionner un forfait d'abonnement qui vous convient.",
+  "faq.answer2":
+    "Il suffit de créer un compte, de choisir votre niveau d'études et de sélectionner un forfait d'abonnement qui vous convient.",
   "faq.question3": "Quels moyens de paiement acceptez-vous ?",
-  "faq.answer3": "Nous acceptons les paiements mobiles via MTN Money et Orange Money pour votre commodité.",
+  "faq.answer3":
+    "Nous acceptons les paiements mobiles via MTN Money et Orange Money pour votre commodité.",
 
   "help.title": "Centre d'Aide",
   "help.categories.gettingStarted.title": "Premiers Pas",
-  "help.categories.gettingStarted.description": "Apprenez les bases de l'utilisation de ClassConnect",
+  "help.categories.gettingStarted.description":
+    "Apprenez les bases de l'utilisation de ClassConnect",
   "help.categories.gettingStarted.item1": "Créer votre compte",
   "help.categories.gettingStarted.item2": "Choisir vos cours",
   "help.categories.gettingStarted.item3": "Guide de navigation",
@@ -484,27 +535,33 @@ export default {
   "help.categories.account.item3": "Historique des paiements",
 
   "help.categories.courses.title": "Accès aux Cours",
-  "help.categories.courses.description": "Découvrez comment accéder et utiliser les cours",
+  "help.categories.courses.description":
+    "Découvrez comment accéder et utiliser les cours",
   "help.categories.courses.item1": "Accéder au contenu des cours",
   "help.categories.courses.item2": "Fonctionnalités interactives",
   "help.categories.courses.item3": "Suivi de progression",
 
   "help.categories.technical.title": "Support Technique",
-  "help.categories.technical.description": "Obtenez de l'aide pour les problèmes techniques",
+  "help.categories.technical.description":
+    "Obtenez de l'aide pour les problèmes techniques",
   "help.categories.technical.item1": "Configuration requise",
   "help.categories.technical.item2": "Dépannage",
   "help.categories.technical.item3": "Contacter le support",
 
   "privacy.title": "Politique de Confidentialité",
   "privacy.dataCollection.title": "Collecte de Données",
-  "privacy.dataCollection.content": "Nous collectons et traitons les informations personnelles nécessaires à la fourniture de nos services éducatifs.",
+  "privacy.dataCollection.content":
+    "Nous collectons et traitons les informations personnelles nécessaires à la fourniture de nos services éducatifs.",
   "privacy.dataSecurity.title": "Sécurité des Données",
-  "privacy.dataSecurity.content": "Nous mettons en œuvre des mesures de sécurité strictes pour protéger vos informations personnelles.",
+  "privacy.dataSecurity.content":
+    "Nous mettons en œuvre des mesures de sécurité strictes pour protéger vos informations personnelles.",
   "privacy.cookies.title": "Politique des Cookies",
-  "privacy.cookies.content": "Nous utilisons des cookies pour améliorer votre expérience de navigation et fournir des services personnalisés.",
+  "privacy.cookies.content":
+    "Nous utilisons des cookies pour améliorer votre expérience de navigation et fournir des services personnalisés.",
 
   "pricing.title": "Nos Forfaits",
-  "pricing.subtitle": "Choisissez le forfait qui correspond le mieux à vos besoins d'apprentissage",
+  "pricing.subtitle":
+    "Choisissez le forfait qui correspond le mieux à vos besoins d'apprentissage",
 
   "contact.title": "Contactez-nous",
   "contact.form.name": "Votre Nom",
@@ -515,12 +572,14 @@ export default {
 
   "notifications.title": "Notifications",
   "notifications.empty": "Aucune notification",
-  "notifications.emptyDescription": "Vous n'avez aucune notification pour le moment",
+  "notifications.emptyDescription":
+    "Vous n'avez aucune notification pour le moment",
   "notifications.error": "Échec du chargement des notifications",
   "notifications.deleteSuccess": "Notification supprimée avec succès",
   "notifications.deleteError": "Échec de la suppression de la notification",
   "notifications.deleteTitle": "Supprimer la notification",
-  "notifications.deleteDescription": "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action ne peut pas être annulée.",
+  "notifications.deleteDescription":
+    "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action ne peut pas être annulée.",
   "stats.totalUsers": "Utilisateurs Totaux",
   "stats.activeCourses": "Cours Actifs",
   "stats.monthlyRevenue": "Revenus Mensuels",
@@ -535,13 +594,15 @@ export default {
   "plan.modal.description": "Description",
   "plan.modal.active": "Statut Actif",
   "plan.modal.delete.title": "Supprimer le Plan",
-  "plan.modal.delete.description": "Êtes-vous sûr de vouloir supprimer {name} ? Cette action ne peut pas être annulée.",
+  "plan.modal.delete.description":
+    "Êtes-vous sûr de vouloir supprimer {name} ? Cette action ne peut pas être annulée.",
   "plan.modal.delete.cancel": "Annuler",
   "plan.modal.delete.confirm": "Supprimer",
   "plan.modal.delete.success": "Plan supprimé avec succès",
   "plan.modal.delete.error": "Échec de la suppression du plan",
   "timeout.title": "Session Expirée",
-  "timeout.description": "Votre session est sur le point d'expirer en raison d'inactivité. Vous serez automatiquement déconnecté dans {seconds} secondes.",
+  "timeout.description":
+    "Votre session est sur le point d'expirer en raison d'inactivité. Vous serez automatiquement déconnecté dans {seconds} secondes.",
   "timeout.staySignedIn": "Rester Connecté",
   "timeout.signOut": "Se Déconnecter Maintenant",
   "chat.searchPlaceholder": "Rechercher ou démarrer une nouvelle discussion",
@@ -555,38 +616,48 @@ export default {
   "topic.title": "Leçons",
   "topic.add": "Ajouter une leçon",
   "topic.delete.title": "Supprimer la leçon",
-  "topic.delete.description": "Êtes-vous sûr de vouloir supprimer cette leçon ? Cette action est irréversible et supprimera également toutes les ressources associées.",
+  "topic.delete.description":
+    "Êtes-vous sûr de vouloir supprimer cette leçon ? Cette action est irréversible et supprimera également toutes les ressources associées.",
   "topic.delete.success": "Leçon supprimée avec succès",
   "topic.delete.error": "Échec de la suppression de la leçon",
   "topic.empty": "Aucune leçon disponible",
-  "topic.noTopics": "Ce chapitre n'a pas encore de leçons. Ajoutez une leçon pour commencer.",
+  "topic.noTopics":
+    "Ce chapitre n'a pas encore de leçons. Ajoutez une leçon pour commencer.",
   "topic.order": "Ordre",
-  "topic.description":"Description",
-  
+  "topic.description": "Description",
+
   // Add missing availability translations
   "availability.title": "Mes Disponibilités",
   "availability.error": "Erreur",
   "availability.close": "Fermer",
-  "availability.lastUpdated": "La dernière mise à jour de vos disponibilités date du {date}",
-  "availability.regularUpdate": "Leur mise à jour régulière nous permet de vous proposer des élèves en adéquation avec votre emploi du temps.",
+  "availability.lastUpdated":
+    "La dernière mise à jour de vos disponibilités date du {date}",
+  "availability.regularUpdate":
+    "Leur mise à jour régulière nous permet de vous proposer des élèves en adéquation avec votre emploi du temps.",
   "availability.iAmAvailable": "Je suis disponible",
   "availability.update": "Mettre à jour",
   "availability.updating": "Mise à jour...",
   "availability.dailyAvailabilities": "Mes disponibilités journalières",
-  "availability.notVisibleWarning": "Vos disponibilités ne sont pas visibles car vous êtes marqué comme indisponible. Veuillez activer votre disponibilité pour gérer votre emploi du temps.",
+  "availability.notVisibleWarning":
+    "Vos disponibilités ne sont pas visibles car vous êtes marqué comme indisponible. Veuillez activer votre disponibilité pour gérer votre emploi du temps.",
   "availability.timeSlot": "Horaire",
-  "availability.errors.loadFailed": "Échec du chargement des données de disponibilité",
-  "availability.errors.updateFailed": "Échec de la mise à jour de la disponibilité",
-  "availability.errors.updateSlotFailed": "Échec de la mise à jour du créneau horaire",
-  
+  "availability.errors.loadFailed":
+    "Échec du chargement des données de disponibilité",
+  "availability.errors.updateFailed":
+    "Échec de la mise à jour de la disponibilité",
+  "availability.errors.updateSlotFailed":
+    "Échec de la mise à jour du créneau horaire",
+
   // Course Offerings translations
   "courseOfferings.title": "Mes Offres de Cours",
-  "courseOfferings.description": "Gérez vos offres de cours et suivez les demandes des étudiants",
+  "courseOfferings.description":
+    "Gérez vos offres de cours et suivez les demandes des étudiants",
   "courseOfferings.add": "Ajouter une Offre",
   "courseOfferings.view": "Voir les Détails",
   "courseOfferings.edit": "Modifier",
   "courseOfferings.delete": "Supprimer",
-  "courseOfferings.noOfferings": "Vous n'avez pas encore d'offres de cours. Créez-en une !",
+  "courseOfferings.noOfferings":
+    "Vous n'avez pas encore d'offres de cours. Créez-en une !",
   "courseOfferings.loading": "Chargement des offres de cours...",
   "courseOfferings.error": "Erreur lors du chargement des offres de cours",
   "courseOfferings.retry": "Réessayer",
@@ -597,32 +668,40 @@ export default {
   "courseOfferings.actions": "Actions",
   "courseOfferings.available": "Disponible",
   "courseOfferings.unavailable": "Indisponible",
-  "courseOfferings.confirm.delete": "Êtes-vous sûr de vouloir supprimer cette offre de cours ?",
-  "courseOfferings.confirm.deleteDescription": "Cette action ne peut pas être annulée.",
+  "courseOfferings.confirm.delete":
+    "Êtes-vous sûr de vouloir supprimer cette offre de cours ?",
+  "courseOfferings.confirm.deleteDescription":
+    "Cette action ne peut pas être annulée.",
   "courseOfferings.confirm.cancel": "Annuler",
   "courseOfferings.confirm.confirm": "Supprimer",
   "courseOfferings.success.deleted": "Offre de cours supprimée avec succès",
-  "courseOfferings.error.deleted": "Erreur lors de la suppression de l'offre de cours",
+  "courseOfferings.error.deleted":
+    "Erreur lors de la suppression de l'offre de cours",
   "courseOfferings.teacher": "Enseignant",
-  
+
   // Course offering create page translations
   "courseOfferings.create.title": "Créer une Offre de Cours",
-  "courseOfferings.create.description": "Créez une nouvelle offre de cours pour un étudiant",
+  "courseOfferings.create.description":
+    "Créez une nouvelle offre de cours pour un étudiant",
   "courseOfferings.create.back": "Retour aux offres de cours",
   "courseOfferings.create.offeringDetails": "Détails de l'Offre de Cours",
-  "courseOfferings.create.offeringDetailsDescription": "Remplissez les détails pour créer une nouvelle offre de cours",
+  "courseOfferings.create.offeringDetailsDescription":
+    "Remplissez les détails pour créer une nouvelle offre de cours",
   "courseOfferings.create.classLevel": "Niveau de Classe",
-  "courseOfferings.create.classLevelDescription": "Sélectionnez le niveau de classe pour cette offre",
+  "courseOfferings.create.classLevelDescription":
+    "Sélectionnez le niveau de classe pour cette offre",
   "courseOfferings.create.selectClass": "Sélectionner une classe",
   "courseOfferings.create.searchClass": "Rechercher une classe...",
   "courseOfferings.create.noClassFound": "Aucune classe trouvée.",
   "courseOfferings.create.subject": "Matière",
-  "courseOfferings.create.subjectDescription": "Sélectionnez la matière pour cette offre",
+  "courseOfferings.create.subjectDescription":
+    "Sélectionnez la matière pour cette offre",
   "courseOfferings.create.selectSubject": "Sélectionner une matière",
   "courseOfferings.create.searchSubject": "Rechercher une matière...",
   "courseOfferings.create.noSubjectFound": "Aucune matière trouvée.",
   "courseOfferings.create.student": "Étudiant",
-  "courseOfferings.create.studentDescription": "Sélectionnez l'étudiant pour cette offre",
+  "courseOfferings.create.studentDescription":
+    "Sélectionnez l'étudiant pour cette offre",
   "courseOfferings.create.selectStudent": "Sélectionner un étudiant",
   "courseOfferings.create.searchStudent": "Rechercher un étudiant...",
   "courseOfferings.create.noStudentFound": "Aucun étudiant trouvé.",
@@ -630,13 +709,16 @@ export default {
   "courseOfferings.create.startDateDescription": "Quand le cours commencera",
   "courseOfferings.create.pickDate": "Choisir une date",
   "courseOfferings.create.duration": "Durée (heures)",
-  "courseOfferings.create.durationDescription": "Durée de chaque session en heures",
+  "courseOfferings.create.durationDescription":
+    "Durée de chaque session en heures",
   "courseOfferings.create.hour": "heure",
   "courseOfferings.create.hours": "heures",
   "courseOfferings.create.frequency": "Fréquence (par semaine)",
-  "courseOfferings.create.frequencyDescription": "Nombre de sessions par semaine (max 7)",
+  "courseOfferings.create.frequencyDescription":
+    "Nombre de sessions par semaine (max 7)",
   "courseOfferings.create.hourlyRate": "Tarif Horaire (XAF)",
-  "courseOfferings.create.hourlyRateDescription": "Le tarif horaire pour ce cours",
+  "courseOfferings.create.hourlyRateDescription":
+    "Le tarif horaire pour ce cours",
   "courseOfferings.create.cancel": "Annuler",
   "courseOfferings.create.submit": "Créer l'Offre de Cours",
   "courseOfferings.create.success": "Offre de cours créée avec succès",
@@ -644,49 +726,62 @@ export default {
 
   // Course offering edit page translations
   "courseOfferings.edit.title": "Modifier l'Offre de Cours",
-  "courseOfferings.edit.description": "Modifier les détails de cette offre de cours",
+  "courseOfferings.edit.description":
+    "Modifier les détails de cette offre de cours",
   "courseOfferings.edit.back": "Retour aux offres de cours",
   "courseOfferings.edit.offeringDetails": "Détails de l'Offre de Cours",
-  "courseOfferings.edit.offeringDetailsDescription": "Mettre à jour les détails de cette offre de cours",
+  "courseOfferings.edit.offeringDetailsDescription":
+    "Mettre à jour les détails de cette offre de cours",
   "courseOfferings.edit.availability": "Disponibilité",
-  "courseOfferings.edit.availabilityDescription": "Activez ou désactivez la disponibilité de cette offre pour les étudiants",
+  "courseOfferings.edit.availabilityDescription":
+    "Activez ou désactivez la disponibilité de cette offre pour les étudiants",
   "courseOfferings.edit.submit": "Mettre à Jour l'Offre",
   "courseOfferings.edit.success": "Offre de cours mise à jour avec succès",
-  "courseOfferings.edit.error": "Échec de la mise à jour de l'offre de cours",
   "courseOfferings.edit.notFound": "Offre de cours introuvable",
 
   // Student dashboard translations
   "student.dashboard.title": "Tableau de Bord Étudiant",
-  "student.dashboard.welcome": "Bienvenue sur votre portail d'apprentissage. Accédez à vos classes et matériels pédagogiques ici.",
+  "student.dashboard.welcome":
+    "Bienvenue sur votre portail d'apprentissage. Accédez à vos classes et matériels pédagogiques ici.",
   "student.dashboard.myClasses": "Mes Classes",
-  "student.dashboard.myClassesDesc": "Accédez à vos classes et matières inscrites",
+  "student.dashboard.myClassesDesc":
+    "Accédez à vos classes et matières inscrites",
   "student.dashboard.recentActivity": "Activité Récente",
-  "student.dashboard.recentActivityDesc": "Votre progression d'apprentissage récente",
+  "student.dashboard.recentActivityDesc":
+    "Votre progression d'apprentissage récente",
   "student.dashboard.noClasses": "Aucune classe inscrite pour le moment.",
   "student.dashboard.enroll": "S'inscrire à une Classe",
-  "student.dashboard.emptyActivity": "Vos activités d'apprentissage récentes apparaîtront ici.",
+  "student.dashboard.emptyActivity":
+    "Vos activités d'apprentissage récentes apparaîtront ici.",
   "student.dashboard.quickAccess": "Accès Rapide",
-  "student.dashboard.quickAccessDesc": "Accéder aux ressources fréquemment utilisées",
+  "student.dashboard.quickAccessDesc":
+    "Accéder aux ressources fréquemment utilisées",
   "student.dashboard.browseClasses": "Parcourir les Classes",
   "student.classes.title": "Mes Classes",
-  "student.classes.description": "Parcourez toutes vos classes inscrites et accédez aux matériels pédagogiques",
+  "student.classes.description":
+    "Parcourez toutes vos classes inscrites et accédez aux matériels pédagogiques",
   "student.classes.viewSubjects": "Voir les Matières",
   "student.classes.noClasses": "Aucune classe trouvée",
-  "student.classes.notEnrolled": "Vous n'êtes inscrit à aucune classe pour le moment.",
+  "student.classes.notEnrolled":
+    "Vous n'êtes inscrit à aucune classe pour le moment.",
   "student.subject.exploreFor": "Explorez vos matières pour {name}",
   "student.subject.noSubjects": "Aucune matière disponible",
-  "student.subject.noSubjectsDesc": "Il n'y a pas encore de matières assignées à cette classe.",
+  "student.subject.noSubjectsDesc":
+    "Il n'y a pas encore de matières assignées à cette classe.",
   "student.subject.chapters": "Chapitres",
   "student.subject.topics": "Leçons",
   "student.subject.backToSubjects": "Retour aux Matières",
   "student.subject.noChapters": "Aucun chapitre disponible",
-  "student.subject.noChaptersDesc": "Il n'y a pas encore de chapitres ajoutés à cette matière.",
+  "student.subject.noChaptersDesc":
+    "Il n'y a pas encore de chapitres ajoutés à cette matière.",
   "student.chapter.noTopics": "Aucune leçon disponible pour ce chapitre.",
   "student.topic.title": "Accédez aux matériels pédagogiques pour cette leçon",
   "student.topic.learningResources": "Ressources d'Apprentissage",
-  "student.topic.resourcesDesc": "Accédez aux vidéos, documents et exercices pour cette leçon",
+  "student.topic.resourcesDesc":
+    "Accédez aux vidéos, documents et exercices pour cette leçon",
   "student.topic.backToChapters": "Retour aux Chapitres",
-  "student.topic.noResources": "Aucune ressource d'apprentissage disponible pour cette leçon.",
+  "student.topic.noResources":
+    "Aucune ressource d'apprentissage disponible pour cette leçon.",
   "student.resource.allResources": "Toutes les Ressources",
   "student.resource.pdfs": "PDFs",
   "student.resource.videos": "Vidéos",
@@ -705,21 +800,26 @@ export default {
   "student.resource.questions": "Ce quiz contient {count} questions.",
   "student.resource.timeAllowed": "Temps alloué: {minutes} minutes",
   "student.resource.startQuiz": "Commencer le Quiz",
-  "student.resource.unsupportedType": "Ce type de ressource n'est pas pris en charge dans la visionneuse. Veuillez contacter le support si vous pensez qu'il s'agit d'une erreur.",
+  "student.resource.unsupportedType":
+    "Ce type de ressource n'est pas pris en charge dans la visionneuse. Veuillez contacter le support si vous pensez qu'il s'agit d'une erreur.",
   "student.profile.title": "Mon Profil",
-  "student.profile.description": "Gérez vos informations de compte et paramètres",
+  "student.profile.description":
+    "Gérez vos informations de compte et paramètres",
   "student.profile.personalInfo": "Informations Personnelles",
-  "student.profile.personalInfoDesc": "Mettez à jour vos détails personnels et informations de contact.",
+  "student.profile.personalInfoDesc":
+    "Mettez à jour vos détails personnels et informations de contact.",
   "student.profile.personalTab": "Profil",
   "student.profile.passwordTab": "Mot de passe",
   "student.profile.changePassword": "Changer le Mot de Passe",
-  "student.profile.changePasswordDesc": "Mettez à jour votre mot de passe pour sécuriser votre compte.",
+  "student.profile.changePasswordDesc":
+    "Mettez à jour votre mot de passe pour sécuriser votre compte.",
   "student.profile.firstName": "Prénom",
   "student.profile.lastName": "Nom",
   "student.profile.email": "Email",
   "student.profile.phone": "Numéro de Téléphone",
   "student.profile.town": "Ville",
   "student.profile.quarter": "Quartier",
+  "student.profile.educationLevel": "Niveau d'études",
   "student.profile.update": "Mettre à Jour le Profil",
   "student.profile.updating": "Mise à jour...",
   "student.profile.currentPassword": "Mot de Passe Actuel",
@@ -727,18 +827,31 @@ export default {
   "student.profile.confirmPassword": "Confirmer le Nouveau Mot de Passe",
   "student.profile.changePasswordButton": "Changer le Mot de Passe",
   "student.profile.changingPassword": "Changement du Mot de Passe...",
+  "student.profile.profilePicture": "Photo de Profil",
+  "student.profile.selectImage": "Sélectionner une Image",
+  "student.profile.imageRequirements": "JPG, PNG ou GIF jusqu'à 2MB",
+  "student.profile.avatarUpdated": "Photo de profil mise à jour avec succès",
+  "student.profile.avatarUpdateFailed":
+    "Échec de la mise à jour de la photo de profil",
+  "common.uploading": "Téléchargement...",
+  "common.save": "Enregistrer",
+  "common.success": "Succès",
   "common.back": "Retour",
   "common.error": "Erreur",
-  "common.errorDesc": "Échec du chargement de {item}. Veuillez réessayer plus tard.",
+  "common.errorDesc":
+    "Échec du chargement de {item}. Veuillez réessayer plus tard.",
   "common.return": "Retourner à {destination}",
   "common.dashboard": "Tableau de Bord",
-  "error.failedToLoadProfile": "Échec du chargement des informations de profil. Veuillez réessayer plus tard.",
+  "error.failedToLoadProfile":
+    "Échec du chargement des informations de profil. Veuillez réessayer plus tard.",
   "common.loading": "Chargement...",
-  
+
   // Course offering detail page translations
   "courseOfferings.detail.title": "Détails de l'Offre de Cours",
-  "courseOfferings.detail.loading": "Chargement des détails de l'offre de cours...",
-  "courseOfferings.detail.error": "Erreur lors du chargement des détails de l'offre de cours",
+  "courseOfferings.detail.loading":
+    "Chargement des détails de l'offre de cours...",
+  "courseOfferings.detail.error":
+    "Erreur lors du chargement des détails de l'offre de cours",
   "courseOfferings.detail.notFound": "Offre de cours introuvable",
   "courseOfferings.detail.retry": "Réessayer",
   "courseOfferings.detail.information": "Informations sur l'Offre",
@@ -753,7 +866,7 @@ export default {
   "courseOfferings.detail.startDate": "Date de début",
   "courseOfferings.detail.location": "Lieu",
   "courseOfferings.detail.overview": "Aperçu",
-  
+
   // Month translations
   "months.01": "Janvier",
   "months.02": "Février",
@@ -771,14 +884,16 @@ export default {
   // NotFound page translations
   "notFound.title": "404",
   "notFound.heading": "Page non trouvée",
-  "notFound.description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+  "notFound.description":
+    "La page que vous recherchez n'existe pas ou a été déplacée.",
   "notFound.goBack": "Retour",
   "notFound.returnHome": "Retour à l'accueil",
-  
+
   // Plan not found specific translations
   "planNotFound.title": "404",
   "planNotFound.heading": "Plan non disponible",
-  "planNotFound.description": "Le plan d'abonnement que vous recherchez n'est pas disponible ou a été supprimé.",
+  "planNotFound.description":
+    "Le plan d'abonnement que vous recherchez n'est pas disponible ou a été supprimé.",
 
   // Section headers for registration
   "registerDialog.sections.personalInfo": "Informations Personnelles",
@@ -788,8 +903,124 @@ export default {
 
   // Server Error page translations
   "serverError.title": "Erreur Serveur",
-  "serverError.description": "Un problème est survenu sur nos serveurs. Nous travaillons à résoudre ce problème.",
+  "serverError.description":
+    "Un problème est survenu sur nos serveurs. Nous travaillons à résoudre ce problème.",
   "common.returnHome": "Retour à l'accueil",
   "common.tryAgain": "Réessayer",
-  "serverError.support": "Si le problème persiste, veuillez contacter le support.",
+  "serverError.support":
+    "Si le problème persiste, veuillez contacter le support.",
+
+  // Password Reset Translations
+  "passwordReset.requestTitle": "Mot de passe oublié",
+  "passwordReset.requestDescription":
+    "Saisissez votre adresse email pour recevoir un lien de réinitialisation.",
+  "passwordReset.resetTitle": "Réinitialiser le mot de passe",
+  "passwordReset.resetDescription":
+    "Créez un nouveau mot de passe pour votre compte.",
+  "passwordReset.enterEmailInstructions":
+    "Nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+  "passwordReset.sendLink": "Envoyer le lien de réinitialisation",
+  "passwordReset.sending": "Envoi en cours...",
+  "passwordReset.emailSent": "Lien de réinitialisation envoyé avec succès !",
+  "passwordReset.checkInbox":
+    "Consultez votre boîte de réception pour le lien de réinitialisation. Si vous ne le voyez pas, vérifiez votre dossier spam.",
+  "passwordReset.didNotReceive": "Vous n'avez pas reçu l'email ?",
+  "passwordReset.resendLink": "Renvoyer le lien",
+  "passwordReset.resending": "Renvoi en cours...",
+  "passwordReset.backToLogin": "Retour à la connexion",
+  "passwordReset.resetButton": "Réinitialiser le mot de passe",
+  "passwordReset.resetting": "Réinitialisation...",
+  "passwordReset.newPassword": "Nouveau mot de passe",
+  "passwordReset.confirmPassword": "Confirmer le mot de passe",
+  "passwordReset.resetSuccess":
+    "Votre mot de passe a été réinitialisé avec succès !",
+  "passwordReset.redirecting":
+    "Vous serez redirigé vers la page de connexion sous peu.",
+  "passwordReset.resetError":
+    "Échec de la réinitialisation du mot de passe. Veuillez réessayer.",
+  "passwordReset.requestError":
+    "Échec de l'envoi du lien de réinitialisation. Veuillez réessayer.",
+  "passwordReset.invalidCode": "Code de réinitialisation invalide ou expiré",
+  "passwordReset.missingCode": "Le code de réinitialisation est manquant",
+  "passwordReset.missingCodeInstructions":
+    "Le lien de réinitialisation semble manquer d'un code de vérification. Veuillez demander un nouveau lien de réinitialisation.",
+  "passwordReset.expiredCodeInstructions":
+    "Le lien de réinitialisation a expiré ou est invalide. Veuillez demander un nouveau lien de réinitialisation.",
+  "passwordReset.requestNewLink": "Demander un nouveau lien",
+  "passwordReset.codeLabel": "Code de réinitialisation",
+  "passwordReset.codePlaceholder": "Entrez le code envoyé à votre email",
+  "passwordReset.codeInstructions":
+    "Entrez le code de vérification qui a été envoyé à votre adresse email.",
+  "profile.pageTitle": "Mon Profil",
+  "profile.pageDescription":
+    "Gérez votre compte et mettez à jour vos informations.",
+  "profile.personalInfo": "Informations personnelles",
+  "profile.personalInfoDesc":
+    "Mettez à jour vos informations personnelles et de contact.",
+  "profile.changePassword": "Changer le mot de passe",
+  "profile.changePasswordDesc":
+    "Mettez à jour votre mot de passe pour sécuriser votre compte.",
+  "profile.changeEmail": "Changer l'email",
+  "profile.changeEmailDesc":
+    "Mettez à jour l'adresse email associée à votre compte.",
+  "profile.changePhoto": "Modifier la photo",
+  "profile.userIdLabel": "Identifiant",
+  "common.notDefined": "Non défini",
+  "nav.subscriptions": "Abonnements",
+  "student.subscriptions.title": "Historique des Abonnements",
+  "student.subscriptions.description":
+    "Consultez l'historique de vos abonnements et les détails de votre forfait actuel",
+  "student.subscriptions.empty": "Aucun historique d'abonnement trouvé",
+  "student.subscriptions.period": "Du {start} au {end}",
+  "student.subscriptions.active": "Actif",
+  "student.subscriptions.expired": "Expiré",
+  "student.subscriptions.status": "Statut",
+  "student.subscriptions.currentPlan": "Forfait Actuel",
+  "student.subscriptions.noPlan": "Vous n'avez pas d'abonnement actif",
+  "student.subscriptions.history": "Historique des Abonnements",
+  "student.subscriptions.historyDesc": "Consultez vos abonnements précédents",
+  "student.subscriptions.validUntil": "Valide jusqu'au",
+  "student.subscriptions.days": "jours",
+  "student.subscriptions.plan": "Plan",
+  "student.subscriptions.price": "Prix",
+  "student.subscriptions.duration": "Durée",
+  "student.subscriptions.activePlanDesc": "Détails de votre abonnement actuel",
+
+  // Subscribe page translations
+  "subscribe.title": "S'abonner à {plan}",
+  "subscribe.subtitle": "Complétez votre abonnement pour accéder aux fonctionnalités premium.",
+  "subscribe.planDetails": "Détails du Plan",
+  "subscribe.planDetailsDesc": "Examinez les détails de votre plan sélectionné",
+  "subscribe.price": "Prix",
+  "subscribe.duration": "Durée",
+  "subscribe.features": "Fonctionnalités",
+  "subscribe.currentSubscription": "Abonnement Actuel",
+  "subscribe.currentSubscriptionDesc": "Vous avez déjà un abonnement actif",
+  "subscribe.activePlanAlert": "Plan Actif",
+  "subscribe.activePlanAlertDesc": "Vous avez actuellement un abonnement actif. Vous devrez attendre qu'il expire avant de souscrire à un nouveau plan.",
+  "subscribe.currentPlan": "Plan Actuel",
+  "subscribe.startDate": "Date de Début",
+  "subscribe.endDate": "Date de Fin",
+
+  // Payment success/failure page translations
+  "payment.success.title": "Paiement Réussi !",
+  "payment.success.description": "Votre paiement a été traité avec succès. Votre abonnement est maintenant actif et vous pouvez profiter de tous les avantages.",
+  "payment.success.viewSubscription": "Voir Mon Abonnement",
+  "payment.success.backToDashboard": "Retour au Tableau de Bord",
+  "payment.success.reference": "Référence de transaction :",
+  "payment.success.transactionDetails": "Détails de la Transaction",
+  "payment.success.amount": "Montant",
+  "payment.success.date": "Date et Heure",
+  "payment.success.paymentMethod": "Méthode de Paiement",
+  "payment.success.phoneNumber": "Numéro de Téléphone",
+  "payment.success.transactionCode": "Code de Transaction",
+  "payment.success.customer": "Client",
+
+  "payment.failed.title": "Paiement Échoué",
+  "payment.failed.description": "Nous n'avons pas pu traiter votre paiement. Veuillez réessayer ou contacter le support si le problème persiste.",
+  "payment.failed.defaultError": "Une erreur s'est produite lors du processus de paiement.",
+  "payment.failed.tryAgain": "Réessayer",
+  "payment.failed.contactSupport": "Contacter le Support",
+  "payment.failed.backToDashboard": "Retour au Tableau de Bord",
+  "payment.failed.reference": "Référence de transaction :",
 } as const;

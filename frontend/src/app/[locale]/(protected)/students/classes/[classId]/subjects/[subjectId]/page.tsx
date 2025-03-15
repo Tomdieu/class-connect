@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React from 'react';
 import { useI18n } from "@/locales/client";
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 function SubjectDetailPage() {
   const t = useI18n();
@@ -20,38 +20,40 @@ function SubjectDetailPage() {
   const classId = parseInt(params.classId as string);
   const subjectId = parseInt(params.subjectId as string);
 
-  const results = useQueries({
-    queries: [
-      {
-        queryKey: ['class', classId],
-        queryFn: () => getUserClass(classId),
-        enabled: !!classId && !isNaN(classId),
-      },
-      {
-        queryKey: ['classSubjects', classId],
-        queryFn: () => getClassSubject({ params: { class_id: classId } }),
-        enabled: !!classId && !isNaN(classId),
-      },
-      {
-        queryKey: ['chapters', classId, subjectId],
-        queryFn: () => listChapters({
-          class_pk: classId.toString(),
-          subject_pk: subjectId.toString(),
-        }),
-        enabled: !!classId && !!subjectId && !isNaN(classId) && !isNaN(subjectId),
-      }
-    ]
+  // Separate queries with individual configurations
+  const { data: classInfo, isLoading: classLoading, error: classError } = useQuery({
+    queryKey: ['class', classId],
+    queryFn: () => getUserClass(classId),
+    enabled: !!classId && !isNaN(classId),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false
+  });
+
+  const { data: subjects, isLoading: subjectsLoading, error: subjectsError } = useQuery({
+    queryKey: ['classSubjects', classId],
+    queryFn: () => getClassSubject({ params: { class_id: classId } }),
+    enabled: !!classId && !isNaN(classId),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false
+  });
+
+  const { data: chapters, isLoading: chaptersLoading, error: chaptersError } = useQuery({
+    queryKey: ['chapters', classId, subjectId],
+    queryFn: () => listChapters({
+      class_pk: classId.toString(),
+      subject_pk: subjectId.toString(),
+    }),
+    enabled: !!classId && !!subjectId && !isNaN(classId) && !isNaN(subjectId),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false
   });
   
-  const [classQuery, subjectsQuery, chaptersQuery] = results;
-  
-  const isLoading = classQuery.isLoading || subjectsQuery.isLoading || chaptersQuery.isLoading;
-  const error = classQuery.error || subjectsQuery.error || chaptersQuery.error;
+  const isLoading = classLoading || subjectsLoading || chaptersLoading;
+  const error = classError || subjectsError || chaptersError;
 
-  const classInfo = classQuery.data;
-  const subjects = subjectsQuery.data;
-  const chapters = chaptersQuery.data;
-  
   // Check if the subject exists in the subjects list
   const subject = subjects?.find(s => s.id === subjectId);
   

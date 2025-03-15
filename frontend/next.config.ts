@@ -33,7 +33,7 @@ export default {
       },
     ]
   },
-  sassOptions: {
-    silenceDeprecations: ['legacy-js-api'],
-  }
+  // sassOptions: {
+  //   silenceDeprecations: ['legacy-js-api'],
+  // }
 };

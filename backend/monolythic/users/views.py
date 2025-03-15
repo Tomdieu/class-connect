@@ -5,19 +5,20 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from .models import User, UserPasswordResetToken
 from .serializers import (
+    PasswordResetConfirmSerializer,
+    PhoneNumberValidationSerializer,
     UserSerializer,
     UserRegistrationSerializer,
     ChangePasswordSerializer,
     PasswordResetSerializer,
     VerifyPasswordSerializer,
-    PhoneNumberValidationSerializer,
-    PasswordResetConfirmSerializer,
 )
+
 from .filters import UserFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from social_django.models import UserSocialAuth
 from django.conf import settings
-from rest_framework import generics, status
+from rest_framework import generics
 import datetime
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -38,7 +39,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.db.models.functions import ExtractMonth
 from django.db.models import Count
-from datetime import datetime
+from datetime import datetime,timedelta
 import logging
 
 from django.db.models import Sum, F
@@ -129,7 +130,6 @@ class UserViewSet(viewsets.ModelViewSet):
             )
         }
     )
-    @method_decorator(cache_page(60 * 60 * 2,key_prefix='user_info'))
     @action(detail=False, methods=["get"])
     def info(self, request):
         user = request.user
@@ -400,12 +400,12 @@ class VerifyCodeView(APIView):
 
         current_datetime = timezone.now()
 
-        # Calculate the datetime 4 hours ago
-        fiveteen_minutes_ago = current_datetime - datetime.timedelta(minutes=15)
+        # Calculate the datetime 15 minutes ago
+        fifteen_minutes_ago = current_datetime - timedelta(minutes=15)
 
-        # Filter UserPasswordResetToken objects with created_at <= 15 minutes ago
+        # Filter UserPasswordResetToken objects with created_at >= 15 minutes ago
         exists = UserPasswordResetToken.objects.filter(
-            code=code, reset_at=None, created_at__gte=fiveteen_minutes_ago
+            code=code, reset_at=None, created_at__gte=fifteen_minutes_ago
         ).exists()
 
         return Response({"exists": exists})

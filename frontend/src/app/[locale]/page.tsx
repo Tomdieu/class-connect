@@ -17,6 +17,8 @@ import learningAnimation from "@/animations/learning-process.json";
 function LandingPage() {
   const t = useI18n();
   const locale = useCurrentLocale();
+
+  console.log({locale})
   
   // Create localized JSON-LD data using translations
   const jsonLdData = {

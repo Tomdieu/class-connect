@@ -34,6 +34,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           client_secret: process.env.NEXT_CLASS_CONNECT_CLIENT_SECRETE!,
         };
 
+        console.log(body);
+
         const res = await fetch(
           process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/token/",
           {
@@ -44,6 +46,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         );
 
         const data = (await res.json()) as LoginResponseType;
+
+        console.log(data)
 
         if (res.ok && !data.access_token) {
           return null;
@@ -73,14 +77,37 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
+      // Initial sign in
       if (user) {
-        
         token = { ...token, ...user };
       }
+
+      // Handle session updates
+      if (trigger === "update") {
+        token = { ...token, ...session.user };
+      }
+
       return token;
     },
-    session: ({ session, token }) => {
+    session: ({ session, token, trigger, newSession }) => {
+      // Handle the update trigger with newSession data
+      if (trigger === "update" && newSession) {
+        // Merge the session with newSession, preserving the user ID
+        const updatedSession = { ...session, ...newSession };
+        
+        // Ensure ID is not overwritten if present in newSession
+        if (session.user?.id) {
+          updatedSession.user = {
+            ...(updatedSession.user || {}),
+            id: session.user.id
+          };
+        }
+        
+        return updatedSession;
+      }
+
+      // Normal session creation from token
       delete token.exp;
       delete token.iat;
       delete token.sub;

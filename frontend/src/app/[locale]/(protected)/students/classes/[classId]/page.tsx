@@ -18,16 +18,31 @@ function ClassSubjectsPage() {
   const params = useParams();
   const classId = parseInt(params.classId as string);
   
+  // Add error check for invalid classId
+  if (!classId || isNaN(classId)) {
+    return (
+      <div className="container mx-auto py-6">
+        <DashboardHeader
+          title={t('common.error')}
+          description={t('common.errorDesc', { item: 'class' })}
+          icon={<BookOpen className="h-6 w-6" />}
+        />
+      </div>
+    );
+  }
+
   const { data: classInfo, isLoading: classLoading, error: classError } = useQuery({
     queryKey: ['class', classId],
     queryFn: () => getUserClass(classId),
-    enabled: !!classId && !isNaN(classId),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false, // Prevent refetch on window focus
   });
   
   const { data: subjects, isLoading: subjectsLoading, error: subjectsError } = useQuery({
     queryKey: ['classSubjects', classId],
     queryFn: () => getClassSubject({ params: { class_id: classId } }),
-    enabled: !!classId && !isNaN(classId),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false, // Prevent refetch on window focus
   });
   
   const isLoading = classLoading || subjectsLoading;

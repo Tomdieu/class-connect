@@ -53,7 +53,7 @@ function DashboardHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src="https://github.com/shadcn.png" alt={session?.user.first_name} />
+                  <AvatarImage src={session?.user?.avatar} alt={session?.user.first_name} />
                   <AvatarFallback>
                     {getInitials(`${session?.user.first_name} ${session?.user.last_name}`)}
                   </AvatarFallback>
@@ -96,7 +96,7 @@ function DashboardHeader() {
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut()}>
+              <DropdownMenuItem onClick={() => signOut({redirectTo:'/auth/login'})}>
                 <LogOut className="mr-2 h-4 w-4" />
                 {t("nav.logout")}
               </DropdownMenuItem>

@@ -67,6 +67,7 @@ export declare interface UserType {
   language: LanguageChoice;
   town: string | null;
   quarter: string | null;
+  avatar: string;
   is_staff: boolean;
   is_superuser: boolean;
   is_active: boolean;

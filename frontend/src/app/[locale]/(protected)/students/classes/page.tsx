@@ -74,7 +74,7 @@ function BrowseClassesPage() {
   }
   
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto py-6 flex-1 w-full h-full">
       <DashboardHeader
         title={t('student.classes.title')}
         description={t('student.classes.description')}

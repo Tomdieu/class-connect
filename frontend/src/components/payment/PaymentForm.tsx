@@ -21,21 +21,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SubscriptionPlan } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2, RotateCcw } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { useEffect } from "react";
 
 // MTN prefixes: 650, 651, 652, 653, 654, 67x, 680, 681, 682, 683
 const MTN_PREFIXES = [
@@ -111,19 +103,7 @@ const paymentSchema = z.object({
 
 type PaymentFormValues = z.infer<typeof paymentSchema>;
 
-interface SubscriptionError {
-  error: string;
-  active?: boolean;
-}
-
 export default function PaymentForm({ plan }: { plan: SubscriptionPlan }) {
-  const [error, setError] = useState<{
-    title: string;
-    message: string;
-    action: string;
-  } | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
     defaultValues: {
@@ -143,8 +123,6 @@ export default function PaymentForm({ plan }: { plan: SubscriptionPlan }) {
     }
   }, [phoneNumber, form]);
 
-  // Comment out the useMutation approach
-  /*
   const subscribeMutation = useMutation({
     mutationFn: (data: PaymentFormValues) =>
       subscribeToPlan({
@@ -157,187 +135,153 @@ export default function PaymentForm({ plan }: { plan: SubscriptionPlan }) {
     onSuccess: (data) => {
       if (data?.payment_link) {
         window.location.href = data.payment_link;
+      } else {
+        toast.error("No payment link received. Please try again.");
       }
     },
-    onError: (error: unknown) => {
-      const errorData = error as SubscriptionError;
-      console.log('Error data:', errorData);
-
-      setError({
-        title: "Payment Failed",
-        message: errorData.error || "Please try again later",
-        action: errorData.active ? "Close" : "Retry"
+    onError: (error: any) => {
+      console.error('Payment error:', error);
+      
+      let errorMessage = "An unexpected error occurred";
+      
+      try {
+        // Try to parse the error if it's a JSON string
+        if (typeof error === 'string') {
+          const parsedError = JSON.parse(error);
+          errorMessage = parsedError.message || parsedError.error || errorMessage;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (error.error) {
+          errorMessage = error.error;
+        }
+      } catch (e) {
+        // If parsing fails, use the string as is
+        errorMessage = error.toString();
+      }
+      
+      toast.error(`Payment Failed: ${errorMessage}`, {
+        duration: 5000,
       });
     },
   });
-  */
 
-  // New approach using plain fetch
-  async function onSubmit(data: PaymentFormValues) {
-    try {
-      setIsLoading(true);
-      const result = await subscribeToPlan({
-        plan: plan.name.toLowerCase() as "basic" | "standard" | "premium",
-        success_url: window.location.href,
-        failure_url: window.location.href,
-        phone_number: data.phone_number,
-        payment_method: data.method,
-      });
-
-      if (result?.payment_link) {
-        window.location.href = result.payment_link;
-      }
-    } catch (error: any) {
-      console.log('Error caught:', error);
-      setError({
-        title: "Payment Failed",
-        message: error.error || "Please try again later",
-        action: error.active ? "Close" : "Retry"
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  function onSubmit(data: PaymentFormValues) {
+    subscribeMutation.mutate(data);
   }
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Payment Method</CardTitle>
-          <CardDescription>
-            Select your preferred payment method
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="phone_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <div className="flex">
-                        <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
-                          +237
-                        </span>
-                        <Input
-                          {...field}
-                          placeholder="612345678"
-                          className="rounded-l-none"
-                          type="tel"
+    <Card>
+      <CardHeader>
+        <CardTitle>Payment Method</CardTitle>
+        <CardDescription>
+          Select your preferred payment method
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="phone_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <div className="flex">
+                      <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
+                        +237
+                      </span>
+                      <Input
+                        {...field}
+                        placeholder="612345678"
+                        className="rounded-l-none"
+                        type="tel"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Enter your number without country code (e.g., 612345678)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="method"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      <div>
+                        <RadioGroupItem
+                          value="MTN"
+                          id="mtn"
+                          className="peer sr-only"
                         />
+                        <label
+                          htmlFor="mtn"
+                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        >
+                          <Image
+                            src="/images/mtn-momo.png"
+                            alt="MTN Mobile Money"
+                            width={100}
+                            height={100}
+                            className="mb-3 w-24 h-24 rounded-md"
+                          />
+                          <span className="text-sm font-medium">
+                            MTN Mobile Money
+                          </span>
+                        </label>
                       </div>
-                    </FormControl>
-                    <FormDescription>
-                      Enter your number without country code (e.g., 612345678)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="method"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        className="grid grid-cols-2 gap-4"
-                      >
-                        <div>
-                          <RadioGroupItem
-                            value="MTN"
-                            id="mtn"
-                            className="peer sr-only"
+                      <div>
+                        <RadioGroupItem
+                          value="ORANGE"
+                          id="orange"
+                          className="peer sr-only"
+                        />
+                        <label
+                          htmlFor="orange"
+                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        >
+                          <Image
+                            src="/images/orange-money.svg"
+                            alt="Orange Money"
+                            width={100}
+                            height={100}
+                            className="mb-3 w-24 h-24 bg-black rounded-md"
                           />
-                          <label
-                            htmlFor="mtn"
-                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                          >
-                            <Image
-                              src="/images/mtn-momo.png"
-                              alt="MTN Mobile Money"
-                              width={100}
-                              height={100}
-                              className="mb-3 w-24 h-24 rounded-md"
-                            />
-                            <span className="text-sm font-medium">
-                              MTN Mobile Money
-                            </span>
-                          </label>
-                        </div>
-                        <div>
-                          <RadioGroupItem
-                            value="ORANGE"
-                            id="orange"
-                            className="peer sr-only"
-                          />
-                          <label
-                            htmlFor="orange"
-                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                          >
-                            <Image
-                              src="/images/orange-money.svg"
-                              alt="Orange Money"
-                              width={100}
-                              height={100}
-                              className="mb-3 w-24 h-24 bg-black rounded-md"
-                            />
-                            <span className="text-sm font-medium">
-                              Orange Money
-                            </span>
-                          </label>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                          <span className="text-sm font-medium">
+                            Orange Money
+                          </span>
+                        </label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Pay {plan.price} XAF
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-
-      <Dialog
-        open={error !== null}
-        onOpenChange={(open) => !open && setError(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{error?.title}</DialogTitle>
-            <DialogDescription>{error?.message}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
             <Button
-              onClick={() => {
-                if (error?.action === "Retry") {
-                  subscribeMutation.reset();
-                }
-                setError(null);
-              }}
+              type="submit"
+              className="w-full"
+              disabled={subscribeMutation.isPending}
             >
-              {error?.action}
+              {subscribeMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Pay {plan.price} XAF
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

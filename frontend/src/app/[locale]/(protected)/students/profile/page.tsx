@@ -15,6 +15,7 @@ import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useQuery } from "@tanstack/react-query";
 import { getAccountInfor } from "@/actions/accounts";
+import AvatarUploadForm from "@/components/forms/AvatarUploadForm";
 
 function StudentProfilePage() {
   const t = useI18n();
@@ -138,6 +139,16 @@ function StudentProfilePage() {
                 </p>
               </div>
               <Separator />
+              
+              {userInfo && (
+                <div className="mb-8">
+                  <h4 className="text-md font-medium mb-2">
+                    {t("student.profile.profilePicture")}
+                  </h4>
+                  <AvatarUploadForm user={userInfo} />
+                </div>
+              )}
+              
               <div className="max-w-2xl">
                 <ProfileForm user={userInfo!} />
               </div>

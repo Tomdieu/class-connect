@@ -1,10 +1,18 @@
-import React from 'react';
-import { listTopics } from '@/actions/courses';
-import { ChapterType } from '@/types';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Card } from '@/components/ui/card';
-import TopicList from './TopicList';
-import { Badge } from '@/components/ui/badge';
+"use client";
+
+import React, { useEffect, useState } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { listTopics } from "@/actions/courses";
+import { ChapterType } from "@/types";
+import Link from "next/link";
+import { ArrowRight, Book, File } from "lucide-react";
+import { useI18n } from "@/locales/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface ChapterAccordionProps {
   chapters: ChapterType[];
@@ -12,59 +20,98 @@ interface ChapterAccordionProps {
   subjectId: number;
 }
 
-const ChapterAccordion: React.FC<ChapterAccordionProps> = async ({ chapters, classId, subjectId }) => {
-  // Sort chapters by order
-  const sortedChapters = [...chapters].sort((a, b) => a.order - b.order);
+export default function ChapterAccordion({ chapters, classId, subjectId }: ChapterAccordionProps) {
+  const [expandedChapters, setExpandedChapters] = useState<string[]>([]);
   
-  // Create an array of promises to get topics for each chapter
-  const topicsPromises = sortedChapters.map(chapter => 
-    listTopics({
+  // Prefetch topics for the first chapter only once on mount
+  useEffect(() => {
+    if (chapters && chapters.length > 0) {
+      const firstChapterId = chapters[0].id;
+      setExpandedChapters([`item-${firstChapterId}`]);
+    }
+  }, [chapters]);
+
+  return (
+    <Accordion
+      type="multiple"
+      value={expandedChapters}
+      onValueChange={setExpandedChapters}
+      className="w-full"
+    >
+      {chapters.map((chapter) => (
+        <AccordionItem 
+          key={chapter.id} 
+          value={`item-${chapter.id}`}
+        >
+          <AccordionTrigger className="hover:no-underline">
+            <div className="flex items-start">
+              <Book className="mr-2 h-5 w-5 mt-0.5 text-primary" />
+              <div className="text-left">
+                <div className="font-medium">{chapter.title}</div>
+                {chapter.description && (
+                  <p className="text-sm text-muted-foreground mt-1">{chapter.description}</p>
+                )}
+              </div>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            {expandedChapters.includes(`item-${chapter.id}`) && (
+              <ChapterTopics 
+                chapterId={chapter.id}
+                classId={classId}
+                subjectId={subjectId}
+              />
+            )}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  );
+}
+
+// Separate component to handle topics data fetching
+function ChapterTopics({ chapterId, classId, subjectId }: { chapterId: number, classId: number, subjectId: number }) {
+  const t = useI18n();
+  
+  const { data: topics, isLoading } = useQuery({
+    queryKey: ['topics', classId, subjectId, chapterId],
+    queryFn: () => listTopics({
       class_pk: classId.toString(),
       subject_pk: subjectId.toString(),
-      chapter_pk: chapter.id.toString(),
-    })
-  );
+      chapter_pk: chapterId.toString(),
+    }),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false,
+    retry: 1, // Limit retries to prevent excessive requests
+  });
   
-  // Wait for all promises to resolve
-  const chapterTopics = await Promise.all(topicsPromises);
+  if (isLoading) {
+    return <div className="py-2 pl-9 text-sm text-muted-foreground">{t('common.loading')}</div>;
+  }
+  
+  if (!topics || topics.length === 0) {
+    return (
+      <div className="py-2 pl-9 text-sm text-muted-foreground">
+        {t('student.chapter.noTopics')}
+      </div>
+    );
+  }
   
   return (
-    <Card className="border rounded-lg shadow-sm overflow-hidden">
-      <Accordion type="single" collapsible className="w-full">
-        {sortedChapters.map((chapter, index) => {
-          const topicCount = chapterTopics[index]?.length || 0;
-          
-          return (
-            <AccordionItem key={chapter.id} value={`chapter-${chapter.id}`} className="border-b last:border-b-0">
-              <AccordionTrigger className="px-4 py-3 hover:bg-muted/20 data-[state=open]:bg-muted/20">
-                <div className="flex flex-col items-start text-left">
-                  <div className="flex items-center">
-                    <h3 className="font-medium text-base">
-                      Chapter : {chapter.title}
-                    </h3>
-                    <Badge variant="outline" className="ml-2">
-                      {topicCount} topic{topicCount !== 1 ? 's' : ''}
-                    </Badge>
-                  </div>
-                  {chapter.description && (
-                    <p className="text-sm text-muted-foreground mt-0.5">{chapter.description}</p>
-                  )}
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-3 pt-1">
-                <TopicList 
-                  topics={chapterTopics[index] || []}
-                  classId={classId}
-                  subjectId={subjectId}
-                  chapterId={chapter.id}
-                />
-              </AccordionContent>
-            </AccordionItem>
-          );
-        })}
-      </Accordion>
-    </Card>
+    <div className="space-y-2 pl-9">
+      {topics.map((topic) => (
+        <Link
+          key={topic.id}
+          href={`/students/classes/${classId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topic.id}`}
+          className="flex items-center justify-between p-2 rounded-md hover:bg-muted group"
+        >
+          <div className="flex items-center gap-2">
+            <File className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm">{topic.title}</span>
+          </div>
+          <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Link>
+      ))}
+    </div>
   );
-};
-
-export default ChapterAccordion;
+}

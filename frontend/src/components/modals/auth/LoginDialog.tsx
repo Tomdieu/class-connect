@@ -30,7 +30,7 @@ import { toast } from "sonner";
 
 function LoginDialog() {
   const { isLoginOpen, closeDialog } = useAuthDialog();
-  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  // const [isResettingPassword, setIsResettingPassword] = useState(false);
   const t = useI18n();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -107,7 +107,7 @@ function LoginDialog() {
         ...values,
         redirect: false,
       });
-      console.log(res);
+      
       if (res?.error == "CredentialsSignin") {
         loginForm.setError("root", {
           message: t("loginDialog.invalidCredential"),
@@ -115,46 +115,41 @@ function LoginDialog() {
         setIsLoading(false)
         return;
       }
+      
       if (res && res.ok && !res.error) {
         setIsLoading(false);
         closeDialog(false);
         router.refresh();
-        toast("Login successfull");
-        if (res.url) {
-          const url = new URL(res.url);
-          const callbackUrl = url.searchParams.get("callbackUrl") || _callbackUrl;
-          if (callbackUrl) {
-            const decodedCallbackUrl = decodeURIComponent(callbackUrl);
-
-            router.push(decodedCallbackUrl);
-          } else {
-            router.push("/redirect");
-          }
+        toast.success("Login successful!");
+        
+        // Check if there's a callback URL from the search params
+        if (_callbackUrl && _callbackUrl !== "/redirect") {
+          router.push(decodeURIComponent(_callbackUrl));
+        } else {
+          // For automatic redirection, redirect to the API endpoint directly
+          router.push("/api/redirect");
+          // window.location.href = "/api/redirect";
         }
       }
     } catch (error) {
       console.error("Login error:", error);
+      setIsLoading(false);
     }
   };
 
-  const handleForgotPasswordSubmit = async (values: ForgotPasswordFormData) => {
-    try {
-      // Handle forgot password logic here
-      console.log("Forgot password submit:", values);
-    } catch (error) {
-      console.error("Forgot password error:", error);
-    }
-  };
+  // const handleForgotPasswordSubmit = async (values: ForgotPasswordFormData) => {
+  //   try {
+  //     // Handle forgot password logic here
+  //     console.log("Forgot password submit:", values);
+  //   } catch (error) {
+  //     console.error("Forgot password error:", error);
+  //   }
+  // };
 
   // Reset forms when switching between login and forgot password
   const handleSwitchToForgotPassword = () => {
-    loginForm.reset();
-    setIsResettingPassword(true);
-  };
-
-  const handleSwitchToLogin = () => {
-    forgotPasswordForm.reset();
-    setIsResettingPassword(false);
+    closeDialog(false);
+    router.push("/auth/forgot-password");
   };
 
   return (
@@ -176,140 +171,88 @@ function LoginDialog() {
                     <BookOpen className="h-8 w-8 text-blue-600" />
                   </div>
                   <DialogTitle className="text-2xl font-bold">
-                    {isResettingPassword
-                      ? t("loginDialog.resetPasswordTitle")
-                      : t("loginDialog.title")}
+                    {t("loginDialog.title")}
                   </DialogTitle>
-                  {!isResettingPassword && (
-                    <p className="text-gray-500 text-base max-w-xs">
-                      {t("loginDialog.subtitle")}
-                    </p>
-                  )}
+                  <p className="text-gray-500 text-base max-w-xs">
+                    {t("loginDialog.subtitle")}
+                  </p>
                 </div>
               </div>
             </CredenzaHeader>
 
-            {isResettingPassword ? (
-              <Form {...forgotPasswordForm}>
-                <form
-                  onSubmit={forgotPasswordForm.handleSubmit(
-                    handleForgotPasswordSubmit
+            <Form {...loginForm}>
+              <form
+                onSubmit={loginForm.handleSubmit(handleLoginSubmit)}
+                className="flex flex-col gap-4 p-6"
+              >
+                {errors.root && (
+                  <div className="w-full bg-red-50 border border-red-200 rounded-xl p-3">
+                    <span className="text-red-600 text-sm font-medium">
+                      {errors.root.message}
+                    </span>
+                  </div>
+                )}
+                <FormField
+                  control={loginForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">
+                        {t("loginDialog.emailLabel")}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="email@example.com"
+                          className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
                   )}
-                  className="flex flex-col gap-4 p-6"
-                >
-                  <FormField
-                    control={forgotPasswordForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700">
-                          {t("loginDialog.emailLabel")}
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="email@example.com"
-                            className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-500" />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="submit"
-                    disabled={forgotPasswordForm.formState.isSubmitting}
-                    className="bg-default hover:bg-default/90 text-white h-11 rounded-xl font-medium"
-                  >
-                    {t("loginDialog.sendResetLinkButton")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={handleSwitchToLogin}
-                    disabled={forgotPasswordForm.formState.isSubmitting}
-                    className="text-gray-600 hover:text-gray-900"
-                  >
-                    {t("loginDialog.backToLoginButton")}
-                  </Button>
-                </form>
-              </Form>
-            ) : (
-              <Form {...loginForm}>
-                <form
-                  onSubmit={loginForm.handleSubmit(handleLoginSubmit)}
-                  className="flex flex-col gap-4 p-6"
-                >
-                  {errors.root && (
-                    <div className="w-full bg-red-50 border border-red-200 rounded-xl p-3">
-                      <span className="text-red-600 text-sm font-medium">
-                        {errors.root.message}
-                      </span>
-                    </div>
+                />
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">
+                        {t("loginDialog.passwordLabel")}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
                   )}
-                  <FormField
-                    control={loginForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700">
-                          {t("loginDialog.emailLabel")}
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="email@example.com"
-                            className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-500" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={loginForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700">
-                          {t("loginDialog.passwordLabel")}
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="••••••••"
-                            className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-500" />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="submit"
-                    disabled={loginForm.formState.isSubmitting || isLoading}
-                    className="bg-default hover:bg-default/90 text-white h-11 rounded-xl font-medium flex items-center justify-center gap-2"
-                  >
-                    {isLoading && (
-                      <LoaderCircle className="h-4 w-4 animate-spin" />
-                    )}
-                    {t("loginDialog.loginButton")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={handleSwitchToForgotPassword}
-                    disabled={loginForm.formState.isSubmitting}
-                    className="text-gray-600 hover:text-gray-900"
-                  >
-                    {t("loginDialog.forgotPasswordButton")}
-                  </Button>
-                </form>
-              </Form>
-            )}
+                />
+                <Button
+                  type="submit"
+                  disabled={loginForm.formState.isSubmitting || isLoading}
+                  className="bg-default hover:bg-default/90 text-white h-11 rounded-xl font-medium flex items-center justify-center gap-2"
+                >
+                  {isLoading && (
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                  )}
+                  {t("loginDialog.loginButton")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleSwitchToForgotPassword}
+                  disabled={loginForm.formState.isSubmitting}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  {t("loginDialog.forgotPasswordButton")}
+                </Button>
+              </form>
+            </Form>
           </div>
         </div>
       </CredenzaContent>

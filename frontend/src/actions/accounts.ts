@@ -116,6 +116,37 @@ export const updateUser = async ({
   }
 };
 
+export const updateUserAvatar = async ({
+  id,
+  avatar,
+}: {
+  id: number | string;
+  avatar: File;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const form = new FormData();
+    form.append("avatar", avatar);
+
+    const res = await api.patch(`/api/accounts/users/${id}/`, form, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    const data = (await res.data) as UserType;
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
 export const deleteUser = async (id: number | string) => {
   try {
     const session = await auth();
@@ -178,7 +209,7 @@ export const validatePhoneNumber = async ({
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
 
-    const res = await api.post(`/accounts/validate-phone/`, {
+    const res = await api.post(`/api/accounts/validate-phone/`, {
       headers: {
         Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",
@@ -202,7 +233,7 @@ export const verifyPasword = async ({ password }: { password: string }) => {
     if (!session?.user) throw Error("Unauthorize user!");
 
     const res = await api.post(
-      `/accounts/verify-password/`,
+      `/api/accounts/verify-password/`,
       { password },
       {
         headers: {
@@ -226,12 +257,8 @@ export const verifyPasword = async ({ password }: { password: string }) => {
 
 export const checkMail = async ({ email }: { email: string }) => {
   try {
-    const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
-
-    const res = await api.get(`/accounts/check-email/${email}/`, {
+    const res = await api.get(`/api/accounts/check-email/${email}/`, {
       headers: {
-        Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",
       },
     });
@@ -252,12 +279,8 @@ export const resentVerificationLink = async ({
   params: { email: string };
 }) => {
   try {
-    const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
-
-    const res = await api.get(`/accounts/resend-verification/`, {
+    const res = await api.get(`/api/accounts/resend-verification/`, {
       headers: {
-        Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",
       },
       params,
@@ -281,12 +304,8 @@ export const confirmResetPassword = async ({
   body: { code: string; new_password: string; confirm_password: string };
 }) => {
   try {
-    const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
-
-    const res = await api.post(`/accounts/password-reset-confirm/`, body, {
+    const res = await api.post(`/api/accounts/password-reset-confirm/`, body, {
       headers: {
-        Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",
       },
     });
@@ -301,21 +320,17 @@ export const confirmResetPassword = async ({
   }
 };
 
-export const sendResetPasswordEmailLinl = async ({
+export const sendResetPasswordEmailLink = async ({
   email,
 }: {
   email: string;
 }) => {
   try {
-    const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
-
     const res = await api.post(
-      `/accounts/password-reset/`,
+      `/api/accounts/password-reset/`,
       { email },
       {
         headers: {
-          Authorization: `Bearer ${session?.user.accessToken}`,
           "Content-Type": "application/json",
         },
       }
@@ -331,4 +346,20 @@ export const sendResetPasswordEmailLinl = async ({
   }
 };
 
-export const verifyCode = async ({ code }: { code: string }) => {};
+export const verifyCode = async ({ code }: { code: string }) => {
+  try {
+    const res = await api.post(`/api/accounts/verify-code/${code}/`, null, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = (await res.data) as { exists: boolean };
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};

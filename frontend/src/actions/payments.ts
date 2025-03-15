@@ -205,6 +205,26 @@ export const getSubscription = async (id: number) => {
   }
 };
 
+export const getMySubscriptions = async ({params}:{params?:Partial<{page:number,page_size:number}>}={}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get("/api/subscription-history/", {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+      params
+    });
+    return response.data as PaginationType<SubscriptionDetail>;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}
+
 export const getCurrentPlan = async () => {
   try {
     const session = await auth();

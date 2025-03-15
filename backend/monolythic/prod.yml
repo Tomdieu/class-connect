@@ -1,6 +1,7 @@
 networks:
   e_learning_network:
     driver: bridge
+
 services:
   api:
     build:
@@ -63,8 +64,41 @@ services:
     networks:
       - e_learning_network
 
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./docker/prod/Dockerfile
+    container_name: classconnect_celery_worker
+    command: celery -A backend worker --loglevel=info
+    restart: unless-stopped
+    env_file:
+      - .envs/.prod/django
+    depends_on:
+      - api
+      - rabbitmq
+      - redis
+    networks:
+      - e_learning_network
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: ./docker/prod/Dockerfile
+    container_name: classconnect_celery_beat
+    command: celery -A backend beat --loglevel=info
+    restart: unless-stopped
+    env_file:
+      - .envs/.prod/django
+    depends_on:
+      - api
+      - celery_worker
+      - rabbitmq
+      - redis
+    networks:
+      - e_learning_network
+
 volumes:
   postgres_data:
   rabbitmq_data:
-  static_volume:  # New volume for static files
+  static_volume:  # Volume for static files
   redis_data:

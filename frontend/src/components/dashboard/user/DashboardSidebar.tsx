@@ -6,13 +6,11 @@ import { FaEuroSign } from "react-icons/fa";
 import { IoLibrarySharp } from "react-icons/io5";
 import { IoChatbubbles } from "react-icons/io5";
 import { FaGraduationCap } from "react-icons/fa6";
-import { UserCircle } from "react-icons/fa";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -22,7 +20,6 @@ import { usePathname } from "next/navigation";
 import { getPathAfterLanguage } from "@/lib/utils";
 import { useI18n } from "@/locales/client";
 import Link from "next/link";
-import { url } from "inspector";
 
 export default function DashboardSidebar() {
   const { toggleSidebar } = useSidebar();
@@ -91,7 +88,7 @@ export default function DashboardSidebar() {
             </Link>
             <div
               onClick={toggleSidebar}
-              className="cursor-pointer sm:hidden hover:bg-gray-100 p-2 rounded-full transition-colors"
+              className="cursor-pointer md:hidden hover:bg-gray-100 p-2 rounded-full transition-colors"
             >
               <X className="text-gray-500 size-5" />
             </div>
