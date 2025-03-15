@@ -1,230 +1,159 @@
+import logging
 from celery import shared_task
-from celery.utils.log import get_task_logger
-from ..models import Transaction, Payment, Subscription, SubscriptionPlan
-from django.contrib.auth import get_user_model
 from django.utils import timezone
-import json
-import base64
-import uuid
 from django.core.cache import cache
+from django.conf import settings
+from django.contrib.auth import get_user_model
+import json
+from ..models import Subscription, SubscriptionPlan, Transaction, Payment, PaymentReference
 
-logger = get_task_logger(__name__)
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
-@shared_task(
-    bind=True,
-    autoretry_for=(Exception,),
-    retry_kwargs={'max_retries': 3, 'countdown': 5}
-)
-def process_payment_task(self, webhook_data):
+@shared_task
+def process_payment_task(webhook_data):
     """
-    Process payment asynchronously using Celery with endpoint validation
+    Process payment webhook data asynchronously using PaymentReference model
     """
     try:
         logger.info(f"Starting process_payment_task with webhook_data: {webhook_data}")
-
-        # Check if webhook_data is empty
-        if not webhook_data:
-            logger.error("Webhook data is empty!")
-            return {
-                'status': 'error',
-                'message': 'Webhook data is empty'
-            }
-
-        # Create Transaction record
-        # try:
-        #     reference = webhook_data.get('reference', str(uuid.uuid4()))
-        #     # Check if transaction already exists
-        #     if Transaction.objects.filter(reference=reference).exists():
-        #         logger.warning(f"Transaction with reference {reference} already exists. Skipping creation.")
-        #         transaction = Transaction.objects.get(reference=reference)  # Get the existing transaction
-        #     else:
-        #         external_reference_str = webhook_data.get('external_reference')
-        #         if external_reference_str:
-        #             try:
-        #                 external_reference = uuid.UUID(external_reference_str)
-        #             except ValueError:
-        #                 logger.error(f"Invalid UUID format for external_reference: {external_reference_str}")
-        #                 external_reference = None  # Or handle the error as appropriate
-        #         else:
-        #             external_reference = None
-
-        #         transaction = Transaction.objects.create(
-        #             reference=reference,
-        #             status=webhook_data.get('status', 'PENDING'),
-        #             amount=webhook_data.get('amount'),
-        #             app_amount=webhook_data.get('app_amount'),
-        #             currency=webhook_data.get('currency', 'XAF'),
-        #             operator=webhook_data.get('operator', 'MTN'),
-        #             endpoint=webhook_data.get('endpoint', ''),  # Get endpoint from webhook
-        #             code=webhook_data.get('code', ''),
-        #             operator_reference=webhook_data.get('operator_reference', ''),
-        #             phone_number=webhook_data.get('phone_number', ''),
-        #             signature=webhook_data.get('signature', ''),
-        #             external_reference=external_reference  # Pass the UUID object or None
-        #         )
-        #         logger.info(f"Transaction created with reference: {transaction.reference}")
-        # except Exception as e:
-        #     logger.error(f"Error creating Transaction: {str(e)}")
-        #     return {
-        #         'status': 'error',
-        #         'message': f'Error creating Transaction: {str(e)}'
-        #     }
         
-        transaction_id = webhook_data.get('external_reference')
+        # Extract key information from webhook
+        campay_reference = webhook_data.get('reference')
+        external_reference = webhook_data.get('external_reference')
+        status = webhook_data.get('status')
+        operator = webhook_data.get('operator', '')
+        
+        if not external_reference:
+            logger.error("Missing external_reference in webhook data")
+            return {'status': 'error', 'message': 'Missing external_reference in webhook data'}
+        
+        # Find payment reference
+        payment_ref = None
         try:
-            transaction = Transaction.objects.get(reference=transaction_id)
-        except Transaction.DoesNotExist:
-            logger.error(f"Transaction with reference {transaction_id} not found.")
-            return {
-                'status': 'error',
-                'message': f'Transaction with reference {transaction_id} not found.'
-            }
-
-        # Only process subscription for collect endpoint
-        if transaction.endpoint != 'collect':
-            logger.info(f"Transaction is not a 'collect' endpoint, skipping further processing. Endpoint: {transaction.endpoint}")
-            
-            # Update transaction status to successful for withdraw endpoint
-            if transaction.endpoint == 'withdraw' and webhook_data.get('status') == 'SUCCESSFUL':
-                transaction.status = 'SUCCESSFUL'
-                transaction.save()
-                logger.info(f"Withdraw transaction status updated to SUCCESSFUL. Transaction ID: {transaction.reference}")
-            
-            return {
-                'status': 'success',
-                'message': 'Non-collect transaction recorded',
-                'transaction_id': str(transaction.reference)
-            }
-
-        # Get the full reference data from Redis
-        transaction_id = webhook_data.get('external_reference')
-        cache_key = f"payment_ref_{transaction_id}"
-        reference_data_str = cache.get(cache_key)
-
-        if not reference_data_str:
-            logger.warning(f"Reference data not found in Redis for transaction_id: {transaction_id}")
-            # Extract IDs from short reference format
-            # Format: p{plan_id}u{user_id}h{hash}
-            try:
-                parts = transaction_id.split('h')[0]  # Get part before hash
-                plan_id = parts.split('u')[0][1:]  # Extract plan_id
-                user_id = parts.split('u')[1]  # Extract user_id
-
-                reference_data = {
-                    'plan_id': plan_id,
-                    'user_id': user_id
-                }
-                logger.info(f"Extracted reference data from transaction_id: {reference_data}")
-            except (IndexError, ValueError) as e:
-                logger.error(f"Invalid transaction reference format: {str(e)}")
-                transaction.status = 'FAILED'
-                transaction.save()
-                return {
-                    'status': 'error',
-                    'message': 'Invalid transaction reference format'
-                }
-        else:
-            try:
-                reference_data = json.loads(reference_data_str)
-                logger.info(f"Reference data loaded from Redis: {reference_data}")
-            except json.JSONDecodeError as e:
-                logger.error(f"Error decoding reference data from Redis: {str(e)}")
-                transaction.status = 'FAILED'
-                transaction.save()
-                return {
-                    'status': 'error',
-                    'message': 'Error decoding reference data from Redis'
-                }
-
-        # Verify and decode the external reference
+            logger.info(f"Looking up payment reference with external_reference: {external_reference}")
+            payment_refs = PaymentReference.objects.filter(external_reference=external_reference)
+            if payment_refs.exists():
+                payment_ref = payment_refs.first()
+                logger.info(f"Found PaymentReference for user {payment_ref.user}, plan {payment_ref.plan}")
+        except Exception as e:
+            logger.error(f"Error looking up payment reference: {e}")
+        
+        # Find transaction
+        transaction = None
         try:
-            if reference_data_str:  # Use reference_data from Redis
-                reference_data = json.loads(reference_data_str)
-
-                # Validate reference data structure
-                required_fields = ['plan_id', 'user_id', 'uuid']
-                if not all(field in reference_data for field in required_fields):
-                    raise ValueError("Invalid reference data structure")
-            else:
-                raise ValueError("Transaction external_reference is None and no Redis data found")
-
-        except (json.JSONDecodeError, ValueError) as e:
-            logger.error(f"Error decoding or validating external reference: {str(e)}")
-            transaction.status = 'FAILED'
+            transactions = Transaction.objects.filter(reference=external_reference)
+            if transactions.exists():
+                transaction = transactions.first()
+                logger.info(f"Found transaction using reference={external_reference}")
+        except Exception as e:
+            logger.error(f"Error looking for transaction by reference: {e}")
+        
+        if not transaction and payment_ref:
+            try:
+                transactions = Transaction.objects.filter(
+                    phone_number=payment_ref.phone_number,
+                    amount=payment_ref.amount,
+                    status='PENDING'
+                ).order_by('-created_at')
+                
+                if transactions.exists():
+                    transaction = transactions.first()
+                    logger.info(f"Found transaction by phone/amount")
+            except Exception as e:
+                logger.error(f"Error finding transaction by phone/amount: {e}")
+        
+        if not transaction:
+            logger.error(f"Transaction not found for external_reference={external_reference}")
+            return {'status': 'error', 'message': f'Transaction with reference {external_reference} not found.'}
+        
+        # Update transaction status
+        try:
+            transaction.status = status
+            transaction.code = webhook_data.get('code', '')
+            transaction.operator = operator
+            transaction.operator_reference = webhook_data.get('operator_reference', '')
             transaction.save()
-            return {
-                'status': 'error',
-                'message': 'Invalid external reference format'
-            }
-
-        if webhook_data.get('status') == 'SUCCESSFUL':
+            logger.info(f"Updated transaction with reference {transaction.reference} to status {status}")
+        except Exception as e:
+            logger.error(f"Error updating transaction: {e}")
+            return {'status': 'error', 'message': f'Error updating transaction: {str(e)}'}
+        
+        # If payment was successful, create subscription and payment
+        if status == 'SUCCESSFUL':
             try:
-                # Verify user and plan exist
-                user = User.objects.get(id=reference_data['user_id'])
-                plan = SubscriptionPlan.objects.get(id=reference_data['plan_id'])
-                logger.info(f"User and Plan found. User ID: {user.id}, Plan ID: {plan.id}")
-
-                # Create or update subscription
-                subscription, created = Subscription.objects.get_or_create(
+                # Determine user and plan
+                if payment_ref:
+                    user = payment_ref.user
+                    plan = payment_ref.plan
+                    amount = payment_ref.amount
+                    logger.info(f"Using data from PaymentReference for user {user}, plan {plan}")
+                else:
+                    # Use cache data as fallback
+                    cache_key = f"payment_ref_{external_reference}"
+                    reference_data_json = cache.get(cache_key)
+                    
+                    if not reference_data_json:
+                        logger.error("Reference data not found in cache")
+                        return {'status': 'error', 'message': 'Reference data not found in cache'}
+                    
+                    reference_data = json.loads(reference_data_json)
+                    user_id = reference_data.get('user_id')
+                    plan_id = reference_data.get('plan_id')
+                    amount = reference_data.get('amount')
+                    
+                    user = User.objects.get(id=user_id)
+                    plan = SubscriptionPlan.objects.get(id=plan_id)
+                    logger.info(f"Using data from cache")
+                
+                # Create subscription with only the fields we know exist
+                subscription = Subscription.objects.create(
                     user=user,
                     plan=plan,
-                    defaults={
-                        'start_date': timezone.now(),
-                        'end_date': timezone.now() + timezone.timedelta(days=plan.duration_days),
-                        'is_active': True
-                    }
+                    start_date=timezone.now(),
+                    end_date=timezone.now() + timezone.timedelta(days=plan.duration_days),
+                    is_active=True,
+                    # Remove status='ACTIVE' - it's a property, not a field
                 )
-
-                if not created:
-                    subscription.activate()
-                    logger.info(f"Subscription activated. Subscription ID: {subscription.id}")
-                else:
-                    logger.info(f"Subscription created. Subscription ID: {subscription.id}")
-
-                # Create payment record
-                payment = Payment.objects.create(
-                    user=user,
-                    subscription=subscription,
-                    amount=transaction.amount,
-                    payment_method=transaction.operator,
-                    transaction_id=str(transaction.reference),
-                    status='SUCCESSFUL',
-                    operator_reference=transaction.operator_reference,
-                    operator_code=transaction.code,
-                    signature=transaction.signature,
-                    phone_number=transaction.phone_number,
-                    app_amount=transaction.app_amount
-                )
-                logger.info(f"Payment created. Payment ID: {payment.id}")
-
+                logger.info(f"Created subscription for user {user}")
+                
+                # Create payment with required subscription field
+                try:
+                    payment = Payment(
+                        user=user,
+                        amount=amount,
+                        status='SUCCESSFUL',
+                        payment_method=operator,
+                        transaction_id=external_reference,
+                        subscription=subscription  # Link to subscription
+                    )
+                    payment.save()
+                    logger.info(f"Created payment with transaction_id: {external_reference}")
+                except Exception as pe:
+                    # If payment fails, delete the subscription
+                    subscription.delete()
+                    logger.error(f"Error creating payment: {pe}")
+                    return {'status': 'error', 'message': f'Error creating payment: {str(pe)}'}
+                
                 return {
                     'status': 'success',
-                    'transaction_id': str(transaction.reference),
-                    'subscription_id': subscription.id
+                    'message': 'Payment processed successfully',
+                    'subscription_id': str(subscription.pk)
                 }
-
-            except (User.DoesNotExist, SubscriptionPlan.DoesNotExist) as e:
-                logger.error(f'Invalid user or plan: {str(e)}')
-                transaction.status = 'FAILED'
-                transaction.save()
-                return {
-                    'status': 'error',
-                    'message': f'Invalid user or plan: {str(e)}'
-                }
-
-        logger.info(f"Payment status is not SUCCESSFUL. Status: {webhook_data.get('status')}")
+                
+            except Exception as e:
+                logger.exception(f"Error creating subscription/payment: {str(e)}")
+                return {'status': 'error', 'message': f'Error creating subscription/payment: {str(e)}'}
+        
         return {
-            'status': 'pending',
-            'transaction_id': str(transaction.reference)
+            'status': 'success',
+            'message': f'Transaction updated with status: {status}',
+            'transaction_reference': str(transaction.reference)
         }
-
+            
     except Exception as e:
         logger.exception(f"Error processing payment: {str(e)}")
-        return {
-            'status': 'error',
-            'message': str(e)
-        }
+        return {'status': 'error', 'message': str(e)}
 
 @shared_task
 def retry_failed_payments():
@@ -267,7 +196,7 @@ def retry_failed_payments():
                 'status': 'failed'
             })
             print(f"Error retrying payment {transaction.reference}: {str(e)}")
-            
+    
     return {
         'retried_count': len(results),
         'results': results
