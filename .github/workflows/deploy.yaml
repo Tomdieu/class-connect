@@ -35,7 +35,8 @@ jobs:
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/backend/monolythic &&
-            docker compose -f prod.yml up -d --build || echo "Failed to start Docker containers"
+            docker compose -f prod.yml build --no-cache &&
+            docker compose -f prod.yml up -d --remove-orphans || echo "Failed to start Docker containers"
           '
       - name: Run Docker Logs  as root
         run: |
@@ -43,6 +44,11 @@ jobs:
             cd /home/ubuntu/class-connect/backend/monolythic &&
             docker compose -f prod.yml logs --tail=500 --no-log-prefix
           '
+      - name: Clean up dangling images and volumes
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+          docker image prune -f &&
+          docker volume prune -f --filter "label!=keep" || echo "Cleanup completed with warnings"
 
 # name: CI/CD auth-app
 
