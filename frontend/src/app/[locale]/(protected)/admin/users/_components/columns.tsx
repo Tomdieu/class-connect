@@ -4,7 +4,6 @@
 import { Button } from "@/components/ui/button";
 import { UserType } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatTimeSince } from "@/lib/timeSince";
 
@@ -58,7 +57,7 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "first_name",
     id: "first_name",
-    header: ({ column }) => {
+    header: () => {
       const t = useI18n();
       return t("users.table.columns.firstName");
     },
@@ -71,7 +70,7 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "last_name",
     id: "last_name",
-    header: ({ column }) => {
+    header: () => {
       const t = useI18n();
       return t("users.table.columns.lastName");
     },
@@ -83,7 +82,7 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "email",
     id: "email",
-    header: ({ column }) => {
+    header: () => {
       const t = useI18n();
       return t("users.table.columns.email");
     },
@@ -95,7 +94,7 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "phone_number",
     id: "phone_number",
-    header: ({ column }) => {
+    header: ({ }) => {
       const t = useI18n();
       return t("users.table.columns.phone");
     },
@@ -107,7 +106,7 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "education_level",
     id: "education_level",
-    header: ({ column }) => {
+    header: () => {
       const t = useI18n();
       return t("users.table.columns.educationLevel");
     },
@@ -118,7 +117,7 @@ export const userColumns: ColumnDef<UserType>[] = [
   },
   {
     id: "class",
-    header: ({ column }) => {
+    header: () => {
       const t = useI18n();
       return t("users.table.columns.class");
     },
@@ -130,7 +129,7 @@ export const userColumns: ColumnDef<UserType>[] = [
   {
     accessorKey: "date_joined",
     id: "date_joined",
-    header: ({ column }) => {
+    header: () => {
       const t = useI18n();
       return t("users.table.columns.dateJoined");
     },
