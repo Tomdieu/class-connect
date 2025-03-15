@@ -1,7 +1,7 @@
-import withPWA from 'next-pwa';
+import withPWA from "next-pwa";
 
 const pwaConfig = withPWA({
-  dest: 'public',
+  dest: "public",
 });
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -11,7 +11,6 @@ export default {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
-
   },
   typescript: {
     // !! WARN !!
@@ -20,20 +19,25 @@ export default {
     ignoreBuildErrors: true,
   },
   // pageExtensions: ['ts', 'tsx'],
-  output: 'standalone',
+  output: "standalone",
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
+        protocol: "https",
         hostname: "**",
       },
       {
-        protocol: 'http',
+        protocol: "http",
         hostname: "**",
       },
-    ]
+    ],
   },
-  // sassOptions: {
-  //   silenceDeprecations: ['legacy-js-api'],
-  // }
+  sassOptions: {
+    silenceDeprecations: ["legacy-js-api"],
+  },
+  // Configure experimental features
+  experimental: {
+    optimizeCss: true,
+    scrollRestoration: true,
+  },
 };
