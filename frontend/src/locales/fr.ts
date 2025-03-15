@@ -502,6 +502,7 @@ export default {
   "users.table.columns.dateJoined": "Date d'inscription",
   "users.table.actions.update": "Mettre à jour",
   "users.table.actions.delete": "Supprimer",
+  "users.table.actions.detail": "Détails",
   "users.delete.title": "Supprimer l'utilisateur",
   "users.delete.description":
     "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action ne peut pas être annulée.",

@@ -464,6 +464,7 @@ export default {
   "users.table.columns.dateJoined": "Date Joined",
   "users.table.actions.update": "Update",
   "users.table.actions.delete": "Delete",
+  "users.table.actions.detail": "Details",
   "users.delete.title": "Delete User",
   "users.delete.description":
     "Are you sure you want to delete this user? This action cannot be undone.",
