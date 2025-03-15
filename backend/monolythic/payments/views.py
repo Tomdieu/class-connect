@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from .models import SubscriptionPlan, Subscription, Payment,Transaction
+from .models import PaymentReference, SubscriptionPlan, Subscription, Payment,Transaction
 from .serializers import SubscriptionDetailSerializer, SubscriptionPlanSerializer, SubscriptionSerializer, PaymentSerializer, TransactionSerializer
 from .filters import SubscriptionFilter, PaymentFilter,TransactionFilter
 from .lib.campay import CamPayManager
@@ -16,12 +16,14 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.utils import timezone
 import json
-from .tasks.process_payments import process_payment_task
+# Import with fully qualified path to avoid task registration issues
+from payments.tasks.process_payments import process_payment_task
 import hashlib
 import hmac
 from rest_framework.authentication import TokenAuthentication
 from django.core.cache import cache
 from .pagination import CustomPagination
+from rest_framework.decorators import action
 
 class SubscriptionPlanViewSet(viewsets.ModelViewSet):
     queryset = SubscriptionPlan.objects.filter(active=True)
@@ -177,6 +179,13 @@ class PaymentLinkView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             
+            # Check amount limit for demo environment
+            if settings.CAMPAY_ENVIRONMENT == "DEV" and float(plan.price) > 100.00:
+                return Response(
+                    {'error': 'In demo mode, maximum amount is limited to 100.00 XAF'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             # Initialize CamPay client
             campay = CamPayManager(
                 app_username=settings.CAMPAY_APP_USERNAME,
@@ -184,67 +193,142 @@ class PaymentLinkView(APIView):
                 environment=settings.CAMPAY_ENVIRONMENT
             )
             
-            # Generate short transaction ID
-            transaction_id = self.generate_short_reference(plan.id, request.user.id)
+            # Generate internal reference for tracking
+            internal_reference = self.generate_short_reference(plan.id, request.user.id)
             
-            # Store the full reference data in Redis for later lookup
+            # Generate proper UUID for external reference and the Transaction model
+            transaction_uuid = uuid.uuid4()
+            external_reference = str(transaction_uuid)
+            
+            # Create a PaymentReference record to store the mapping
+            payment_reference = PaymentReference.objects.create(
+                external_reference=transaction_uuid,  # Use UUID object
+                internal_reference=internal_reference,
+                user=request.user,
+                plan=plan,
+                amount=plan.price,
+                phone_number=phone_number.replace('+', ''),
+                metadata={
+                    'user_email': request.user.email,
+                    'user_first_name': request.user.first_name,
+                    'user_last_name': request.user.last_name,
+                    'plan_name': plan.name,
+                    'created_at': str(timezone.now())
+                }
+            )
+            
+            # Still store in Redis cache as a backup
             reference_data = {
                 'plan_id': str(plan.id),
                 'user_id': str(request.user.id),
-                'uuid': str(uuid.uuid4())
+                'uuid': external_reference,
+                'internal_reference': internal_reference,
+                'phone_number': phone_number.replace('+', ''),
+                'amount': str(plan.price),
+                'user_email': request.user.email,
+                'user_first_name': request.user.first_name,
+                'user_last_name': request.user.last_name,
+                'plan_name': plan.name,
+                'created_at': str(timezone.now())
             }
             
-            # Store in Redis with 24-hour expiry
-            cache_key = f"payment_ref_{transaction_id}"
-            cache.set(cache_key, json.dumps(reference_data), timeout=86400)  # 24 hours
+            # Store in Redis with 24-hour expiry as backup
+            cache_key_external = f"payment_ref_{external_reference}"
+            cache.set(cache_key_external, json.dumps(reference_data), timeout=86400)
             
             # Create payment description
             description = f"Subscription to {plan.name} plan"
             
-            # Get the base URL from settings or request
-            base_url = request.build_absolute_uri('/')[:-1]
-            
-            # Get success and failure URLs from request or use defaults
+            # Get success and failure URLs
             success_url = request.data.get('success_url') or request.build_absolute_uri(reverse('payment-success'))
             failure_url = request.data.get('failure_url') or request.build_absolute_uri(reverse('payment-failure'))
             
-            # Create payment link
-            payment_link = campay.create_payment_link(
-                amount=str(plan.price),
-                description=description,
-                external_reference=transaction_id,  # Using short reference
-                redirect_url=success_url,
-                failure_redirect_url=failure_url,
-                first_name=request.user.first_name,
-                last_name=request.user.last_name,
-                email=request.user.email,
-                phone=phone_number.replace('+', '')  # Use provided phone number
-            )
-            
-            # Create pending transaction record
-            transaction = Transaction.objects.create(
-                reference=transaction_id,
-                status='PENDING',
-                amount=plan.price,
-                app_amount=plan.price,
-                currency='XAF',
-                operator='MTN',  # Default to MTN, can be updated later
-                endpoint='collect',
-                code='',
-                operator_reference='',
-                phone_number=phone_number.replace('+', ''),
-                external_reference=transaction_id,
-            )
-            
-            return Response({
-                'payment_link': payment_link['link'],
-                'transaction_id': transaction_id,
-                'success_url': success_url,
-                'failure_url': failure_url
-            })
+            try:
+                # Create payment link
+                payment_link = campay.create_payment_link(
+                    amount=str(plan.price),
+                    description=description,
+                    external_reference=external_reference,  # Using UUID format required by CamPay
+                    redirect_url=success_url,
+                    failure_redirect_url=failure_url,
+                    first_name=request.user.first_name,
+                    last_name=request.user.last_name,
+                    email=request.user.email,
+                    phone=phone_number.replace('+', '')  # Remove + if present
+                )
+                
+                # Create pending transaction record with enhanced error handling
+                try:
+                    # Print the data we're about to use for Transaction creation
+                    print(f"Creating Transaction with reference={external_reference}, external_reference={internal_reference}")
+                    
+                    # Create the transaction object and save it
+                    transaction = Transaction(
+                        reference=external_reference,  # Use the UUID string
+                        status='PENDING',
+                        amount=plan.price,
+                        app_amount=plan.price,
+                        currency='XAF',
+                        operator='MTN',  # Default to MTN, can be updated later
+                        endpoint='collect',
+                        code='',
+                        operator_reference='',
+                        phone_number=phone_number.replace('+', ''),
+                        external_reference=internal_reference  # Store our internal reference for tracking
+                    )
+                    
+                    # Explicitly save the transaction without accessing ID afterward
+                    transaction.save()
+                    
+                    # Log success without accessing ID
+                    print(f"Successfully created transaction with reference={external_reference}")
+                    print(f"Transaction external_reference (internal): {internal_reference}")
+                    print(f"Created PaymentReference with ID: {payment_reference.id}")
+                    
+                    # Store in Redis without transaction ID
+                    cache.set(cache_key_external, json.dumps(reference_data), timeout=86400)
+                    
+                except Exception as tx_error:
+                    # Enhanced error logging
+                    print(f"Transaction creation error: {str(tx_error)}")
+                    print(f"Error type: {type(tx_error).__name__}")
+                    
+                    # Return more detailed error information for debugging
+                    return Response({
+                        'payment_link': payment_link['link'],
+                        'transaction_id': internal_reference,
+                        'external_reference': external_reference,
+                        'success_url': success_url,
+                        'failure_url': failure_url,
+                        'warning': f'Payment link created, but transaction recording failed: {str(tx_error)}'
+                    })
+                
+                return Response({
+                    'payment_link': payment_link['link'],
+                    'transaction_id': internal_reference,
+                    'external_reference': external_reference,
+                    'success_url': success_url,
+                    'failure_url': failure_url
+                })
+                
+            except Exception as campay_error:
+                # Clean up the payment reference if payment link creation fails
+                payment_reference.delete()
+                
+                print(f"CamPay Error: {str(campay_error)}")
+                # Extract the CamPay error message
+                if isinstance(campay_error, dict) and 'message' in campay_error:
+                    error_message = campay_error['message']
+                else:
+                    error_message = str(campay_error)
+                
+                return Response(
+                    {'error': f"Payment service error: {error_message}", 'campay_error': True},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             
         except Exception as e:
-            print(e)
+            print("Error : ", str(e))
             return Response(
                 {'error': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
@@ -374,6 +458,12 @@ class SubscriptionViewSet(viewsets.ReadOnlyModelViewSet):
         if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
             return Subscription.objects.none()  # Return empty queryset for swagger
         return Subscription.objects.filter(user=self.request.user)
+    
+    @action(methods=['GET'], detail=False,url_path='my-subscriptions',url_name='my-subscriptions')
+    def my_subscriptions(self,request):
+        subscriptions = Subscription.objects.filter(user=request.user)
+        serializer = SubscriptionDetailSerializer(subscriptions, many=True)
+        return Response(serializer.data)
 
 class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PaymentSerializer
@@ -432,11 +522,13 @@ def payment_webhook(request):
         # Get webhook data and convert QueryDict to dict
         webhook_data = request.GET.dict()
         
-        # # Log the webhook data for debugging
-        # print(f"Received webhook data: {webhook_data}")
+        # Log the webhook data for debugging
+        print(f"Received webhook data: {webhook_data}")
         
         # Queue payment processing using Celery
         result = process_payment_task.delay(webhook_data)
+        
+        print(f"Task queued with ID: {result.id}")
         
         return Response({
             'status': 'success',
