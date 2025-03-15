@@ -153,7 +153,7 @@ class Transaction(models.Model):
     # Reference numbers
     code = models.CharField(max_length=50)  # Transaction code (e.g., D250214D0016GM)
     operator_reference = models.CharField(max_length=50)  # Operator's reference number
-    external_reference = models.UUIDField(null=True, blank=True)  # Optional external reference
+    external_reference = models.CharField(max_length=255, null=True, blank=True)  # Changed to CharField
     
     # Customer information
     phone_number = models.CharField(max_length=15)
@@ -193,3 +193,56 @@ class Transaction(models.Model):
     @property
     def formatted_amount(self):
         return f"{self.amount:,.2f} {self.currency}"
+
+class PaymentReference(models.Model):
+    """
+    Stores mapping between internal and external payment references
+    for reliable reference lookup during webhook processing.
+    """
+    # The UUID sent to payment provider as external_reference
+    external_reference = models.UUIDField(unique=True, db_index=True)
+    
+    # Our internal reference (p{plan_id}u{user_id}h{hash})
+    internal_reference = models.CharField(max_length=100, unique=True, db_index=True)
+    
+    # Related data for quick access
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    plan = models.ForeignKey('SubscriptionPlan', on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    phone_number = models.CharField(max_length=20)
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    metadata = models.JSONField(blank=True, null=True)
+    
+    class Meta:
+        verbose_name = "Payment Reference"
+        verbose_name_plural = "Payment References"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.internal_reference} → {self.external_reference}"
+    
+    @classmethod
+    def get_by_reference(cls, reference):
+        """
+        Find a payment reference by either external or internal reference,
+        safely handling UUID conversion
+        """
+        # First try direct lookup by external_reference UUID
+        try:
+            return cls.objects.get(external_reference=reference)
+        except (cls.DoesNotExist, ValueError):
+            # If that fails, try string comparison for external_reference
+            try:
+                for pr in cls.objects.all():
+                    if str(pr.external_reference) == reference:
+                        return pr
+            except Exception:
+                pass
+            
+            # If still not found, try internal reference
+            try:
+                return cls.objects.get(internal_reference=reference)
+            except cls.DoesNotExist:
+                return None
