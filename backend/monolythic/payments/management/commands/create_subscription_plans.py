@@ -21,7 +21,7 @@ class Command(BaseCommand):
             },
             {
                 'name': 'STANDARD',
-                'price': 10000.00 settings.CAMPAY_ENVIRONMENT != "DEV" else 3,
+                'price': 10000.00 if settings.CAMPAY_ENVIRONMENT != "DEV" else 3,
                 'duration_days': 30,
                 'description': 'Forfait standard avec plus de fonctionnalités',
                 'features': {
@@ -33,7 +33,7 @@ class Command(BaseCommand):
             },
             {
                 'name': 'PREMIUM',
-                'price': 20000.00 settings.CAMPAY_ENVIRONMENT != "DEV" else 4,
+                'price': 20000.00 if settings.CAMPAY_ENVIRONMENT != "DEV" else 4,
                 'duration_days': 30,
                 'description': 'Forfait premium avec toutes les fonctionnalités',
                 'features': {
