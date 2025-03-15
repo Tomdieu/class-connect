@@ -99,7 +99,7 @@ class CamPayManager:
         Args:
             amount: Amount to collect
             description: Payment description
-            external_reference: External reference for tracking
+            external_reference: External reference for tracking (must be a valid UUID)
             redirect_url: Success redirect URL
             phone: Optional phone number
             first_name: Customer's first name
@@ -111,6 +111,10 @@ class CamPayManager:
             
         Returns:
             Dict: Payment link response
+            
+        Raises:
+            ValueError: For invalid phone number or amount
+            Exception: For CamPay API errors
         """
         if phone and not self.validate_phone_number(phone):
             raise ValueError("Invalid phone number format. Must start with 237 followed by 9 digits")
@@ -119,20 +123,34 @@ class CamPayManager:
             amount = str(float(amount))
         except ValueError:
             raise ValueError("Invalid amount provided")
-
-        return self.client.get_payment_link({
-            "amount": amount,
-            "currency": currency,
-            "description": description,
-            "external_reference": external_reference,
-            "from": phone if phone else "",
-            "first_name": first_name,
-            "last_name": last_name,
-            "email": email,
-            "redirect_url": redirect_url,
-            "failure_redirect_url": failure_redirect_url,
-            "payment_options": payment_options
-        })
+            
+        try:
+            # Call the CamPay API
+            response = self.client.get_payment_link({
+                "amount": amount,
+                "currency": currency,
+                "description": description,
+                "external_reference": external_reference,
+                "from": phone if phone else "",
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": email,
+                "redirect_url": redirect_url,
+                "failure_redirect_url": failure_redirect_url,
+                "payment_options": payment_options
+            })
+            
+            # Check for error in response
+            if isinstance(response, dict) and 'error_code' in response:
+                raise Exception(response.get('message', 'Error creating payment link'))
+                
+            return response
+            
+        except Exception as e:
+            print(f">>>>>>>>>>>>>>>>>>:  Getting payment link...")
+            print(f">>>>>>>>>>>>>>>>>>:  {str(e)}")
+            # Re-raise the exception to be handled by the caller
+            raise
 
     def check_transaction_status(self, reference: str) -> Dict:
         """
