@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 function ProtectedPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
