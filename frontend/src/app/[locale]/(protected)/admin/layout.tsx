@@ -2,32 +2,81 @@
 import { AdminSidebar } from "@/components/dashboard/admin/AdminSidebar";
 import DashboardHeader from "@/components/dashboard/global/DashboardHeader";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import React,{useEffect} from "react";
+import React, { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { getUserRole } from "@/lib/utils";
+import { UserType } from "@/types";
+import { Loader2 } from "lucide-react";
 
 export default function AdminLayout({ children }: React.PropsWithChildren) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+  // Check authorization immediately when session is available
   useEffect(() => {
-    if (!session?.user?.expiresAt) return;
-
-    const checkExpiration = () => {
-      const currentTime = Date.now();
-      const expiresAt = session.user.expiresAt as number;
-
-      if (currentTime >= expiresAt) {
-        signOut({ redirect: true, callbackUrl: "/" });
+    const checkAuthorization = async () => {
+      // If not authenticated at all, redirect to login
+      if (status === "unauthenticated") {
+        window.location.href = "/api/redirect"; // Use API for automatic redirection
+        return;
       }
+
+      // If still loading session, wait
+      if (status === "loading" || !session?.user) return;
+
+      // Check for session expiration
+      if (session.user.expiresAt) {
+        const currentTime = Date.now();
+        const expiresAt = session.user.expiresAt as number;
+        if (currentTime >= expiresAt) {
+          signOut({ redirect: true, callbackUrl: "/auth/login" });
+          return;
+        }
+      }
+
+      // Check if user has admin role
+      const role = getUserRole(session.user as UserType);
+      if (role !== "admin") {
+        // Immediately redirect non-admin users to their appropriate page
+        // Use the direct API endpoint for automatic server-side redirection
+        window.location.href = "/api/redirect"; // This will automatically redirect to the right page
+        return;
+      }
+      
+      // User is authorized - show admin UI
+      setIsAuthorized(true);
+      
+      // Set up expiration check interval
+      const intervalId = setInterval(() => {
+        if (session?.user?.expiresAt) {
+          const currentTime = Date.now();
+          const expiresAt = session.user.expiresAt as number;
+          if (currentTime >= expiresAt) {
+            signOut({ redirect: true, callbackUrl: "/auth/login" });
+          }
+        }
+      }, 1000);
+      
+      return () => clearInterval(intervalId);
     };
 
-    const intervalId = setInterval(checkExpiration, 1000);
+    checkAuthorization();
+  }, [session, status]);
 
-    // Initial check
-    checkExpiration();
+  // Show loading state while checking authorization
+  if (isAuthorized === null) {
+    return (
+      <div className="flex items-center justify-center h-screen w-full">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-default" />
+          <p className="text-sm text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
-    return () => clearInterval(intervalId);
-  }, [session]);
-
+  // Only render the admin layout if authorized
   return (
     <SidebarProvider
       aria-describedby="dashboard-layout"
