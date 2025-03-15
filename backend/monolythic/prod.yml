@@ -92,12 +92,10 @@ services:
       - e_learning_network
 volumes:
   monolythic_postgres_data:
-    external: true
     name: monolythic_postgres_data
     labels:
       - "keep=true"
   monolythic_rabbitmq_data:
-    external: true
     labels:
       - "keep=true"
   monolythic_static_volume:
