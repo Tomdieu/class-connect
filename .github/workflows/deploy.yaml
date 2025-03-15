@@ -43,13 +43,9 @@ jobs:
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/backend/monolythic &&
             docker compose -f prod.yml logs --tail=500 --no-log-prefix
+            docker image prune -f &&
+            docker volume prune -f --filter "label!=keep" || echo "Cleanup completed with warnings
           '
-      - name: Clean up dangling images and volumes
-        run: |
-          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
-          cd /home/ubuntu/class-connect/backend/monolythic &&
-          docker image prune -f &&
-          docker volume prune -f --filter "label!=keep" || echo "Cleanup completed with warnings"
 
 # name: CI/CD auth-app
 
