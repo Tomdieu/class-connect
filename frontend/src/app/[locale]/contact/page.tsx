@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useI18n } from "@/locales/client";
+import { useCurrentLocale, useI18n } from "@/locales/client";
 import { Helmet } from 'react-helmet-async';
 
 const ContactPage = () => {
   const t = useI18n();
+  const locale = useCurrentLocale()
   
   const jsonLdData = {
     "@context": "https://schema.org",
@@ -43,10 +44,10 @@ const ContactPage = () => {
       <Helmet>
         <title>{t("contact.title")} | ClassConnect</title>
         <meta name="description" content="Contactez l'équipe ClassConnect pour toute question ou assistance." />
-        <link rel="canonical" href="https://www.classconnect.cm/contact" />
+        <link rel="canonical" href={`https://www.classconnect.cm/${locale}/contact`} />
         <meta property="og:title" content={`${t("contact.title")} | ClassConnect`} />
         <meta property="og:description" content="Contactez l'équipe ClassConnect" />
-        <meta property="og:url" content="https://www.classconnect.cm/contact" />
+        <meta property="og:url" content={`https://www.classconnect.cm/${locale}/contact`} />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
       </Helmet>
