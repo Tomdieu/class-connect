@@ -36,8 +36,8 @@ export default {
     silenceDeprecations: ["legacy-js-api"],
   },
   // Configure experimental features
-  experimental: {
-    optimizeCss: true,
-    scrollRestoration: true,
-  },
+  // experimental: {
+  //   optimizeCss: true,
+  //   scrollRestoration: true,
+  // },
 };
