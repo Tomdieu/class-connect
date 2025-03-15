@@ -285,15 +285,19 @@ export default async function RootLayout({ params, children }: { params: Promise
           hrefLang="fr"
           href="https://www.classconnect.cm/fr"
         />
-        <link
-          rel="alternate"
-          hrefLang="en"
-          href="https://www.classconnect.cm/en"
+        <link 
+          rel="alternate" 
+          hrefLang="en-US" 
+          href="https://www.classconnect.cm/en" 
+        />
+        <link 
+          rel="canonical" 
+          href={`https://www.classconnect.cm/${locale}`}
         />
         <link
           rel="alternate"
           hrefLang="x-default"
-          href="https://www.classconnect.cm/fr"
+          href="https://www.classconnect.cm"
         />
         <script
           type="application/ld+json"
