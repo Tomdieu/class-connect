@@ -98,17 +98,12 @@ volumes:
       - "keep=true"
   monolythic_rabbitmq_data:
     external: true
-    name: monolythic_rabbitmq_data
     labels:
       - "keep=true"
   monolythic_static_volume:
-    external: true
-    name: monolythic_static_volume
     labels:
       - "keep=true"
   monolythic_redis_data:
-    external: true
-    name: monolythic_redis_data
     labels:
       - "keep=true"
 
