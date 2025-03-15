@@ -99,6 +99,14 @@ services:
 
 volumes:
   postgres_data:
+    labels:
+      - "keep=true"
   rabbitmq_data:
-  static_volume:  # Volume for static files
+    labels:
+      - "keep=true"
+  static_volume:
+    labels:
+      - "keep=true"
   redis_data:
+    labels:
+      - "keep=true"
