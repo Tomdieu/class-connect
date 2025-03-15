@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SubscriptionPlan, Subscription, Payment, Transaction
+from .models import SubscriptionPlan, Subscription, Payment, Transaction, PaymentReference
 
 @admin.register(SubscriptionPlan)
 class SubscriptionPlanAdmin(admin.ModelAdmin):
@@ -91,3 +91,13 @@ class TransactionAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         # Disable manual creation of transactions
         return False
+
+@admin.register(PaymentReference)
+class PaymentReferenceAdmin(admin.ModelAdmin):
+    list_display = ('internal_reference', 'external_reference', 'user', 'plan', 
+                    'amount', 'phone_number', 'created_at')
+    list_filter = ('created_at', 'plan')
+    search_fields = ('internal_reference', 'external_reference', 'phone_number', 
+                     'user__username', 'user__email')
+    readonly_fields = ('created_at',)
+    raw_id_fields = ('user', 'plan')
