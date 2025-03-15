@@ -21,7 +21,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         },
       },
       async authorize(credentials) {
-        console.log(credentials);
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid Credentials");
         }
@@ -34,8 +33,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           client_secret: process.env.NEXT_CLASS_CONNECT_CLIENT_SECRETE!,
         };
 
-        console.log(body);
-
         const res = await fetch(
           process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/token/",
           {
@@ -46,8 +43,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         );
 
         const data = (await res.json()) as LoginResponseType;
-
-        console.log(data)
 
         if (res.ok && !data.access_token) {
           return null;
@@ -76,6 +71,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  pages:{
+    signIn: "/auth/login",
+  },
   callbacks: {
     jwt({ token, user, trigger, session }) {
       // Initial sign in
