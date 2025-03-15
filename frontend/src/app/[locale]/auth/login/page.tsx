@@ -32,7 +32,7 @@ export default function LoginPage() {
   const router = useRouter();
   const locale = useCurrentLocale();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/students";
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -100,14 +100,12 @@ export default function LoginPage() {
 
       // This needs to match the parameter names expected by the authorize function
       const res = await signIn("credentials", {
-        email: email, // Use the same field name as in LoginDialog
+        email: email,
         password: password,
         redirect: false,
       });
 
-      console.log("Login response:", res); // For debugging
-
-      // Handle specific error code like in LoginDialog
+      // Handle specific error code
       if (res?.error === "CredentialsSignin") {
         setError(t("loginDialog.invalidCredential"));
         setIsLoading(false);
@@ -117,22 +115,16 @@ export default function LoginPage() {
       if (res && res.ok && !res.error) {
         setIsLoading(false);
         toast.success("Login successful!");
-
-        // Handle URL parsing similar to LoginDialog
-        if (res.url) {
-          const url = new URL(res.url);
-          const urlCallbackParam = url.searchParams.get("callbackUrl");
-          if (urlCallbackParam) {
-            const decodedCallbackUrl = decodeURIComponent(urlCallbackParam);
-            router.push(decodedCallbackUrl);
-          } else {
-            router.push(callbackUrl || "/redirect");
-          }
-        } else {
-          router.push(callbackUrl || "/redirect");
-        }
-
         router.refresh();
+
+        // If a callbackUrl is provided, use it
+        if (callbackUrl) {
+          router.push(decodeURIComponent(callbackUrl));
+        } else {
+          // Use the automatic redirection feature
+          router.push("/api/redirect");
+          // window.location.href = "/api/redirect";
+        }
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -235,6 +227,15 @@ export default function LoginPage() {
                   disabled={isLoading}
                   required
                 />
+              </div>
+              
+              <div className="text-right">
+                <Link 
+                  href="/auth/forgot-password" 
+                  className="text-xs text-primary hover:underline"
+                >
+                  {t("loginDialog.forgotPasswordButton")}
+                </Link>
               </div>
             </CardContent>
 

@@ -4,6 +4,7 @@ import { useI18n, useCurrentLocale } from "@/locales/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { InputPhone } from "@/components/ui/input-phone"; // Add import for InputPhone
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -743,7 +744,14 @@ export default function RegisterPage() {
                     <FormItem>
                       <FormLabel>{t('registerDialog.phoneNumberLabel')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. 6XXXXXXXX" {...field} />
+                        <InputPhone 
+                          placeholder="Enter phone number"
+                          value={field.value} 
+                          onChange={(value) => field.onChange(value || "")}
+                          international
+                          defaultCountry="CM"
+                          countryCallingCodeEditable={false}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

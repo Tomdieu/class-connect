@@ -80,19 +80,22 @@ export const SubscriptionPlans = () => {
   return (
     <div className="py-24 relative overflow-hidden">
       {/* Background decorations */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-white" />
+      <div className="absolute inset-0 bg-gradient-to-b" />
       <div className="absolute inset-0">
         <div className="absolute top-1/2 left-0 w-72 h-72 bg-blue-200/20 rounded-full filter blur-3xl" />
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-indigo-200/20 rounded-full filter blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative">
-        <div className="text-center mb-16">
+        {/* <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             {t("subscriptionPlans.title")}
           </h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
+            {t("subscriptionPlans.subtitle")}
+          </p>
           <div className="w-24 h-1 bg-default mx-auto rounded-full" />
-        </div>
+        </div> */}
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {plans.map((plan) => (

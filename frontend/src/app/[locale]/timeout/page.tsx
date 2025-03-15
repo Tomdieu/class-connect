@@ -14,7 +14,7 @@ export default function TimeoutPage() {
   
   const handleSignOut = useCallback(() => {
     signOut({
-      redirectTo: `/?callbackUrl=${encodeURIComponent(returnUrl)}`,
+      redirectTo: `/auth/login?callbackUrl=${encodeURIComponent(returnUrl)}`,
       redirect: true
     });
   }, [returnUrl]);

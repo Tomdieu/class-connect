@@ -5,7 +5,7 @@ import { UserCreateType, UserType } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,11 +13,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { InputPhone } from "@/components/ui/input-phone";
 
 interface ProfileFormProps {
   user: UserType;
@@ -119,7 +120,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             <FormItem>
               <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. 6XXXXXXXX" {...field} />
+                <InputPhone placeholder="e.g. 6XXXXXXXX" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

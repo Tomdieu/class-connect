@@ -218,7 +218,7 @@ function UserDialog() {
       // Clear validation errors for optional fields when user becomes staff
       form.clearErrors(["date_of_birth", "education_level", "town", "quarter"]);
     }
-  }, [form.watch("is_staff")]);
+  }, [form]);
 
   // Add update user mutation
   const updateUserMutation = useMutation({
@@ -248,7 +248,6 @@ function UserDialog() {
           },
           onError: (error: any) => {
             let errorMessage = "Failed to update user";
-            console.log(error);
             try {
               const parsedError = JSON.parse(error.message);
               errorMessage = parsedError.message || errorMessage;

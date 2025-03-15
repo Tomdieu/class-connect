@@ -75,6 +75,7 @@ export default {
   "about.conclusion":
     "ClassConnect isn't just a platform, it's a revolution in education. Join us to transform your way of learning and achieve your academic or professional goals.",
   "subscriptionPlans.title": "Our Subscription Plans",
+  "subscriptionPlans.subtitle": "Choose an affordable plan that's packed with the best features for engaging your audience, creating customer loyalty, and driving sales.",
   "subscriptionPlans.basic.name": "Basic",
   "subscriptionPlans.basic.description": "Perfect to get started",
   "subscriptionPlans.basic.features": [
@@ -100,7 +101,7 @@ export default {
     "Exclusive content",
   ],
   "subscriptionPlans.choose": "Choose this plan",
-  "loginDialog.invalidCredential":"Email or Password incorrect",
+  "loginDialog.invalidCredential": "Email or Password incorrect",
   "loginDialog.title": "Welcome to ClassConnect",
   "loginDialog.subtitle": "Log in to access your learning space",
   "loginDialog.resetPasswordTitle": "Reset Password",
@@ -172,8 +173,8 @@ export default {
   "registerDialog.platformUsageReasonLabel": "Reason for Using Platform",
   "registerDialog.lyceeSpecialityLabel": "Speciality",
   "registerDialog.lyceeSpecialities": {
-    "scientifique": "Scientific",
-    "litteraire": "Literary"
+    scientifique: "Scientific",
+    litteraire: "Literary",
   },
   "registerDialog.errors.firstNameRequired": "First name is required",
   "registerDialog.errors.firstNameMin":
@@ -245,11 +246,14 @@ export default {
     "FAQ and Guides: A comprehensive knowledge base to assist you.",
   ],
   "animatedFeatures.selfPaced.title": "Learn at Your Own Pace",
-  "animatedFeatures.selfPaced.description": "Access courses anytime, anywhere, and learn at your own speed",
+  "animatedFeatures.selfPaced.description":
+    "Access courses anytime, anywhere, and learn at your own speed",
   "animatedFeatures.experts.title": "Expert Teachers",
-  "animatedFeatures.experts.description": "Learn from experienced educators who are passionate about teaching",
+  "animatedFeatures.experts.description":
+    "Learn from experienced educators who are passionate about teaching",
   "animatedFeatures.interactive.title": "Interactive Learning",
-  "animatedFeatures.interactive.description": "Engage with interactive content and real-time feedback",
+  "animatedFeatures.interactive.description":
+    "Engage with interactive content and real-time feedback",
   "dashboardSidebar.menu": "Menu",
   "dashboardSidebar.home": "Home",
   "dashboardSidebar.myStudents": "My Students",
@@ -267,20 +271,20 @@ export default {
   "userDialog.subtitle": "Modify user details below",
   "userDialog.submitButton": "Update",
   "class.title": "Class",
-  "educationLevels": {
-    "college": "Middle School",
-    "lycee": "High School",
-    "university": "University",
-    "professional": "Professional"
+  educationLevels: {
+    college: "Middle School",
+    lycee: "High School",
+    university: "University",
+    professional: "Professional",
   },
-  "sections": {
-    "FRANCOPHONE": "French Section",
-    "ANGLOPHONE": "English Section"
+  sections: {
+    FRANCOPHONE: "French Section",
+    ANGLOPHONE: "English Section",
   },
   "ui.expand": "Expand",
   "ui.collapse": "Collapse",
   "ui.viewClasses": "View Classes",
-  "error": "Error",
+  error: "Error",
   "subscriptionsPage.title": "User Subscriptions",
   "subscriptionsPage.description": "Manage user subscriptions",
   "subscriptionsPage.loading": "Loading subscriptions...",
@@ -298,7 +302,8 @@ export default {
   "subscriptionsPage.autoRenew.enabled": "Enabled",
   "subscriptionsPage.autoRenew.disabled": "Disabled",
   "footer.aboutUs": "About Us",
-  "footer.aboutText": "We are dedicated to providing quality education and helping students achieve their learning goals.",
+  "footer.aboutText":
+    "We are dedicated to providing quality education and helping students achieve their learning goals.",
   "footer.quickLinks": "Quick Links",
   "footer.courses": "Courses",
   "footer.pricing": "Pricing",
@@ -335,7 +340,8 @@ export default {
   "subject.form.addDescription": "Fill in the information to add a subject",
   "subject.form.editDescription": "Fill in the information to edit the subject",
   "subject.delete.title": "Delete Subject",
-  "subject.delete.description": "Are you sure you want to delete this subject? This action cannot be undone and will also delete all associated chapters, topics, and resources (including PDFs, videos, exercises, and revisions).",
+  "subject.delete.description":
+    "Are you sure you want to delete this subject? This action cannot be undone and will also delete all associated chapters, topics, and resources (including PDFs, videos, exercises, and revisions).",
   "subject.form.submit.add": "Add",
   "subject.form.submit.edit": "Update",
   "class.detail.title": "Subjects",
@@ -351,7 +357,8 @@ export default {
   "chapter.form.name": "Chapter Name",
   "chapter.form.description": "Description",
   "chapter.delete.title": "Delete Chapter",
-  "chapter.delete.description": "Are you sure you want to delete this chapter? This action cannot be undone and will also delete all associated topics and their resources (including PDFs, videos, exercises, and revisions).",
+  "chapter.delete.description":
+    "Are you sure you want to delete this chapter? This action cannot be undone and will also delete all associated topics and their resources (including PDFs, videos, exercises, and revisions).",
   "chapter.delete.success": "Chapter deleted successfully",
   "chapter.delete.error": "Failed to delete chapter",
   "chapter.form.editDescription": "Fill in the information to edit the chapter",
@@ -362,7 +369,8 @@ export default {
   "chapter.form.submit.add": "Add",
   "chapter.form.submit.edit": "Update",
   "chapter.empty": "No chapters available",
-  "chapter.noChapters": "This subject has no chapters yet. Add a chapter to get started.",
+  "chapter.noChapters":
+    "This subject has no chapters yet. Add a chapter to get started.",
   "chapter.order": "Order",
   "topic.dragTooltip": "Drag to reorder",
   "topic.editTooltip": "Edit topic",
@@ -385,7 +393,8 @@ export default {
   "resources.loading": "Loading resources...",
   "resources.error": "Error loading resources",
   "resources.delete.title": "Delete Resource",
-  "resources.delete.description": "Are you sure you want to delete this resource? This action cannot be undone.",
+  "resources.delete.description":
+    "Are you sure you want to delete this resource? This action cannot be undone.",
   "resources.delete.success": "Resource deleted successfully",
   "resources.delete.error": "Failed to delete resource",
   "resources.tooltips.view": "View resource",
@@ -415,7 +424,7 @@ export default {
   "chapter.modal.subtitle.add": "Fill in the information to add a chapter",
   "chapter.modal.subtitle.edit": "Fill in the information to edit the chapter",
   "topic.modal.title.add": "Add Topic",
-  "topic.modal.title.edit": "Edit Topic", 
+  "topic.modal.title.edit": "Edit Topic",
   "topic.modal.subtitle.add": "Fill in the information to add a topic",
   "topic.modal.subtitle.edit": "Fill in the information to edit the topic",
   "resource.modal.pdf.title": "Create PDF Resource",
@@ -427,19 +436,22 @@ export default {
   "resource.modal.instructions": "Instructions",
   "resource.modal.content": "Content",
   "resource.modal.file.pdf": "PDF File",
-  "resource.modal.file.video": "Video File", 
+  "resource.modal.file.video": "Video File",
   "resource.modal.file.exercise": "Exercise File",
   "resource.modal.file.solution": "Solution File (optional)",
   "resource.modal.file.dropzone.pdf": "Drop PDF here or click to select",
-  "resource.modal.file.dropzone.video": "Drop video file here or click to select",
-  "resource.modal.file.dropzone.exercise": "Drop exercise file here or click to select",
-  "resource.modal.file.dropzone.solution": "Drop solution file here or click to select",
+  "resource.modal.file.dropzone.video":
+    "Drop video file here or click to select",
+  "resource.modal.file.dropzone.exercise":
+    "Drop exercise file here or click to select",
+  "resource.modal.file.dropzone.solution":
+    "Drop solution file here or click to select",
   "resource.modal.submit.pdf": "Upload PDF",
   "resource.modal.submit.video": "Upload Video",
   "resource.modal.submit.exercise": "Create Exercise",
   "resource.modal.submit.revision": "Create Revision",
   "resource.modal.pdf.edit": "Edit PDF Resource",
-  "resource.modal.video.edit": "Edit Video Resource", 
+  "resource.modal.video.edit": "Edit Video Resource",
   "resource.modal.exercise.edit": "Edit Exercise Resource",
   "resource.modal.revision.edit": "Edit Revision Resource",
   "resource.modal.file.current": "View current file",
@@ -453,21 +465,26 @@ export default {
   "users.table.actions.update": "Update",
   "users.table.actions.delete": "Delete",
   "users.delete.title": "Delete User",
-  "users.delete.description": "Are you sure you want to delete this user? This action cannot be undone.",
+  "users.delete.description":
+    "Are you sure you want to delete this user? This action cannot be undone.",
   "users.delete.success": "User deleted successfully",
   "users.delete.error": "Failed to delete user",
   "users.loading": "Loading users...",
   "users.error": "Error loading users",
   "faq.title": "Frequently Asked Questions",
   "faq.question1": "What is ClassConnect?",
-  "faq.answer1": "ClassConnect is an online learning platform designed to provide quality education to students across different educational levels.",
+  "faq.answer1":
+    "ClassConnect is an online learning platform designed to provide quality education to students across different educational levels.",
   "faq.question2": "How do I get started?",
-  "faq.answer2": "Simply create an account, choose your educational level, and select a subscription plan that suits your needs.",
+  "faq.answer2":
+    "Simply create an account, choose your educational level, and select a subscription plan that suits your needs.",
   "faq.question3": "What payment methods do you accept?",
-  "faq.answer3": "We accept mobile money payments through MTN Money and Orange Money for your convenience.",
+  "faq.answer3":
+    "We accept mobile money payments through MTN Money and Orange Money for your convenience.",
   "help.title": "Help Center",
   "help.categories.gettingStarted.title": "Getting Started",
-  "help.categories.gettingStarted.description": "Learn the basics of using ClassConnect",
+  "help.categories.gettingStarted.description":
+    "Learn the basics of using ClassConnect",
   "help.categories.gettingStarted.item1": "Creating your account",
   "help.categories.gettingStarted.item2": "Choosing your courses",
   "help.categories.gettingStarted.item3": "Navigation guide",
@@ -477,7 +494,8 @@ export default {
   "help.categories.account.item2": "Subscription management",
   "help.categories.account.item3": "Payment history",
   "help.categories.courses.title": "Course Access",
-  "help.categories.courses.description": "Learn about accessing and using courses",
+  "help.categories.courses.description":
+    "Learn about accessing and using courses",
   "help.categories.courses.item1": "Accessing course content",
   "help.categories.courses.item2": "Interactive features",
   "help.categories.courses.item3": "Progress tracking",
@@ -488,11 +506,14 @@ export default {
   "help.categories.technical.item3": "Contact support",
   "privacy.title": "Privacy Policy",
   "privacy.dataCollection.title": "Data Collection",
-  "privacy.dataCollection.content": "We collect and process personal information necessary to provide our educational services.",
+  "privacy.dataCollection.content":
+    "We collect and process personal information necessary to provide our educational services.",
   "privacy.dataSecurity.title": "Data Security",
-  "privacy.dataSecurity.content": "We implement strong security measures to protect your personal information.",
+  "privacy.dataSecurity.content":
+    "We implement strong security measures to protect your personal information.",
   "privacy.cookies.title": "Cookies Policy",
-  "privacy.cookies.content": "We use cookies to enhance your browsing experience and provide personalized services.",
+  "privacy.cookies.content":
+    "We use cookies to enhance your browsing experience and provide personalized services.",
   "pricing.title": "Our Pricing Plans",
   "pricing.subtitle": "Choose the plan that best fits your learning needs",
   "contact.title": "Contact Us",
@@ -503,12 +524,14 @@ export default {
   "contact.form.submit": "Send Message",
   "notifications.title": "Notifications",
   "notifications.empty": "No notifications",
-  "notifications.emptyDescription": "You don't have any notifications at the moment",
+  "notifications.emptyDescription":
+    "You don't have any notifications at the moment",
   "notifications.error": "Failed to load notifications",
   "notifications.deleteSuccess": "Notification deleted successfully",
   "notifications.deleteError": "Failed to delete notification",
   "notifications.deleteTitle": "Delete Notification",
-  "notifications.deleteDescription": "Are you sure you want to delete this notification? This action cannot be undone.",
+  "notifications.deleteDescription":
+    "Are you sure you want to delete this notification? This action cannot be undone.",
   "stats.totalUsers": "Total Users",
   "stats.activeCourses": "Active Courses",
   "stats.monthlyRevenue": "Monthly Revenue",
@@ -516,7 +539,7 @@ export default {
   "stats.monthlyUsers": "Monthly User Growth",
   "stats.vsPreviousMonth": "vs previous month",
   "plan.modal.title.add": "Add Subscription Plan",
-  "plan.modal.title.edit": "Edit Subscription Plan", 
+  "plan.modal.title.edit": "Edit Subscription Plan",
   "plan.modal.subtitle.add": "Add a new subscription plan",
   "plan.modal.subtitle.edit": "Update the subscription plan details",
   "plan.modal.name": "Plan Name",
@@ -535,13 +558,15 @@ export default {
   "plan.modal.errors.durationMin": "Duration must be at least 1 day",
   "plan.modal.errors.descriptionRequired": "Description is required",
   "plan.modal.delete.title": "Delete Plan",
-  "plan.modal.delete.description": "Are you sure you want to delete {name}? This action cannot be undone.",
+  "plan.modal.delete.description":
+    "Are you sure you want to delete {name}? This action cannot be undone.",
   "plan.modal.delete.cancel": "Cancel",
   "plan.modal.delete.confirm": "Delete",
   "plan.modal.delete.success": "Plan deleted successfully",
   "plan.modal.delete.error": "Failed to delete plan",
   "timeout.title": "Session Timeout",
-  "timeout.description": "Your session is about to expire due to inactivity. You will be automatically signed out in {seconds} seconds.",
+  "timeout.description":
+    "Your session is about to expire due to inactivity. You will be automatically signed out in {seconds} seconds.",
   "timeout.staySignedIn": "Stay Signed In",
   "timeout.signOut": "Sign Out Now",
   "chat.searchPlaceholder": "Search or start new chat",
@@ -555,36 +580,42 @@ export default {
   "topic.title": "Topics",
   "topic.add": "Add Topic",
   "topic.delete.title": "Delete Topic",
-  "topic.delete.description": "Are you sure you want to delete this topic? This action cannot be undone and will also delete all associated resources.",
+  "topic.delete.description":
+    "Are you sure you want to delete this topic? This action cannot be undone and will also delete all associated resources.",
   "topic.delete.success": "Topic deleted successfully",
   "topic.delete.error": "Failed to delete topic",
   "topic.empty": "No topics available",
-  "topic.noTopics": "This chapter has no topics yet. Add a topic to get started.",
+  "topic.noTopics":
+    "This chapter has no topics yet. Add a topic to get started.",
   "topic.order": "Order",
-  "topic.description":"Description",
+  "topic.description": "Description",
   "availability.title": "My Availabilities",
   "availability.error": "Error",
   "availability.close": "Close",
   "availability.lastUpdated": "Your availabilities were last updated on {date}",
-  "availability.regularUpdate": "Regularly updating them allows us to match you with students according to your schedule.",
+  "availability.regularUpdate":
+    "Regularly updating them allows us to match you with students according to your schedule.",
   "availability.iAmAvailable": "I am available",
   "availability.update": "Update",
   "availability.updating": "Updating...",
   "availability.dailyAvailabilities": "My Daily Availabilities",
-  "availability.notVisibleWarning": "Your availabilities are not visible because you are marked as unavailable. Please activate your availability to manage your schedule.",
+  "availability.notVisibleWarning":
+    "Your availabilities are not visible because you are marked as unavailable. Please activate your availability to manage your schedule.",
   "availability.timeSlot": "Time Slot",
   "availability.errors.loadFailed": "Failed to load availability data",
   "availability.errors.updateFailed": "Failed to update availability",
   "availability.errors.updateSlotFailed": "Failed to update time slot",
-  
+
   // Course Offerings translations
   "courseOfferings.title": "My Course Offerings",
-  "courseOfferings.description": "Manage your course offerings and track student requests",
+  "courseOfferings.description":
+    "Manage your course offerings and track student requests",
   "courseOfferings.add": "Add Offering",
   "courseOfferings.view": "View Details",
   "courseOfferings.edit": "Edit",
   "courseOfferings.delete": "Delete",
-  "courseOfferings.noOfferings": "You don't have any course offerings yet. Create one!",
+  "courseOfferings.noOfferings":
+    "You don't have any course offerings yet. Create one!",
   "courseOfferings.loading": "Loading course offerings...",
   "courseOfferings.error": "Error loading course offerings",
   "courseOfferings.retry": "Retry",
@@ -595,7 +626,8 @@ export default {
   "courseOfferings.actions": "Actions",
   "courseOfferings.available": "Available",
   "courseOfferings.unavailable": "Unavailable",
-  "courseOfferings.confirm.delete": "Are you sure you want to delete this course offering?",
+  "courseOfferings.confirm.delete":
+    "Are you sure you want to delete this course offering?",
   "courseOfferings.confirm.deleteDescription": "This action cannot be undone.",
   "courseOfferings.confirm.cancel": "Cancel",
   "courseOfferings.confirm.confirm": "Delete",
@@ -624,22 +656,27 @@ export default {
 
   // Course offering create page translations
   "courseOfferings.create.title": "Create Course Offering",
-  "courseOfferings.create.description": "Create a new course offering for a student",
+  "courseOfferings.create.description":
+    "Create a new course offering for a student",
   "courseOfferings.create.back": "Back to course offerings",
   "courseOfferings.create.offeringDetails": "Course Offering Details",
-  "courseOfferings.create.offeringDetailsDescription": "Fill in the details to create a new course offering",
+  "courseOfferings.create.offeringDetailsDescription":
+    "Fill in the details to create a new course offering",
   "courseOfferings.create.classLevel": "Class Level",
-  "courseOfferings.create.classLevelDescription": "Select the class level for this offering",
+  "courseOfferings.create.classLevelDescription":
+    "Select the class level for this offering",
   "courseOfferings.create.selectClass": "Select class",
   "courseOfferings.create.searchClass": "Search class...",
   "courseOfferings.create.noClassFound": "No class found.",
   "courseOfferings.create.subject": "Subject",
-  "courseOfferings.create.subjectDescription": "Select the subject for this offering",
+  "courseOfferings.create.subjectDescription":
+    "Select the subject for this offering",
   "courseOfferings.create.selectSubject": "Select subject",
   "courseOfferings.create.searchSubject": "Search subject...",
   "courseOfferings.create.noSubjectFound": "No subject found.",
   "courseOfferings.create.student": "Student",
-  "courseOfferings.create.studentDescription": "Select the student for this offering",
+  "courseOfferings.create.studentDescription":
+    "Select the student for this offering",
   "courseOfferings.create.selectStudent": "Select student",
   "courseOfferings.create.searchStudent": "Search student...",
   "courseOfferings.create.noStudentFound": "No student found.",
@@ -647,13 +684,16 @@ export default {
   "courseOfferings.create.startDateDescription": "When the course will start",
   "courseOfferings.create.pickDate": "Pick a date",
   "courseOfferings.create.duration": "Duration (hours)",
-  "courseOfferings.create.durationDescription": "How long each session will be in hours",
+  "courseOfferings.create.durationDescription":
+    "How long each session will be in hours",
   "courseOfferings.create.hour": "hour",
   "courseOfferings.create.hours": "hours",
   "courseOfferings.create.frequency": "Frequency (per week)",
-  "courseOfferings.create.frequencyDescription": "How many sessions per week (max 7)",
+  "courseOfferings.create.frequencyDescription":
+    "How many sessions per week (max 7)",
   "courseOfferings.create.hourlyRate": "Hourly Rate (XAF)",
-  "courseOfferings.create.hourlyRateDescription": "The hourly rate for this course",
+  "courseOfferings.create.hourlyRateDescription":
+    "The hourly rate for this course",
   "courseOfferings.create.cancel": "Cancel",
   "courseOfferings.create.submit": "Create Course Offering",
   "courseOfferings.create.success": "Course offering created successfully",
@@ -661,12 +701,15 @@ export default {
 
   // Course offering edit page translations
   "courseOfferings.edit.title": "Edit Course Offering",
-  "courseOfferings.edit.description": "Modify the details of this course offering",
+  "courseOfferings.edit.description":
+    "Modify the details of this course offering",
   "courseOfferings.edit.back": "Back to course offerings",
   "courseOfferings.edit.offeringDetails": "Course Offering Details",
-  "courseOfferings.edit.offeringDetailsDescription": "Update the details of this course offering",
+  "courseOfferings.edit.offeringDetailsDescription":
+    "Update the details of this course offering",
   "courseOfferings.edit.availability": "Availability",
-  "courseOfferings.edit.availabilityDescription": "Toggle whether this course offering is available to students",
+  "courseOfferings.edit.availabilityDescription":
+    "Toggle whether this course offering is available to students",
   "courseOfferings.edit.submit": "Update Course Offering",
   "courseOfferings.edit.success": "Course offering updated successfully",
   "courseOfferings.edit.error": "Failed to update course offering",
@@ -674,21 +717,25 @@ export default {
 
   // Student dashboard translations
   "student.dashboard.title": "Student Dashboard",
-  "student.dashboard.welcome": "Welcome to your learning portal. Access your classes and learning materials here.",
+  "student.dashboard.welcome":
+    "Welcome to your learning portal. Access your classes and learning materials here.",
   "student.dashboard.myClasses": "My Classes",
-  "student.dashboard.myClassesDesc": "Access your enrolled classes and subjects",
+  "student.dashboard.myClassesDesc":
+    "Access your enrolled classes and subjects",
   "student.dashboard.recentActivity": "Recent Activity",
   "student.dashboard.recentActivityDesc": "Your recent learning progress",
   "student.dashboard.noClasses": "No enrolled classes yet.",
   "student.dashboard.enroll": "Enroll in a Class",
-  "student.dashboard.emptyActivity": "Your recent learning activities will appear here.",
+  "student.dashboard.emptyActivity":
+    "Your recent learning activities will appear here.",
   "student.dashboard.quickAccess": "Quick Access",
   "student.dashboard.quickAccessDesc": "Access frequently used resources",
   "student.dashboard.browseClasses": "Browse Classes",
 
   // Student classes page translations
   "student.classes.title": "My Classes",
-  "student.classes.description": "Browse all your enrolled classes and access learning materials",
+  "student.classes.description":
+    "Browse all your enrolled classes and access learning materials",
   "student.classes.viewSubjects": "View Subjects",
   "student.classes.noClasses": "No classes found",
   "student.classes.notEnrolled": "You are not enrolled in any classes yet.",
@@ -696,20 +743,24 @@ export default {
   // Student subject pages translations
   "student.subject.exploreFor": "Explore your subjects for {name}",
   "student.subject.noSubjects": "No subjects available",
-  "student.subject.noSubjectsDesc": "There are no subjects assigned to this class yet.",
+  "student.subject.noSubjectsDesc":
+    "There are no subjects assigned to this class yet.",
   "student.subject.chapters": "Chapters",
   "student.subject.topics": "Topics",
   "student.subject.backToSubjects": "Back to Subjects",
   "student.subject.noChapters": "No chapters available",
-  "student.subject.noChaptersDesc": "There are no chapters added to this subject yet.",
+  "student.subject.noChaptersDesc":
+    "There are no chapters added to this subject yet.",
 
   // Student chapter/topic page translations
   "student.chapter.noTopics": "No topics available for this chapter.",
   "student.topic.title": "Access learning materials for this topic",
   "student.topic.learningResources": "Learning Resources",
-  "student.topic.resourcesDesc": "Access videos, documents, and exercises for this topic",
+  "student.topic.resourcesDesc":
+    "Access videos, documents, and exercises for this topic",
   "student.topic.backToChapters": "Back to Chapters",
-  "student.topic.noResources": "No learning resources available for this topic.",
+  "student.topic.noResources":
+    "No learning resources available for this topic.",
 
   // Student resources translations
   "student.resource.allResources": "All Resources",
@@ -730,7 +781,46 @@ export default {
   "student.resource.questions": "This quiz contains {count} questions.",
   "student.resource.timeAllowed": "Time allowed: {minutes} minutes",
   "student.resource.startQuiz": "Start Quiz",
-  "student.resource.unsupportedType": "This resource type is not supported in the viewer. Please contact support if you believe this is an error.",
+  "student.resource.unsupportedType":
+    "This resource type is not supported in the viewer. Please contact support if you believe this is an error.",
+
+  // Password Reset Translations
+  "passwordReset.requestTitle": "Forgot Password",
+  "passwordReset.requestDescription":
+    "Enter your email address to receive a password reset link.",
+  "passwordReset.resetTitle": "Reset Password",
+  "passwordReset.resetDescription": "Create a new password for your account.",
+  "passwordReset.enterEmailInstructions":
+    "We'll send you a link to reset your password.",
+  "passwordReset.sendLink": "Send Reset Link",
+  "passwordReset.sending": "Sending...",
+  "passwordReset.emailSent": "Password reset link sent successfully!",
+  "passwordReset.checkInbox":
+    "Check your inbox for the password reset link. If you don't see it, check your spam folder.",
+  "passwordReset.didNotReceive": "Didn't receive the email?",
+  "passwordReset.resendLink": "Resend reset link",
+  "passwordReset.resending": "Resending...",
+  "passwordReset.backToLogin": "Back to Login",
+  "passwordReset.resetButton": "Reset Password",
+  "passwordReset.resetting": "Resetting...",
+  "passwordReset.newPassword": "New Password",
+  "passwordReset.confirmPassword": "Confirm New Password",
+  "passwordReset.resetSuccess": "Your password has been successfully reset!",
+  "passwordReset.redirecting":
+    "You will be redirected to the login page shortly.",
+  "passwordReset.resetError": "Failed to reset password. Please try again.",
+  "passwordReset.requestError": "Failed to send reset link. Please try again.",
+  "passwordReset.invalidCode": "Invalid or expired reset code",
+  "passwordReset.missingCode": "Reset code is missing",
+  "passwordReset.missingCodeInstructions":
+    "The reset link appears to be missing a verification code. Please request a new password reset link.",
+  "passwordReset.expiredCodeInstructions":
+    "The reset link has expired or is invalid. Please request a new password reset link.",
+  "passwordReset.requestNewLink": "Request New Link",
+  "passwordReset.codeLabel": "Reset Code",
+  "passwordReset.codePlaceholder": "Enter the code sent to your email",
+  "passwordReset.codeInstructions":
+    "Enter the verification code that was sent to your email address.",
 
   // Common phrases
   "common.errorDesc": "Failed to load {item}. Please try again later.",
@@ -742,17 +832,20 @@ export default {
   "student.profile.title": "My Profile",
   "student.profile.description": "Manage your account information and settings",
   "student.profile.personalInfo": "Personal Information",
-  "student.profile.personalInfoDesc": "Update your personal details and contact information.",
+  "student.profile.personalInfoDesc":
+    "Update your personal details and contact information.",
   "student.profile.personalTab": "Profile",
   "student.profile.passwordTab": "Password",
   "student.profile.changePassword": "Change Password",
-  "student.profile.changePasswordDesc": "Update your password to secure your account.",
+  "student.profile.changePasswordDesc":
+    "Update your password to secure your account.",
   "student.profile.firstName": "First Name",
   "student.profile.lastName": "Last Name",
   "student.profile.email": "Email",
   "student.profile.phone": "Phone Number",
   "student.profile.town": "Town",
   "student.profile.quarter": "Quarter",
+  "student.profile.educationLevel": "Education Level",
   "student.profile.update": "Update Profile",
   "student.profile.updating": "Updating...",
   "student.profile.currentPassword": "Current Password",
@@ -760,15 +853,16 @@ export default {
   "student.profile.confirmPassword": "Confirm New Password",
   "student.profile.changePasswordButton": "Change Password",
   "student.profile.changingPassword": "Changing Password...",
-  
+
   // Error messages
-  "error.failedToLoadProfile": "Failed to load profile information. Please try again later.",
+  "error.failedToLoadProfile":
+    "Failed to load profile information. Please try again later.",
 
   // Month translations
   "months.01": "January",
   "months.02": "February",
   "months.03": "March",
-  "months.04": "April", 
+  "months.04": "April",
   "months.05": "May",
   "months.06": "June",
   "months.07": "July",
@@ -781,14 +875,16 @@ export default {
   // NotFound page translations
   "notFound.title": "404",
   "notFound.heading": "Page not found",
-  "notFound.description": "The page you're looking for doesn't exist or has been moved.",
+  "notFound.description":
+    "The page you're looking for doesn't exist or has been moved.",
   "notFound.goBack": "Go Back",
   "notFound.returnHome": "Return Home",
-  
+
   // Plan not found specific translations
   "planNotFound.title": "404",
   "planNotFound.heading": "Plan not available",
-  "planNotFound.description": "The subscription plan you're looking for is not available or has been discontinued.",
+  "planNotFound.description":
+    "The subscription plan you're looking for is not available or has been discontinued.",
 
   // Section headers for registration
   "registerDialog.sections.personalInfo": "Personal Information",
@@ -798,8 +894,87 @@ export default {
 
   // Server Error page translations
   "serverError.title": "Server Error",
-  "serverError.description": "Something went wrong on our servers. We're working to fix the issue.",
+  "serverError.description":
+    "Something went wrong on our servers. We're working to fix the issue.",
   "common.returnHome": "Return Home",
   "common.tryAgain": "Try Again",
   "serverError.support": "If the problem persists, please contact support.",
+  "student.profile.profilePicture": "Profile Picture",
+  "student.profile.selectImage": "Select Image",
+  "student.profile.imageRequirements": "JPG, PNG or GIF up to 2MB",
+  "student.profile.avatarUpdated": "Profile picture updated successfully",
+  "student.profile.avatarUpdateFailed": "Failed to update profile picture",
+  "common.uploading": "Uploading...",
+  "common.save": "Save",
+  "common.success": "Success",
+  "profile.pageTitle": "My Profile",
+  "profile.pageDescription": "Manage your account and update your details.",
+  "profile.personalInfo": "Personal Information",
+  "profile.personalInfoDesc":
+    "Update your personal details and contact information.",
+  "profile.changePassword": "Change Password",
+  "profile.changePasswordDesc": "Update your password to secure your account.",
+  "profile.changeEmail": "Change Email",
+  "profile.changeEmailDesc": "Update your email address for your account.",
+  "profile.changePhoto": "Change Photo",
+  "profile.userIdLabel": "ID",
+  "common.notDefined": "Not defined",
+  "nav.subscriptions": "Subscriptions",
+  "student.subscriptions.title": "Subscription History",
+  "student.subscriptions.description":
+    "View your subscription history and current plan details",
+  "student.subscriptions.empty": "No subscription history found",
+  "student.subscriptions.period": "From {start} to {end}",
+  "student.subscriptions.active": "Active",
+  "student.subscriptions.expired": "Expired",
+  "student.subscriptions.status": "Status",
+  "student.subscriptions.currentPlan": "Current Plan",
+  "student.subscriptions.noPlan": "You don't have an active subscription",
+  "student.subscriptions.history": "Subscription History",
+  "student.subscriptions.historyDesc": "View your previous subscriptions",
+  "student.subscriptions.validUntil": "Valid until",
+  "student.subscriptions.days": "days",
+  "student.subscriptions.plan": "Plan",
+  "student.subscriptions.price": "Price",
+  "student.subscriptions.duration": "Duration",
+  "student.subscriptions.activePlanDesc":
+    "Your current subscription plan details",
+
+  // Subscribe page translations
+  "subscribe.title": "Subscribe to {plan}",
+  "subscribe.subtitle": "Complete your subscription to access premium features.",
+  "subscribe.planDetails": "Plan Details",
+  "subscribe.planDetailsDesc": "Review your selected plan details",
+  "subscribe.price": "Price",
+  "subscribe.duration": "Duration",
+  "subscribe.features": "Features",
+  "subscribe.currentSubscription": "Current Subscription",
+  "subscribe.currentSubscriptionDesc": "You already have an active subscription",
+  "subscribe.activePlanAlert": "Active Plan",
+  "subscribe.activePlanAlertDesc": "You currently have an active subscription. You'll need to wait for it to expire before subscribing to a new plan.",
+  "subscribe.currentPlan": "Current Plan",
+  "subscribe.startDate": "Start Date",
+  "subscribe.endDate": "End Date",
+
+  // Payment success/failure page translations
+  "payment.success.title": "Payment Successful!",
+  "payment.success.description": "Your payment was processed successfully. Your subscription is now active and you can enjoy all the benefits.",
+  "payment.success.viewSubscription": "View My Subscription",
+  "payment.success.backToDashboard": "Back to Dashboard",
+  "payment.success.reference": "Transaction Reference:",
+  "payment.success.transactionDetails": "Transaction Details",
+  "payment.success.amount": "Amount",
+  "payment.success.date": "Date & Time",
+  "payment.success.paymentMethod": "Payment Method",
+  "payment.success.phoneNumber": "Phone Number",
+  "payment.success.transactionCode": "Transaction Code",
+  "payment.success.customer": "Customer",
+
+  "payment.failed.title": "Payment Failed",
+  "payment.failed.description": "We couldn't process your payment. Please try again or contact support if the issue persists.",
+  "payment.failed.defaultError": "An error occurred during the payment process.",
+  "payment.failed.tryAgain": "Try Again",
+  "payment.failed.contactSupport": "Contact Support",
+  "payment.failed.backToDashboard": "Back to Dashboard",
+  "payment.failed.reference": "Transaction Reference:",
 } as const;

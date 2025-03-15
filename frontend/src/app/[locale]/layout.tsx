@@ -8,7 +8,7 @@ import { Providers } from "./providers";
 import localFont from "next/font/local";
 import { SessionProvider } from "next-auth/react";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
-import React from "react";
+import React, { ReactElement } from "react";
 import InactivityProvider from "@/providers/InactivityProvider";
 import HelmetWrapper from "@/providers/HelmetWrapperProvider";
 
@@ -146,13 +146,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
+export default async function RootLayout({ params, children }: { params: Promise<{ locale: string }>, children: ReactElement }) {
   const {locale} = await params;
   const jsonLdData = {
     "@context": "https://schema.org",

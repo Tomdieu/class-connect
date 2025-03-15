@@ -24,13 +24,13 @@ import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
+import { useI18n } from "@/locales/client";
 
 function SubscribePlanPage() {
+  const t = useI18n();
   const { plan } = useParams<{ plan: string }>();
   const router = useRouter();
-
   const { data: session } = useSession();
-
   const { openLogin } = useAuthDialog();
   const pathname = usePathname();
 
@@ -43,10 +43,10 @@ function SubscribePlanPage() {
     (p) => p.name.toLowerCase() === plan.toLowerCase()
   );
 
-  const hasCurrentPlan = useQuery({
+  const { data: currentPlanData, isLoading: isCurrentPlanLoading } = useQuery({
     queryKey: ["currentPlan"],
     queryFn: getCurrentPlan,
-    enabled: selectedPlan !== undefined,
+    enabled: !!selectedPlan,
   });
 
   useEffect(() => {
@@ -56,8 +56,7 @@ function SubscribePlanPage() {
     }
   }, [openLogin, pathname, router, session]);
   
-
-  if (isLoading) {
+  if (isLoading || isCurrentPlanLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -69,10 +68,9 @@ function SubscribePlanPage() {
     return (
       <div className="container mx-auto py-10">
         <Alert variant="destructive">
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>{t("planNotFound.heading")}</AlertTitle>
           <AlertDescription>
-            The requested subscription plan could not be found. Please select a
-            valid plan.
+            {t("planNotFound.description")}
           </AlertDescription>
         </Alert>
       </div>
@@ -86,10 +84,10 @@ function SubscribePlanPage() {
       <main className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Subscribe to {selectedPlan.name}
+            {t("subscribe.title", { plan: selectedPlan.name })}
           </h1>
           <p className="mt-2 text-sm text-gray-600">
-            Complete your subscription to access premium features.
+            {t("subscribe.subtitle")}
           </p>
         </div>
 
@@ -99,14 +97,14 @@ function SubscribePlanPage() {
             <CardHeader className="space-y-1">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-2xl font-bold">
-                  Plan Details
+                  {t("subscribe.planDetails")}
                 </CardTitle>
                 <Badge variant="secondary" className="font-medium">
                   {selectedPlan.name}
                 </Badge>
               </div>
               <CardDescription>
-                Review your selected plan details
+                {t("subscribe.planDetailsDesc")}
               </CardDescription>
             </CardHeader>
 
@@ -115,7 +113,7 @@ function SubscribePlanPage() {
                 <div className="flex items-center space-x-4 text-sm">
                   <CreditCard className="h-4 w-4 text-gray-500" />
                   <div className="flex justify-between w-full">
-                    <span className="font-medium text-gray-700">Price</span>
+                    <span className="font-medium text-gray-700">{t("subscribe.price")}</span>
                     <span className="font-bold text-primary">
                       {selectedPlan.price.toLocaleString()} XAF
                     </span>
@@ -125,15 +123,15 @@ function SubscribePlanPage() {
                 <div className="flex items-center space-x-4 text-sm">
                   <Clock className="h-4 w-4 text-gray-500" />
                   <div className="flex justify-between w-full">
-                    <span className="font-medium text-gray-700">Duration</span>
-                    <span>{selectedPlan.duration_days} days</span>
+                    <span className="font-medium text-gray-700">{t("subscribe.duration")}</span>
+                    <span>{selectedPlan.duration_days} {t("student.subscriptions.days")}</span>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4 text-sm">
                   <Package className="h-4 w-4 text-gray-500 mt-1" />
                   <div className="space-y-1 flex-1">
-                    <span className="font-medium text-gray-700">Features</span>
+                    <span className="font-medium text-gray-700">{t("subscribe.features")}</span>
                     <p className="text-gray-600 leading-relaxed">
                       {selectedPlan.description}
                     </p>
@@ -144,24 +142,22 @@ function SubscribePlanPage() {
           </Card>
 
           {/* Current Plan or Payment Form */}
-          {hasCurrentPlan.data &&
-          hasCurrentPlan.data.subscription!==undefined ? (
+          {currentPlanData?.has_active_subscription && currentPlanData?.subscription ? (
             <Card className="bg-white shadow-sm h-fit">
               <CardHeader>
                 <CardTitle className="text-2xl font-bold">
-                  Current Subscription
+                  {t("subscribe.currentSubscription")}
                 </CardTitle>
                 <CardDescription>
-                  You already have an active subscription
+                  {t("subscribe.currentSubscriptionDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <Alert className="bg-primary/5 border-primary/10">
                   <Package className="h-4 w-4" />
-                  <AlertTitle>Active Plan</AlertTitle>
+                  <AlertTitle>{t("subscribe.activePlanAlert")}</AlertTitle>
                   <AlertDescription>
-                    You currently have an active subscription. You&apos;ll need
-                    to wait for it to expire before subscribing to a new plan.
+                    {t("subscribe.activePlanAlertDesc")}
                   </AlertDescription>
                 </Alert>
 
@@ -170,10 +166,10 @@ function SubscribePlanPage() {
                     <Package className="h-4 w-4 text-gray-500" />
                     <div className="flex justify-between w-full">
                       <span className="font-medium text-gray-700">
-                        Current Plan
+                        {t("subscribe.currentPlan")}
                       </span>
                       <Badge variant="outline">
-                        {hasCurrentPlan.data.subscription.plan.name}
+                        {currentPlanData.subscription.plan.name}
                       </Badge>
                     </div>
                   </div>
@@ -182,11 +178,11 @@ function SubscribePlanPage() {
                     <CalendarDays className="h-4 w-4 text-gray-500" />
                     <div className="flex justify-between w-full">
                       <span className="font-medium text-gray-700">
-                        Start Date
+                        {t("subscribe.startDate")}
                       </span>
                       <span>
                         {format(
-                          new Date(hasCurrentPlan.data.subscription.start_date),
+                          new Date(currentPlanData.subscription.start_date),
                           "PPP"
                         )}
                       </span>
@@ -197,10 +193,10 @@ function SubscribePlanPage() {
                     <CalendarDays className="h-4 w-4 text-gray-500" />
                     <div className="flex justify-between w-full">
                       <span className="font-medium text-gray-700">
-                        End Date
+                        {t("subscribe.endDate")}
                       </span>
                       <span>
-                        {format(new Date(hasCurrentPlan.data.subscription.end_date), "PPP")}
+                        {format(new Date(currentPlanData.subscription.end_date), "PPP")}
                       </span>
                     </div>
                   </div>

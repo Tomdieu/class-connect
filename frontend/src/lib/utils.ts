@@ -124,10 +124,10 @@ export function groupClassesByHierarchy(classes: ClassType[]): GroupedClasses {
 export function createClassSelectOptions(classes: ClassType[]) {
   const grouped = groupClassesByHierarchy(classes);
   
-  return Object.entries(grouped).map(([sectionKey, sectionData]) => {
+  return Object.entries(grouped).map(([, sectionData]) => {
     return {
       label: sectionData.section,
-      options: Object.entries(sectionData.levels).flatMap(([levelKey, levelData]) => {
+      options: Object.entries(sectionData.levels).flatMap(([, levelData]) => {
         return levelData.classes.map(classItem => ({
           value: classItem.id.toString(),
           label: formatClassName(classItem),
@@ -138,12 +138,25 @@ export function createClassSelectOptions(classes: ClassType[]) {
   });
 }
 
-export const getUserRole = (user:UserType)=>{
-  if(user.is_superuser || user.is_staff){
+export const getUserRole = (user: UserType) => {
+  // Check for admin roles first
+  if (user.is_superuser || user.is_staff) {
     return "admin";
   }
-  if(user.education_level === "PROFESSIONAL"){
+  
+  // For education levels, make sure to handle case consistently
+  const educationLevel = user.education_level?.toUpperCase();
+  
+  // Check for teacher role
+  if (educationLevel === "PROFESSIONAL") {
     return "teacher";
   }
+  
+  // All other education levels are students
+  if (["COLLEGE", "LYCEE", "UNIVERSITY"].includes(educationLevel)) {
+    return "student";
+  }
+  
+  // If we can't determine the role for some reason, default to student
   return "student";
 }
