@@ -45,109 +45,170 @@ const Inter = localFont({
   preload: true,
 });
 
-export const metadata: Metadata = {
-  title: "ClassConnect | Plateforme E-learning N°1 au Cameroun",
-  description:
-    "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
-  keywords: [
-    "ClassConnect",
-    "e learning Cameroun",
-    "e-learning Cameroon",
-    "Tomdieu Ivan",
-    "plateforme éducative Cameroun",
-    "cours en ligne Cameroun",
-    "education Cameroun",
-    "apprentissage en ligne",
-    "formation en ligne Cameroun",
-    "meilleure plateforme e-learning Cameroun",
-    "ClassConnect Cameroun",
-    "education numérique Afrique",
-  ].join(", "),
-  authors: [
-    {
-      name: "Tomdieu Ivan",
-      url: "https://www.linkedin.com/in/tomdieuivan", // Add your actual LinkedIn URL
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const {locale} = await params;
+  
+  // Base URL for all environments
+  const baseUrl = "https://www.classconnect.cm";
+  
+  // Create metadata objects for each language
+  const metadata: Record<string, Metadata> = {
+    fr: {
+      title: "ClassConnect | Plateforme E-learning N°1 au Cameroun",
+      description: "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+      keywords: [
+        "ClassConnect",
+        "e learning Cameroun",
+        "e-learning Cameroon",
+        "Tomdieu Ivan",
+        "plateforme éducative Cameroun",
+        "cours en ligne Cameroun",
+        "education Cameroun",
+        "apprentissage en ligne",
+        "formation en ligne Cameroun",
+        "meilleure plateforme e-learning Cameroun",
+        "ClassConnect Cameroun",
+        "education numérique Afrique",
+      ].join(", "),
+      openGraph: {
+        type: "website",
+        locale: "fr_FR",
+        url: `${baseUrl}/fr`,
+        title: "ClassConnect | Meilleure Plateforme E-learning au Cameroun",
+        description: "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés et une expérience d'apprentissage unique.",
+        images: [
+          {
+            url: `${baseUrl}/og-image-fr.jpg`,
+            width: 1200,
+            height: 630,
+            alt: "ClassConnect - Plateforme E-learning Cameroun",
+          },
+        ],
+        siteName: "ClassConnect",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "ClassConnect | E-learning Cameroun",
+        description: "La meilleure plateforme d'apprentissage en ligne au Cameroun. Une éducation accessible à tous.",
+        site: "@classconnect",
+        creator: "@tomdieuivan",
+        images: [
+          {
+            url: `${baseUrl}/twitter-card-fr.jpg`,
+            width: 1200,
+            height: 630,
+            alt: "ClassConnect - E-learning Cameroun",
+          },
+        ],
+      },
     },
-  ],
-  creator: "Tomdieu Ivan",
-  publisher: "ClassConnect",
-  robots: {
-    index: true,
-    follow: true,
-    nocache: true,
-    googleBot: {
+    en: {
+      title: "ClassConnect | #1 E-learning Platform in Cameroon",
+      description: "ClassConnect is the first online learning platform in Cameroon offering personalized courses and learning adapted to your pace.",
+      keywords: [
+        "ClassConnect",
+        "e learning Cameroon",
+        "e-learning Cameroon",
+        "Tomdieu Ivan",
+        "educational platform Cameroon",
+        "online courses Cameroon",
+        "education Cameroon",
+        "online learning",
+        "online training Cameroon",
+        "best e-learning platform Cameroon",
+        "ClassConnect Cameroon",
+        "digital education Africa",
+      ].join(", "),
+      openGraph: {
+        type: "website",
+        locale: "en_US",
+        url: `${baseUrl}/en`,
+        title: "ClassConnect | Best E-learning Platform in Cameroon",
+        description: "Discover ClassConnect, the innovative e-learning platform in Cameroon. Learn at your own pace with personalized courses and a unique learning experience.",
+        images: [
+          {
+            url: `${baseUrl}/og-image-en.jpg`,
+            width: 1200,
+            height: 630,
+            alt: "ClassConnect - E-learning Platform Cameroon",
+          },
+        ],
+        siteName: "ClassConnect",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "ClassConnect | E-learning Cameroon",
+        description: "The best online learning platform in Cameroon. Education accessible to everyone.",
+        site: "@classconnect",
+        creator: "@tomdieuivan",
+        images: [
+          {
+            url: `${baseUrl}/twitter-card-en.jpg`,
+            width: 1200,
+            height: 630,
+            alt: "ClassConnect - E-learning Cameroon",
+          },
+        ],
+      },
+    }
+  };
+  
+  // Common metadata properties for both languages
+  return {
+    ...metadata[locale] || metadata["fr"], // Default to French if locale not found
+    authors: [
+      {
+        name: "Tomdieu Ivan",
+        url: "https://www.linkedin.com/in/tomdieuivan",
+      },
+    ],
+    creator: "Tomdieu Ivan",
+    publisher: "ClassConnect",
+    robots: {
       index: true,
       follow: true,
-      noimageindex: false,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-  openGraph: {
-    type: "website",
-    locale: "fr_FR",
-    url: "https://www.classconnect.cm",
-    title: "ClassConnect | Meilleure Plateforme E-learning au Cameroun",
-    description:
-      "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés et une expérience d'apprentissage unique.",
-    images: [
-      {
-        url: "https://www.classconnect.cm/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "ClassConnect - Plateforme E-learning Cameroun",
+      nocache: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        noimageindex: false,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
       },
-    ],
-    siteName: "ClassConnect",
-    alternateLocale: ["en", "fr"],
-    countryName: "Cameroon",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "ClassConnect | E-learning Cameroun",
-    description:
-      "La meilleure plateforme d'apprentissage en ligne au Cameroun. Une éducation accessible à tous.",
-    site: "@classconnect",
-    creator: "@tomdieuivan",
-    images: [
-      {
-        url: "https://www.classconnect.cm/twitter-card.jpg",
-        width: 1200,
-        height: 630,
-        alt: "ClassConnect - E-learning Cameroun",
-      },
-    ],
-  },
-  metadataBase: new URL("https://www.classconnect.cm"),
-  category: "Education",
-  classification: "E-learning Platform",
-  verification: {
-    google: "google1a036d19159746c1.html",
-  },
-  alternates: {
-    languages: {
-      fr: "/fr",
-      en: "/en",
     },
-    canonical: "/fr", // Set French as canonical version
-  },
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.png", type: "image/png", sizes: "32x32" },
-    ],
-    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "ClassConnect",
-  },
-};
+    metadataBase: new URL(baseUrl),
+    category: "Education",
+    classification: "E-learning Platform",
+    verification: {
+      google: "google1a036d19159746c1.html",
+    },
+    alternates: {
+      languages: {
+        fr: "/fr",
+        en: "/en",
+      },
+      canonical: `/${locale}`,
+    },
+    icons: {
+      icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/icon.png", type: "image/png", sizes: "32x32" },
+      ],
+      apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "ClassConnect",
+    },
+  };
+}
 
 export default async function RootLayout({ params, children }: { params: Promise<{ locale: string }>, children: ReactElement }) {
-  const {locale} = await params;
+  const { locale } = await params;
+  
+  // Locale-specific structured data
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
@@ -157,10 +218,10 @@ export default async function RootLayout({ params, children }: { params: Promise
     sameAs: [
       "https://www.linkedin.com/in/tomdieuivan",
       "https://twitter.com/classconnect",
-      // Add other social media profiles if available
     ],
-    description:
-      "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+    description: locale === "en" 
+      ? "ClassConnect is the first online learning platform in Cameroon offering personalized courses and learning adapted to your pace."
+      : "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
     address: {
       "@type": "PostalAddress",
       addressCountry: "CM",
@@ -204,6 +265,7 @@ export default async function RootLayout({ params, children }: { params: Promise
       email: "contact@classconnect.cm", // Add actual contact email
     },
   };
+  
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
