@@ -30,7 +30,7 @@ jobs:
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/backend/monolythic &&
-            docker compose -f prod.yml up --build -d || echo "Failed to start Docker containers"
+            docker compose -f prod.yml build --no-cache && docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
           '
       - name: Run Docker Logs as root
         run: |
