@@ -69,7 +69,7 @@ export default function PaymentFailedPage() {
           <Button
             variant="ghost"
             className="w-full"
-            onClick={() => router.push("/api/redirect")}
+            onClick={() => router.push("/redirect")}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t("payment.failed.backToDashboard")}

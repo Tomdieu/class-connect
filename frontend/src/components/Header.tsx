@@ -89,7 +89,7 @@ function Header({ className }: { className?: string }) {
             <Button
               variant="ghost"
               className="text-gray-700 hover:text-default hover:bg-blue-50"
-              onClick={() => router.push("/api/redirect")}
+              onClick={() => router.push("/redirect")}
             >
               Dashboard
             </Button>

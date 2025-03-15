@@ -127,8 +127,8 @@ function LoginDialog() {
           router.push(decodeURIComponent(_callbackUrl));
         } else {
           // For automatic redirection, redirect to the API endpoint directly
-          router.push("/api/redirect");
-          // window.location.href = "/api/redirect";
+          router.push("/redirect");
+          // window.location.href = "/redirect";
         }
       }
     } catch (error) {

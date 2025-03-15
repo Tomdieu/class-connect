@@ -122,8 +122,8 @@ export default function LoginPage() {
           router.push(decodeURIComponent(callbackUrl));
         } else {
           // Use the automatic redirection feature
-          router.push("/api/redirect");
-          // window.location.href = "/api/redirect";
+          router.push("/redirect");
+          // window.location.href = "/redirect";
         }
       }
     } catch (error) {

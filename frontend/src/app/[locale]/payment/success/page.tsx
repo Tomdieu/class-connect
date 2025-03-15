@@ -132,7 +132,7 @@ export default function PaymentSuccessPage() {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => router.push("/api/redirect")}
+              onClick={() => router.push("/redirect")}
             >
               {t("payment.success.backToDashboard")}
             </Button>

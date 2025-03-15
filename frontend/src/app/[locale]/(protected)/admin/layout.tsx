@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: React.PropsWithChildren) {
     const checkAuthorization = async () => {
       // If not authenticated at all, redirect to login
       if (status === "unauthenticated") {
-        window.location.href = "/api/redirect"; // Use API for automatic redirection
+        window.location.href = "/redirect"; // Use API for automatic redirection
         return;
       }
 
@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: React.PropsWithChildren) {
       if (role !== "admin") {
         // Immediately redirect non-admin users to their appropriate page
         // Use the direct API endpoint for automatic server-side redirection
-        window.location.href = "/api/redirect"; // This will automatically redirect to the right page
+        window.location.href = "/redirect"; // This will automatically redirect to the right page
         return;
       }
       
