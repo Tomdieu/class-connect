@@ -10,10 +10,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         forum_name = options['name']
         try:
-            forum = Forum.objects.create(name=forum_name)
-            self.stdout.write(
-                self.style.SUCCESS(f'Successfully created public forum "{forum_name}"')
-            )
+            forum, created = Forum.objects.get_or_create(name=forum_name)
+            if created:
+                self.stdout.write(
+                    self.style.SUCCESS(f'Successfully created public forum "{forum_name}"')
+                )
+            else:
+                self.stdout.write(
+                    self.style.WARNING(f'Forum "{forum_name}" already exists, skipping creation.')
+                )
         except Exception as e:
             self.stdout.write(
                 self.style.ERROR(f'Failed to create forum: {str(e)}')
