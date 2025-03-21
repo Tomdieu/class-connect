@@ -41,7 +41,6 @@ class Command(BaseCommand):
                     'date_joined': timezone.now(),
                     'is_staff': True,
                     'is_superuser': True,
-                    'is_admin': True  # Add this if your User model has this field
                 }
             )
 
