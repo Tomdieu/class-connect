@@ -45,17 +45,22 @@ const Inter = localFont({
   preload: true,
 });
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  const {locale} = await params;
-  
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
   // Base URL for all environments
   const baseUrl = "https://www.classconnect.cm";
-  
+
   // Create metadata objects for each language
   const metadata: Record<string, Metadata> = {
     fr: {
       title: "ClassConnect | Plateforme E-learning N°1 au Cameroun",
-      description: "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+      description:
+        "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
       keywords: [
         "ClassConnect",
         "e learning Cameroun",
@@ -75,7 +80,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         locale: "fr_FR",
         url: `${baseUrl}/fr`,
         title: "ClassConnect | Meilleure Plateforme E-learning au Cameroun",
-        description: "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés et une expérience d'apprentissage unique.",
+        description:
+          "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés et une expérience d'apprentissage unique.",
         images: [
           {
             url: `${baseUrl}/og-image-fr.jpg`,
@@ -89,7 +95,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       twitter: {
         card: "summary_large_image",
         title: "ClassConnect | E-learning Cameroun",
-        description: "La meilleure plateforme d'apprentissage en ligne au Cameroun. Une éducation accessible à tous.",
+        description:
+          "La meilleure plateforme d'apprentissage en ligne au Cameroun. Une éducation accessible à tous.",
         site: "@classconnect",
         creator: "@tomdieuivan",
         images: [
@@ -104,7 +111,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     en: {
       title: "ClassConnect | #1 E-learning Platform in Cameroon",
-      description: "ClassConnect is the first online learning platform in Cameroon offering personalized courses and learning adapted to your pace.",
+      description:
+        "ClassConnect is the first online learning platform in Cameroon offering personalized courses and learning adapted to your pace.",
       keywords: [
         "ClassConnect",
         "e learning Cameroon",
@@ -124,7 +132,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         locale: "en_US",
         url: `${baseUrl}/en`,
         title: "ClassConnect | Best E-learning Platform in Cameroon",
-        description: "Discover ClassConnect, the innovative e-learning platform in Cameroon. Learn at your own pace with personalized courses and a unique learning experience.",
+        description:
+          "Discover ClassConnect, the innovative e-learning platform in Cameroon. Learn at your own pace with personalized courses and a unique learning experience.",
         images: [
           {
             url: `${baseUrl}/og-image-en.jpg`,
@@ -138,7 +147,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       twitter: {
         card: "summary_large_image",
         title: "ClassConnect | E-learning Cameroon",
-        description: "The best online learning platform in Cameroon. Education accessible to everyone.",
+        description:
+          "The best online learning platform in Cameroon. Education accessible to everyone.",
         site: "@classconnect",
         creator: "@tomdieuivan",
         images: [
@@ -150,12 +160,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
           },
         ],
       },
-    }
+    },
   };
-  
+
   // Common metadata properties for both languages
   return {
-    ...metadata[locale] || metadata["fr"], // Default to French if locale not found
+    ...(metadata[locale] || metadata["fr"]), // Default to French if locale not found
     authors: [
       {
         name: "Tomdieu Ivan",
@@ -205,9 +215,15 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default async function RootLayout({ params, children }: { params: Promise<{ locale: string }>, children: ReactElement }) {
+export default async function RootLayout({
+  params,
+  children,
+}: {
+  params: Promise<{ locale: string }>;
+  children: ReactElement;
+}) {
   const { locale } = await params;
-  
+
   // Locale-specific structured data
   const jsonLdData = {
     "@context": "https://schema.org",
@@ -219,9 +235,10 @@ export default async function RootLayout({ params, children }: { params: Promise
       "https://www.linkedin.com/in/tomdieuivan",
       "https://twitter.com/classconnect",
     ],
-    description: locale === "en" 
-      ? "ClassConnect is the first online learning platform in Cameroon offering personalized courses and learning adapted to your pace."
-      : "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+    description:
+      locale === "en"
+        ? "ClassConnect is the first online learning platform in Cameroon offering personalized courses and learning adapted to your pace."
+        : "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
     address: {
       "@type": "PostalAddress",
       addressCountry: "CM",
@@ -265,7 +282,7 @@ export default async function RootLayout({ params, children }: { params: Promise
       email: "contact@classconnect.cm", // Add actual contact email
     },
   };
-  
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
@@ -285,15 +302,12 @@ export default async function RootLayout({ params, children }: { params: Promise
           hrefLang="fr"
           href="https://www.classconnect.cm/fr"
         />
-        <link 
-          rel="alternate" 
-          hrefLang="en-US" 
-          href="https://www.classconnect.cm/en" 
+        <link
+          rel="alternate"
+          hrefLang="en-US"
+          href="https://www.classconnect.cm/en"
         />
-        <link 
-          rel="canonical" 
-          href={`https://www.classconnect.cm/${locale}`}
-        />
+        <link rel="canonical" href={`https://www.classconnect.cm/${locale}`} />
         <link
           rel="alternate"
           hrefLang="x-default"
@@ -316,13 +330,11 @@ export default async function RootLayout({ params, children }: { params: Promise
           <SessionProvider>
             <ReactQueryProvider>
               <Providers locale={locale}>
-                <InactivityProvider>
-                  <HelmetWrapper>
-                    {children}
-                    <Modals />
-                    <Toaster />
-                  </HelmetWrapper>
-                </InactivityProvider>
+                <HelmetWrapper>
+                  {children}
+                  <Modals />
+                  <Toaster />
+                </HelmetWrapper>
               </Providers>
             </ReactQueryProvider>
           </SessionProvider>
