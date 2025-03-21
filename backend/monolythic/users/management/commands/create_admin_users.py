@@ -45,6 +45,9 @@ class Command(BaseCommand):
             )
 
             if created:
+                # Set the password after creating the user
+                user.set_password(user_data['password'])
+                user.save()
                 self.stdout.write(self.style.SUCCESS(f'Successfully created admin user: {user.email}'))
             else:
                 self.stdout.write(self.style.WARNING(f'Admin user already exists: {user.email}'))
