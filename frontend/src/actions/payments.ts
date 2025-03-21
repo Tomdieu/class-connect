@@ -83,14 +83,17 @@ export const subscribeToPlan = async ({
 
 // region subscription plan
 
-export const getSubscriptionPlan = async () => {
+type SubscriptionPlanParams = {
+  name: string;
+  price: number;
+  duration_days: number;
+  created_at: string;
+}
+
+export const getSubscriptionPlan = async (params?:Partial<SubscriptionPlanParams>) => {
   try {
-    const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
     const response = await api.get("/api/plans/", {
-      headers: {
-        Authorization: `Bearer ${session.user.accessToken}`,
-      },
+      params
     });
     return response.data as SubscriptionPlan[];
   } catch (error: unknown) {
@@ -101,6 +104,20 @@ export const getSubscriptionPlan = async () => {
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
+
+
+export const getSubscriptionPlanByIdorSlug = async (id:number|string)=>{
+  try {
+    const response = await api.get(`/api/plans/${id}/`);
+    return response.data as SubscriptionPlan;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}
 
 export const addSubscriptionPlan = async (plan: SubscriptionPlan) => {
   try {
