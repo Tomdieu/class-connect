@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .models import PaymentReference, SubscriptionPlan, Subscription, Payment,Transaction
 from .serializers import SubscriptionDetailSerializer, SubscriptionPlanSerializer, SubscriptionSerializer, PaymentSerializer, TransactionSerializer
-from .filters import SubscriptionFilter, PaymentFilter,TransactionFilter
+from .filters import SubscriptionFilter, PaymentFilter, SubscriptionPlanFilter,TransactionFilter
 from .lib.campay import CamPayManager
 from django.urls import reverse
 import uuid
@@ -30,7 +30,14 @@ class SubscriptionPlanViewSet(viewsets.ModelViewSet):
     serializer_class = SubscriptionPlanSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'slug'
+    filterset_class = SubscriptionPlanFilter
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     lookup_url_kwarg = None  # Remove this line or set to None
+
+    def get_permissions(self):
+        if self.action in ['retrieve', 'list']:
+            return [permissions.AllowAny()]
+        return super().get_permissions()
 
     def get_object(self):
         """

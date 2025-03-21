@@ -1,6 +1,16 @@
 import django_filters
-from .models import Subscription, Payment, Transaction
+from .models import Subscription, Payment, Transaction,SubscriptionPlan
 
+
+class SubscriptionPlanFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(lookup_expr='icontains')
+    price = django_filters.NumberFilter()
+    duration_days = django_filters.NumberFilter()
+    created_at = django_filters.DateTimeFromToRangeFilter()
+    
+    class Meta:
+        model = SubscriptionPlan
+        fields = ['name', 'price', 'duration_days', 'created_at']
 class SubscriptionFilter(django_filters.FilterSet):
     is_active = django_filters.BooleanFilter()
     start_date = django_filters.DateTimeFromToRangeFilter()
