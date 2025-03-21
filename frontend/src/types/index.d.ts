@@ -574,10 +574,13 @@ declare interface SubscriptionPlan {
   price: number;
   duration_days: number;
   description: string;
-  features: object;
+  features: {
+    [key: string]: boolean | string;
+  };
   active: boolean;
   created_at: string;
 }
+
 
 declare interface Subscription {
   id: number;

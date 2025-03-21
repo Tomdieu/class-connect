@@ -13,12 +13,61 @@ import { useI18n } from "@/locales/client";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
+import { useEffect, useState } from "react";
+import { getSubscriptionPlanByIdorSlug } from "@/actions/payments";
+import { SubscriptionPlan } from "@/types";
 
 export const SubscriptionPlans = () => {
   const t = useI18n();
   const router = useRouter();
   const { data: session } = useSession();
   const { openLogin } = useAuthDialog();
+  
+  // State for fetched plan data
+  const [planData, setPlanData] = useState<Record<string, SubscriptionPlan | null>>({
+    basic: null,
+    standard: null,
+    premium: null,
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+
+  // Fetch plan data on component mount
+  useEffect(() => {
+    const fetchPlans = async () => {
+      setIsLoading(true);
+      setError(false);
+      
+      try {
+        // Fetch plans in parallel
+        const results = await Promise.allSettled([
+          getSubscriptionPlanByIdorSlug("basic"),
+          getSubscriptionPlanByIdorSlug("standard"),
+          getSubscriptionPlanByIdorSlug("premium"),
+        ]);
+        
+        const newPlanData: Record<string, SubscriptionPlan | null> = {
+          basic: null,
+          standard: null,
+          premium: null,
+        };
+        
+        // Process results
+        if (results[0].status === 'fulfilled') newPlanData.basic = results[0].value;
+        if (results[1].status === 'fulfilled') newPlanData.standard = results[1].value;
+        if (results[2].status === 'fulfilled') newPlanData.premium = results[2].value;
+        
+        setPlanData(newPlanData);
+      } catch (err) {
+        console.error("Failed to fetch plan data:", err);
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchPlans();
+  }, []);
 
   const handleSubscribe = (planType: "basic" | "standard" | "premium") => {
     if (!session?.user) {
@@ -38,7 +87,8 @@ export const SubscriptionPlans = () => {
         t("subscriptionPlans.basic.features.1"),
         t("subscriptionPlans.basic.features.2"),
       ],
-      price: "5,000",
+      // Use fetched price if available, otherwise fall back to default
+      price: planData.basic ? planData.basic.price.toLocaleString() : "5,000",
       period: "month",
       gradient: "from-blue-50 to-blue-100/50",
       popular: false,
@@ -53,7 +103,8 @@ export const SubscriptionPlans = () => {
         t("subscriptionPlans.standard.features.2"),
         t("subscriptionPlans.standard.features.3"),
       ],
-      price: "10,000",
+      // Use fetched price if available, otherwise fall back to default
+      price: planData.standard ? planData.standard.price.toLocaleString() : "10,000",
       period: "month",
       gradient: "from-blue-100 to-blue-200/50",
       popular: true,
@@ -69,7 +120,8 @@ export const SubscriptionPlans = () => {
         t("subscriptionPlans.premium.features.3"),
         t("subscriptionPlans.premium.features.4"),
       ],
-      price: "15,000",
+      // Use fetched price if available, otherwise fall back to default
+      price: planData.premium ? planData.premium.price.toLocaleString() : "15,000",
       period: "month",
       gradient: "from-blue-200 to-blue-300/50",
       popular: false,
