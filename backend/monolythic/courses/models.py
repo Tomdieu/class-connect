@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -428,7 +429,8 @@ class CourseOffering(models.Model):
     start_date = models.DateField(_("Start Date"))
     hourly_rate = models.DecimalField(_("Hourly Rate"), max_digits=10, decimal_places=2)
     is_available = models.BooleanField(default=True)
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.subject} - {self.class_level} - {self.hourly_rate} FCFA"
 
@@ -450,7 +452,7 @@ class CourseOfferingAction(models.Model):
     )
 
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='offer_actions')
-    offer = models.ForeignKey(CourseOffering, on_delete=models.CASCADE)
+    offer = models.ForeignKey(CourseOffering, on_delete=models.CASCADE,related_name='courseofferingaction_set')
     action = models.CharField(max_length=20,choices=ACTIONS,default=PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -523,7 +525,7 @@ class CourseDeclaration(models.Model):
 
     teacher_student_enrollment = models.ForeignKey(TeacherStudentEnrollment, on_delete=models.CASCADE, related_name='declarations')
     duration = models.PositiveIntegerField(_("Duration in minutes"))
-    declaration_date = models.DateField(_("Declaration Date"))
+    declaration_date = models.DateField(_("Declaration Date"),default=datetime.date.today)
     accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_declarations')
     status = models.CharField(max_length=20, choices=ACTIONS, default=PENDING)
     updated_at = models.DateTimeField(auto_now=True)
