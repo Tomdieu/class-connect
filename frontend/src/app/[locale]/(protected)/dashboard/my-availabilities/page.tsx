@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { getMyAvailability, updateUserAvailability, updateAvailabilityTimeSlot } from '@/actions/user-availability';
-import { UserAvailabilityType, DailyTimeSlotType, DayOfWeek, TimeSlot } from '@/types';
+import { DayOfWeek, TimeSlot } from '@/types';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '@/locales/client';
