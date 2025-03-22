@@ -432,10 +432,24 @@ class CourseOfferingViewSet(viewsets.ModelViewSet):
     """
     permission_classes = [IsAuthenticated]
     pagination_class = CustomPagination
-    queryset = CourseOffering.objects.all()
+    queryset = CourseOffering.objects.all()  # Add this line
     serializer_class = CourseOfferingSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = CourseOfferingFilter
+    
+    def get_queryset(self):
+        # Your existing method code remains the same
+        queryset = CourseOffering.objects.all()
+        user = self.request.user
+        
+        if not user.is_staff or user.is_superuser:
+            # Get the course offerings that have the CANCELLED action by the user
+            cancelled_course_offerings = CourseOffering.objects.filter(courseofferingaction_set__action=CourseOfferingAction.CANCELLED)
+            
+            # Exclude these course offerings from the queryset
+            queryset = queryset.exclude(id__in=cancelled_course_offerings.values('id'))
+        
+        return queryset
 
     @swagger_auto_schema(
         method='get',
@@ -462,12 +476,12 @@ class CourseOfferingActionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return CourseOfferingAction.objects.none()
-        return CourseOfferingAction.objects.filter(offering=self.kwargs['offering_pk'])
+        return CourseOfferingAction.objects.filter(offer=self.kwargs['offering_pk'])
 
     def perform_create(self, serializer):
         serializer.save(
             teacher=self.request.user,
-            offering_id=self.kwargs['offering_pk']
+            offer_id=self.kwargs['offering_pk']
         )
         
 class SchoolYearViewSet(viewsets.ModelViewSet):
