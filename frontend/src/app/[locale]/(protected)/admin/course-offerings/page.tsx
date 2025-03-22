@@ -149,7 +149,9 @@ export default function CourseOfferingPage() {
                             {t("courseOfferings.view")}
                           </Link>
                         </Button>
-                        <Button variant="outline" size="sm" asChild>
+                        {offering.is_available && (
+<>
+<Button variant="outline" size="sm" asChild>
                           <Link href={`/admin/course-offerings/${offering.id}/edit`}>
                             <Edit className="h-4 w-4 mr-1" />
                             {t("courseOfferings.edit")}
@@ -163,6 +165,9 @@ export default function CourseOfferingPage() {
                           <Trash className="h-4 w-4 mr-1" />
                           {t("courseOfferings.delete")}
                         </Button>
+</>
+                        )}
+                        
                       </TableCell>
                     </TableRow>
                   ))}
