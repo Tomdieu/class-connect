@@ -2,7 +2,7 @@
 
 import api from "@/services/api";
 import { auth } from "@/auth";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import {
   PaginationType,
   Payments,
@@ -13,10 +13,6 @@ import {
   TransactionListResponse,
 } from "@/types";
 
-interface SubscriptionError {
-  error: string;
-  active?: boolean;
-}
 
 // region Payments
 
