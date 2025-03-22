@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save,post_delete
 from django.dispatch import receiver
-from .models import UserAvailability,Class,Subject,UserClass
+from .models import UserAvailability,Class,Subject,UserClass,CourseOfferingAction,TeacherStudentEnrollment
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
 import logging
@@ -80,3 +80,31 @@ def create_user_class(sender, instance, created, **kwargs):
 
     except Exception as e:
         logger.error(f"Error creating user class for user {instance.id}: {str(e)}")
+        
+        
+@receiver(post_save,sender=CourseOfferingAction)
+def create_teacher_enrollment_when_offering_action_mark_as_accepted(sender, instance, created, **kwargs):
+    """Create a teacher enrollment when the offering action is marked as accepted"""
+    if created:
+        pass
+    else:
+        if instance.action == CourseOfferingAction.ACCEPTED:
+            try:
+                # Check if the enrollment already exists
+                enrollment = TeacherStudentEnrollment.objects.filter(
+                    offer=instance.offer,
+                    teacher=instance.teacher
+                ).first()
+                
+                if not enrollment:
+                    TeacherStudentEnrollment.objects.create(
+                        offer=instance.offer,
+                        teacher=instance.teacher
+                    )
+                
+                # Set the offer's is_available to False
+                instance.offer.is_available = False
+                instance.offer.save()
+                    
+            except Exception as e:
+                logger.error(f"Error creating teacher enrollment for offering action {instance.id}: {str(e)}")
