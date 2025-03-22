@@ -1,13 +1,13 @@
 "use client";
 
-import { deleteCourseOffering, getCourseOffering } from "@/actions/course-offerings";
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  deleteCourseOffering,
+  getCourseOffering,
+  listCourseOfferingActions,
+  updateCourseOfferingAction,
+} from "@/actions/course-offerings";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,12 +22,20 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useI18n } from "@/locales/client";
-import { ArrowLeft, CalendarIcon, Edit, Loader2, MapPin, Trash, UserCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarIcon,
+  Edit,
+  Loader2,
+  MapPin,
+  Trash,
+  UserCircle,
+} from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { UserType } from "@/types";
+import { UserType, CourseOfferingActionType, ActionStatus } from "@/types";
 
 export default function CourseOfferingDetailPage() {
   const t = useI18n();
@@ -36,18 +44,50 @@ export default function CourseOfferingDetailPage() {
   const id = Number(params.id);
 
   // Query for fetching course offering details
-  const { 
-    data: offering, 
-    isLoading, 
-    isError, 
-    refetch 
+  const {
+    data: offering,
+    isLoading,
+    isError,
+    refetch,
   } = useQuery({
-    queryKey: ['courseOffering', id],
+    queryKey: ["courseOffering", id],
     queryFn: () => getCourseOffering(id),
     enabled: !isNaN(id),
     staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: 1
+    retry: 1,
   });
+
+  const courseOfferingActions = useQuery({
+    queryKey: ["courseOffering", id, "actions"],
+    queryFn: () => listCourseOfferingActions(id),
+    enabled: !isNaN(id),
+  });
+
+  const updateActionMutation = useMutation({
+    mutationFn: ({
+      actionId,
+      status,
+    }: {
+      actionId: number;
+      status: ActionStatus;
+    }) =>
+      updateCourseOfferingAction({
+        actionId,
+        offeringId: id,
+        data: { action: status },
+      }),
+    onSuccess: () => {
+      toast.success(t("courseOfferings.actions.success.updated"));
+      courseOfferingActions.refetch();
+    },
+    onError: () => {
+      toast.error(t("courseOfferings.actions.error.updated"));
+    },
+  });
+
+  const handleUpdateAction = (actionId: number, status: ActionStatus) => {
+    updateActionMutation.mutate({ actionId, status });
+  };
 
   // Mutation for deleting a course offering
   const deleteMutation = useMutation({
@@ -58,7 +98,7 @@ export default function CourseOfferingDetailPage() {
     },
     onError: () => {
       toast.error(t("courseOfferings.error.deleted"));
-    }
+    },
   });
 
   const handleDelete = () => {
@@ -81,10 +121,17 @@ export default function CourseOfferingDetailPage() {
   if (isError || !offering) {
     return (
       <div className="container py-10 flex flex-col justify-center items-center min-h-[60vh] gap-4">
-        <p className="text-destructive text-lg">{t("courseOfferings.detail.notFound")}</p>
+        <p className="text-destructive text-lg">
+          {t("courseOfferings.detail.notFound")}
+        </p>
         <div className="flex gap-4">
-          <Button onClick={() => refetch()}>{t("courseOfferings.detail.retry")}</Button>
-          <Button variant="outline" onClick={() => router.push("/dashboard/course-offering")}>
+          <Button onClick={() => refetch()}>
+            {t("courseOfferings.detail.retry")}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/dashboard/course-offering")}
+          >
             {t("courseOfferings.detail.actions.back")}
           </Button>
         </div>
@@ -99,73 +146,81 @@ export default function CourseOfferingDetailPage() {
     <div className="container py-6 space-y-6">
       {/* Header with back button */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <Button 
-          variant="ghost" 
-          className="p-0 h-auto flex items-center text-muted-foreground" 
+        <Button
+          variant="ghost"
+          className="p-0 h-auto flex items-center text-muted-foreground"
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t("courseOfferings.detail.actions.back")}
         </Button>
       </div>
-      
+
       {/* Title section with badge */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight flex flex-wrap items-center gap-3">
             {offering.subject.name}
-            <Badge 
+            <Badge
               variant={offering.is_available ? "default" : "secondary"}
               className="text-sm"
             >
-              {offering.is_available 
-                ? t("courseOfferings.available") 
+              {offering.is_available
+                ? t("courseOfferings.available")
                 : t("courseOfferings.unavailable")}
             </Badge>
           </h1>
-          <p className="text-muted-foreground mt-1">{offering.class_level.name}</p>
+          <p className="text-muted-foreground mt-1">
+            {offering.class_level.name}
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline">
-            <a href={`/admin/course-offerings/${offering.id}/edit`}>
-              <Edit className="h-4 w-4 mr-2" />
-              {t("courseOfferings.detail.actions.edit")}
-            </a>
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive">
-                <Trash className="h-4 w-4 mr-2" />
-                {t("courseOfferings.detail.actions.delete")}
+          {offering.is_available && (
+            <>
+              <Button asChild variant="outline">
+                <a href={`/admin/course-offerings/${offering.id}/edit`}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  {t("courseOfferings.detail.actions.edit")}
+                </a>
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{t("courseOfferings.confirm.delete")}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {t("courseOfferings.confirm.deleteDescription")}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={deleteMutation.isPending}>
-                  {t("courseOfferings.confirm.cancel")}
-                </AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleDelete();
-                  }}
-                  disabled={deleteMutation.isPending}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  {deleteMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : null}
-                  {t("courseOfferings.confirm.confirm")}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">
+                    <Trash className="h-4 w-4 mr-2" />
+                    {t("courseOfferings.detail.actions.delete")}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {t("courseOfferings.confirm.delete")}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t("courseOfferings.confirm.deleteDescription")}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={deleteMutation.isPending}>
+                      {t("courseOfferings.confirm.cancel")}
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleDelete();
+                      }}
+                      disabled={deleteMutation.isPending}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {deleteMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : null}
+                      {t("courseOfferings.confirm.confirm")}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          )}
         </div>
       </div>
 
@@ -182,17 +237,23 @@ export default function CourseOfferingDetailPage() {
                   <div className="flex items-center gap-2">
                     <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm font-medium">{t("courseOfferings.detail.startDate")}</p>
+                      <p className="text-sm font-medium">
+                        {t("courseOfferings.detail.startDate")}
+                      </p>
                       <p className="text-sm text-muted-foreground">
-                        {offering.start_date ? formatDate(offering.start_date) : "N/A"}
+                        {offering.start_date
+                          ? formatDate(offering.start_date)
+                          : "N/A"}
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm font-medium">{t("courseOfferings.detail.location")}</p>
+                      <p className="text-sm font-medium">
+                        {t("courseOfferings.detail.location")}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {"Online"}
                       </p>
@@ -201,20 +262,26 @@ export default function CourseOfferingDetailPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium mb-2">Duration & Frequency</p>
+                  <p className="text-sm font-medium mb-2">
+                    Duration & Frequency
+                  </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm">Duration: {offering.duration} hours</p>
+                      <p className="text-sm">
+                        Duration: {offering.duration} hours
+                      </p>
                     </div>
                     <div>
-                      <p className="text-sm">Frequency: {offering.frequency} times per week</p>
+                      <p className="text-sm">
+                        Frequency: {offering.frequency} times per week
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           {/* Student section */}
           <Card>
             <CardHeader>
@@ -230,11 +297,16 @@ export default function CourseOfferingDetailPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                      {student.first_name?.charAt(0)}{student.last_name?.charAt(0)}
+                      {student.first_name?.charAt(0)}
+                      {student.last_name?.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-medium">{student.first_name} {student.last_name}</p>
-                      <p className="text-sm text-muted-foreground">{student.email}</p>
+                      <p className="font-medium">
+                        {student.first_name} {student.last_name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {student.email}
+                      </p>
                     </div>
                   </div>
                   <Button variant="ghost" size="sm" asChild>
@@ -242,12 +314,79 @@ export default function CourseOfferingDetailPage() {
                   </Button>
                 </div>
               ) : (
-                <p className="text-muted-foreground">{t("courseOfferings.detail.noStudents")}</p>
+                <p className="text-muted-foreground">
+                  {t("courseOfferings.detail.noStudents")}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Actions section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("courseOfferings.detail.actions")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {courseOfferingActions.isLoading ? (
+                <p>{t("courseOfferings.actions.loading")}</p>
+              ) : courseOfferingActions.isError ? (
+                <p>{t("courseOfferings.actions.error")}</p>
+              ) : courseOfferingActions.data?.results.length === 0 ? (
+                <p>{t("courseOfferings.actions.noActions")}</p>
+              ) : (
+                <div className="space-y-4">
+                  {courseOfferingActions.data?.results.map(
+                    (action: CourseOfferingActionType) => (
+                      <div
+                        key={action.id}
+                        className="flex justify-between items-center p-4 border rounded-md"
+                      >
+                        <div>
+                          <p className="text-sm font-medium">
+                            {action.teacher.first_name}{" "}
+                            {action.teacher.last_name}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {t(
+                              `courseOfferings.actions.status.${action.action.toLowerCase()}` as keyof typeof t
+                            )}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {action.action === "PENDING" && (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  handleUpdateAction(action.id, "ACCEPTED")
+                                }
+                                disabled={updateActionMutation.isPending}
+                              >
+                                {t("courseOfferings.actions.accept")}
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() =>
+                                  handleUpdateAction(action.id, "REJECTED")
+                                }
+                                disabled={updateActionMutation.isPending}
+                              >
+                                {t("courseOfferings.actions.reject")}
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>
         </div>
-        
+
         {/* Sidebar */}
         <div className="space-y-6">
           <Card>
@@ -257,32 +396,48 @@ export default function CourseOfferingDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm font-medium">{t("courseOfferings.hourlyRate")}</p>
-                  <p className="text-xl font-bold">{formatCurrency(offering.hourly_rate)}</p>
+                  <p className="text-sm font-medium">
+                    {t("courseOfferings.hourlyRate")}
+                  </p>
+                  <p className="text-xl font-bold">
+                    {formatCurrency(offering.hourly_rate)}
+                  </p>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div>
-                  <p className="text-sm font-medium">{t("courseOfferings.subject")}</p>
+                  <p className="text-sm font-medium">
+                    {t("courseOfferings.subject")}
+                  </p>
                   <p>{offering.subject.name}</p>
                 </div>
-                
+
                 <div>
-                  <p className="text-sm font-medium">{t("courseOfferings.class")}</p>
+                  <p className="text-sm font-medium">
+                    {t("courseOfferings.class")}
+                  </p>
                   <p>{offering.class_level.name}</p>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div>
-                  <p className="text-sm font-medium">{t("courseOfferings.detail.created")}</p>
-                  <p className="text-muted-foreground">{formatDate(offering.created_at)}</p>
+                  <p className="text-sm font-medium">
+                    {t("courseOfferings.detail.created")}
+                  </p>
+                  <p className="text-muted-foreground">
+                    {formatDate(offering.created_at)}
+                  </p>
                 </div>
-                
+
                 <div>
-                  <p className="text-sm font-medium">{t("courseOfferings.detail.updated")}</p>
-                  <p className="text-muted-foreground">{formatDate(offering.updated_at)}</p>
+                  <p className="text-sm font-medium">
+                    {t("courseOfferings.detail.updated")}
+                  </p>
+                  <p className="text-muted-foreground">
+                    {formatDate(offering.updated_at)}
+                  </p>
                 </div>
               </div>
             </CardContent>
