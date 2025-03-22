@@ -36,7 +36,7 @@ function SubscribePlanPage() {
 
   const { data: plans, isLoading } = useQuery({
     queryKey: ["plans"],
-    queryFn: getSubscriptionPlan,
+    queryFn: ()=>getSubscriptionPlan(),
   });
 
   const selectedPlan = plans?.find(
@@ -51,7 +51,7 @@ function SubscribePlanPage() {
 
   useEffect(() => {
     if (!session?.user) {
-      router.push(`/callbackUrl=${pathname}`);
+      router.push(`/auth/login?callbackUrl=${pathname}`);
       openLogin();
     }
   }, [openLogin, pathname, router, session]);
