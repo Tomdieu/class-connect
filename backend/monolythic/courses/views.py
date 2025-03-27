@@ -26,7 +26,7 @@ from .filters import (
     CourseCategoryFilter, ClassFilter, SubjectFilter,
     ChapterFilter, TopicFilter, ResourceFilter, UserProgressFilter,
     CourseOfferingFilter, CourseOfferingActionFilter,
-    TeacherStudentEnrollmentFilter, CourseDeclarationFilter
+    TeacherStudentEnrollmentFilter, CourseDeclarationFilter, UserClassFilter
 )
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -55,9 +55,30 @@ class ClassViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ClassFilter
     
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        school_year_param = self.request.query_params.get('school_year')
+        if school_year_param:
+            try:
+                start_year, end_year = school_year_param.split('-')
+                school_year = SchoolYear.objects.filter(
+                    start_year=start_year,
+                    end_year=end_year
+                ).first()
+                if school_year:
+                    context['school_year'] = school_year
+            except (ValueError, SchoolYear.DoesNotExist):
+                pass
+        return context
+    
     @swagger_auto_schema(
         method='get',
         operation_description="Get classes organized by section and level",
+        manual_parameters=[
+            openapi.Parameter('school_year', openapi.IN_QUERY, 
+                            description="School year in format YYYY-YYYY to count students for",
+                            type=openapi.TYPE_STRING, required=False),
+        ],
         responses={
             200: openapi.Response(
                 description="Classes organized hierarchically",
@@ -79,7 +100,8 @@ class ClassViewSet(viewsets.ModelViewSet):
                                                     'name': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'level': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'section': openapi.Schema(type=openapi.TYPE_STRING),
-                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'student_count': openapi.Schema(type=openapi.TYPE_INTEGER)
                                                 }
                                             )
                                         )
@@ -98,7 +120,8 @@ class ClassViewSet(viewsets.ModelViewSet):
                                                     'level': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'section': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'speciality': openapi.Schema(type=openapi.TYPE_STRING),
-                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'student_count': openapi.Schema(type=openapi.TYPE_INTEGER)
                                                 }
                                             )
                                         ),
@@ -112,7 +135,8 @@ class ClassViewSet(viewsets.ModelViewSet):
                                                     'level': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'section': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'speciality': openapi.Schema(type=openapi.TYPE_STRING),
-                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'student_count': openapi.Schema(type=openapi.TYPE_INTEGER)
                                                 }
                                             )
                                         )
@@ -130,7 +154,8 @@ class ClassViewSet(viewsets.ModelViewSet):
                                                     'name': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'level': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'section': openapi.Schema(type=openapi.TYPE_STRING),
-                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'student_count': openapi.Schema(type=openapi.TYPE_INTEGER)
                                                 }
                                             )
                                         ),
@@ -143,7 +168,8 @@ class ClassViewSet(viewsets.ModelViewSet):
                                                     'name': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'level': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'section': openapi.Schema(type=openapi.TYPE_STRING),
-                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'student_count': openapi.Schema(type=openapi.TYPE_INTEGER)
                                                 }
                                             )
                                         ),
@@ -156,7 +182,8 @@ class ClassViewSet(viewsets.ModelViewSet):
                                                     'name': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'level': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'section': openapi.Schema(type=openapi.TYPE_STRING),
-                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'student_count': openapi.Schema(type=openapi.TYPE_INTEGER)
                                                 }
                                             )
                                         )
@@ -179,7 +206,8 @@ class ClassViewSet(viewsets.ModelViewSet):
                                                     'name': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'level': openapi.Schema(type=openapi.TYPE_STRING),
                                                     'section': openapi.Schema(type=openapi.TYPE_STRING),
-                                                    'description': openapi.Schema(type=openapi.TYPE_STRING)
+                                                    'description': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    'student_count': openapi.Schema(type=openapi.TYPE_INTEGER)
                                                 }
                                             )
                                         )
@@ -198,6 +226,9 @@ class ClassViewSet(viewsets.ModelViewSet):
         classes = self.get_queryset().exclude(level='PROFESSIONAL')
         formatted_data = {}
 
+        # Use the same context as the viewset to ensure student_count is included
+        context = self.get_serializer_context()
+
         for class_obj in classes:
             section = class_obj.section
             level = class_obj.level
@@ -213,20 +244,20 @@ class ClassViewSet(viewsets.ModelViewSet):
                 if speciality not in formatted_data[section][level]:
                     formatted_data[section][level][speciality] = []
                 formatted_data[section][level][speciality].append(
-                    self.serializer_class(class_obj).data
+                    self.serializer_class(class_obj, context=context).data
                 )
             elif level == 'UNIVERSITY':
                 univ_level = class_obj.description or 'OTHER'
                 if univ_level not in formatted_data[section][level]:
                     formatted_data[section][level][univ_level] = []
                 formatted_data[section][level][univ_level].append(
-                    self.serializer_class(class_obj).data
+                    self.serializer_class(class_obj, context=context).data
                 )
             else:
                 if 'classes' not in formatted_data[section][level]:
                     formatted_data[section][level]['classes'] = []
                 formatted_data[section][level]['classes'].append(
-                    self.serializer_class(class_obj).data
+                    self.serializer_class(class_obj, context=context).data
                 )
 
         return Response(formatted_data)
@@ -238,6 +269,70 @@ class ClassViewSet(viewsets.ModelViewSet):
     @method_decorator(cache_page(60*60*2,key_prefix='class_detail'))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        method='get',
+        responses={200: PolymorphicResourceSerializer(many=True)},
+        operation_description="Get all resources associated with a specific class except video resources"
+    )
+    @action(detail=True, methods=['get'], url_path='resources')
+    def resources(self, request, pk=None):
+        """Get all resources associated with a specific class except videos."""
+        class_obj = self.get_object()
+        
+        # Get all subjects for this class
+        subjects = Subject.objects.filter(class_level=class_obj)
+        
+        # Get all chapters for these subjects
+        chapters = Chapter.objects.filter(subject__in=subjects)
+        
+        # Get all topics for these chapters
+        topics = Topic.objects.filter(chapter__in=chapters)
+        
+        # Get all resources for these topics except videos
+        resources = AbstractResource.objects.filter(topic__in=topics).exclude(
+            polymorphic_ctype__model='videoresource'
+        )
+        
+        # Paginate the results
+        page = self.paginate_queryset(resources)
+        if page is not None:
+            serializer = PolymorphicResourceSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
+            
+        serializer = PolymorphicResourceSerializer(resources, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    @swagger_auto_schema(
+        method='get',
+        responses={200: VideoResourceSerializer(many=True)},
+        operation_description="Get all video resources associated with a specific class"
+    )
+    @action(detail=True, methods=['get'], url_path='videos')
+    def videos(self, request, pk=None):
+        """Get all video resources associated with a specific class."""
+        class_obj = self.get_object()
+        
+        # Get all subjects for this class
+        subjects = Subject.objects.filter(class_level=class_obj)
+        
+        # Get all chapters for these subjects
+        chapters = Chapter.objects.filter(subject__in=subjects)
+        
+        # Get all topics for these chapters
+        topics = Topic.objects.filter(chapter__in=chapters)
+        
+        # Get all video resources for these topics
+        videos = VideoResource.objects.filter(topic__in=topics)
+        
+        # Paginate the results
+        page = self.paginate_queryset(videos)
+        if page is not None:
+            serializer = VideoResourceSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
+            
+        serializer = VideoResourceSerializer(videos, many=True, context={'request': request})
+        return Response(serializer.data)
 
 class SubjectViewSet(viewsets.ModelViewSet):
     """
@@ -308,6 +403,25 @@ class ResourceViewSet(viewsets.ModelViewSet):
             return AbstractResource.objects.none()  # Return empty queryset for swagger
         queryset = AbstractResource.objects.filter(topic=self.kwargs['topic_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
+
+
+class DirectResourceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for directly accessing resources by ID.
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+    queryset = AbstractResource.objects.all()
+    serializer_class = PolymorphicResourceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ResourceFilter
+    
+    @swagger_auto_schema(
+        responses={200: PolymorphicResourceSerializer()},
+        operation_description="Get a resource directly by ID"
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
 
 class UserProgressViewSet(viewsets.ModelViewSet):
@@ -784,16 +898,102 @@ class UserClassViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = UserClass.objects.all()
     serializer_class = UserClassSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = UserClassFilter
+    
+    def get_queryset(self):
+        """
+        Adjust queryset when accessed through the nested route.
+        """
+        queryset = UserClass.objects.all()
+        
+        # When accessed through /classes/{class_pk}/students/
+        if 'class_pk' in self.kwargs:
+            queryset = queryset.filter(class_level_id=self.kwargs['class_pk'])
+            
+            # Filter by school_year if provided in query params
+            school_year_param = self.request.query_params.get('school_year')
+            if school_year_param:
+                try:
+                    start_year, end_year = school_year_param.split('-')
+                    school_year = SchoolYear.objects.filter(
+                        start_year=start_year,
+                        end_year=end_year
+                    ).first()
+                    if school_year:
+                        queryset = queryset.filter(school_year=school_year)
+                except (ValueError, SchoolYear.DoesNotExist):
+                    pass
+            else:
+                # Default to current school year
+                queryset = queryset.filter(school_year=SchoolYear.current_year())
+                
+        return queryset
     
     def perform_create(self, serializer):
         """
-        If school_year is not provided, use the current school year
+        If school_year is not provided, use the current school year.
+        When created through nested route, set class_level automatically.
         """
+        if 'class_pk' in self.kwargs:
+            serializer.validated_data['class_level_id'] = self.kwargs['class_pk']
+            
         if not serializer.validated_data.get('school_year'):
             serializer.validated_data['school_year'] = SchoolYear.current_year()
+            
         serializer.save()
     
     @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter('school_year', openapi.IN_QUERY, 
+                             description="School year in format YYYY-YYYY", 
+                             type=openapi.TYPE_STRING, required=False),
+        ],
+        responses={200: UserClassSerializer(many=True)},
+        operation_description="Get all students for a specific class level for the given school year"
+    )
+    @action(detail=False, methods=['get'], url_path='students-by-class')
+    def students_by_class(self, request):
+        """Get all students enrolled in a specific class level for a given school year."""
+        class_level_id = request.query_params.get('class_level')
+        school_year_param = request.query_params.get('school_year')
+        
+        if not class_level_id:
+            return Response(
+                {"error": "class_level parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        queryset = UserClass.objects.filter(class_level_id=class_level_id)
+        
+        if school_year_param:
+            try:
+                start_year, end_year = school_year_param.split('-')
+                school_year_obj = SchoolYear.objects.filter(
+                    start_year=start_year,
+                    end_year=end_year
+                ).first()
+                if school_year_obj:
+                    queryset = queryset.filter(school_year=school_year_obj)
+            except (ValueError, SchoolYear.DoesNotExist):
+                return Response(
+                    {"error": "Invalid school_year format. Use YYYY-YYYY"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            # Default to current school year
+            queryset = queryset.filter(school_year=SchoolYear.current_year())
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @swagger_auto_schema(   
         method='get',
         responses={200: UserClassSerializer(many=True)},
         operation_description="Get current student's class information"
@@ -805,13 +1005,20 @@ class UserClassViewSet(viewsets.ModelViewSet):
         
         # Check if user is not a professional (thus a student)
         if user.education_level != 'PROFESSIONAL':
-            user_classes = UserClass.objects.filter(
+            # Get the current user class for the current school year
+            user_class = UserClass.objects.filter(
                 user=user,
                 school_year=SchoolYear.current_year()
-            )
+            ) # Only get the first one if exist
             
-            serializer = self.get_serializer(user_classes, many=True)
-            return Response(serializer.data)
+            if user_class:
+                serializer = self.get_serializer(user_class,many=True)  # Single object, not many=True
+                return Response(serializer.data)
+            else:
+                return Response(
+                    {"message": "No class found for the current user in the current school year"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
         else:
             return Response(
                 {"error": "Only students can access this endpoint"}, 
@@ -849,3 +1056,52 @@ class UserClassViewSet(viewsets.ModelViewSet):
                 {"error": "Class not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+    
+    @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter('class_level', openapi.IN_QUERY, description="Class Level ID", type=openapi.TYPE_INTEGER, required=True),
+            openapi.Parameter('school_year', openapi.IN_QUERY, description="School Year in format YYYY-YYYY", type=openapi.TYPE_STRING, required=False),
+        ],
+        responses={200: UserClassSerializer(many=True)},
+        operation_description="Get all students enrolled in a specific class level for a given school year"
+    )
+    @action(detail=False, methods=['get'], url_path='students-by-class')
+    def students_by_class(self, request):
+        """Get all students enrolled in a specific class level for a given school year."""
+        class_level_id = request.query_params.get('class_level')
+        school_year_param = request.query_params.get('school_year')
+        
+        if not class_level_id:
+            return Response(
+                {"error": "class_level parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        queryset = UserClass.objects.filter(class_level_id=class_level_id)
+        
+        if school_year_param:
+            try:
+                start_year, end_year = school_year_param.split('-')
+                school_year_obj = SchoolYear.objects.filter(
+                    start_year=start_year,
+                    end_year=end_year
+                ).first()
+                if school_year_obj:
+                    queryset = queryset.filter(school_year=school_year_obj)
+            except (ValueError, SchoolYear.DoesNotExist):
+                return Response(
+                    {"error": "Invalid school_year format. Use YYYY-YYYY"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            # Default to current school year
+            queryset = queryset.filter(school_year=SchoolYear.current_year())
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
