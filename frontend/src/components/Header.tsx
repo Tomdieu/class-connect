@@ -28,7 +28,7 @@ function Header({ className }: { className?: string }) {
   if (!isMounted) {
     return (
       <header className={cn("w-full", className)}>
-        <div className="container mx-auto flex items-center justify-between h-16 px-4">
+        <div className="container mx-auto flex items-center justify-between h-16 px-0 sm:px-4">
           <Link
             href="/"
             className="flex items-center gap-2 text-default transition-colors hover:opacity-90"
