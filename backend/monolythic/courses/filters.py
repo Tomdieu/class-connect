@@ -3,25 +3,8 @@ from .models import (
     Class, Subject, Chapter, Topic, AbstractResource,
     VideoResource, RevisionResource,
     PDFResource, ExerciseResource, UserProgress, CourseCategory, User,
-    CourseOffering,CourseOfferingAction,CourseDeclaration,TeacherStudentEnrollment
+    CourseOffering,CourseOfferingAction,CourseDeclaration,TeacherStudentEnrollment, UserClass, SchoolYear
 )
-
-# Filter for the Course model
-# class CourseFilter(django_filters.FilterSet):
-#     level = django_filters.ChoiceFilter(choices=Course.COURSE_LEVELS, label="Niveau")
-#     title = django_filters.CharFilter(lookup_expr='icontains', label="Titre")
-#     category = django_filters.ModelChoiceFilter(
-#         queryset=Course.objects.values_list('category', flat=True).distinct(),
-#         label="Catégorie"
-#     )
-#     instructor = django_filters.ModelChoiceFilter(
-#         queryset=User.objects.all(), 
-#         label="Instructeur"
-#     )
-
-#     class Meta:
-#         model = Course
-#         fields = ['level', 'title', 'category', 'instructor', 'minimum_subscription_plan_id']
 
 class CourseCategoryFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
@@ -147,3 +130,19 @@ class CourseDeclarationFilter(django_filters.FilterSet):
     class Meta:
         model = CourseDeclaration
         fields = ['status', 'declaration_date']
+
+class UserClassFilter(django_filters.FilterSet):
+    class_level = django_filters.NumberFilter(field_name='class_level')
+    school_year = django_filters.CharFilter(method='filter_by_school_year')
+    
+    class Meta:
+        model = UserClass
+        fields = ['class_level', 'school_year', 'user']
+    
+    def filter_by_school_year(self, queryset, name, value):
+        try:
+            start_year, end_year = value.split('-')
+            school_year = SchoolYear.objects.get(start_year=start_year, end_year=end_year)
+            return queryset.filter(school_year=school_year)
+        except (ValueError, SchoolYear.DoesNotExist):
+            return queryset.none()
