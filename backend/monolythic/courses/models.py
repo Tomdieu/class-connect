@@ -65,12 +65,11 @@ class Class(models.Model):
 class SchoolYear(models.Model):
     start_year = models.PositiveIntegerField()
     end_year = models.PositiveIntegerField()
-    is_active = models.BooleanField(default=True)
+    # Removing is_active field and replacing with property
 
     class Meta:
         unique_together = ('start_year', 'end_year')
         ordering = ['-start_year']
-
 
     def __str__(self):
         return f"{self.start_year}-{self.end_year}"
@@ -79,6 +78,18 @@ class SchoolYear(models.Model):
     def formatted_year(self):
         """Returns the school year in 'YYYY-YYYY' format."""
         return f"{self.start_year}-{self.end_year}"
+    
+    @property
+    def is_active(self):
+        """Determines if this is the active school year based on the current date."""
+        today = now().date()
+        current_year = today.year
+        
+        # School year typically runs from September to August
+        if today.month >= 9:  # September or later
+            return self.start_year == current_year
+        else:  # January to August
+            return self.start_year == current_year - 1
     
     @classmethod
     def current_year(cls):
@@ -90,8 +101,7 @@ class SchoolYear(models.Model):
 
         school_year, created = cls.objects.get_or_create(
             start_year=start_year,
-            end_year=end_year,
-            defaults={'is_active': True}
+            end_year=end_year
         )
         return school_year
 
@@ -538,6 +548,11 @@ class UserProgress(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)  # Replacing 'course' with 'topic'
     resource = models.ForeignKey(AbstractResource, on_delete=models.CASCADE)  # Polymorphic resource
     completed = models.BooleanField(default=False)
+    current_page = models.PositiveIntegerField(blank=True, null=True)
+    total_pages = models.PositiveIntegerField(blank=True,null=True)
+    current_time = models.PositiveIntegerField(blank=True,null=True)
+    total_duration = models.PositiveIntegerField(blank=True,null=True)
+    
     progress_percentage = models.IntegerField(default=0)
     last_accessed = models.DateTimeField(auto_now=True)
 
@@ -582,3 +597,5 @@ class UserProgress(models.Model):
     
 #     def __str__(self):
 #         return self.title
+
+
