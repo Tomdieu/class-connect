@@ -7,6 +7,8 @@ import {
   User,
   BookOpen,
   X,
+  Video,
+  Users,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -47,6 +49,22 @@ export function StudentSidebar() {
       icon: GraduationCap,
       href: "/students/classes",
     },
+    {
+      title: t("student.dashboard.myCourses"),
+      icon: BookOpen,
+      href: "/students/mes-cours"
+    },
+    {
+      title: t("student.dashboard.myVideos"),
+      icon: Video,
+      href: "/students/mes-video"
+    },
+    {
+      title: t("student.dashboard.myTeachers"),
+      icon: Users,
+      href: "/students/mes-profs"
+    },
+
     // {
     //   title: t('student.dashboard.recentActivity'),
     //   icon: Clock, 
