@@ -11,4 +11,6 @@ declare interface UserParams {
     email_verified?:boolean,
     page?:string|number;
     is_student?:boolean;
+    is_professional?:boolean;
+    is_admin?:boolean;
 }
