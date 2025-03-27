@@ -331,7 +331,7 @@ export default async function RootLayout({
             <ReactQueryProvider>
               <Providers locale={locale}>
                 <HelmetWrapper>
-                  {children}
+                  <InactivityProvider>{children}</InactivityProvider>
                   <Modals />
                   <Toaster />
                 </HelmetWrapper>
