@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework_nested import routers
 from .views import (
     CourseCategoryViewSet, ClassViewSet, SchoolYearViewSet, SubjectViewSet,
-    ChapterViewSet, TopicViewSet, ResourceViewSet,
+    ChapterViewSet, TopicViewSet, ResourceViewSet, DirectResourceViewSet,
     UserProgressViewSet,
     UserAvailabilityViewSet,
     CourseOfferingViewSet,
@@ -25,17 +25,12 @@ router.register(r'course-offerings', CourseOfferingViewSet)
 router.register(r'school-year', SchoolYearViewSet)
 router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
 router.register(r'user-classes', UserClassViewSet)  # Add the new viewset
-# Remove the standalone declaration registration
-# router.register(r'declarations', CourseDeclarationViewSet)
-# router.register(r'quizzes', QuizResourceViewSet)
-# router.register(r'questions', QuestionViewSet)
-# router.register(r'question-options', QuestionOptionViewSet)
-# router.register(r'quiz-attempts', QuizAttemptViewSet)
-# router.register(r'question-responses', QuestionResponseViewSet)
+router.register(r'resources', DirectResourceViewSet)  # Add direct resource access
 
 # Create nested routers
 class_router = routers.NestedDefaultRouter(router, r'classes', lookup='class')
 class_router.register(r'subjects', SubjectViewSet, basename='class-subjects')
+class_router.register(r'students', UserClassViewSet, basename='class-students')  # Add nested route for students by class
 
 subject_router = routers.NestedDefaultRouter(class_router, r'subjects', lookup='subject')
 subject_router.register(r'chapters', ChapterViewSet, basename='subject-chapters')
