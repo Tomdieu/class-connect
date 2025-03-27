@@ -1,8 +1,8 @@
 export default {
-  "nav.login": "Connexion",
+  "nav.login": "Se connecter",
   "nav.register": "S'inscrire",
   "nav.language": "Langue",
-  "nav.logout": "Déconnexion",
+  "nav.logout": "Se déconnecter",
   "nav.profile": "Profil",
   "hero.title": "Apprenez à votre rythme avec ClassConnect",
   "hero.subtitle":
@@ -75,7 +75,8 @@ export default {
   "about.conclusion":
     "ClassConnect n'est pas qu'une plateforme, c'est une révolution dans l'éducation. Rejoignez-nous pour transformer votre façon d'apprendre et atteindre vos objectifs académiques ou professionnels.",
   "subscriptionPlans.title": "Nos Formules d'Abonnement",
-  "subscriptionPlans.subtitle": "Choisissez un forfait abordable qui comprend les meilleures fonctionnalités pour engager votre audience, créer une fidélité client et stimuler vos ventes.",
+  "subscriptionPlans.subtitle":
+    "Choisissez un forfait abordable qui comprend les meilleures fonctionnalités pour engager votre audience, créer une fidélité client et stimuler vos ventes.",
   "subscriptionPlans.basic.name": "Basique",
   "subscriptionPlans.basic.description": "Parfait pour commencer",
   "subscriptionPlans.basic.features": [
@@ -376,6 +377,27 @@ export default {
   "subject.form.submit.edit": "Mettre à jour",
   "class.detail.title": "Matières",
   "class.detail.addButton": "Ajouter une matière",
+  "class.detail.subjectsTab": "Matières",
+  "class.detail.studentsTab": "Étudiants",
+  "class.detail.studentsCount": "Étudiants",
+  "class.detail.schoolYear": "Année scolaire",
+  "class.detail.selectSchoolYear": "Sélectionner une année scolaire",
+  "class.detail.enrolledStudents": "Étudiants inscrits",
+  "class.detail.enrolledStudentsFor":
+    "Étudiants actuellement inscrits dans cette classe pour l'année scolaire {year}",
+  "class.detail.noSubjects": "Aucune matière disponible",
+  "class.detail.noSubjectsDesc":
+    "Cette classe n'a pas encore de matières. Ajoutez votre première matière pour commencer à créer du contenu éducatif.",
+  "class.detail.addFirstSubject": "Ajouter votre première matière",
+  "class.detail.noStudents": "Aucun étudiant inscrit",
+  "class.detail.noStudentsDesc":
+    "Aucun étudiant n'est actuellement inscrit dans cette classe pour l'année scolaire {year}.",
+  "class.detail.loadingSubjects": "Chargement des matières...",
+  "class.detail.loadingStudents": "Chargement des étudiants...",
+  "class.detail.studentInfo": "Étudiant",
+  "class.detail.studentEmail": "E-mail",
+  "class.detail.studentEnrollmentDate": "Inscrit le",
+  "class.detail.viewChapters": "Voir les chapitres",
   "class.detail.loading": "Chargement des matières...",
   "class.detail.empty": "Aucune matière disponible",
   "chapter.title": "Chapitre",
@@ -741,7 +763,7 @@ export default {
   "courseOfferings.edit.notFound": "Offre de cours introuvable",
 
   // Student dashboard translations
-  "student.dashboard.title": "Tableau de Bord Étudiant",
+  "student.dashboard.title": "Tableau de Bord",
   "student.dashboard.welcome":
     "Bienvenue sur votre portail d'apprentissage. Accédez à vos classes et matériels pédagogiques ici.",
   "student.dashboard.myClasses": "Mes Classes",
@@ -867,6 +889,16 @@ export default {
   "courseOfferings.detail.startDate": "Date de début",
   "courseOfferings.detail.location": "Lieu",
   "courseOfferings.detail.overview": "Aperçu",
+  "courseOfferings.detail.actions": "Actions",
+  "courseOfferings.detail.durationFrequency": "Durée & Fréquence",
+  "courseOfferings.detail.duration": "Durée",
+  "courseOfferings.detail.hours": "heures",
+  "courseOfferings.detail.frequency": "Fréquence",
+  "courseOfferings.detail.timesPerWeek": "fois par semaine",
+  "courseOfferings.detail.view": "Voir",
+  "availability.studentAvailability": "Disponibilités de l'élève",
+  "availability.studentNotVisibleWarning":
+    "Les disponibilités de l'élève ne sont pas visibles.",
 
   // Month translations
   "months.01": "Janvier",
@@ -967,7 +999,7 @@ export default {
   "profile.changePhoto": "Modifier la photo",
   "profile.userIdLabel": "Identifiant",
   "common.notDefined": "Non défini",
-  "nav.subscriptions": "Abonnements",
+  "nav.subscriptions": "Mon Abonnement",
   "student.subscriptions.title": "Historique des Abonnements",
   "student.subscriptions.description":
     "Consultez l'historique de vos abonnements et les détails de votre forfait actuel",
@@ -989,7 +1021,8 @@ export default {
 
   // Subscribe page translations
   "subscribe.title": "S'abonner à {plan}",
-  "subscribe.subtitle": "Complétez votre abonnement pour accéder aux fonctionnalités premium.",
+  "subscribe.subtitle":
+    "Complétez votre abonnement pour accéder aux fonctionnalités premium.",
   "subscribe.planDetails": "Détails du Plan",
   "subscribe.planDetailsDesc": "Examinez les détails de votre plan sélectionné",
   "subscribe.price": "Prix",
@@ -998,14 +1031,16 @@ export default {
   "subscribe.currentSubscription": "Abonnement Actuel",
   "subscribe.currentSubscriptionDesc": "Vous avez déjà un abonnement actif",
   "subscribe.activePlanAlert": "Plan Actif",
-  "subscribe.activePlanAlertDesc": "Vous avez actuellement un abonnement actif. Vous devrez attendre qu'il expire avant de souscrire à un nouveau plan.",
+  "subscribe.activePlanAlertDesc":
+    "Vous avez actuellement un abonnement actif. Vous devrez attendre qu'il expire avant de souscrire à un nouveau plan.",
   "subscribe.currentPlan": "Plan Actuel",
   "subscribe.startDate": "Date de Début",
   "subscribe.endDate": "Date de Fin",
 
   // Payment success/failure page translations
   "payment.success.title": "Paiement Réussi !",
-  "payment.success.description": "Votre paiement a été traité avec succès. Votre abonnement est maintenant actif et vous pouvez profiter de tous les avantages.",
+  "payment.success.description":
+    "Votre paiement a été traité avec succès. Votre abonnement est maintenant actif et vous pouvez profiter de tous les avantages.",
   "payment.success.viewSubscription": "Voir Mon Abonnement",
   "payment.success.backToDashboard": "Retour au Tableau de Bord",
   "payment.success.reference": "Référence de transaction :",
@@ -1018,10 +1053,153 @@ export default {
   "payment.success.customer": "Client",
 
   "payment.failed.title": "Paiement Échoué",
-  "payment.failed.description": "Nous n'avons pas pu traiter votre paiement. Veuillez réessayer ou contacter le support si le problème persiste.",
-  "payment.failed.defaultError": "Une erreur s'est produite lors du processus de paiement.",
+  "payment.failed.description":
+    "Nous n'avons pas pu traiter votre paiement. Veuillez réessayer ou contacter le support si le problème persiste.",
+  "payment.failed.defaultError":
+    "Une erreur s'est produite lors du processus de paiement.",
   "payment.failed.tryAgain": "Réessayer",
   "payment.failed.contactSupport": "Contacter le Support",
   "payment.failed.backToDashboard": "Retour au Tableau de Bord",
   "payment.failed.reference": "Référence de transaction :",
+
+  // Add translations for the newly added text related to course offering actions
+  "courseOfferings.actions.loading": "Chargement des demande...",
+  "courseOfferings.actions.error": "Erreur lors du chargement des actions",
+  "courseOfferings.actions.noActions": "Aucune action disponible",
+  "courseOfferings.actions.status.pending": "En attente",
+  "courseOfferings.actions.status.accepted": "Acceptée",
+  "courseOfferings.actions.status.rejected": "Rejetée",
+  "courseOfferings.actions.accept": "Accepter",
+  "courseOfferings.actions.reject": "Rejeter",
+  "courseOfferings.actions.success.updated": "Demande mise à jour avec succès",
+  "courseOfferings.actions.error.updated":
+    "Erreur lors de la mise à jour de l'action",
+  "courseOfferings.actions.cancel": "Annulée",
+  "courseOfferings.actions.create": "Envoyer une demande",
+  "courseOfferings.actions.success.deleted": "Demande supprimer avec success",
+  "courseOfferings.actions.error.deleted":
+    "Une erreur est survenue lors de la tentative de suppression.",
+  "courseOfferings.actions.success.created": "Demande envoyer avec success",
+  "courseOfferings.actions.error.created":
+    "Une erreur est survenue lors de la tentative d'envoie de demande.",
+  "courseOfferings.confirm.cancelDescription": "Description",
+
+  "studentsPage.title": "Mes étudiants",
+  "studentsPage.schoolYear": "Année scolaire",
+  "studentsPage.selectSchoolYear": "Sélectionner une année scolaire",
+  "studentsPage.activeStudentsOnly": "Uniquement les étudiants actifs",
+  "studentsPage.uncheckToShowAll":
+    "Décocher pour afficher les étudiants dont les cours sont terminés.",
+  "studentsPage.loading": "Chargement des étudiants...",
+  "studentsPage.noStudentsFound":
+    "Aucun étudiant trouvé pour cette année scolaire.",
+  "error.failedToLoadStudents": "Échec du chargement des étudiants",
+  "tabs.courses": "Cours",
+  "tabs.followUps": "Suivis",
+  "tabs.contactInfo": "Informations de contact",
+  "course.hourlyRate": "Taux horaire",
+  "course.declare": "Déclarer un cours",
+  "course.reportEnd": "Signaler la fin des cours",
+  "course.history": "Historique des cours",
+  "course.march2025": "Mars 2025",
+  "course.noDeclared": "Aucun cours déclaré",
+  "form.errors.dateRequired": "La date est requise",
+  "form.errors.durationRange":
+    "La durée doit être comprise entre 1 et 5 heures",
+  "form.date": "Date",
+  "form.duration": "Durée",
+  "form.selectDuration": "Sélectionner la durée",
+  "form.submit": "Soumettre",
+  "followUps.content": "Le contenu des suivis va ici...",
+  "contactInfo.content": "Le contenu des informations de contact va ici...",
+
+  // User type translations
+  "users.all": "Tous les Utilisateurs",
+  "users.students": "Étudiants",
+  "users.professionals": "Professionnels",
+  "users.admins": "Administrateurs",
+  "users.total": "Total",
+  "users.statistics": "Statistiques des Utilisateurs",
+  "users.distribution": "Distribution des utilisateurs par type",
+  "profile.newEmail": "Nouvelle adresse email",
+  "profile.confirmEmail": "Confirmer l'adresse email",
+  "profile.updateEmail": "Mettre à jour l'email",
+  "common.current": "Actuel",
+
+  // Validation des formulaires
+  "validation.currentPasswordRequired": "Le mot de passe actuel est requis",
+  "validation.passwordMinLength":
+    "Le mot de passe doit contenir au moins 8 caractères",
+  "validation.passwordRequirements":
+    "Le mot de passe doit contenir des lettres majuscules, minuscules et des chiffres",
+  "validation.confirmPasswordRequired": "Veuillez confirmer votre mot de passe",
+  "validation.passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+  "validation.emailRequired": "L'adresse e-mail est requise",
+  "validation.validEmail": "Veuillez entrer une adresse e-mail valide",
+  "validation.emailsDoNotMatch": "Les adresses e-mail ne correspondent pas",
+  "validation.phoneRequired": "Le numéro de téléphone est requis",
+  "validation.phoneInvalid": "Format du numéro de téléphone invalide",
+  "validation.dateOfBirthRequired": "La date de naissance est requise",
+  "validation.townRequired": "La ville est requise",
+  "validation.quarterRequired": "Le quartier est requis",
+
+  // Profil utilisateur
+  "profile.updateFailed": "Échec de la mise à jour du profil",
+  "profile.passwordUpdated": "Mot de passe mis à jour avec succès",
+  "profile.passwordUpdateFailed": "Échec de la mise à jour du mot de passe",
+  "profile.emailUpdated": "Adresse e-mail mise à jour avec succès",
+  "profile.emailUpdateFailed": "Échec de la mise à jour de l'adresse e-mail",
+  "profile.personalInfoUpdated":
+    "Informations personnelles mises à jour avec succès",
+  "profile.passwordRequirementsInfo":
+    "Le mot de passe doit contenir au moins 8 caractères et inclure des lettres majuscules, minuscules et des chiffres.",
+  "profile.currentPassword": "Mot de passe actuel",
+  "profile.newPassword": "Nouveau mot de passe",
+  "profile.confirmPassword": "Confirmer le nouveau mot de passe",
+  "profile.updateProfile": "Mettre à jour le profil",
+  "profile.firstName": "Prénom",
+  "profile.lastName": "Nom",
+  "profile.email": "E-mail",
+  "profile.phone": "Numéro de téléphone",
+  "profile.dateOfBirth": "Date de naissance",
+  "profile.town": "Ville",
+  "profile.quarter": "Quartier",
+  "profile.language": "Langue",
+  "profile.enterpriseName": "Nom de l'entreprise",
+  "profile.platformUsage": "Raison d'utilisation de la plateforme",
+
+  // Commun
+  "common.saving": "Enregistrement en cours...",
+  
+  // Add missing translations for AdminPersonalInfoForm
+  "profile.firstNamePlaceholder": "Entrez votre prénom",
+  "profile.lastNamePlaceholder": "Entrez votre nom",
+  "profile.phoneNumber": "Numéro de téléphone",
+  "profile.phoneNumberPlaceholder": "Entrez votre numéro de téléphone",
+  "profile.selectLanguage": "Sélectionnez une langue",
+  "profile.townPlaceholder": "Entrez votre ville",
+  "profile.quarterPlaceholder": "Entrez votre quartier", 
+  "profile.enterpriseNamePlaceholder": "Entrez le nom de votre entreprise",
+  "profile.platformUsageReason": "Raison d'utilisation de la plateforme",
+  "profile.platformUsageReasonPlaceholder": "Expliquez pourquoi vous utilisez la plateforme",
+  "profile.currentEmail": "Adresse e-mail actuelle",
+
+  // Admin-specific translations
+  "admin.permissions": "Permissions administratives",
+  "admin.isStaff": "Privilèges du personnel (peut accéder à la zone d'administration)",
+  "admin.isSuperuser": "Privilèges super-utilisateur (accès complet au système)",
+  
+  // Email change form translations
+  "profile.currentEmailDescription": "Votre adresse e-mail actuelle que vous utilisez pour vous connecter",
+  "profile.emailChangeInfo": "Après avoir changé votre e-mail, vous devrez vérifier votre nouvelle adresse",
+  "profile.newEmailPlaceholder": "Entrez votre nouvelle adresse e-mail",
+  "profile.confirmEmailPlaceholder": "Confirmez votre nouvelle adresse e-mail",
+  "student.dashboard.myCourses": "Mes cours",
+  "student.dashboard.myVideos": "Mes vidéos",
+  "student.dashboard.myTeachers": "Mes profs",
+
+  "resource.completed": "Terminé",
+  "resource.inProgress": "En cours",
+  "resource.continueReading": "Continuer la lecture à partir de la page {page}",
+  "resource.continueWatching": "Continuer à regarder à partir de {time}",
 } as const;
