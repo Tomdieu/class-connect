@@ -20,6 +20,7 @@ import {
   TopicType,
   VideoResourceCreateType,
   VideoResourceType,
+  UserClassType
 } from "@/types";
 import axios, { AxiosError } from "axios";
 
@@ -108,6 +109,52 @@ export const getClass = async (id: string) => {
   }
 };
 
+
+export const getClassRessources = async (id:string)=>{
+  // resources except videos
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const res = await api.get(`/api/classes/${id}/resources/`, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = (await res.data) as AbstractResourceType[];
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}
+
+export const getClassVideoResources = async (id:string) =>{
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const res = await api.get(`/api/classes/${id}/videos/`, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = (await res.data) as VideoResourceType[];
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}
+
 export const addClass = async ({ body }: { body: ClassCreateType }) => {
   try {
     const session = await auth();
@@ -179,6 +226,59 @@ export const deleteClass = async (id: number) => {
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
+
+// region Student class
+
+export const listClassStudents = async ({classId,params}:{classId:number,params?:Partial<{school_year:string}>})=>{
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const res = await api.get(`/api/classes/${classId}/students/`, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+      params
+    });
+    const data = (await res.data) as UserClassType;
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}
+
+export const addStudentToClass = async ({
+  classId,
+  body,
+}: {
+  classId: number;
+  body: { user_id: string };
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const res = await api.post(`/api/classes/${classId}/students/`, {...body,class_level_id:classId}, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = (await res.data) as UserClassType;
+    return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}
 
 // region Subjects
 
