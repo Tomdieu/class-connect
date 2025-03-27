@@ -1,17 +1,17 @@
-import { User } from 'next-auth';
-export const EDUCATION_LEVELS = [
+import { User } from "next-auth";
+export declare const EDUCATION_LEVELS: readonly [
   "COLLEGE",
   "LYCEE",
   "UNIVERSITY",
-  "PROFESSIONAL",
-] as const;
-export const LYCEE_CLASSES = ["2nde", "1ere", "terminale"] as const;
-export const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
-export const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
-export const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
-export const MASTER_YEARS = ["M1", "M2"] as const;
-export const SECTIONS = ["FRANCOPHONE", "ANGLOPHONE"] as const;
-export const COLLEGE_CLASSES = ["6eme", "5eme", "4eme", "3eme"] as const;
+  "PROFESSIONAL"
+];
+export declare const LYCEE_CLASSES: readonly ["2nde", "1ere", "terminale"];
+export declare const LYCEE_SPECIALITIES: readonly ["scientifique", "litteraire"];
+export declare const UNIVERSITY_LEVELS: readonly ["licence", "master", "doctorat"];
+export declare const LICENCE_YEARS: readonly ["L1", "L2", "L3"];
+export declare const MASTER_YEARS: readonly ["M1", "M2"];
+export declare const SECTIONS: readonly ["FRANCOPHONE", "ANGLOPHONE"];
+export declare const COLLEGE_CLASSES: readonly ["6eme", "5eme", "4eme", "3eme"];
 
 export type EducationLevel = (typeof EDUCATION_LEVELS)[number];
 export type LyceeClass = (typeof LYCEE_CLASSES)[number];
@@ -22,7 +22,7 @@ export type MasterYear = (typeof MASTER_YEARS)[number];
 export type Section = (typeof SECTIONS)[number];
 export type CollegeClass = (typeof COLLEGE_CLASSES)[number];
 
-export const LANGUAGE_CHOICES = ["en", "fr"] as const;
+export declare const LANGUAGE_CHOICES: readonly ["en", "fr"];
 export type LanguageChoice = (typeof LANGUAGE_CHOICES)[number];
 
 export declare interface UserCreateType {
@@ -55,7 +55,7 @@ export declare interface UserType {
   phone_number: string;
   date_of_birth: string | null;
   education_level: EducationLevel;
-  class_level:number|null;
+  class_level: number | null;
   lycee_class: LyceeClass | null;
   lycee_speciality: LyceeSpecialities | null;
   university_level: UniversityLevel | null;
@@ -71,7 +71,7 @@ export declare interface UserType {
   is_staff: boolean;
   is_superuser: boolean;
   is_active: boolean;
-  last_login:string|null;
+  last_login: string | null;
   created_at: string;
   updated_at: string;
   date_joined: string;
@@ -79,11 +79,11 @@ export declare interface UserType {
   subscription_status:
     | { active: boolean; plan: string; expires_at: string }
     | { active: boolean };
-    class_display: string;
+  class_display: string;
 }
 
 export declare interface UserActiveToken {
-  user: User;
+  user: UserType;
   token: string;
   device_type: string | null; // mobile, tablet, desktop
   device_name: string | null; // iPhone 12, Samsung Galaxy S21, etc.
@@ -97,16 +97,16 @@ export declare interface UserActiveToken {
   updated_at: string; // ISO date string
 }
 
-export const DAYS_OF_WEEK = [
+export declare const DAYS_OF_WEEK: readonly [
   "lun",
   "mar",
   "mer",
   "jeu",
   "ven",
   "sam",
-  "dim",
-] as const;
-export const TIME_SLOTS = [
+  "dim"
+];
+export declare const TIME_SLOTS: readonly [
   "matin",
   "13h-14h",
   "14h-15h",
@@ -114,19 +114,19 @@ export const TIME_SLOTS = [
   "16h-17h",
   "17h-18h",
   "18h-19h",
-  "19h-20h",
-] as const;
-export const USER_TYPE_CHOICES = ["TEACHER", "STUDENT"] as const;
-export const COURSE_ACTION_STATUS = [
+  "19h-20h"
+];
+export const USER_TYPE_CHOICES:readonly ["TEACHER", "STUDENT"];
+export declare const COURSE_ACTION_STATUS: readonly [
   "PENDING",
   "ACCEPTED",
   "REJECTED",
-  "CANCELLED",
-] as const;
+  "CANCELLED"
+];
 
 export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
 export type TimeSlot = (typeof TIME_SLOTS)[number];
-export type UserType = (typeof USER_TYPE_CHOICES)[number];
+export type UserRoleType = (typeof USER_TYPE_CHOICES)[number];
 export type ActionStatus = (typeof COURSE_ACTION_STATUS)[number];
 export declare interface CourseCategory {
   id: number;
@@ -150,6 +150,7 @@ export declare interface ClassType {
   description: string | null;
   created_at: string;
   updated_at: string;
+  student_count:number;
 }
 
 // College structure
@@ -188,13 +189,14 @@ export declare interface ClassCreateType {
   level: EducationLevel;
   section: Section;
   description?: string;
+  speciality?: LyceeSpecialities;
 }
 
 export declare interface SubjectType {
   id: number;
   name: string;
   description: string | null;
-  class_level: Class;
+  class_level: ClassType;
   created_at: string;
   updated_at: string;
 }
@@ -209,7 +211,7 @@ export declare interface ChapterType {
   id: number;
   title: string;
   description: string | null;
-  subject: Subject;
+  subject: SubjectType;
   order: number;
   created_at: string;
   updated_at: string;
@@ -225,7 +227,7 @@ export declare interface ChapterCreateType {
 export declare interface TopicType {
   id: number;
   title: string;
-  chapter: Chapter;
+  chapter: ChapterType;
   description: string | null;
   order: number;
   created_at: string;
@@ -266,117 +268,41 @@ export declare interface AbstractResourceCreateType {
   polymorphic_ctype?: number;
 }
 
-// // Quiz Types
-// export declare interface QuestionOptionType {
-//   id: number;
-//   question: number;
-//   text: string;
-//   image: string | null;
-//   is_correct: boolean;
-//   order: number;
-//   created_at: string;
-//   updated_at: string;
-// }
+export declare interface PDFResourceType extends AbstractResourceType {
+  pdf_file: string;
+  pdf_url?: string;
+}
 
-// export declare interface QuestionType {
-//   id: number;
-//   quiz: number;
-//   text: string;
-//   image: string | null;
-//   type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
-//   points: number;
-//   order: number;
-//   explanation: string;
-//   explanation_image: string | null;
-//   created_at: string;
-//   updated_at: string;
-//   options: QuestionOptionType[];
-// }
+export declare interface VideoResourceType extends AbstractResourceType {
+  video_file: string;
+  video_url?: string;
+}
 
-// export declare interface QuizResourceType extends AbstractResourceType {
-//   total_questions: number;
-//   duration_minutes: number;
-//   passing_score: number;
-//   show_correct_answers: boolean;
-//   show_explanation: boolean;
-//   shuffle_questions: boolean;
-//   attempts_allowed: number;
-//   partial_credit: boolean;
-//   questions: QuestionType[];
-// }
+export declare interface ExerciseResourceType extends AbstractResourceType {
+  instructions: string;
+  solution_file: string;
+  exercise_file: string;
+  solution_url?: string;
+  exercise_url?: string;
+}
 
-// export declare interface QuizAttemptType {
-//   id: number;
-//   quiz: number;
-//   user: number;
-//   score: number;
-//   started_at: string;
-//   completed_at: string | null;
-//   is_completed: boolean;
-// }
 
-// export declare interface QuestionResponseType {
-//   id: number;
-//   attempt: number;
-//   question: number;
-//   selected_options: number[];
-//   text_response: string;
-//   is_correct: boolean;
-//   points_earned: number;
-//   created_at: string;
-//   updated_at: string;
-// }
-
-// // Create Types
-// export declare interface QuestionOptionCreateType {
-//   text: string;
-//   image?: File;
-//   is_correct: boolean;
-//   order: number;
-// }
-
-// export declare interface QuestionCreateType {
-//   text: string;
-//   image?: File;
-//   type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
-//   points: number;
-//   order: number;
-//   explanation: string;
-//   explanation_image?: File;
-//   options: QuestionOptionCreateType[];
-// }
-
-// export declare interface QuizResourceCreateType
-//   extends AbstractResourceCreateType {
-//   total_questions: number;
-//   duration_minutes: number;
-//   passing_score: number;
-//   show_correct_answers: boolean;
-//   show_explanation: boolean;
-//   shuffle_questions: boolean;
-//   attempts_allowed: number;
-//   partial_credit: boolean;
-//   questions: QuestionCreateType[];
-// }
+export declare interface RevisionResourceType extends AbstractResourceType {
+  content: string;
+}
 
 export declare interface PDFResourceCreateType
   extends AbstractResourceCreateType {
   pdf_file: File;
 }
 
-export declare interface PDFResourceType extends AbstractResourceType {
-  pdf_file: string;
-  pdf_url?: string;
-}
-
 export declare interface VideoResourceCreateType
   extends AbstractResourceCreateType {
   video_file: File;
 }
-
-export declare interface VideoResourceType extends AbstractResourceType {
-  video_file: string;
-  video_url?: string;
+export declare interface RevisionResourceCreateType
+  extends AbstractResourceCreateType {
+  content: string;
 }
 
 export declare interface ExerciseResourceCreateType
@@ -386,29 +312,10 @@ export declare interface ExerciseResourceCreateType
   exercise_file: File;
 }
 
-export declare interface ExerciseResourceType
-  extends AbstractResourceType {
-  instructions: string;
-  solution_file: string;
-  exercise_file: string;
-  solution_url?: string;
-  exercise_url?: string;
-}
-
-export declare interface RevisionResourceCreateType
-  extends AbstractResourceCreateType {
-  content: string;
-}
-
-export declare interface RevisionResourceType
-  extends AbstractResourceType {
-  content: string;
-}
-
 export declare interface UserAvailabilityType {
   id: number;
   daily_slots: DailyTimeSlotType[];
-  user: User;
+  user: UserType;
   user_type: UserType;
   is_available: boolean;
   last_updated: string;
@@ -434,16 +341,16 @@ export declare interface DailyTimeSlotCreateType {
 
 export declare interface CourseOfferingType {
   id: number;
-  student: User;
-  subject: Subject;
-  class_level: Class;
+  student: UserType;
+  subject: SubjectType;
+  class_level: ClassType;
   duration: number;
   frequency: number;
   start_date: string;
   hourly_rate: number;
   is_available: boolean;
-  created_at:string;
-  updated_at:string;
+  created_at: string;
+  updated_at: string;
 }
 
 export declare interface CourseOfferingCreateType {
@@ -458,31 +365,31 @@ export declare interface CourseOfferingCreateType {
 
 export declare interface CourseOfferingActionType {
   id: number;
-  teacher: User;
-  offer: CourseOffering;
+  teacher: UserType;
+  offer: CourseOfferingType;
   action: ActionStatus;
   created_at: string;
 }
 
 export declare interface CourseOfferingActionCreateType {
-  teacher: string; // UUID
-  offer: number;
-  action: ActionStatus;
+  teacher_id: string; // UUID
+  offer_id: number;
+  action?: ActionStatus;
 }
 
 export declare interface SchoolYearType {
-  start_year:number;
-  end_year:number;
-  is_active:boolean;
-  formatted_year:string;
+  start_year: number;
+  end_year: number;
+  is_active: boolean;
+  formatted_year: string;
 }
 
 export declare interface TeacherStudentEnrollmentType {
   id: number;
-  teacher: User;
-  teacher_id:string;
-  offer: CourseOffering;
-  offer_id:number;
+  teacher: UserType;
+  teacher_id: string;
+  offer: CourseOfferingType;
+  offer_id: number;
   school_year: SchoolYearType;
   created_at: string;
   has_class_end: boolean;
@@ -490,15 +397,15 @@ export declare interface TeacherStudentEnrollmentType {
 
 export declare interface EnhaceTeacherStudentEnrollmentType {
   id: number;
-  teacher: User;
-  teacher_id:string;
-  offer: CourseOffering;
-  offer_id:number;
+  teacher: UserType;
+  teacher_id: string;
+  offer: CourseOfferingType;
+  offer_id: number;
   school_year: SchoolYearType;
   created_at: string;
   has_class_end: boolean;
-  subject:string;
-  class_level:string;
+  subject: string;
+  class_level: string;
   hourly_rate: number;
 }
 
@@ -510,7 +417,7 @@ export declare interface TeacherStudentEnrollmentCreateType {
 
 export declare interface CourseDeclarationType {
   id: number;
-  teacher_student_enrollment: TeacherStudentEnrollment;
+  teacher_student_enrollment: TeacherStudentEnrollmentType;
   duration: number;
   declaration_date: string;
   accepted_by: User | null;
@@ -528,12 +435,16 @@ export declare interface CourseDeclarationCreateType {
 
 export declare interface UserProgressType {
   id: number;
-  user: User;
-  topic: Topic;
+  user: UserType;
+  topic: TopicType;
   resource: AbstractResourceType;
   completed: boolean;
   progress_percentage: number;
   last_accessed: string;
+  current_page?: number;
+  total_pages?: number;
+  current_time?: number;
+  total_duration?: number;
 }
 
 export declare interface LoginResponseType {
@@ -581,7 +492,6 @@ declare interface SubscriptionPlan {
   created_at: string;
 }
 
-
 declare interface Subscription {
   id: number;
   user: string;
@@ -603,28 +513,28 @@ declare interface SubscriptionDetail {
 }
 
 // Enum definitions for choice fields
-enum TransactionType {
+export enum TransactionType {
   COLLECT = "collect",
   WITHDRAW = "withdraw",
 }
 
-enum TransactionStatus {
+export enum TransactionStatus {
   SUCCESSFUL = "SUCCESSFUL",
   FAILED = "FAILED",
   PENDING = "PENDING",
 }
 
-enum Operator {
+export enum Operator {
   MTN = "MTN",
   ORANGE = "ORANGE",
 }
 
-enum Currency {
+export enum Currency {
   XAF = "XAF",
 }
 
 // Main Transaction interface
-interface Transaction {
+export interface Transaction {
   // Core transaction fields
   reference: string; // UUID
   status: TransactionStatus;
@@ -660,14 +570,14 @@ interface Transaction {
 }
 
 // Response type for API endpoints
-interface TransactionResponse {
+export interface TransactionResponse {
   data: Transaction;
   status: "success" | "error";
   message?: string;
 }
 
 // List response type
-interface TransactionListResponse {
+export interface TransactionListResponse {
   results: Transaction[];
   count: number;
   next?: string | null;
@@ -675,13 +585,13 @@ interface TransactionListResponse {
 }
 
 // Date range filter type
-interface DateRangeFilter {
+export interface DateRangeFilter {
   after?: string; // ISO date string
   before?: string; // ISO date string
 }
 
 // Main transaction filter parameters
-interface TransactionFilterParams {
+export interface TransactionFilterParams {
   // Filter fields from TransactionFilter class
   status?: "SUCCESSFUL" | "FAILED" | "PENDING";
   endpoint?: "collect" | "withdraw";
@@ -700,52 +610,58 @@ interface TransactionFilterParams {
   page_size?: number;
 }
 
-interface MonthStat {
+export interface MonthStat {
   month: string;
   users: string;
 }
 
-interface Stats {
+export interface Stats {
   total_users: number;
   monthly_stats: MonthStat[];
 }
 
-
-
-export const NOTICATION_TYPES = ["PAYMENT", "COURSE","SESSION", "SYSTEM"] as const;
+export declare const NOTICATION_TYPES: readonly [
+  "PAYMENT",
+  "COURSE",
+  "SESSION",
+  "SYSTEM"
+];
 
 export type NOTICATION_TYPE = (typeof NOTICATION_TYPES)[number];
 
-
-declare interface NotificationType {
+export declare interface NotificationType {
   id: number;
   user_id: string;
   title: string;
   message: string;
-  notification_type:NOTICATION_TYPE ;
+  notification_type: NOTICATION_TYPE;
   read: boolean;
   created_at: string;
 }
 
-
-
-declare interface VideoConferenceSessionType {
-  id:number;
-  title:string;
+export declare interface VideoConferenceSessionType {
+  id: number;
+  title: string;
 }
 
-
-declare interface UserClassType {
+export declare interface UserClassType {
   id: number;
-  user: User;
+  user: UserType;
   class_level: ClassType;
   school_year: SchoolYearType;
   created_at: string;
   updated_at: string;
 }
 
-declare interface UserClassCreateType {
+export declare interface UserClassCreateType {
   user_id: string;
   class_level_id: number;
   school_year_id: number;
+}
+
+export declare interface UserStats {
+  total_students: number;
+  total_professionals: number;
+  total_admins: number;
+  total_users: number;
 }
