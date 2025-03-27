@@ -63,7 +63,7 @@ export default function ProfilePage() {
   }
   
   return (
-    <div className="container max-w-5xl py-10">
+    <div className="container py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">{t("profile.pageTitle")}</h1>
         <p className="text-muted-foreground mt-2">
