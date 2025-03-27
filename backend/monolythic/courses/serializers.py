@@ -33,9 +33,18 @@ class CourseCategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ClassSerializer(serializers.ModelSerializer):
+    student_count = serializers.SerializerMethodField()
+    
     class Meta:
         model = Class
         fields = "__all__"
+    
+    def get_student_count(self, obj):
+        school_year = self.context.get('school_year')
+        queryset = UserClass.objects.filter(class_level=obj)
+        if school_year:
+            queryset = queryset.filter(school_year=school_year)
+        return queryset.count()
 
 
 class SubjectSerializer(serializers.ModelSerializer):
@@ -245,6 +254,7 @@ class CourseOfferingActionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SchoolYearSerializer(serializers.ModelSerializer):
+    is_active = serializers.BooleanField(read_only=True)  # Converted to read-only field from property
     
     class Meta:
         model = SchoolYear
