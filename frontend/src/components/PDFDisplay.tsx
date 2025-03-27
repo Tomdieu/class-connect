@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
@@ -9,15 +9,41 @@ import {
   type ToolbarSlot,
   type TransformToolbarSlot,
 } from "@react-pdf-viewer/toolbar";
+import { pageNavigationPlugin, PageChangeEvent } from "@react-pdf-viewer/page-navigation";
 
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 type PDFDisplayProps = {
   pdfUrl: string;
+  onProgressUpdate?: (currentPage: number, totalPages: number, progressPercentage: number) => void;
+  initialPage?: number;
 };
 
-const PDFDisplay: React.FC<PDFDisplayProps> = ({ pdfUrl }) => {
+const PDFDisplay: React.FC<PDFDisplayProps> = ({ 
+  pdfUrl, 
+  onProgressUpdate,
+  initialPage = 0 
+}) => {
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+
+  // Create the page navigation plugin
+  const pageNavigationPluginInstance = pageNavigationPlugin();
+  const { jumpToPage } = pageNavigationPluginInstance;
+
+  // Use the jumpToPage function when initialPage is set
+  useEffect(() => {
+    if (initialPage > 0 && jumpToPage) {
+      // Need to wait a bit for the PDF to load
+      const timer = setTimeout(() => {
+        jumpToPage(initialPage - 1); // PDF viewer uses 0-indexed pages
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [initialPage, jumpToPage]);
+
   const transform: TransformToolbarSlot = (slot: ToolbarSlot) => ({
     ...slot,
     Download: () => <></>,
@@ -26,30 +52,53 @@ const PDFDisplay: React.FC<PDFDisplayProps> = ({ pdfUrl }) => {
     EnterFullScreenMenuItem: () => <></>,
     SwitchTheme: () => <></>,
     SwitchThemeMenuItem: () => <></>,
-    Print:()=><></>,
-    Open:()=><></>
+    Print: () => <></>,
+    Open: () => <></>
   });
 
-  const renderToolbar = (
-    Toolbar: (props: ToolbarProps) => ReactreactElement
-  ) => <Toolbar>{renderDefaultToolbar(transform)}</Toolbar>;
+  const renderToolbar = (Toolbar: (props: ToolbarProps) => React.ReactElement) => 
+    <Toolbar>{renderDefaultToolbar(transform)}</Toolbar>;
+    
+  // Add page navigation plugin to defaultLayoutPlugin
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     renderToolbar,
+    sidebarTabs: (defaultTabs) => [],
   });
-  const { renderDefaultToolbar } =
-    defaultLayoutPluginInstance.toolbarPluginInstance;
+  
+  const { renderDefaultToolbar } = defaultLayoutPluginInstance.toolbarPluginInstance;
 
-  // const defaultLayoutPluginInstance = defaultLayoutPlugin();
+  // Handle page change events
+  const handlePageChange = (e: PageChangeEvent) => {
+    const newPage = e.currentPage + 1; // Convert from 0-indexed to 1-indexed
+    setCurrentPage(newPage);
+
+    if (onProgressUpdate && totalPages > 0) {
+      const progress = Math.round((newPage / totalPages) * 100);
+      onProgressUpdate(newPage, totalPages, progress);
+    }
+  };
+
+  // Handle document loaded event to get total pages
+  const handleDocumentLoad = (e: any) => {
+    if (e && e.doc) {
+      const numPages = e.doc.numPages;
+      setTotalPages(numPages);
+    }
+  };
 
   return (
     <div className="pdf-container">
-      <Worker
-        // workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
-        // workerUrl="https://unpkg.com/pdfjs-dist@2.15.349/build/pdf.worker.js"
-        workerUrl={window.location.origin + "/pdf.worker.min.js"}
-      >
+      <Worker workerUrl={window.location.origin + "/pdf.worker.min.js"}>
         <div style={{ height: "750px" }}>
-          <Viewer fileUrl={pdfUrl} plugins={[defaultLayoutPluginInstance]} />
+          <Viewer 
+            fileUrl={pdfUrl} 
+            plugins={[
+              defaultLayoutPluginInstance, 
+              pageNavigationPluginInstance
+            ]}
+            onPageChange={handlePageChange}
+            onDocumentLoad={handleDocumentLoad}
+          />
         </div>
       </Worker>
     </div>
