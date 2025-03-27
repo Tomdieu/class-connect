@@ -50,7 +50,7 @@ export default function DashboardSidebar() {
     },
     {
       title: t("dashboardSidebar.myPayments"),
-      url: "#",
+      url: "/dashboard/salaire",
       icon: FaEuroSign,
     },
     {
@@ -60,7 +60,7 @@ export default function DashboardSidebar() {
     },
     {
       title: t("dashboardSidebar.contactUs"),
-      url: "#",
+      url: "/dashboard/message",
       icon: IoChatbubbles,
     },
   ];
