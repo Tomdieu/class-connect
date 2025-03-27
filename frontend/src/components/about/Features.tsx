@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { useI18n } from "@/locales/client";
+import Image from "next/image";
 
 export const Features = () => {
   const t = useI18n();
@@ -81,11 +82,16 @@ export const Features = () => {
       <div className="space-y-8">
         {features.map((feature, index) => (
           <div key={index} className="grid md:grid-cols-2 gap-8 items-center">
-            <img 
+            {index%2===0 && (
+              <Image 
               src={feature.image}
               alt={feature.alt}
+              width={600} 
+              height={300} 
               className="rounded-lg shadow-lg w-full h-[300px] object-cover"
             />
+            )}
+            
             <div>
               <h3 className="text-2xl font-semibold text-gray-900 mb-4">{feature.title}</h3>
               <ul className="space-y-3 text-gray-600">
@@ -94,6 +100,15 @@ export const Features = () => {
                 ))}
               </ul>
             </div>
+            {index%2!==0 && (
+              <Image 
+              src={feature.image}
+              alt={feature.alt}
+              width={600} 
+              height={300} 
+              className="rounded-lg shadow-lg w-full h-[300px] object-cover"
+            />
+            )}
           </div>
         ))}
       </div>
