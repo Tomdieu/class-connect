@@ -134,7 +134,7 @@ function CoursesPages() {
   };
 
   return (
-    <div className="container py-10">
+    <div className="container px-1 sm:px-8 py-10">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-medium">{t("class.title")}</h1>
         <Button 
@@ -147,7 +147,7 @@ function CoursesPages() {
 
       <div className="space-y-12">
         {Object.entries(data).map(([section, sectionData]) => (
-          <div key={section} className="bg-white rounded-xl p-6 shadow-sm">
+          <div key={section} className="bg-white rounded-xl px-2 p-6 shadow-sm">
             <h2 className="text-2xl font-semibold mb-6 text-gray-900">
               {t(`sections.${section}`)}
             </h2>
