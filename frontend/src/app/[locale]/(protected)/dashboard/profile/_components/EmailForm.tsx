@@ -1,112 +1,125 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { useSession } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSession } from "next-auth/react";
+import { useI18n } from "@/locales/client";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { updateUser } from "@/actions/accounts";
 import { toast } from "sonner";
 
-// Email Form Schema
-const emailSchema = z.object({
-  oldEmail: z.string().email("Please provide a valid email"),
-  newEmail: z.string().email("Please provide a valid email"),
-  confirmEmail: z.string().email("Please provide a valid email")
-}).refine(data => data.newEmail === data.confirmEmail, {
-  message: "Emails don't match",
-  path: ["confirmEmail"]
-});
-
-export type EmailFormValues = z.infer<typeof emailSchema>;
-
 interface EmailFormProps {
-  defaultValues: EmailFormValues;
+  defaultValues: {
+    oldEmail: string;
+    newEmail: string;
+    confirmEmail: string;
+  };
 }
 
 export default function EmailForm({ defaultValues }: EmailFormProps) {
-  const { update } = useSession();
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const form = useForm<EmailFormValues>({
-    resolver: zodResolver(emailSchema),
-    defaultValues,
+  const { data: session, update } = useSession();
+  const t = useI18n();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Define form schema with zod for email change
+  const formSchema = z
+    .object({
+      newEmail: z.string().email({ message: t("validation.validEmail") }),
+      confirmEmail: z.string().email({ message: t("validation.validEmail") }),
+    })
+    .refine((data) => data.newEmail === data.confirmEmail, {
+      message: t("validation.emailsDoNotMatch"),
+      path: ["confirmEmail"],
+    });
+
+  // Initialize form with default values
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      newEmail: defaultValues.newEmail || "",
+      confirmEmail: defaultValues.confirmEmail || "",
+    },
   });
 
-  const onSubmit = async (data: EmailFormValues) => {
+  // Handle form submission
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!session?.user?.id) {
+      toast.error(t("profile.updateFailed"));
+      return;
+    }
+
     try {
-      setIsLoading(true);
+      setIsSubmitting(true);
       
-      const response = await fetch('/api/update-email', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          oldEmail: data.oldEmail,
-          newEmail: data.newEmail
-        })
+      // Update user email
+      await updateUser({
+        id: session.user.id,
+        body: { email: values.newEmail },
       });
+
+      // Update session with new email
+      await update({ email: values.newEmail });
+
+      toast.success(t("profile.emailUpdated"));
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update email');
-      }
+      // Reset confirmation field
+      form.setValue("confirmEmail", "");
+    } catch (error) {
+      let errorMessage = t("profile.emailUpdateFailed");
       
-      // Update the session with the new email
-      await update({
-        user: {
-          email: data.newEmail
+      try {
+        const parsedError = JSON.parse(error as string);
+        if (parsedError.email) {
+          errorMessage = parsedError.email[0];
+        } else if (parsedError.message) {
+          errorMessage = parsedError.message;
         }
-      });
-      
-      toast.success("Email modifié avec succès");
-      form.reset({
-        oldEmail: data.newEmail,
-        newEmail: "",
-        confirmEmail: ""
-      });
-    } catch (error: any) {
-      console.error('Error updating email:', error);
-      toast.error(error.message || "Échec de la modification de l'email");
+      } catch (e) {
+        // Use default error message
+      }
+
+      toast.error(errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="oldEmail"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email actuel</FormLabel>
-              <FormControl>
-                <Input 
-                  {...field} 
-                  disabled 
-                  className="bg-muted" 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Current Email - Read only */}
+        <FormItem>
+          <FormLabel>{t("profile.email")} ({t("common.current")})</FormLabel>
+          <Input 
+            value={defaultValues.oldEmail} 
+            disabled 
+            readOnly 
+          />
+        </FormItem>
         
+        {/* New Email */}
         <FormField
           control={form.control}
           name="newEmail"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nouvel email</FormLabel>
+              <FormLabel>{t("profile.newEmail")}</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="nouveau@exemple.com" 
-                  {...field} 
+                <Input
+                  type="email"
+                  placeholder="email@example.com"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -114,16 +127,18 @@ export default function EmailForm({ defaultValues }: EmailFormProps) {
           )}
         />
         
+        {/* Confirm Email */}
         <FormField
           control={form.control}
           name="confirmEmail"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirmer le nouvel email</FormLabel>
+              <FormLabel>{t("profile.confirmEmail")}</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="nouveau@exemple.com" 
-                  {...field} 
+                <Input
+                  type="email"
+                  placeholder="email@example.com"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -131,15 +146,19 @@ export default function EmailForm({ defaultValues }: EmailFormProps) {
           )}
         />
         
-        <div className="flex justify-end">
-          <Button 
-            type="submit" 
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            disabled={isLoading}
-          >
-            {isLoading ? "Modification en cours..." : "Modifier mon email"}
-          </Button>
-        </div>
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {t("common.saving")}
+            </>
+          ) : (
+            t("profile.updateEmail")
+          )}
+        </Button>
       </form>
     </Form>
   );

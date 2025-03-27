@@ -1,200 +1,275 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { toast } from "sonner";
 import { useSession } from "next-auth/react";
-import { InputPhone } from "@/components/ui/input-phone";
-
-// Personal Info Form Schema
-const personalInfoSchema = z.object({
-  phone_number: z.string().min(1, "Phone number is required"),
-  date_of_birth: z.string().optional().nullable(),
-  language: z.enum(["fr", "en"]),
-  town: z.string().min(1, "Town is required"),
-  quarter: z.string().min(1, "Quarter is required"),
-  enterprise_name: z.string().optional().nullable(),
-  platform_usage_reason: z.string().optional().nullable(),
-});
-
-export type PersonalInfoFormValues = z.infer<typeof personalInfoSchema>;
+import { useI18n } from "@/locales/client";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { updateUser } from "@/actions/accounts";
+import { toast } from "sonner";
+import { UserType } from "@/types";
 
 interface PersonalInfoFormProps {
-  defaultValues: PersonalInfoFormValues;
+  defaultValues: {
+    phone_number: string;
+    date_of_birth: string;
+    language: "fr" | "en";
+    town: string;
+    quarter: string;
+    enterprise_name?: string;
+    platform_usage_reason?: string;
+  };
 }
 
 export default function PersonalInfoForm({ defaultValues }: PersonalInfoFormProps) {
-  const { update } = useSession();
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const form = useForm<PersonalInfoFormValues>({
-    resolver: zodResolver(personalInfoSchema),
-    defaultValues,
+  const { data: session, update } = useSession();
+  const t = useI18n();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isProfessional = session?.user?.education_level === "PROFESSIONAL";
+
+  // Format date from ISO string to YYYY-MM-DD for date input
+  const formatDateForInput = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date.getTime()) 
+      ? date.toISOString().split('T')[0]
+      : "";
+  };
+
+  // Define form schema with zod for personal info
+  const formSchema = z.object({
+    phone_number: z.string()
+      .min(1, { message: t("validation.phoneRequired") })
+      .regex(/^\+?[0-9]{8,15}$/, { message: t("validation.phoneInvalid") }),
+    date_of_birth: z.string().optional(),
+    language: z.enum(["fr", "en"]),
+    town: z.string().min(1, { message: t("validation.townRequired") }),
+    quarter: z.string().min(1, { message: t("validation.quarterRequired") }),
+    enterprise_name: isProfessional 
+      ? z.string().min(1) 
+      : z.string().optional(),
+    platform_usage_reason: isProfessional 
+      ? z.string().min(1) 
+      : z.string().optional(),
   });
 
-  const onSubmit = async (data: PersonalInfoFormValues) => {
+  // Initialize form with default values
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      phone_number: defaultValues.phone_number || "",
+      date_of_birth: formatDateForInput(defaultValues.date_of_birth || ""),
+      language: defaultValues.language || "fr",
+      town: defaultValues.town || "",
+      quarter: defaultValues.quarter || "",
+      enterprise_name: defaultValues.enterprise_name || "",
+      platform_usage_reason: defaultValues.platform_usage_reason || "",
+    },
+  });
+
+  // Handle form submission
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!session?.user?.id) {
+      toast.error(t("profile.updateFailed"));
+      return;
+    }
+
     try {
-      setIsLoading(true);
+      setIsSubmitting(true);
       
-      const response = await fetch('/api/update-profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
+      // Update user information
+      const updatedUser = await updateUser({
+        id: session.user.id,
+        body: values,
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
-      
-      // Update the session with the new data
+
+      // Update session with new information
       await update({
-        user: data
+        ...session.user,
+        phone_number: values.phone_number,
+        date_of_birth: values.date_of_birth,
+        language: values.language,
+        town: values.town,
+        quarter: values.quarter,
+        enterprise_name: values.enterprise_name,
+        platform_usage_reason: values.platform_usage_reason,
       });
-      
-      toast.success("Profil mis à jour avec succès");
+
+      toast.success(t("profile.personalInfoUpdated"));
     } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error("Échec de la mise à jour du profil");
+      let errorMessage = t("profile.updateFailed");
+      
+      try {
+        const parsedError = JSON.parse(error as string);
+        if (parsedError.message) {
+          errorMessage = parsedError.message;
+        }
+      } catch (e) {
+        // Use default error message
+      }
+
+      toast.error(errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="phone_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Téléphone</FormLabel>
-                <FormControl>
-                  <InputPhone {...field} placeholder="Votre numéro de téléphone" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="date_of_birth"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date de naissance</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} value={field.value || ''} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="language"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Langue</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner la langue" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="fr">Français</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="town"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Ville</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Votre ville" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
+        {/* Phone Number */}
         <FormField
           control={form.control}
-          name="quarter"
+          name="phone_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Quartier</FormLabel>
+              <FormLabel>{t("profile.phone")}</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Votre quartier" />
+                <Input placeholder="+237 6XXXXXXXX" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         
-        <div className="grid gap-4 md:grid-cols-2">
+        {/* Date of Birth */}
+        <FormField
+          control={form.control}
+          name="date_of_birth"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("profile.dateOfBirth")}</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        {/* Language */}
+        <FormField
+          control={form.control}
+          name="language"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("profile.language")}</FormLabel>
+              <Select 
+                onValueChange={field.onChange} 
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select language" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        {/* Town */}
+        <FormField
+          control={form.control}
+          name="town"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("profile.town")}</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        {/* Quarter */}
+        <FormField
+          control={form.control}
+          name="quarter"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("profile.quarter")}</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        {/* Enterprise Name - Only for professional users */}
+        {isProfessional && (
           <FormField
             control={form.control}
             name="enterprise_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Entreprise</FormLabel>
+                <FormLabel>{t("profile.enterpriseName")}</FormLabel>
                 <FormControl>
-                  <Input {...field} value={field.value || ''} placeholder="Nom de l'entreprise" />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
+        )}
+        
+        {/* Platform Usage Reason - Only for professional users */}
+        {isProfessional && (
           <FormField
             control={form.control}
             name="platform_usage_reason"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Raison d'utilisation</FormLabel>
+                <FormLabel>{t("profile.platformUsage")}</FormLabel>
                 <FormControl>
-                  <Input {...field} value={field.value || ''} placeholder="Pourquoi utilisez-vous la plateforme" />
+                  <Textarea rows={3} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </div>
-
-        <div className="flex justify-end">
-          <Button 
-            type="submit" 
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            disabled={isLoading}
-          >
-            {isLoading ? "Sauvegarde en cours..." : "Sauvegarder mes informations"}
-          </Button>
-        </div>
+        )}
+        
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {t("common.saving")}
+            </>
+          ) : (
+            t("profile.updateProfile")
+          )}
+        </Button>
       </form>
     </Form>
   );
