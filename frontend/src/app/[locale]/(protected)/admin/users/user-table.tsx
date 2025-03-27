@@ -15,9 +15,24 @@ function UserTable() {
   const t = useI18n();
   const searchParams = useSearchParams();
   const page = searchParams.get("page") || "1";
+  const userType = searchParams.get("type") || "all";
+  
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["users", "page", page],
-    queryFn: () => getUsers({ params: {page} }),
+    queryKey: ["users", "page", page, "type", userType],
+    queryFn: () => {
+      // Create params object with correct boolean flags based on user type
+      const params: Record<string, any> = { page };
+      
+      if (userType === "student") {
+        params.is_student = true;
+      } else if (userType === "professional") {
+        params.is_professional = true;
+      } else if (userType === "admin") {
+        params.is_admin = true;
+      }
+      
+      return getUsers({ params });
+    },
   });
 
   const [users, setUsers] = useState<UserType[]>([]);
@@ -32,9 +47,9 @@ function UserTable() {
     if (value) {
       const _usersToDisplay = data?.filter(
         (user) =>
-          user.first_name?.toLocaleLowerCase().includes(value) ||
-          user.last_name?.toLocaleLowerCase().includes(value) ||
-          user.email?.toLocaleLowerCase().includes(value)
+          user.first_name?.toLocaleLowerCase().includes(value.toLowerCase()) ||
+          user.last_name?.toLocaleLowerCase().includes(value.toLowerCase()) ||
+          user.email?.toLocaleLowerCase().includes(value.toLowerCase())
       );
       setUsers(_usersToDisplay!);
     } else {
@@ -89,7 +104,7 @@ function UserTable() {
 
   if (data) {
     return (
-      <div className="space-y-4 w-full overflow-x-auto w-full">
+      <div className="space-y-4 w-full overflow-x-auto">
         <DataTable onChange={handleFilter} columns={userColumns} data={users} />
         <DeleteConfirmationModal />
       </div>
