@@ -42,7 +42,7 @@ from django.db.models import Count
 from datetime import datetime,timedelta
 import logging
 
-from django.db.models import Sum, F
+from django.db.models import Sum, F,Q
 from payments.models import Subscription
 
 logger = logging.getLogger(__name__)
@@ -84,7 +84,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
     
     # With cookie: cache requested url for each user for 2 hours
-    @method_decorator(cache_page(60*60*2,key_prefix='user_list'))
     @swagger_auto_schema(tags=["Users"])
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -135,6 +134,48 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         serializer = UserSerializer(user, context={"request": request})
         return Response(serializer.data)
+
+    @swagger_auto_schema(
+        tags=["Users"],
+        responses={
+            200: openapi.Response(
+                description="User statistics",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "total_students": openapi.Schema(type=openapi.TYPE_INTEGER),
+                        "total_professionals": openapi.Schema(type=openapi.TYPE_INTEGER),
+                        "total_admins": openapi.Schema(type=openapi.TYPE_INTEGER),
+                    }
+                )
+            )
+        }
+    )
+    @action(detail=False, methods=["get"])
+    def stats(self, request):
+        # Get counts for different user types
+        student_education_levels = ['COLLEGE', 'LYCEE', 'UNIVERSITY']
+        
+        # Count students (users with education level in student levels)
+        total_students = User.objects.filter(education_level__in=student_education_levels).count()
+        
+        # Count professionals (users with education level PROFESSIONAL)
+        total_professionals = User.objects.filter(education_level='PROFESSIONAL').count()
+        
+        # Count admins (users who are staff OR superusers)
+        total_admins = User.objects.filter(Q(is_staff=True) | Q(is_superuser=True)).count()
+        
+        # Totale users
+        total_users = User.objects.count()
+        # Return the statistics
+        data = {
+            'total_students': total_students,
+            'total_professionals': total_professionals,
+            'total_admins': total_admins,
+            'total_users': total_users,
+        }
+        
+        return Response(data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
         user = serializer.save()
