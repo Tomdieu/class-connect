@@ -101,9 +101,7 @@ function LandingPage() {
       
       <Header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 px-5 sticky top-0 z-50" />
       <main className="flex-1">
-        <RevealOnScroll>
-          <Hero />
-        </RevealOnScroll>
+      <Hero />
         
         {/* Animated Features Section */}
         <section className="py-24 bg-gradient-to-b from-white to-blue-50">
@@ -172,9 +170,7 @@ function LandingPage() {
           </div>
         </section>
 
-        <RevealOnScroll direction="up">
           <SubscriptionPlans />
-        </RevealOnScroll>
       </main>
       <Footer />
     </div>
