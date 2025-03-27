@@ -3,7 +3,7 @@
 import api from "@/services/api";
 import { auth } from "@/auth";
 
-import { UserType, UserCreateType, ChangePasswordType } from "@/types";
+import { UserType, UserCreateType, ChangePasswordType, UserStats } from "@/types";
 import { AxiosError } from "axios";
 
 export const getAccountInfor = async (token: string) => {
@@ -355,6 +355,28 @@ export const verifyCode = async ({ code }: { code: string }) => {
     });
     const data = (await res.data) as { exists: boolean };
     return data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const getUserStats = async () => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorized user!");
+
+    const res = await api.get(`/api/accounts/users/stats/`, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data as UserStats;
   } catch (error: unknown) {
     const axiosError = error as AxiosError;
     if (axiosError.response?.data) {
