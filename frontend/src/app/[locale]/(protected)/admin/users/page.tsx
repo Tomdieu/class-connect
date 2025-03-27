@@ -1,10 +1,18 @@
 import React from "react";
 import UserTable from "./user-table";
+import UserTypeSidebar from "./_components/user-type-sidebar";
 
 async function UsersPage() {
   return (
-    <div className="flex w-full flex-col gap-5 px-2 sm:container pt-10 overflow-x-auto">
-      <UserTable />
+    <div className="p-4 md:p-6">
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="w-full lg:w-1/4 lg:max-w-[300px]">
+          <UserTypeSidebar />
+        </div>
+        <div className="w-full lg:flex-1">
+          <UserTable />
+        </div>
+      </div>
     </div>
   );
 }
