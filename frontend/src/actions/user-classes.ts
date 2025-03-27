@@ -111,14 +111,16 @@ export const deleteUserClass = async (id: number) => {
 export const getMyClass = async () => {
   try {
     const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
-    const response = await api.get("/api/user-classes/my-class/", {
+    if (!session?.user) throw Error("Unauthorized user!");
+
+    const res = await api.get(`/api/user-classes/my-class/`, {
       headers: {
-        Authorization: `Bearer ${session.user.accessToken}`,
+        Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",
       },
     });
-    return response.data as UserClassType[];
+    const data = (await res.data) as UserClassType[];
+    return data;
   } catch (error: unknown) {
     const axiosError = error as AxiosError;
     if (axiosError.response?.data) {
@@ -152,5 +154,35 @@ export const getClassSubject = async ({
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
+
+export async function getStudentsByClass(classId: string, schoolYearId?: number) {
+  try {
+    const session = await auth();
+    if (!session?.user) throw new Error("Unauthorized");
+
+    // Format school year as "YYYY-YYYY" instead of just the ID
+    let params = {};
+    if (schoolYearId) {
+      const endYear = schoolYearId + 1;
+      const formattedSchoolYear = `${schoolYearId}-${endYear}`;
+      params = { school_year: formattedSchoolYear };
+    }
+    
+    const res = await api.get(`/api/classes/${classId}/students/`, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+      params
+    });
+
+    return res.data as UserClassType[];
+  } catch (error: any) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}
 
 // endregion User Classes
