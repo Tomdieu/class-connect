@@ -7,7 +7,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatTimeSince } from "@/lib/timeSince";
 
-import { MoreHorizontal, RefreshCw, Trash } from "lucide-react";
+import { Eye, MoreHorizontal, RefreshCw, Trash } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -195,7 +195,7 @@ export const userColumns: ColumnDef<UserType>[] = [
                   goToDetail()
                 }}
               >
-                <RefreshCw className="w-4 h-4 mr-2" />
+                <Eye className="w-4 h-4 mr-2" />
                 <span>{t("users.table.actions.detail")}</span>
               </DropdownMenuItem>
               {session?.user?.id !== user.id && (
