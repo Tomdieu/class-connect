@@ -47,6 +47,21 @@ export function formatDate(dateString: string | null | undefined): string {
 }
 
 /**
+ * Extract initials from a name
+ * @param name Full name
+ * @returns Initials (first letter of first and last name)
+ */
+export function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .filter(Boolean)
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+/**
  * Formats a class name with speciality if present
  * @param classItem The class object to format
  * @returns Formatted class name string
