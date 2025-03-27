@@ -49,7 +49,7 @@ export const AdminSidebar = () => {
 
   return (
     <Sidebar>
-      <SidebarContent className="bg-white">
+      <SidebarContent className="bg-white z-in">
         <div className="font-bold text-xl p-5 pb-0 flex items-center justify-between">
           <Link href="/admin">
             <span>{t("adminSidebar.title")}</span>
