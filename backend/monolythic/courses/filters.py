@@ -124,12 +124,21 @@ class TeacherStudentEnrollmentFilter(django_filters.FilterSet):
             return queryset.none()
 
 class CourseDeclarationFilter(django_filters.FilterSet):
+    user_id = django_filters.UUIDFilter(method='filter_by_user')
     status = django_filters.ChoiceFilter(choices=CourseDeclaration.ACTIONS)
     declaration_date = django_filters.DateFromToRangeFilter()
-
+    
+    def filter_by_user(self, queryset, name, value):
+        """
+        Filter course declarations by the teacher's user ID
+        """
+        return queryset.filter(
+            teacher_student_enrollment__teacher__id=value
+        )
+    
     class Meta:
         model = CourseDeclaration
-        fields = ['status', 'declaration_date']
+        fields = ['status', 'declaration_date', 'user_id']
 
 class UserClassFilter(django_filters.FilterSet):
     class_level = django_filters.NumberFilter(field_name='class_level')
