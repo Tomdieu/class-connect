@@ -164,7 +164,7 @@ export const listEnrollmentDeclarations = async (id: number) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
-    const response = await api.get(`/enrollments/${id}/declarations/`, {
+    const response = await api.get(`/api/enrollments/${id}/declarations/`, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
@@ -183,7 +183,7 @@ export const createEnrollmentDeclaration = async ({enrollmentId,data}:{enrollmen
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
-    const response = await api.post(`/enrollments/${enrollmentId}/declarations/`,data, {
+    const response = await api.post(`/api/enrollments/${enrollmentId}/declarations/`,{...data,teacher_student_enrollment_id:enrollmentId}, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
@@ -206,7 +206,7 @@ export const getEnrollmentDeclaration = async (
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
     const response = await api.get(
-      `/enrollments/${id}/declarations/${declarationId}/`,
+      `/api/enrollments/${id}/declarations/${declarationId}/`,
       {
         headers: {
           Authorization: `Bearer ${session.user.accessToken}`,
@@ -228,7 +228,7 @@ export const updateEnrollmentDeclaration = async ({id,declarationId,data}:{id:nu
   try{
     const session = await auth();
     if(!session?.user) throw Error("Unauthorize user!");
-    const response = await api.patch(`/enrollments/${id}/declarations/${declarationId}/`,data,{
+    const response = await api.patch(`/api/enrollments/${id}/declarations/${declarationId}/`,data,{
       headers:{
         Authorization: `Bearer ${session.user.accessToken}`,
       },
@@ -247,7 +247,7 @@ export const deleteEnrollmentDeclaration = async (id:number,declarationId:number
   try{
     const session = await auth();
     if(!session?.user) throw Error("Unauthorize user!");
-    const response = await api.delete(`/enrollments/${id}/declarations/${declarationId}/`,{
+    const response = await api.delete(`/api/enrollments/${id}/declarations/${declarationId}/`,{
       headers:{
         Authorization: `Bearer ${session.user.accessToken}`,
       },
@@ -266,7 +266,7 @@ export const updateEnrollmentDeclarationStatus = async (id:number,declarationId:
   try{
     const session = await auth();
     if(!session?.user) throw Error("Unauthorize user!");
-    const response = await api.patch(`/enrollments/${id}/declarations/${declarationId}/status/`,data,{
+    const response = await api.patch(`/api/enrollments/${id}/declarations/${declarationId}/status/`,data,{
       headers:{
         Authorization: `Bearer ${session.user.accessToken}`,
       },
