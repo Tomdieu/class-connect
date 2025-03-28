@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { 
   Card, 
   CardContent 
@@ -29,26 +29,70 @@ import {
   CheckSquare, 
   User,
   X,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { getTeacherCourseDeclarations } from '@/actions/course-declarations'
+import { CourseDeclarationType } from '@/types'
+import { format, startOfMonth, endOfMonth, parse } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
-// Define types for payment data
-interface Payment {
-  date: string;
-  student: string;
-  course: string;
-  hours: string;
-  status: 'Payé' | 'Validé' | 'En attente de validation';
-  hasInfo?: boolean;
+// Map status to UI values
+const statusMap: Record<string, 'Payé' | 'Validé' | 'En attente de validation'> = {
+  'PAID': 'Payé',
+  'ACCEPTED': 'Validé',
+  'PENDING': 'En attente de validation',
+  'REJECTED': 'En attente de validation' // Or any other fallback status
 }
 
 export default function PaymentsPage() {
-  const [month, setMonth] = useState<string>('Mars 2025')
+  const [month, setMonth] = useState<string>('all') // Default to 'all' to show all data
   const [showSummary, setShowSummary] = useState<boolean>(true)
   const [activeTab, setActiveTab] = useState<string>("historique")
+
+  // Calculate date range for the selected month, only if a specific month is selected
+  const dateRange = useMemo(() => {
+    if (month === 'all') {
+      return {}; // Return empty object for no filtering
+    }
+    
+    // Parse the selected month string back to a Date
+    const selectedDate = parse(month, 'MMMM yyyy', new Date(), { locale: fr })
+    
+    // Get the first and last day of the month
+    const firstDay = startOfMonth(selectedDate)
+    const lastDay = endOfMonth(selectedDate)
+    
+    return {
+      declaration_date_after: format(firstDay, 'yyyy-MM-dd'),
+      declaration_date_before: format(lastDay, 'yyyy-MM-dd')
+    }
+  }, [month])
+
+  // Fetch course declarations using React Query
+  const { data: declarations, isLoading, error } = useQuery({
+    queryKey: ['courseDeclarations', month],
+    queryFn: () => getTeacherCourseDeclarations(dateRange)
+  })
+  
+  // Calculate total hours from declarations
+  const totalHours = useMemo(() => {
+    // Check if declarations exists and is an array
+    if (!declarations || !Array.isArray(declarations)) return '0h00';
+    
+    const totalMinutes = declarations.reduce((acc, declaration) => {
+      return acc + (declaration.duration || 0);
+    }, 0);
+    
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    
+    return `${hours}h${minutes.toString().padStart(2, '0')}`;
+  }, [declarations])
   
   // Payment status badge styling
-  const getBadgeStyle = (status: Payment['status']): string => {
+  const getBadgeStyle = (status: 'Payé' | 'Validé' | 'En attente de validation'): string => {
     switch (status) {
       case 'Payé':
         return 'bg-green-100 text-green-800 hover:bg-green-100'
@@ -60,77 +104,6 @@ export default function PaymentsPage() {
         return 'bg-gray-100 text-gray-800 hover:bg-gray-100'
     }
   }
-  
-  // Course data
-  const payments: Payment[] = [
-    { 
-      date: '21/03/2025', 
-      student: 'TSALATSOUZY Yann (MATHEMATIQUES / PHYSIQUE-CHIMIE - 2NDE)', 
-      course: 'Vendredi 21/03/2025 - Durée : 3h00', 
-      hours: '3h00', 
-      status: 'En attente de validation'
-    },
-    { 
-      date: '19/03/2025', 
-      student: 'MBILA Darrell (PHYSIQUE-CHIMIE - 3EME)', 
-      course: 'Mercredi 19/03/2025 - Durée : 1h30', 
-      hours: '1h00', 
-      status: 'Validé',
-      hasInfo: true
-    },
-    { 
-      date: '15/03/2025', 
-      student: 'MARCHAL Nolan (MATHEMATIQUES / PHYSIQUE-CHIMIE - 4EME)', 
-      course: 'Vendredi 14/03/2025 - Durée : 2h00', 
-      hours: '2h00', 
-      status: 'Payé'
-    },
-    { 
-      date: '12/03/2025', 
-      student: 'MBILA Darrell (PHYSIQUE-CHIMIE - 3EME)', 
-      course: 'Mercredi 12/03/2025 - Durée : 1h00', 
-      hours: '1h00', 
-      status: 'Payé'
-    },
-    { 
-      date: '09/03/2025', 
-      student: 'MBILA Darrell (PHYSIQUE-CHIMIE - 3EME)', 
-      course: 'Samedi 08/03/2025 - Durée : 2h30', 
-      hours: '3h00', 
-      status: 'Payé',
-      hasInfo: true
-    },
-    { 
-      date: '07/03/2025', 
-      student: 'MARCHAL Nolan (MATHEMATIQUES / PHYSIQUE-CHIMIE - 4EME)', 
-      course: 'Vendredi 07/03/2025 - Durée : 1h30', 
-      hours: '1h00', 
-      status: 'Payé',
-      hasInfo: true
-    },
-    { 
-      date: '06/03/2025', 
-      student: 'TSALATSOUZY Yann (MATHEMATIQUES / PHYSIQUE-CHIMIE - 2NDE)', 
-      course: 'Jeudi 06/03/2025 - Durée : 2h00', 
-      hours: '2h00', 
-      status: 'Payé'
-    },
-    { 
-      date: '04/03/2025', 
-      student: 'TSALATSOUZY Yann (MATHEMATIQUES / PHYSIQUE-CHIMIE - 2NDE)', 
-      course: 'Mardi 04/03/2025 - Durée : 1h30', 
-      hours: '1h00', 
-      status: 'Payé',
-      hasInfo: true
-    },
-    { 
-      date: '03/03/2025', 
-      student: 'MBILA Darrell (PHYSIQUE-CHIMIE - 3EME)', 
-      course: 'Lundi 03/03/2025 - Durée : 2h00', 
-      hours: '2h00', 
-      status: 'Payé'
-    }
-  ]
 
   // Custom tab component that matches the design
   const TabItem = ({ id, icon, label }: { id: string; icon: React.ReactNode; label: string }) => {
@@ -151,6 +124,25 @@ export default function PaymentsPage() {
     );
   };
 
+  // Generate available months for selection
+  const getAvailableMonths = () => {
+    const months = [{ value: 'all', label: 'Toutes les périodes' }];
+    const currentDate = new Date();
+    
+    // Generate last 12 months
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(currentDate);
+      date.setMonth(currentDate.getMonth() - i);
+      const monthStr = format(date, 'MMMM yyyy', { locale: fr });
+      months.push({
+        value: monthStr,
+        label: monthStr.charAt(0).toUpperCase() + monthStr.slice(1)
+      });
+    }
+    
+    return months;
+  };
+
   // Render the active tab content
   const renderTabContent = () => {
     switch (activeTab) {
@@ -161,21 +153,27 @@ export default function PaymentsPage() {
             <div className="mb-6 max-w-xs">
               <Select value={month} onValueChange={setMonth}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue>
+                    {month === 'all' ? 'Toutes les périodes' : month.charAt(0).toUpperCase() + month.slice(1)}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Mars 2025">Mars 2025</SelectItem>
-                  <SelectItem value="Février 2025">Février 2025</SelectItem>
-                  <SelectItem value="Janvier 2025">Janvier 2025</SelectItem>
+                  {getAvailableMonths().map((monthOption) => (
+                    <SelectItem key={monthOption.value} value={monthOption.value}>
+                      {monthOption.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             
             {/* Summary card */}
-            {showSummary && (
+            {showSummary && declarations && Array.isArray(declarations) && declarations.length > 0 && (
               <Card className="mb-6 bg-blue-50 border-blue-200">
                 <CardContent className="p-4 flex justify-between items-center">
-                  <p className="text-blue-800">10 cours déclarés pour un total de 18h00</p>
+                  <p className="text-blue-800">
+                    {declarations.length} cours déclarés pour un total de {totalHours}
+                  </p>
                   <Button 
                     variant="ghost" 
                     size="icon" 
@@ -188,40 +186,91 @@ export default function PaymentsPage() {
               </Card>
             )}
             
+            {/* Loading state */}
+            {isLoading && (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+                <span className="ml-2 text-gray-600">Chargement des déclarations...</span>
+              </div>
+            )}
+
+            {/* Error state */}
+            {error && (
+              <Card className="mb-6 bg-red-50 border-red-200">
+                <CardContent className="p-4">
+                  <p className="text-red-800">
+                    Une erreur s&apos;est produite lors du chargement des déclarations.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+            
             {/* Payment table */}
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-1/8">Date déclaration</TableHead>
-                    <TableHead className="w-1/3">Élève</TableHead>
-                    <TableHead className="w-1/3">Cours</TableHead>
-                    <TableHead className="w-1/8">Heure</TableHead>
-                    <TableHead className="w-1/8">Statut</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {payments.map((payment, index) => (
-                    <TableRow key={index} className={index % 2 === 0 ? "bg-gray-50" : ""}>
-                      <TableCell className="py-3">{payment.date}</TableCell>
-                      <TableCell className="py-3">{payment.student}</TableCell>
-                      <TableCell className="py-3">{payment.course}</TableCell>
-                      <TableCell className="py-3 whitespace-nowrap">
-                        {payment.hours}
-                        {payment.hasInfo && (
-                          <AlertCircle className="h-4 w-4 text-blue-500 inline ml-1" />
-                        )}
-                      </TableCell>
-                      <TableCell className="py-3">
-                        <Badge className={getBadgeStyle(payment.status)}>
-                          {payment.status}
-                        </Badge>
-                      </TableCell>
+            {!isLoading && !error && declarations && (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-1/8">Date déclaration</TableHead>
+                      <TableHead className="w-1/3">Élève</TableHead>
+                      <TableHead className="w-1/3">Cours</TableHead>
+                      <TableHead className="w-1/8">Heure</TableHead>
+                      <TableHead className="w-1/8">Statut</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {Array.isArray(declarations) && declarations.length > 0 ? (
+                      declarations.map((declaration: CourseDeclarationType, index: number) => {
+                        const declarationDate = new Date(declaration.declaration_date);
+                        const formattedDate = format(declarationDate, 'dd/MM/yyyy');
+                        const formattedDay = format(declarationDate, 'EEEE dd/MM/yyyy', { locale: fr });
+                        
+                        const hours = Math.floor(declaration.duration / 60);
+                        const minutes = declaration.duration % 60;
+                        const formattedDuration = `${hours}h${minutes.toString().padStart(2, '0')}`;
+                        
+                        const enrollmentData = declaration.teacher_student_enrollment;
+                        const studentName = enrollmentData?.offer?.student?.first_name + ' ' + 
+                                           enrollmentData?.offer?.student?.last_name;
+                        const subjectName = enrollmentData?.offer?.subject?.name;
+                        const className = enrollmentData?.offer?.class_level?.name;
+                        
+                        const status = statusMap[declaration.status] || 'En attente de validation';
+                        
+                        return (
+                          <TableRow key={declaration.id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
+                            <TableCell className="py-3">{formattedDate}</TableCell>
+                            <TableCell className="py-3">
+                              {`${studentName || 'Étudiant'} (${subjectName || 'Matière'} - ${className || 'Classe'})`}
+                            </TableCell>
+                            <TableCell className="py-3">
+                              {`${formattedDay} - Durée : ${formattedDuration}`}
+                            </TableCell>
+                            <TableCell className="py-3 whitespace-nowrap">
+                              {formattedDuration}
+                              {declaration.status === 'ACCEPTED' && declaration.duration % 30 !== 0 && (
+                                <AlertCircle className="h-4 w-4 text-blue-500 inline ml-1" />
+                              )}
+                            </TableCell>
+                            <TableCell className="py-3">
+                              <Badge className={getBadgeStyle(status)}>
+                                {status}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                          Aucune déclaration de cours pour cette période
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </>
         );
       case 'reglements':
