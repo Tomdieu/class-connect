@@ -354,9 +354,9 @@ export declare interface CourseOfferingType {
 }
 
 export declare interface CourseOfferingCreateType {
-  student: string; // UUID
-  subject: number;
-  class_level: number;
+  student_id: string; // UUID
+  subject_id: number;
+  class_level_id: number;
   duration: number;
   frequency: number;
   start_date: string;
