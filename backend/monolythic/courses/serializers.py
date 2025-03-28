@@ -13,13 +13,14 @@ from .models import (
     VideoResource,
     RevisionResource,
     Topic,
-    UserAvailability, DailyTimeSlot,
+    UserAvailability,
+    DailyTimeSlot,
     CourseOffering,
     CourseOfferingAction,
     TeacherStudentEnrollment,
     CourseDeclaration,
     SchoolYear,
-    UserClass
+    UserClass,
     # Question, QuestionOption, QuizAttempt, QuestionResponse
 )
 from users.serializers import UserSerializer
@@ -27,20 +28,22 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class CourseCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseCategory
         fields = "__all__"
 
+
 class ClassSerializer(serializers.ModelSerializer):
     student_count = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Class
         fields = "__all__"
-    
+
     def get_student_count(self, obj):
-        school_year = self.context.get('school_year')
+        school_year = self.context.get("school_year")
         queryset = UserClass.objects.filter(class_level=obj)
         if school_year:
             queryset = queryset.filter(school_year=school_year)
@@ -80,7 +83,15 @@ class AbstractResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AbstractResource
-        fields = ["id", "topic", "title", "description", "created_at", "updated_at", "resource_type"]
+        fields = [
+            "id",
+            "topic",
+            "title",
+            "description",
+            "created_at",
+            "updated_at",
+            "resource_type",
+        ]
 
     def get_resource_type(self, obj):
         return obj.__class__.__name__
@@ -109,13 +120,14 @@ class AbstractResourceSerializer(serializers.ModelSerializer):
 #             "questions"
 #         ]
 
+
 class VideoResourceSerializer(AbstractResourceSerializer):
     video_url = serializers.SerializerMethodField()
 
     class Meta:
         model = VideoResource
         fields = AbstractResourceSerializer.Meta.fields + ["video_file", "video_url"]
-    
+
     def get_video_url(self, obj):
         return obj.get_video_url() if obj.video_file else None
 
@@ -132,7 +144,7 @@ class PDFResourceSerializer(AbstractResourceSerializer):
     class Meta:
         model = PDFResource
         fields = AbstractResourceSerializer.Meta.fields + ["pdf_file", "pdf_url"]
-    
+
     def get_pdf_url(self, obj):
         return obj.get_pdf_url() if obj.pdf_file else None
 
@@ -148,12 +160,12 @@ class ExerciseResourceSerializer(AbstractResourceSerializer):
             "exercise_file",
             "solution_file",
             "exercise_url",
-            "solution_url"
+            "solution_url",
         ]
-    
+
     def get_exercise_url(self, obj):
         return obj.get_exercise_url() if obj.exercise_file else None
-        
+
     def get_solution_url(self, obj):
         return obj.get_solution_url() if obj.solution_file else None
 
@@ -179,29 +191,28 @@ class PolymorphicResourceSerializer(serializers.ModelSerializer):
         return AbstractResourceSerializer(obj, context=self.context).data
 
 
-
 class DailyTimeSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyTimeSlot
-        fields = ['id', 'day', 'time_slot', 'is_available']
+        fields = ["id", "day", "time_slot", "is_available"]
+
 
 class DailyTimeSlotUpdateSerializer(serializers.ModelSerializer):
     slot_id = serializers.PrimaryKeyRelatedField(
-        queryset=DailyTimeSlot.objects.all(),
-        write_only=True,
-        source='id'
+        queryset=DailyTimeSlot.objects.all(), write_only=True, source="id"
     )
     is_available = serializers.BooleanField()
-    
+
     class Meta:
         model = DailyTimeSlot
-        fields = ['slot_id','is_available']
+        fields = ["slot_id", "is_available"]
 
 
 class UserAvailabilityCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAvailability
-        fields = ['is_available']
+        fields = ["is_available"]
+
 
 class UserAvailabilitySerializer(serializers.ModelSerializer):
     daily_slots = DailyTimeSlotSerializer(many=True, read_only=True)
@@ -209,78 +220,82 @@ class UserAvailabilitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserAvailability
-        fields = '__all__'
-        read_only_fields = ["user", "user_type", "created_at", 'last_updated']
+        fields = "__all__"
+        read_only_fields = ["user", "user_type", "created_at", "last_updated"]
+
 
 class CourseOfferingSerializer(serializers.ModelSerializer):
     student = UserSerializer(read_only=True)
     student_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-        source='student'
+        queryset=User.objects.all(), write_only=True, source="student"
     )
     subject = SubjectSerializer(read_only=True)
     subject_id = serializers.PrimaryKeyRelatedField(
-        queryset=Subject.objects.all(),
-        write_only=True,
-        source='subject'
+        queryset=Subject.objects.all(), write_only=True, source="subject"
     )
     class_level = ClassSerializer(read_only=True)
     class_level_id = serializers.PrimaryKeyRelatedField(
-        queryset=Class.objects.all(),
-        write_only=True,
-        source='class_level'
+        queryset=Class.objects.all(), write_only=True, source="class_level"
     )
+
     class Meta:
         model = CourseOffering
-        fields = '__all__'
+        fields = "__all__"
+
 
 class CourseOfferingActionSerializer(serializers.ModelSerializer):
     teacher = UserSerializer(read_only=True)
     offer = CourseOfferingSerializer(read_only=True)
     teacher_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-        source='teacher'
+        queryset=User.objects.all(), write_only=True, source="teacher"
     )
     offer_id = serializers.PrimaryKeyRelatedField(
-        queryset=CourseOffering.objects.all(),
-        write_only=True,
-        source='offer'
+        queryset=CourseOffering.objects.all(), write_only=True, source="offer"
     )
-    
+
     class Meta:
         model = CourseOfferingAction
-        fields = '__all__'
+        fields = "__all__"
+
 
 class SchoolYearSerializer(serializers.ModelSerializer):
-    is_active = serializers.BooleanField(read_only=True)  # Converted to read-only field from property
-    
+    is_active = serializers.BooleanField(
+        read_only=True
+    )  # Converted to read-only field from property
+
     class Meta:
         model = SchoolYear
-        fields = ['id','start_year','end_year','is_active','formatted_year']
+        fields = ["id", "start_year", "end_year", "is_active", "formatted_year"]
+
 
 class TeacherStudentEnrollmentSerializer(serializers.ModelSerializer):
     offer = CourseOfferingSerializer(read_only=True)
     offer_id = serializers.PrimaryKeyRelatedField(
-        queryset=CourseOffering.objects.all(),
-        write_only=True,
-        source='offer'
+        queryset=CourseOffering.objects.all(), write_only=True, source="offer"
     )
     teacher = UserSerializer(read_only=True)
     teacher_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-        source='teacher'
+        queryset=User.objects.all(), write_only=True, source="teacher"
     )
     school_year = SchoolYearSerializer(read_only=True)
 
     class Meta:
         model = TeacherStudentEnrollment
-        fields = ['id', 'teacher','teacher_id','status', 'offer', 'offer_id', 'created_at', 'has_class_end','school_year']
+        fields = [
+            "id",
+            "teacher",
+            "teacher_id",
+            "status",
+            "offer",
+            "offer_id",
+            "created_at",
+            "has_class_end",
+            "school_year",
+        ]
 
     def create(self, validated_data):
         return TeacherStudentEnrollment.objects.create(**validated_data)
+
 
 class EnhancedTeacherEnrollmentSerializer(TeacherStudentEnrollmentSerializer):
     subject = serializers.SerializerMethodField()
@@ -289,7 +304,11 @@ class EnhancedTeacherEnrollmentSerializer(TeacherStudentEnrollmentSerializer):
 
     class Meta(TeacherStudentEnrollmentSerializer.Meta):
         model = TeacherStudentEnrollment
-        fields = TeacherStudentEnrollmentSerializer.Meta.fields + ['subject', 'class_level', 'hourly_rate']
+        fields = TeacherStudentEnrollmentSerializer.Meta.fields + [
+            "subject",
+            "class_level",
+            "hourly_rate",
+        ]
 
     def get_subject(self, obj):
         return obj.offer.subject if obj.offer else None
@@ -300,39 +319,46 @@ class EnhancedTeacherEnrollmentSerializer(TeacherStudentEnrollmentSerializer):
     def get_hourly_rate(self, obj):
         return obj.offer.hourly_rate if obj.offer else None
 
+
 class CourseDeclarationSerializer(serializers.ModelSerializer):
     accepted_by = UserSerializer(read_only=True)
     accepted_by_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         write_only=True,
-        source='accepted_by'
+        source="accepted_by",
+        required=False,
     )
+    teacher_student_enrollment = TeacherStudentEnrollmentSerializer(read_only=True)
+    teacher_student_enrollment_id = serializers.PrimaryKeyRelatedField(
+        queryset=TeacherStudentEnrollment.objects.all(),
+        write_only=True,
+        source='teacher_student_enrollment',
+        required=True
+    )
+
     class Meta:
         model = CourseDeclaration
-        fields = '__all__'
+        fields = "__all__"
+
 
 class UserProgressSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-        source='user'
+        queryset=User.objects.all(), write_only=True, source="user"
     )
     topic = TopicSerializer(read_only=True)
     topic_id = serializers.PrimaryKeyRelatedField(
-        queryset=Topic.objects.all(),
-        write_only=True,
-        source='topic'
+        queryset=Topic.objects.all(), write_only=True, source="topic"
     )
     resource = PolymorphicResourceSerializer(read_only=True)
     resource_id = serializers.PrimaryKeyRelatedField(
-        queryset=AbstractResource.objects.all(),
-        write_only=True,
-        source='resource'
+        queryset=AbstractResource.objects.all(), write_only=True, source="resource"
     )
+
     class Meta:
         model = UserProgress
         fields = "__all__"
+
 
 # class QuizAttemptSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -346,11 +372,11 @@ class UserProgressSerializer(serializers.ModelSerializer):
 
 # class BulkQuestionSerializer(serializers.Serializer):
 #     questions = QuestionSerializer(many=True)
-    
+
 #     def create(self, validated_data):
 #         questions_data = validated_data.get('questions', [])
 #         questions = []
-        
+
 #         for question_data in questions_data:
 #             options_data = question_data.pop('options', [])
 #             question = Question.objects.create(
@@ -360,35 +386,37 @@ class UserProgressSerializer(serializers.ModelSerializer):
 #             for option_data in options_data:
 #                 QuestionOption.objects.create(question=question, **option_data)
 #             questions.append(question)
-            
+
 #         return questions
+
 
 class UserClassSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-        source='user'
+        queryset=User.objects.all(), write_only=True, source="user"
     )
     class_level = ClassSerializer(read_only=True)
     class_level_id = serializers.PrimaryKeyRelatedField(
-        queryset=Class.objects.all(),
-        write_only=True,
-        source='class_level'
+        queryset=Class.objects.all(), write_only=True, source="class_level"
     )
     school_year = SchoolYearSerializer(read_only=True)
     school_year_id = serializers.PrimaryKeyRelatedField(
         queryset=SchoolYear.objects.all(),
         write_only=True,
-        source='school_year',
-        required=False
+        source="school_year",
+        required=False,
     )
-    
+
     class Meta:
         model = UserClass
         fields = [
-            'id', 'user', 'user_id', 
-            'class_level', 'class_level_id', 
-            'school_year', 'school_year_id', 
-            'created_at', 'updated_at'
+            "id",
+            "user",
+            "user_id",
+            "class_level",
+            "class_level_id",
+            "school_year",
+            "school_year_id",
+            "created_at",
+            "updated_at",
         ]
