@@ -49,7 +49,7 @@ function Header({ className }: { className?: string }) {
 
   return (
     <header className={cn("w-full", className)}>
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
+      <div className="px-2 sm:container mx-auto flex items-center justify-between h-16 sm:px-4">
         <Link
           href="/"
           className="flex items-center gap-2 text-default transition-colors hover:opacity-90"
