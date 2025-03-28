@@ -526,11 +526,13 @@ class CourseDeclaration(models.Model):
     PENDING = 'PENDING'
     ACCEPTED = 'ACCEPTED'
     REJECTED = 'REJECTED'
+    PAID = 'PAID'
 
     ACTIONS = (
         (PENDING,'Pending'),
         (ACCEPTED, 'Accepted'),
-        (REJECTED, 'Rejected')
+        (REJECTED, 'Rejected'),
+        (PAID,'Paid')
     )
 
     teacher_student_enrollment = models.ForeignKey(TeacherStudentEnrollment, on_delete=models.CASCADE, related_name='declarations')
