@@ -729,6 +729,59 @@ class CourseDeclarationViewSet(viewsets.ModelViewSet):
             return Response({'status': 'updated'})
         return Response({'error': 'Invalid status'}, status=400)
 
+class CourseDeclarationDirectViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for directly accessing course declarations with filtering by user ID.
+    This allows retrieving all declarations made by a professional user.
+    """
+    permission_classes = [IsAuthenticated]
+    # pagination_class = CustomPagination
+    queryset = CourseDeclaration.objects.all()
+    serializer_class = CourseDeclarationSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CourseDeclarationFilter
+    
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('user_id', openapi.IN_QUERY, 
+                             description="Teacher's user ID to filter declarations", 
+                             type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('status', openapi.IN_QUERY, 
+                             description="Filter by declaration status", 
+                             type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('declaration_date_after', openapi.IN_QUERY, 
+                             description="Filter by declarations after this date (YYYY-MM-DD)", 
+                             type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('declaration_date_before', openapi.IN_QUERY, 
+                             description="Filter by declarations before this date (YYYY-MM-DD)", 
+                             type=openapi.TYPE_STRING, required=False),
+        ],
+        responses={200: CourseDeclarationSerializer(many=True)}
+    )
+    def list(self, request, *args, **kwargs):
+        """
+        Get course declarations with optional filtering by user ID
+        """
+        return super().list(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        """
+        Ensure user can only see their own declarations if not staff
+        """
+        queryset = super().get_queryset()
+        user = self.request.user
+        
+        # Staff can see all declarations
+        if user.is_staff or user.is_superuser:
+            return queryset
+            
+        # Otherwise, users can only see their own declarations
+        if user.education_level == 'PROFESSIONAL':
+            return queryset.filter(teacher_student_enrollment__teacher=user)
+        else:
+            # Students can see declarations made for them
+            return queryset.filter(teacher_student_enrollment__offer__student=user)
+
 class VideoResourceViewSet(viewsets.ModelViewSet):
     """
     API endpoint for managing video resources.
