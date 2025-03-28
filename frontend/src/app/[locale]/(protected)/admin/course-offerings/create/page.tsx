@@ -69,16 +69,17 @@ export default function CreateCourseOfferPage() {
   const [open, setOpen] = useState<boolean>(false);
   const [subjectOpen, setSubjectOpen] = useState<boolean>(false);
   const [studentOpen, setStudentOpen] = useState<boolean>(false);
+  const [dateOpen, setDateOpen] = useState<boolean>(false); // New state for date popover
 
   // Create the form schema
   const formSchema = z.object({
-    student: z.string({
+    student_id: z.string({
       required_error: "Please select a student",
     }),
-    subject: z.number({
+    subject_id: z.number({
       required_error: "Please select a subject",
     }),
-    class_level: z.number({
+    class_level_id: z.number({
       required_error: "Please select a class level",
     }),
     duration: z.coerce.number({
@@ -131,18 +132,18 @@ export default function CreateCourseOfferPage() {
 
   // Query for fetching subjects based on selected class
   const { data: subjects, isLoading: subjectsLoading } = useQuery({
-    queryKey: ["subjects", form.watch("class_level")],
+    queryKey: ["subjects", form.watch("class_level_id")],
     queryFn: () => listSubjects({ 
-      class_pk: form.watch("class_level").toString(), 
+      class_pk: form.watch("class_level_id").toString(), 
       params: {} 
     }),
-    enabled: !!form.watch("class_level"),
+    enabled: !!form.watch("class_level_id"),
   });
 
   // Effect to update form when class is selected
   useEffect(() => {
     if (selectedClass) {
-      form.setValue("class_level", selectedClass.id);
+      form.setValue("class_level_id", selectedClass.id);
     }
   }, [selectedClass, form]);
 
@@ -151,7 +152,7 @@ export default function CreateCourseOfferPage() {
     mutationFn: (values: CourseOfferingCreateType) => createCourseOffering(values),
     onSuccess: () => {
       toast.success("Course offering created successfully");
-      router.push("/dashboard/course-offering");
+      router.push("/admin/course-offerings");
     },
     onError: (error: Error | AxiosError) => {
       console.error("Error creating course offering:", error);
@@ -226,7 +227,7 @@ export default function CreateCourseOfferPage() {
                 {/* Class Level Selection - Updated with grouping */}
                 <FormField
                   control={form.control}
-                  name="class_level"
+                  name="class_level_id"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>{t("courseOfferings.create.classLevel")}</FormLabel>
@@ -297,7 +298,7 @@ export default function CreateCourseOfferPage() {
                 {/* Subject Selection - Updated to close popover when selecting */}
                 <FormField
                   control={form.control}
-                  name="subject"
+                  name="subject_id"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>{t("courseOfferings.create.subject")}</FormLabel>
@@ -337,7 +338,7 @@ export default function CreateCourseOfferPage() {
                                       key={subject.id}
                                       value={subject.name}
                                       onSelect={() => {
-                                        form.setValue("subject", subject.id);
+                                        form.setValue("subject_id", subject.id);
                                         setSubjectOpen(false); // Close the popover when a subject is selected
                                       }}
                                     >
@@ -360,7 +361,7 @@ export default function CreateCourseOfferPage() {
                 {/* Student Selection - Updated to close popover when selecting */}
                 <FormField
                   control={form.control}
-                  name="student"
+                  name="student_id"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>{t("courseOfferings.create.student")}</FormLabel>
@@ -399,7 +400,7 @@ export default function CreateCourseOfferPage() {
                                       key={student.id}
                                       value={`${student.first_name} ${student.last_name} ${student.email}`}
                                       onSelect={() => {
-                                        form.setValue("student", student.id);
+                                        form.setValue("student_id", student.id);
                                         setStudentOpen(false); // Close the popover when a student is selected
                                       }}
                                     >
@@ -426,7 +427,7 @@ export default function CreateCourseOfferPage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>{t("courseOfferings.create.startDate")}</FormLabel>
-                      <Popover>
+                      <Popover open={dateOpen} onOpenChange={setDateOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
@@ -449,7 +450,10 @@ export default function CreateCourseOfferPage() {
                           <Calendar
                             mode="single"
                             selected={field.value}
-                            onSelect={field.onChange}
+                            onSelect={(date) => {
+                              field.onChange(date);
+                              setDateOpen(false); // Close popover after selecting a date
+                            }}
                             disabled={(date) =>
                               date < new Date(new Date().setHours(0, 0, 0, 0))
                             }
