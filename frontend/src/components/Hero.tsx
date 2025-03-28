@@ -30,7 +30,7 @@ function Hero() {
           {/* Left side - Text content */}
           <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left gap-8">
             <div className="space-y-6">
-              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-5xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
                 {t("hero.title")}
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed max-w-2xl">
