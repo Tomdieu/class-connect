@@ -88,7 +88,7 @@ export const SubscriptionPlans = () => {
         t("subscriptionPlans.basic.features.2"),
       ],
       // Use fetched price if available, otherwise fall back to default
-      price: planData.basic ? planData.basic.price.toLocaleString() : "5,000",
+      price: planData.basic ? Math.floor(planData.basic.price).toLocaleString() : "5,000",
       period: "month",
       gradient: "from-blue-50 to-blue-100/50",
       popular: false,
@@ -104,7 +104,7 @@ export const SubscriptionPlans = () => {
         t("subscriptionPlans.standard.features.3"),
       ],
       // Use fetched price if available, otherwise fall back to default
-      price: planData.standard ? planData.standard.price.toLocaleString() : "10,000",
+      price: planData.standard ? Math.floor(planData.standard.price).toLocaleString() : "10,000",
       period: "month",
       gradient: "from-blue-100 to-blue-200/50",
       popular: true,
@@ -121,7 +121,7 @@ export const SubscriptionPlans = () => {
         t("subscriptionPlans.premium.features.4"),
       ],
       // Use fetched price if available, otherwise fall back to default
-      price: planData.premium ? planData.premium.price.toLocaleString() : "15,000",
+      price: planData.premium ? Math.floor(planData.premium.price).toLocaleString() : "15,000",
       period: "month",
       gradient: "from-blue-200 to-blue-300/50",
       popular: false,
