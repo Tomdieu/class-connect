@@ -9,6 +9,7 @@ from .views import (
     CourseOfferingActionViewSet,
     TeacherStudentEnrollmentViewSet,
     CourseDeclarationViewSet,
+    CourseDeclarationDirectViewSet,  # Add the new viewset import
     # QuizResourceViewSet, QuestionViewSet, QuestionOptionViewSet,
     # QuizAttemptViewSet, QuestionResponseViewSet,
     VideoResourceViewSet, RevisionResourceViewSet, PDFResourceViewSet, ExerciseResourceViewSet,
@@ -26,6 +27,7 @@ router.register(r'school-year', SchoolYearViewSet)
 router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
 router.register(r'user-classes', UserClassViewSet)  # Add the new viewset
 router.register(r'resources', DirectResourceViewSet)  # Add direct resource access
+router.register(r'course-declarations', CourseDeclarationDirectViewSet)  # Add the new route
 
 # Create nested routers
 class_router = routers.NestedDefaultRouter(router, r'classes', lookup='class')
