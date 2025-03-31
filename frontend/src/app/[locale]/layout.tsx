@@ -198,7 +198,7 @@ export async function generateMetadata({
         fr: "/fr",
         en: "/en",
       },
-      canonical: `/${locale}`,
+      // canonical: `/${locale}`,
     },
     icons: {
       icon: [
