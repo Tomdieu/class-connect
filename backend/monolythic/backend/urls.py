@@ -30,6 +30,8 @@ urlpatterns = [
         path('',include('payments.urls')),
         path('',include('notifications.urls')),
         path('',include('streamings.urls')),
+        path('',include('forum.urls')),
+        
         
         # Updated OAuth2 configuration with explicit namespace and application name
         re_path(r'^auth/', include(('drf_social_oauth2.urls', 'drf_social_oauth2'), namespace='drf')),
