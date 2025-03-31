@@ -12,6 +12,7 @@ class Forum(models.Model):
         return self.name
 
 class Messages(models.Model):
+    parent = models.ForeignKey('self',on_delete=models.CASCADE,related_name='replies',null=True,blank=True)
     forum  = models.ForeignKey(Forum,on_delete=models.CASCADE,related_name='messages')
     sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name='messages')
     content = models.TextField()
