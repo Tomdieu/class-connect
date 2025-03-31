@@ -11,6 +11,13 @@ class ForumSerializer(serializers.ModelSerializer):
         model = Forum
         fields = ["id", "name", "created_at"]
 
+class MessageNestedSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Messages
+        fields = ["id", "sender","file", "content", "created_at"]
+
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
@@ -20,6 +27,9 @@ class MessageSerializer(serializers.ModelSerializer):
         queryset=Messages.objects.all(),
         source="parent",
         write_only=True,
+        required=False,
+        allow_null=True,
+        help_text="ID of the parent message if this is a reply."
     )
     replies = serializers.SerializerMethodField()
 
@@ -57,7 +67,7 @@ class MessageSerializer(serializers.ModelSerializer):
     
     def get_replies(self, obj):
         replies = obj.replies.all()
-        return MessageSerializer(replies, many=True).data
+        return MessageNestedSerializer(replies, many=True).data
 
 
 class SeenSerializer(serializers.ModelSerializer):
