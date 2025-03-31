@@ -1,218 +1,218 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { ChatWebSocketService, WebSocketMessage, getChatWebSocketService } from "@/services/websocket";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { ForumType, MessagesType, MessageCreateType } from "@/types";
 import { useSession } from "next-auth/react";
+import { 
+  listForums, 
+  listForumMessages, 
+  createForumMessage, 
+  markMessageSeenByUser,
+  getPublicChat
+} from "@/actions/forum";
+import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// Types based on your Django models
-export interface Forum {
-  id: number;
-  name: string;
-}
-
-export interface User {
-  id: string;
-  first_name: string;
-  last_name: string;
-  profile_picture: string | null;
-}
-
-export interface Message {
-  id: number;
-  forum_id: number;
-  sender_id: string;
-  content: string;
-  file?: string | null;
-  created_at: string;
-  seen_by: string[]; // Array of user IDs who've seen the message
-}
+export type Forum = ForumType;
 
 interface ChatContextType {
   forums: Forum[];
+  publicChat: Forum | null;
   currentForum: Forum | null;
-  messages: Message[];
-  isLoading: boolean;
-  error: string | null;
-  setCurrentForum: (forum: Forum) => void;
-  sendMessage: (content: string, file?: File) => void;
-  markAsSeen: (messageId: number) => void;
+  setCurrentForum: (forum: Forum | null) => void;
+  messages: MessagesType[];
   isConnected: boolean;
+  isLoadingForums: boolean;
+  isLoadingMessages: boolean;
+  sendMessage: (data: MessageCreateType) => void;
+  markAsSeen: (messageId: string) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
-export function ChatProvider({ children }: { children: ReactNode }) {
+export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: session } = useSession();
-  const [websocketService, setWebsocketService] = useState<ChatWebSocketService | null>(null);
-  const [forums, setForums] = useState<Forum[]>([]);
+  const queryClient = useQueryClient();
   const [currentForum, setCurrentForum] = useState<Forum | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [processedMessageIds] = useState<Set<string>>(new Set());
+  
+  // Query for forums
+  const { 
+    data: forums = [], 
+    isLoading: isLoadingForums,
+    isError: isForumsError,
+    error: forumsError
+  } = useQuery({
+    queryKey: ['forums'],
+    queryFn: listForums,
+    enabled: !!session?.user
+  });
 
-  // Initialize WebSocket service
+  // Query for public chat
+  const {
+    data: publicChats = [],
+    isError: isPublicChatError,
+    error: publicChatError
+  } = useQuery({
+    queryKey: ['publicChat'],
+    queryFn: getPublicChat,
+    enabled: !!session?.user
+  });
+
+  const publicChat = publicChats.length > 0 ? publicChats[0] : null;
+
+  // Query for messages based on current forum
+  const {
+    data: currentForumMessages = [],
+    isLoading: isLoadingCurrentMessages,
+    isError: isCurrentMessagesError,
+    error: currentMessagesError
+  } = useQuery({
+    queryKey: ['messages', currentForum?.id],
+    queryFn: () => currentForum ? listForumMessages(currentForum.id) : Promise.resolve([]),
+    enabled: !!currentForum && !!session?.user,
+    refetchInterval: 5000 // Poll every 5 seconds
+  });
+
+  // Query for public chat messages
+  const {
+    data: publicMessages = [],
+    isLoading: isLoadingPublicMessages,
+    isError: isPublicMessagesError,
+    error: publicMessagesError
+  } = useQuery({
+    queryKey: ['messages', publicChat?.id],
+    queryFn: () => publicChat ? listForumMessages(publicChat.id) : Promise.resolve([]),
+    enabled: !!publicChat && !!session?.user && publicChat?.id !== currentForum?.id,
+    refetchInterval: 5000 // Poll every 5 seconds
+  });
+
+  // Handle errors with useEffect
   useEffect(() => {
-    if (!session?.user) return;
+    if (isForumsError && forumsError) {
+      toast.error("Failed to load forums", {
+        description: "Please try again later."
+      });
+      console.error("Forums error:", forumsError);
+    }
+    
+    if (isPublicChatError && publicChatError) {
+      toast.error("Failed to load public chat", {
+        description: "Please try again later."
+      });
+      console.error("Public chat error:", publicChatError);
+    }
+    
+    if (isCurrentMessagesError && currentMessagesError) {
+      toast.error("Failed to load messages", {
+        description: "Please try again later."
+      });
+      console.error("Current forum messages error:", currentMessagesError);
+    }
+    
+    if (isPublicMessagesError && publicMessagesError) {
+      toast.error("Failed to load public chat messages", {
+        description: "Please try again later."
+      });
+      console.error("Public messages error:", publicMessagesError);
+    }
+  }, [
+    isForumsError, forumsError, 
+    isPublicChatError, publicChatError,
+    isCurrentMessagesError, currentMessagesError,
+    isPublicMessagesError, publicMessagesError
+  ]);
 
-    const getToken = () => session.user.accessToken as string;
-    const service = getChatWebSocketService(
-      process.env.NEXT_PUBLIC_WEBSOCKET_URL || "wss://your-django-backend.com", 
-      getToken
-    );
+  // Combine messages and ensure no duplicates
+  const allMessages = [...currentForumMessages, ...publicMessages];
+  const messageMap = new Map();
+  allMessages.forEach(msg => messageMap.set(msg.id, msg));
+  const messages = Array.from(messageMap.values());
+  
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: ({ forumId, data }: { forumId: string | number, data: MessageCreateType }) => 
+      createForumMessage(forumId, data),
+    onSuccess: (newMessage) => {
+      queryClient.invalidateQueries({ queryKey: ['messages', newMessage.forum] });
+      toast.success("Message sent successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to send message:", error);
+      toast.error("Failed to send message", {
+        description: "Please try again."
+      });
+    }
+  });
 
-    setWebsocketService(service);
+  // Mark message as seen mutation
+  const markAsSeenMutation = useMutation({
+    mutationFn: ({ forumId, messageId }: { forumId: string, messageId: string }) => 
+      markMessageSeenByUser(forumId, messageId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['messages', variables.forumId] });
+    },
+    onError: () => {
+      // Silent failure for marking messages as seen
+      console.error("Failed to mark message as seen");
+    }
+  });
 
-    // Cleanup
-    return () => {
-      service.disconnect();
-    };
-  }, [session]);
-
-  // Load forums
+  // Set initial current forum if needed
   useEffect(() => {
-    if (!session?.user) return;
+    if (!currentForum && forums.length > 0) {
+      setCurrentForum(forums[0]);
+    }
+  }, [forums, currentForum]);
 
-    const fetchForums = async () => {
-      setIsLoading(true);
-      try {
-        // Replace with your API call
-        const response = await fetch('/api/forums', {
-          headers: {
-            'Authorization': `Bearer ${session.user.accessToken}`
-          }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch forums');
-        
-        const data = await response.json();
-        setForums(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchForums();
-  }, [session]);
-
-  // Connect to WebSocket when forum changes
-  useEffect(() => {
-    if (!websocketService || !currentForum) return;
-
-    websocketService.connect(currentForum.id);
-    setIsConnected(websocketService.isConnected);
-
-    // Load historical messages
-    const fetchMessages = async () => {
-      setIsLoading(true);
-      try {
-        // Replace with your API call
-        const response = await fetch(`/api/forums/${currentForum.id}/messages`, {
-          headers: {
-            'Authorization': `Bearer ${session?.user?.accessToken}`
-          }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch messages');
-        
-        const data = await response.json();
-        setMessages(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMessages();
-
-    // Handle incoming WebSocket messages
-    const unsubscribe = websocketService.onMessage((message: WebSocketMessage) => {
-      switch (message.type) {
-        case 'message':
-          setMessages(prev => [...prev, message.payload]);
-          break;
-        case 'seen':
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === message.payload.message_id 
-                ? { ...msg, seen_by: [...msg.seen_by, message.payload.user_id] } 
-                : msg
-            )
-          );
-          break;
-        case 'error':
-          setError(message.payload.message);
-          break;
-      }
+  const sendMessage = async (data: MessageCreateType) => {
+    if (!currentForum || !session?.user) return;
+    
+    sendMessageMutation.mutate({ 
+      forumId: currentForum.id, 
+      data
     });
-
-    // Check connection status periodically
-    const connectionCheckInterval = setInterval(() => {
-      setIsConnected(websocketService.isConnected);
-    }, 5000);
-
-    // Cleanup
-    return () => {
-      unsubscribe();
-      clearInterval(connectionCheckInterval);
-      websocketService.disconnect();
-    };
-  }, [currentForum, websocketService, session]);
-
-  const sendMessageHandler = (content: string, file?: File) => {
-    if (!websocketService || !currentForum) return;
-    
-    websocketService.sendMessage(content, file);
-    
-    // Optimistically add message to UI
-    const tempId = Date.now();
-    const newMessage: Message = {
-      id: tempId,
-      forum_id: currentForum.id,
-      sender_id: session?.user?.id || '',
-      content,
-      created_at: new Date().toISOString(),
-      seen_by: [session?.user?.id || ''],
-    };
-    
-    setMessages(prev => [...prev, newMessage]);
   };
 
-  const markAsSeenHandler = (messageId: number) => {
-    if (!websocketService) return;
-    websocketService.sendSeen(messageId);
-  };
-
-  const selectForumHandler = (forum: Forum) => {
-    setCurrentForum(forum);
-  };
+  // Memoize markAsSeen to prevent recreating it on every render
+  const markAsSeen = useCallback((messageId: string) => {
+    if (!currentForum || !session?.user) return;
+    
+    // Don't mark messages as seen if we've already processed this message
+    if (processedMessageIds.has(messageId)) return;
+    
+    processedMessageIds.add(messageId);
+    
+    markAsSeenMutation.mutate({
+      forumId: currentForum.id,
+      messageId
+    });
+  }, [currentForum, session?.user, processedMessageIds, markAsSeenMutation]);
 
   return (
     <ChatContext.Provider
       value={{
         forums,
+        publicChat,
         currentForum,
+        setCurrentForum,
         messages,
-        isLoading,
-        error,
-        setCurrentForum: selectForumHandler,
-        sendMessage: sendMessageHandler,
-        markAsSeen: markAsSeenHandler,
-        isConnected,
+        isConnected: !isLoadingForums && !isLoadingCurrentMessages && !isLoadingPublicMessages,
+        isLoadingForums,
+        isLoadingMessages: isLoadingCurrentMessages || isLoadingPublicMessages,
+        sendMessage,
+        markAsSeen,
       }}
     >
       {children}
     </ChatContext.Provider>
   );
-}
+};
 
-export function useChat() {
+export const useChat = () => {
   const context = useContext(ChatContext);
   if (context === undefined) {
-    throw new Error('useChat must be used within a ChatProvider');
+    throw new Error("useChat must be used within a ChatProvider");
   }
   return context;
-}
+};
