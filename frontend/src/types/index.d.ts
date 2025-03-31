@@ -665,3 +665,38 @@ export declare interface UserStats {
   total_admins: number;
   total_users: number;
 }
+
+
+export declare interface ForumType {
+  id:string;
+  name:string;
+  created_at:string;
+}
+
+export declare interface ForumCreateType {
+  name:string;
+}
+export declare interface MessagesType{
+  id:string;
+  forum:number|string;
+  sender:UserType;
+  sender_id:string;
+  content: string;
+  file?:string;
+  created_at:string;
+  seen_by:string[];
+  reply_to?: string;  // ID of the message being replied to
+  replies?: string[];  // IDs of messages that reply to this message
+}
+
+export declare interface MessageCreateType{
+  content: string;
+  file?:File;
+}
+
+export declare interface SeenType{
+  id:string;
+  message:string;
+  user:UserType;
+  created_at:string;
+}
