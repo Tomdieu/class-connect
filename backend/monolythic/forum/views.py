@@ -84,10 +84,54 @@ class MessageDetailAPIView(APIView):
         serializer = MessageSerializer(message)
         return Response(serializer.data)
     
+    def patch(self, request, forum_id, message_id):
+        """Update a specific message partially"""
+        forum = get_object_or_404(Forum, id=forum_id)
+        message = get_object_or_404(Messages, id=message_id, forum=forum)
+        
+        # Check if user is the message sender
+        if message.sender != request.user:
+            return Response(
+                {"detail": "You don't have permission to edit this message."}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = MessageSerializer(message, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, forum_id, message_id):
+        """Update a specific message completely"""
+        forum = get_object_or_404(Forum, id=forum_id)
+        message = get_object_or_404(Messages, id=message_id, forum=forum)
+        
+        # Check if user is the message sender
+        if message.sender != request.user:
+            return Response(
+                {"detail": "You don't have permission to edit this message."}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = MessageSerializer(message, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     def delete(self, request, forum_id, message_id):
         """Delete a specific message"""
         forum = get_object_or_404(Forum, id=forum_id)
         message = get_object_or_404(Messages, id=message_id, forum=forum)
+        
+        # Check if user is the message sender
+        if message.sender != request.user:
+            return Response(
+                {"detail": "You don't have permission to delete this message."}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
         message.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
