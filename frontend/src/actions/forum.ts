@@ -160,8 +160,15 @@ export const createForumMessage = async (
     const form = new FormData();
     form.append("forum", forumId.toString());
     form.append("content", data.content);
-    if(data.parent){
-      form.append("parent_id",data.parent.toString())
+    
+    // Check if this message is a reply to another message
+    if (data.parent) {
+      // Make sure we're sending the correct parent ID
+      // If parent is an object, extract its ID, otherwise use the value directly
+      const parentId = typeof data.parent === 'object' && data.parent !== null 
+                      ? data.parent.id.toString() 
+                      : data.parent.toString();
+      form.append("parent_id", parentId);
     }
 
     if (data.file) {
@@ -222,9 +229,15 @@ export const updateForumMessage = async (
     form.append("forum", forumId);
     form.append("content", data.content);
     
-    if(data.parent){
-      form.append("parent_id",data.parent.toString())
+    // Similar improvement for handling parent ID in updates
+    if (data.parent) {
+      // Make sure we're sending the correct parent ID
+      const parentId = typeof data.parent === 'object' && data.parent !== null 
+                      ? data.parent.id.toString() 
+                      : data.parent.toString();
+      form.append("parent_id", parentId);
     }
+    
     if (data.file) {
       form.append("file", data.file);
     }
