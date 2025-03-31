@@ -41,6 +41,7 @@ from django.db.models.functions import ExtractMonth
 from django.db.models import Count
 from datetime import datetime,timedelta
 import logging
+from utils.mixins import ActivityLoggingMixin
 
 from django.db.models import Sum, F,Q
 from payments.models import Subscription
@@ -48,7 +49,7 @@ from payments.models import Subscription
 logger = logging.getLogger(__name__)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(ActivityLoggingMixin,viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filterset_class = UserFilter
@@ -69,27 +70,38 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(tags=["Users"])
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        # return super().create(request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
+        self.log_activity(self.request,"Created a new user", {"email": request.data.get("email")})
+        return response
 
     @swagger_auto_schema(tags=["Users"])
     def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
+        self.log_activity(self.request,"Updated user details", {"user_id": kwargs.get("pk")})
+        return response
 
     @swagger_auto_schema(tags=["Users"])
     def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
+        response = super().partial_update(request, *args, **kwargs)
+        self.log_activity(self.request,"Partially updated user", {"user_id": kwargs.get("pk")})
+        return response
 
     @swagger_auto_schema(tags=["Users"])
     def destroy(self, request, *args, **kwargs):
+        user_id = kwargs.get("pk")
+        self.log_activity(self.request,"Deleted a user", {"user_id": user_id})
         return super().destroy(request, *args, **kwargs)
     
     # With cookie: cache requested url for each user for 2 hours
     @swagger_auto_schema(tags=["Users"])
     def list(self, request, *args, **kwargs):
+        self.log_activity(self.request,"Viewed list of users")   
         return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=["Users"])
     def retrieve(self, request, *args, **kwargs):
+        self.log_activity(self.request,"Viewed user details", {"user_id": kwargs.get("pk")})
         return super().retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -105,18 +117,20 @@ class UserViewSet(viewsets.ModelViewSet):
             )
         },
     )
-    @action(detail=True, methods=["post"],url_path='change-password')
+    @action(detail=True, methods=["post"], url_path='change-password')
     def change_password(self, request, pk=None):
         user = self.get_object()
         serializer = ChangePasswordSerializer(data=request.data)
         if serializer.is_valid():
             if not user.check_password(serializer.data.get("current_password")):
+                self.log_activity(self.request,"Failed password change attempt", {"user_id": pk})
                 return Response(
                     {"current_password": ["Wrong password."]},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             user.set_password(serializer.data.get("new_password"))
             user.save()
+            self.log_activity(self.request,"Changed password", {"user_id": pk})
             return Response({"status": "password set"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -133,6 +147,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def info(self, request):
         user = request.user
         serializer = UserSerializer(user, context={"request": request})
+        self.log_activity(self.request,"Viewed user information", {"user_id": str(user.id)})
         return Response(serializer.data)
 
     @swagger_auto_schema(
@@ -174,11 +189,12 @@ class UserViewSet(viewsets.ModelViewSet):
             'total_admins': total_admins,
             'total_users': total_users,
         }
-        
+        self.log_activity(self.request,"Retrieved user statistics")
         return Response(data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
         user = serializer.save()
+        self.log_activity(self.request,"Created a new user account", {"user_id": str(user.id), "email": user.email})
 
         # Email verification is wrapped in try-except and won't break user creation
         try:
@@ -207,13 +223,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         user = serializer.save()
+        self.log_activity(self.request,"Updated user account details", {"user_id": str(user.id)})
 
     def perform_destroy(self, instance):
         user_id = instance.id
+        self.log_activity(self.request,"Deleted a user account", {"user_id": str(user_id)})
         instance.delete()
 
 
-class VerifyEmailView(APIView):
+class VerifyEmailView(ActivityLoggingMixin,APIView):
     permission_classes = [AllowAny]
     swagger_tags = ["Email Verification"]
 
@@ -262,6 +280,8 @@ class VerifyEmailView(APIView):
             user.email_verified = True
             user.save()
 
+            self.log_activity(request,"Verify email",{'user_id':str(user.id)})
+
             return Response(
                 {"message": "Email verified successfully"}, status=status.HTTP_200_OK
             )
@@ -272,7 +292,7 @@ class VerifyEmailView(APIView):
             )
 
 
-class PasswordResetView(generics.CreateAPIView):
+class PasswordResetView(ActivityLoggingMixin,generics.CreateAPIView):
     serializer_class = PasswordResetSerializer
     permission_classes = [AllowAny]
     swagger_tags = ["Password Reset"]
@@ -359,6 +379,8 @@ class PasswordResetView(generics.CreateAPIView):
         except Exception as e:
             # Just log the error and continue - don't let email issues affect password reset
             logger.error(f"Error queuing password reset email: {str(e)}")
+
+        self.log_activity(request, "Demande de réinitialisation du mot de passe")
 
         return Response(
             {
@@ -452,7 +474,7 @@ class VerifyCodeView(APIView):
         return Response({"exists": exists})
 
 
-class VerifyPasswordView(generics.CreateAPIView):
+class VerifyPasswordView(ActivityLoggingMixin,generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     swagger_tags = ["Password Verification"]
 
@@ -476,6 +498,8 @@ class VerifyPasswordView(generics.CreateAPIView):
         password = request.data.get("password")
         user = request.user
         valid = False
+
+        self.log_activity(request,"Verifying password",{'user_id':str(user.id)})
 
         if check_password(password, user.password):
             valid = True

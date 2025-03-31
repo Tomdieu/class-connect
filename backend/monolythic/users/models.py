@@ -418,3 +418,17 @@ class UserActiveToken(models.Model):
 
     def __str__(self):
         return f"{self.user.email}'s active token on {self.device_name}"
+
+class UserActivityLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    action = models.TextField()  # What the user did
+    ip_address = models.GenericIPAddressField(null=True, blank=True)  # User's IP address
+    user_agent = models.TextField(null=True, blank=True)  # Browser & device info
+    request_method = models.CharField(max_length=10, null=True, blank=True)  # GET, POST, etc.
+    request_path = models.TextField(null=True, blank=True)  # Which page/API was accessed
+    referrer = models.TextField(null=True, blank=True)  # Where the user came from
+    extra_data = models.JSONField(null=True, blank=True)  # Any additional metadata
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.action} - {self.timestamp}"

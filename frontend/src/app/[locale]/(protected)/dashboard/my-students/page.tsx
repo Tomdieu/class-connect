@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ChevronDown, X } from "lucide-react";
-import { listSchoolYear, getMyStudents, createEnrollmentDeclaration } from "@/actions/enrollments";
-import { SchoolYearType, TeacherStudentEnrollmentType } from "@/types";
+import { ChevronDown, X, ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { listSchoolYear, getMyStudents, createEnrollmentDeclaration, listEnrollmentDeclarations } from "@/actions/enrollments";
+import { SchoolYearType, TeacherStudentEnrollmentType, CourseDeclarationType, PaginationType, ActionStatus } from "@/types";
 import {
   Select,
   SelectContent,
@@ -29,6 +29,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { useI18n } from "@/locales/client";
+import { format } from "date-fns";
+import { enUS, fr } from 'date-fns/locale';
 
 // Helper function to determine current school year
 const getCurrentSchoolYear = (): string => {
@@ -95,9 +97,82 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Cours");
   const t = useI18n();
+  const locale = t === useI18n() ? enUS : fr;
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    startDate: "",
+    endDate: "",
+    status: ""
+  });
 
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
+  };
+
+  // Fetch declarations for this enrollment with pagination and filters
+  const { data: declarationsData, isLoading: declarationsLoading } = useQuery({
+    queryKey: ["declarations", student.id, currentPage, pageSize, filters],
+    queryFn: () => listEnrollmentDeclarations(student.id, {
+      page: currentPage,
+      page_size: pageSize,
+      status: filters.status as ActionStatus || undefined,
+      // Transform flat filters to the expected nested structure
+      ...(filters.startDate || filters.endDate ? {
+        declaration_date: {
+          from: filters.startDate ? new Date(filters.startDate) : undefined,
+          to: filters.endDate ? new Date(filters.endDate) : undefined
+        }
+      } : {})
+    }),
+    enabled: isOpen && activeTab === "Cours",
+  });
+
+  // Group declarations by month
+  const declarationsByMonth = React.useMemo(() => {
+    if (!declarationsData?.results || declarationsData.results.length === 0) return {};
+    
+    const grouped = declarationsData.results.reduce((acc, declaration) => {
+      const date = new Date(declaration.declaration_date);
+      const monthKey = `${date.getMonth() + 1}-${date.getFullYear()}`;
+      const monthDisplay = format(date, 'MMMM yyyy', { locale });
+      
+      if (!acc[monthKey]) {
+        acc[monthKey] = {
+          display: monthDisplay,
+          declarations: []
+        };
+      }
+      
+      acc[monthKey].declarations.push(declaration);
+      return acc;
+    }, {} as Record<string, { display: string, declarations: CourseDeclarationType[] }>);
+    
+    return grouped;
+  }, [declarationsData, locale]);
+
+  // Set default selected month when data loads
+  useEffect(() => {
+    if (Object.keys(declarationsByMonth).length > 0 && !selectedMonth) {
+      setSelectedMonth(Object.keys(declarationsByMonth)[0]);
+    }
+  }, [declarationsByMonth, selectedMonth]);
+
+  // Format a declaration date
+  const formatDeclarationDate = (dateString: string) => {
+    return format(new Date(dateString), 'dd MMM yyyy', { locale });
+  };
+
+  // Format duration from minutes to hours and minutes
+  const formatDurationFromMinutes = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h ${remainingMinutes}m`;
   };
 
   const formSchema = z.object({
@@ -138,6 +213,32 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
     const hr = Math.floor(hours);
     const min = (hours - hr) * 60;
     return min ? `${hr}h ${min}m` : `${hr}h`;
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Apply filters and reset to page 1
+  const applyFilters = () => {
+    setCurrentPage(1);
+    setFilterOpen(false);
+  };
+
+  // Reset filters
+  const resetFilters = () => {
+    setFilters({
+      startDate: "",
+      endDate: "",
+      status: ""
+    });
+    setCurrentPage(1);
+    setFilterOpen(false);
   };
 
   return (
@@ -285,13 +386,181 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                   {t("course.reportEnd")}
                 </button>
                 <div className="mt-4">
-                  <h4 className="font-medium">{t("course.history")}</h4>
-                  <select className="mt-2 p-2 border rounded">
-                    <option>{t("course.march2025")}</option>
-                  </select>
-                  <div className="mt-4 p-4 bg-blue-100 rounded">
-                    {t("course.noDeclared")}
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-medium">{t("course.history")}</h4>
+                    <button 
+                      onClick={() => setFilterOpen(!filterOpen)}
+                      className="text-blue-500 flex items-center text-sm"
+                    >
+                      <Filter className="h-4 w-4 mr-1" />
+                      {t("common.filter")}
+                    </button>
                   </div>
+                  
+                  {filterOpen && (
+                    <div className="mt-2 p-4 border rounded-md bg-gray-50">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t("filter.startDate")}
+                          </label>
+                          <input
+                            type="date"
+                            name="startDate"
+                            value={filters.startDate}
+                            onChange={handleFilterChange}
+                            className="w-full p-2 border rounded-md"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t("filter.endDate")}
+                          </label>
+                          <input
+                            type="date"
+                            name="endDate"
+                            value={filters.endDate}
+                            onChange={handleFilterChange}
+                            className="w-full p-2 border rounded-md"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t("filter.status")}
+                          </label>
+                          <select
+                            name="status"
+                            value={filters.status}
+                            onChange={handleFilterChange}
+                            className="w-full p-2 border rounded-md"
+                          >
+                            <option value="">{t("filter.allStatuses")}</option>
+                            <option value="PENDING">{t("status.pending")}</option>
+                            <option value="ACCEPTED">{t("status.approved")}</option>
+                            <option value="REJECTED">{t("status.rejected")}</option>
+                            <option value="PAID">{t("status.paid")}</option>
+
+                          </select>
+                        </div>
+                      </div>
+                      <div className="flex justify-end mt-4 space-x-2">
+                        <button
+                          onClick={resetFilters}
+                          className="px-3 py-1 border border-gray-300 rounded-md text-sm"
+                        >
+                          {t("filter.reset")}
+                        </button>
+                        <button
+                          onClick={applyFilters}
+                          className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm"
+                        >
+                          {t("filter.apply")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {declarationsLoading ? (
+                    <div className="mt-2 text-sm text-gray-500">Loading...</div>
+                  ) : declarationsData?.results && declarationsData.results.length > 0 ? (
+                    <>
+                      <Select
+                        value={selectedMonth}
+                        onValueChange={setSelectedMonth}
+                      >
+                        <SelectTrigger className="mt-2 w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(declarationsByMonth).map(([key, { display }]) => (
+                            <SelectItem key={key} value={key}>
+                              {display}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      {selectedMonth && declarationsByMonth[selectedMonth] && (
+                        <div className="mt-4 space-y-3">
+                          {declarationsByMonth[selectedMonth].declarations.map(declaration => (
+                            <div key={declaration.id} className="p-3 bg-blue-50 rounded-md border border-blue-100">
+                              <div className="flex justify-between">
+                                <span className="font-medium">{formatDeclarationDate(declaration.declaration_date)}</span>
+                                <span>{formatDurationFromMinutes(declaration.duration)}</span>
+                              </div>
+                              <div className="mt-1 text-sm text-gray-500">
+                                Status: <span className="font-medium">{declaration.status}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Pagination controls */}
+                      <div className="mt-6 flex items-center justify-between">
+                        <div className="text-sm text-gray-600">
+                          {t("pagination.showing")} {(currentPage - 1) * pageSize + 1}-
+                          {Math.min(currentPage * pageSize, declarationsData.count)} {t("pagination.of")} {declarationsData.count}
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className={`p-1 rounded-full ${
+                              currentPage === 1 
+                                ? 'text-gray-300 cursor-not-allowed' 
+                                : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                            aria-label="Previous page"
+                          >
+                            <ChevronLeft className="h-5 w-5" />
+                          </button>
+                          
+                          <span className="text-sm px-2">
+                            {currentPage} / {Math.ceil(declarationsData.count / pageSize) || 1}
+                          </span>
+                          
+                          <button
+                            onClick={() => setCurrentPage(prev => 
+                              prev < Math.ceil(declarationsData.count / pageSize) ? prev + 1 : prev
+                            )}
+                            disabled={currentPage >= Math.ceil(declarationsData.count / pageSize)}
+                            className={`p-1 rounded-full ${
+                              currentPage >= Math.ceil(declarationsData.count / pageSize) 
+                                ? 'text-gray-300 cursor-not-allowed' 
+                                : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                            aria-label="Next page"
+                          >
+                            <ChevronRight className="h-5 w-5" />
+                          </button>
+                        </div>
+                        
+                        <div>
+                          <select
+                            value={pageSize}
+                            onChange={(e) => {
+                              setPageSize(Number(e.target.value));
+                              setCurrentPage(1);
+                            }}
+                            className="text-sm p-1 border rounded"
+                            aria-label="Items per page"
+                          >
+                            {[5, 10, 25, 50].map(size => (
+                              <option key={size} value={size}>
+                                {size} {t("pagination.perPage")}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="mt-4 p-4 bg-blue-100 rounded">
+                      {t("course.noDeclared")}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

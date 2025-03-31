@@ -158,8 +158,8 @@ export default function PaymentsPage() {
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {getAvailableMonths().map((monthOption) => (
-                    <SelectItem key={monthOption.value} value={monthOption.value}>
+                  {getAvailableMonths().map((monthOption,index) => (
+                    <SelectItem key={index} value={monthOption.value}>
                       {monthOption.label}
                     </SelectItem>
                   ))}

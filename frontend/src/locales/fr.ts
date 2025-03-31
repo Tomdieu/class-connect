@@ -1170,7 +1170,7 @@ export default {
 
   // Commun
   "common.saving": "Enregistrement en cours...",
-  
+
   // Add missing translations for AdminPersonalInfoForm
   "profile.firstNamePlaceholder": "Entrez votre prénom",
   "profile.lastNamePlaceholder": "Entrez votre nom",
@@ -1178,20 +1178,25 @@ export default {
   "profile.phoneNumberPlaceholder": "Entrez votre numéro de téléphone",
   "profile.selectLanguage": "Sélectionnez une langue",
   "profile.townPlaceholder": "Entrez votre ville",
-  "profile.quarterPlaceholder": "Entrez votre quartier", 
+  "profile.quarterPlaceholder": "Entrez votre quartier",
   "profile.enterpriseNamePlaceholder": "Entrez le nom de votre entreprise",
   "profile.platformUsageReason": "Raison d'utilisation de la plateforme",
-  "profile.platformUsageReasonPlaceholder": "Expliquez pourquoi vous utilisez la plateforme",
+  "profile.platformUsageReasonPlaceholder":
+    "Expliquez pourquoi vous utilisez la plateforme",
   "profile.currentEmail": "Adresse e-mail actuelle",
 
   // Admin-specific translations
   "admin.permissions": "Permissions administratives",
-  "admin.isStaff": "Privilèges du personnel (peut accéder à la zone d'administration)",
-  "admin.isSuperuser": "Privilèges super-utilisateur (accès complet au système)",
-  
+  "admin.isStaff":
+    "Privilèges du personnel (peut accéder à la zone d'administration)",
+  "admin.isSuperuser":
+    "Privilèges super-utilisateur (accès complet au système)",
+
   // Email change form translations
-  "profile.currentEmailDescription": "Votre adresse e-mail actuelle que vous utilisez pour vous connecter",
-  "profile.emailChangeInfo": "Après avoir changé votre e-mail, vous devrez vérifier votre nouvelle adresse",
+  "profile.currentEmailDescription":
+    "Votre adresse e-mail actuelle que vous utilisez pour vous connecter",
+  "profile.emailChangeInfo":
+    "Après avoir changé votre e-mail, vous devrez vérifier votre nouvelle adresse",
   "profile.newEmailPlaceholder": "Entrez votre nouvelle adresse e-mail",
   "profile.confirmEmailPlaceholder": "Confirmez votre nouvelle adresse e-mail",
   "student.dashboard.myCourses": "Mes cours",
@@ -1202,4 +1207,26 @@ export default {
   "resource.inProgress": "En cours",
   "resource.continueReading": "Continuer la lecture à partir de la page {page}",
   "resource.continueWatching": "Continuer à regarder à partir de {time}",
+
+  "pagination.showing": "Affichage de",
+  "pagination.of": "sur",
+  "pagination.perPage": "par page",
+
+  // Common filter translations
+  "common.filter": "Filtrer",
+  "filter.startDate": "Date de début",
+  "filter.endDate": "Date de fin",
+  "filter.status": "Statut",
+  "filter.allStatuses": "Tous les statuts",
+  "filter.apply": "Appliquer",
+  "filter.reset": "Réinitialiser",
+
+  // Status translations
+  "status.pending": "En attente",
+  "status.approved": "Approuvé",
+  "status.rejected": "Rejeté",
+
+  // Breadcrumb translations
+  "breadcrumb.class": "Classe",
+  "breadcrumb.dashboard": "Tableau de bord",
 } as const;

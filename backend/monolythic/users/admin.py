@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
-from .models import User, UserPasswordResetToken, UserActiveToken
+from .models import User, UserPasswordResetToken, UserActiveToken,UserActivityLog
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -79,3 +79,10 @@ class UserActiveTokenAdmin(admin.ModelAdmin):
             'fields': ('last_activity', 'created_at', 'updated_at')
         }),
     )
+
+
+@admin.register(UserActivityLog)
+class UserActivityLogAdmin(admin.ModelAdmin):
+    list_display = ('user', 'action', 'ip_address', 'request_method', 'timestamp')
+    search_fields = ('user__username', 'action', 'ip_address', 'request_path')
+    list_filter = ('timestamp', 'request_method')

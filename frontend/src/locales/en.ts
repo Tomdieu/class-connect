@@ -416,18 +416,6 @@ export default {
   "resources.tooltips.view": "View resource",
   "resources.tooltips.edit": "Edit resource",
   "resources.tooltips.delete": "Delete resource",
-  "resources.title": "Learning Resources",
-  "resources.empty": "No resources available",
-  "resources.loading": "Loading resources...",
-  "resources.error": "Error loading resources",
-  "resources.delete.title": "Delete Resource",
-  "resources.delete.description":
-    "Are you sure you want to delete this resource? This action cannot be undone.",
-  "resources.delete.success": "Resource deleted successfully",
-  "resources.delete.error": "Failed to delete resource",
-  "resources.tooltips.view": "View resource",
-  "resources.tooltips.edit": "Edit resource",
-  "resources.tooltips.delete": "Delete resource",
   "resource.completed": "Completed",
   "resource.inProgress": "In Progress",
   "resource.continueReading": "Continue reading from page {page}",
@@ -1144,4 +1132,20 @@ export default {
   "profile.emailChangeInfo": "After changing your email, you'll need to verify your new address",
   "profile.newEmailPlaceholder": "Enter your new email address",
   "profile.confirmEmailPlaceholder": "Confirm your new email address",
+
+  // Common filter translations
+"common.filter": "Filter",
+"filter.startDate": "Start Date",
+"filter.endDate": "End Date",
+"filter.status": "Status",
+"filter.allStatuses": "All Statuses",
+"filter.apply": "Apply",
+"filter.reset": "Reset",
+
+// Status translations
+"status.pending": "Pending",
+"status.approved": "Approved",
+"status.rejected": "Rejected",
+
+
 } as const;

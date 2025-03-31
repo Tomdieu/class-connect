@@ -5,6 +5,8 @@ from django.conf import settings
 import user_agents
 import threading
 from urllib.parse import parse_qs
+from .models import UserActivityLog
+from django.utils.timezone import now
 
 # Thread local storage
 _thread_locals = threading.local()
@@ -76,4 +78,30 @@ class SingleSessionMiddleware:
             'ip_address': request.META.get('REMOTE_ADDR'),
         }
 
-# class TokenAuthMiddleware(Bas)
+class UserActivityMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        
+        if request.user.is_authenticated:
+            UserActivityLog.objects.create(
+                user=request.user,
+                action=f"visited {request.path}",
+                ip_address=self.get_client_ip(request),
+                user_agent=request.META.get("HTTP_USER_AGENT", ""),
+                request_method=request.method,
+                request_path=request.path,
+                referrer=request.META.get("HTTP_REFERER", ""),
+                timestamp=now()
+            )
+        
+        return response
+
+    def get_client_ip(self, request):
+        """ Get the real IP address of the user. """
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if x_forwarded_for:
+            return x_forwarded_for.split(",")[0]
+        return request.META.get("REMOTE_ADDR")

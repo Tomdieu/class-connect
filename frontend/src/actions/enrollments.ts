@@ -160,16 +160,41 @@ export const completeEnrollment = async (id: number) => {
 
 // region Course Declarations
 
-export const listEnrollmentDeclarations = async (id: number) => {
+interface CourseDeclarationFilter {
+  page?: string|number;
+  page_size?: number;
+  user_id?: string; // UUID is typically represented as a string in TypeScript
+  status?: ActionStatus; // Using the ActionStatus type for consistency
+  declaration_date?: { from?: Date; to?: Date }; // DateFromToRangeFilter translates to an object with optional 'from' and 'to' dates
+}
+
+export const listEnrollmentDeclarations = async (id: number, params?: Partial<CourseDeclarationFilter>) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
+    
+    // Prepare API params by transforming the nested date structure if it exists
+    const apiParams: Record<string, any> = { ...params };
+    
+    // Handle the nested date structure for the API
+    if (params?.declaration_date) {
+      if (params.declaration_date.from) {
+        apiParams.declaration_date_from = params.declaration_date.from.toISOString().split('T')[0];
+      }
+      if (params.declaration_date.to) {
+        apiParams.declaration_date_to = params.declaration_date.to.toISOString().split('T')[0];
+      }
+      // Remove the nested structure as the API expects flat parameters
+      delete apiParams.declaration_date;
+    }
+    
     const response = await api.get(`/api/enrollments/${id}/declarations/`, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
+      params: apiParams,
     });
-    return response.data as CourseDeclarationType[];
+    return response.data as PaginationType<CourseDeclarationType>;
   } catch (error: unknown) {
     const axiosError = error as AxiosError;
     if (axiosError.response?.data) {
