@@ -44,13 +44,7 @@ export default async function StudentLayout({
             </div>
 
             <div className="flex-1 p-6">{children}</div>
-            <div className="mt-auto w-full pt-4 border-t border-border">
-              <div className="px-4 py-3">
-                <p className="text-xs text-center text-muted-foreground">
-                  Copyright © 2024 ClassConnect
-                </p>
-              </div>
-            </div>
+            
           </main>
         </div>
       </SidebarProvider>
