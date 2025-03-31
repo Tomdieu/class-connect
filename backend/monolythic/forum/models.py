@@ -20,6 +20,10 @@ class Messages(models.Model):
 
     def __str__(self):
         return f"{self.sender} {self.content}"
+    
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Message'
 
 class Seen(models.Model):
     message = models.ForeignKey(Messages,related_name='seen',on_delete=models.CASCADE)
