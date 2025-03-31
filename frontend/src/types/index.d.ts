@@ -676,28 +676,37 @@ export declare interface ForumType {
 export declare interface ForumCreateType {
   name:string;
 }
-export declare interface MessagesType{
-  id:string;
-  parent?:number; // parent here represent the reply message id here we just 
-  forum:number|string;
-  sender:UserType;
-  sender_id:string;
+
+export declare interface ParentMessageType {
+  id: string;
+  sender: UserType;
   content: string;
-  file?:string;
-  created_at:string;
-  seen_by:string[]; // users id of users who saw the message
-  replies:MessagesType[];
+  file?: string;
+  created_at: string;
+  forum: number | string;
 }
 
-export declare interface MessageCreateType{
+export declare interface MessagesType {
+  id: string;
+  parent?: ParentMessageType; // parent message that this is replying to
+  forum: number | string;
+  sender: UserType;
   content: string;
-  parent?:number; // parent here represent the reply message id
-  file?:File;
+  file?: string;
+  created_at: string;
+  seen_by: string[]; // users id of users who saw the message
+  replies: MessagesType[];
 }
 
-export declare interface SeenType{
-  id:string;
-  message:string;
-  user:UserType;
-  created_at:string;
+export declare interface MessageCreateType {
+  content: string;
+  parent?: number; // parent here represent the reply message id
+  file?: File;
+}
+
+export declare interface SeenType {
+  id: string;
+  message: string;
+  user: UserType;
+  created_at: string;
 }
