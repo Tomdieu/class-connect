@@ -74,9 +74,8 @@ function LandingPage() {
   // Enhanced keywords for better SEO
   const keywords =
     locale === "fr"
-      ? "e-learning, éducation en ligne, cours en ligne, Cameroun, apprentissage en ligne, plateforme éducative, cours personnalisés, enseignement à distance, école virtuelle, lycée en ligne, université en ligne, tutorat, développement professionnel, compétences numériques, enseignement interactif, formation continue, soutien scolaire, préparation aux examens, apprentissage mobile, éducation en Afrique"
-      : "e-learning, online education, online courses, Cameroon, online learning, educational platform, personalized courses, distance learning, virtual school, online high school, online university, tutoring, professional development, digital skills, interactive teaching, continuing education, academic support, exam preparation, mobile learning, education in Africa";
-
+      ? "e-learning, éducation en ligne, cours en ligne, Cameroun, apprentissage en ligne, plateforme éducative, cours personnalisés, enseignement à distance, école virtuelle, lycée en ligne, université en ligne, tutorat, développement professionnel, compétences numériques, enseignement interactif, formation continue, soutien scolaire, préparation aux examens, apprentissage mobile, éducation en Afrique, plateforme éducative Cameroun, cours en ligne certifiés, apprentissage numérique Afrique, préparation baccalauréat en ligne, enseignement secondaire virtuel, ressources pédagogiques digitales, formation professionnelle en ligne, système éducatif camerounais, cours de remise à niveau, pédagogie interactive, enseignement supérieur à distance, exercices corrigés en ligne, suivi académique personnalisé, technologie éducative innovante, apprentissage adaptatif, préparation concours Cameroun, tutorat en ligne francophone, éducation inclusive numérique, méthodologie d'apprentissage, réussite scolaire garantie"
+      : "e-learning, online education, online courses, Cameroon, online learning, educational platform, personalized courses, distance learning, virtual school, online high school, online university, tutoring, professional development, digital skills, interactive teaching, continuing education, academic support, exam preparation, mobile learning, education in Africa, online learning Cameroon, virtual classroom Africa, Cameroon education technology, affordable e-learning Africa, interactive online courses, certified digital courses, STEM education online, GCE A-Level courses, flexible learning schedules, academic support Cameroon, career-focused courses, mobile-friendly learning, Cameroon curriculum alignment, expert-led webinars, 24/7 course access, educational subscription service, digital skills Cameroon, professional certification prep, adaptive learning technology, Cameroon student success stories";
   return (
     <div className="relative flex-1 w-full h-full flex flex-col min-h-screen">
       <Helmet>
@@ -99,8 +98,6 @@ function LandingPage() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
-        <meta name="geo.region" content="CM" />
-        <meta name="geo.placename" content="Cameroon" />
         <meta name="author" content="ClassConnect" />
         <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
       </Helmet>
