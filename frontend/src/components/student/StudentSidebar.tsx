@@ -27,6 +27,7 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { HiChatAlt2 } from "react-icons/hi";
 
 export function StudentSidebar() {
   const t = useI18n();
@@ -63,6 +64,11 @@ export function StudentSidebar() {
       title: t("student.dashboard.myTeachers"),
       icon: Users,
       href: "/students/mes-profs"
+    },
+    {
+      title: t("student.dashboard.chat"),
+      icon: HiChatAlt2,
+      href: "/students/chat"
     },
 
     // {
@@ -171,6 +177,13 @@ export function StudentSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <div className="mt-auto w-full pt-4 border-t border-border">
+              <div className="px-4 py-3">
+                <p className="text-xs text-center text-muted-foreground">
+                  Copyright © 2024 ClassConnect
+                </p>
+              </div>
+            </div>
       </SidebarContent>
     </Sidebar>
   );

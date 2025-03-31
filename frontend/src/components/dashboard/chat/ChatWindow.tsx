@@ -375,11 +375,11 @@ export function ChatWindow() {
           <div className="space-y-4">
             {forumMessages.map((message) => {
               const isSender = message.sender.id === currentUserId;
-              const showActions =
-                messageActionsVisible === message.id && isSender;
-              const parentMessage = message.parent
-                ? messageMap.get(message.parent.toString())
-                : null;
+              // const showActions =
+              //   messageActionsVisible === message.id && isSender;
+              // const parentMessage = message.parent
+              //   ? messageMap.get(message.parent.toString())
+              //   : null;
 
               return (
                 <div
