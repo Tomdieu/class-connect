@@ -260,6 +260,7 @@ export default {
   "dashboardSidebar.myAvailabilities": "My Availabilities",
   "dashboardSidebar.myPayments": "My Payments",
   "dashboardSidebar.myResources": "My Resources",
+  "dashboardSidebar.forum":"Forums",
   "dashboardSidebar.contactUs": "Contact Us",
   "dashboardSidebar.myCourseOfferings": "My Course Offerings",
   "dashboardPage.welcome": "Welcome to your dashboard",
@@ -674,7 +675,7 @@ export default {
   "courseOfferings.detail.startDate": "Start Date",
   "courseOfferings.detail.location": "Location",
   "courseOfferings.detail.overview": "Overview",
-  "courseOfferings.detail.actions":"Actions",
+  "courseOfferings.detail.actions": "Actions",
   "courseOfferings.detail.durationFrequency": "Duration & Frequency",
   "courseOfferings.detail.duration": "Duration",
   "courseOfferings.detail.hours": "hours",
@@ -1024,17 +1025,17 @@ export default {
   "courseOfferings.actions.reject": "Reject",
   "courseOfferings.actions.success.updated": "Request updated successfully",
   "courseOfferings.actions.error.updated": "Error updating request",
-  "courseOfferings.actions.cancel":"Cancel",
-  "courseOfferings.actions.create":"Envoyer une demande",
-  "courseOfferings.actions.success.deleted":"Request deleted successfully",
-  "courseOfferings.actions.error.deleted":"An error occurred while attempting to delete.",
-  "courseOfferings.actions.success.created":"Request send successfully",
-  "courseOfferings.actions.error.created":"An error occurred while attempting to send the request.",
-  "courseOfferings.confirm.cancelDescription":"Description",
+  "courseOfferings.actions.cancel": "Cancel",
+  "courseOfferings.actions.create": "Envoyer une demande",
+  "courseOfferings.actions.success.deleted": "Request deleted successfully",
+  "courseOfferings.actions.error.deleted": "An error occurred while attempting to delete.",
+  "courseOfferings.actions.success.created": "Request send successfully",
+  "courseOfferings.actions.error.created": "An error occurred while attempting to send the request.",
+  "courseOfferings.confirm.cancelDescription": "Description",
 
   "availability.studentAvailability": "Student Availability",
   "availability.studentNotVisibleWarning": "The student's availabilities are not visible.",
-  
+
   // StudentsPage translations
   "studentsPage.title": "My Students",
   "studentsPage.schoolYear": "School Year",
@@ -1061,7 +1062,7 @@ export default {
   "form.submit": "Submit",
   "followUps.content": "Follow-ups content goes here...",
   "contactInfo.content": "Contact info content goes here...",
-  
+
   // User type translations
   "users.all": "All Users",
   "users.students": "Students",
@@ -1072,8 +1073,8 @@ export default {
   "users.distribution": "User Distribution by Type",
   "validation.currentPasswordRequired": "Current password is required",
   "validation.passwordMinLength": "Password must be at least 8 characters",
-  "breadcrumb.class": "Class", 
-  "breadcrumb.dashboard": "Dashboard",  "validation.passwordRequirements": "Password must include uppercase, lowercase letters and numbers",
+  "breadcrumb.class": "Class",
+  "breadcrumb.dashboard": "Dashboard", "validation.passwordRequirements": "Password must include uppercase, lowercase letters and numbers",
   "validation.confirmPasswordRequired": "Please confirm your password",
   "validation.passwordsDoNotMatch": "Passwords do not match",
   "validation.emailRequired": "Email is required",
@@ -1084,7 +1085,7 @@ export default {
   "validation.dateOfBirthRequired": "Date of birth is required",
   "validation.townRequired": "Town is required",
   "validation.quarterRequired": "Quarter is required",
-  
+
   "profile.updateFailed": "Failed to update profile",
   "profile.passwordUpdated": "Password updated successfully",
   "profile.passwordUpdateFailed": "Failed to update password",
@@ -1106,7 +1107,7 @@ export default {
   "profile.language": "Language",
   "profile.enterpriseName": "Enterprise Name",
   "profile.platformUsage": "Platform Usage Reason",
-  
+
   "common.saving": "Saving...",
 
   // Add missing translations for AdminPersonalInfoForm
@@ -1126,7 +1127,7 @@ export default {
   "admin.permissions": "Administrative Permissions",
   "admin.isStaff": "Staff privileges (can access admin area)",
   "admin.isSuperuser": "Superuser privileges (full system access)",
-  
+
   // Email change form translations
   "profile.currentEmailDescription": "Your current email address that you use to log in",
   "profile.emailChangeInfo": "After changing your email, you'll need to verify your new address",
@@ -1134,18 +1135,17 @@ export default {
   "profile.confirmEmailPlaceholder": "Confirm your new email address",
 
   // Common filter translations
-"common.filter": "Filter",
-"filter.startDate": "Start Date",
-"filter.endDate": "End Date",
-"filter.status": "Status",
-"filter.allStatuses": "All Statuses",
-"filter.apply": "Apply",
-"filter.reset": "Reset",
+  "common.filter": "Filter",
+  "filter.startDate": "Start Date",
+  "filter.endDate": "End Date",
+  "filter.status": "Status",
+  "filter.allStatuses": "All Statuses",
+  "filter.apply": "Apply",
+  "filter.reset": "Reset",
 
-// Status translations
-"status.pending": "Pending",
-"status.approved": "Approved",
-"status.rejected": "Rejected",
-
+  // Status translations
+  "status.pending": "Pending",
+  "status.approved": "Approved",
+  "status.rejected": "Rejected",
 
 } as const;
