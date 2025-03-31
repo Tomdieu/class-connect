@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, X } from "lucide-react";
+import { BookOpen, MessageSquare, X } from "lucide-react";
 import { TiHome } from "react-icons/ti";
 import { FaCalendarCheck, FaTasks } from "react-icons/fa";
 import { FaEuroSign } from "react-icons/fa";
@@ -57,6 +57,11 @@ export default function DashboardSidebar() {
       title: t("dashboardSidebar.myResources"),
       url: "#",
       icon: IoLibrarySharp,
+    },
+    {
+      title: t("dashboardSidebar.forum"),
+      url: "/dashboard/chat",
+      icon: MessageSquare,
     },
     {
       title: t("dashboardSidebar.contactUs"),
