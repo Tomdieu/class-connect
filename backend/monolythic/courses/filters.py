@@ -126,7 +126,8 @@ class TeacherStudentEnrollmentFilter(django_filters.FilterSet):
 class CourseDeclarationFilter(django_filters.FilterSet):
     user_id = django_filters.UUIDFilter(method='filter_by_user')
     status = django_filters.ChoiceFilter(choices=CourseDeclaration.ACTIONS)
-    declaration_date = django_filters.DateFromToRangeFilter()
+    declaration_date_from = django_filters.DateFilter(field_name='declaration_date', lookup_expr='gte')
+    declaration_date_to = django_filters.DateFilter(field_name='declaration_date', lookup_expr='lte')
     
     def filter_by_user(self, queryset, name, value):
         """
@@ -138,7 +139,7 @@ class CourseDeclarationFilter(django_filters.FilterSet):
     
     class Meta:
         model = CourseDeclaration
-        fields = ['status', 'declaration_date', 'user_id']
+        fields = ['status', 'declaration_date_from', 'declaration_date_to', 'user_id']
 
 class UserClassFilter(django_filters.FilterSet):
     class_level = django_filters.NumberFilter(field_name='class_level')
