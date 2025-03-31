@@ -763,6 +763,8 @@ export default {
   "student.dashboard.myCourses": "My Courses",
   "student.dashboard.myVideos": "My Videos",
   "student.dashboard.myTeachers": "My Teachers",
+  "student.dashboard.chat": "Forum",
+
 
   // Student classes page translations
   "student.classes.title": "My Classes",

@@ -1198,6 +1198,8 @@ export default {
   "student.dashboard.myCourses": "Mes cours",
   "student.dashboard.myVideos": "Mes vidéos",
   "student.dashboard.myTeachers": "Mes profs",
+  "student.dashboard.chat": "Forum",
+
 
   "resource.completed": "Terminé",
   "resource.inProgress": "En cours",
