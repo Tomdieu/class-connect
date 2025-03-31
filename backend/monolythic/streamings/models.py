@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from courses.models import Subject
+from courses.models import Subject,TeacherStudentEnrollment
 
 User = get_user_model()
 
@@ -12,6 +12,7 @@ class VideoConferenceSession(models.Model):
         ('CANCELLED', 'Cancelled'),
     ]
     
+    teacher_student_enrollment = models.ForeignKey(TeacherStudentEnrollment,on_delete=models.CASCADE,null=True,blank=True,related_name='online_course')
     subject = models.ForeignKey(Subject,on_delete=models.CASCADE,related_name='online_course')
     instructor = models.ForeignKey(User,on_delete=models.CASCADE,related_name='online_course')
     title = models.CharField(max_length=200)
@@ -26,14 +27,14 @@ class VideoConferenceSession(models.Model):
     def __str__(self):
         return self.title
 
-class SessionParticipant(models.Model):
-    session = models.ForeignKey(VideoConferenceSession, on_delete=models.CASCADE, related_name='participants')
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='participated_session')
-    joined_at = models.DateTimeField(null=True)
-    left_at = models.DateTimeField(null=True)
+# class SessionParticipant(models.Model):
+#     session = models.ForeignKey(VideoConferenceSession, on_delete=models.CASCADE, related_name='participants')
+#     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='participated_session')
+#     joined_at = models.DateTimeField(null=True)
+#     left_at = models.DateTimeField(null=True)
     
-    class Meta:
-        unique_together = ['session', 'user_id']
+#     class Meta:
+#         unique_together = ['session', 'user_id']
         
-    def __str__(self):
-        return f'{self.session_id} - {self.user_id}'
+#     def __str__(self):
+#         return f'{self.session_id} - {self.user_id}'

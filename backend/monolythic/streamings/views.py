@@ -1,4 +1,5 @@
 from django.shortcuts import render
+import django_filters
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -6,14 +7,18 @@ from django.conf import settings
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
-from .models import VideoConferenceSession, SessionParticipant
-from .serializers import VideoConferenceSessionSerializer, SessionParticipantSerializer
-from .filters import VideoConferenceSessionFilter, SessionParticipantFilter
+from .models import VideoConferenceSession
+from .serializers import VideoConferenceSessionSerializer
+from .filters import VideoConferenceSessionFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
 
 class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
     queryset = VideoConferenceSession.objects.all()
     serializer_class = VideoConferenceSessionSerializer
     filterset_class = VideoConferenceSessionFilter
+    filter_backends = [DjangoFilterBackend]
+    permission_classes = [IsAuthenticated]
 
     def create_google_meet_link(self, title, start_time, duration_minutes):
         SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -58,22 +63,22 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
         meeting_link = self.create_google_meet_link(title, start_time, duration_minutes)
         serializer.save(meeting_link=meeting_link)
 
-class SessionParticipantViewSet(viewsets.ModelViewSet):
-    serializer_class = SessionParticipantSerializer
-    filterset_class = SessionParticipantFilter
+# class SessionParticipantViewSet(viewsets.ModelViewSet):
+#     serializer_class = SessionParticipantSerializer
+#     filterset_class = SessionParticipantFilter
     
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
-            return SessionParticipant.objects.none()  # Return empty queryset for swagger
+#     def get_queryset(self):
+#         if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
+#             return SessionParticipant.objects.none()  # Return empty queryset for swagger
             
-        session_id = self.kwargs.get('session_pk')
-        if session_id:
-            return SessionParticipant.objects.filter(session_id=session_id)
-        return SessionParticipant.objects.all()
+#         session_id = self.kwargs.get('session_pk')
+#         if session_id:
+#             return SessionParticipant.objects.filter(session_id=session_id)
+#         return SessionParticipant.objects.all()
     
-    def perform_create(self, serializer):
-        session_id = self.kwargs.get('session_pk')
-        if session_id:
-            serializer.save(session_id=session_id)
-        else:
-            serializer.save()
+#     def perform_create(self, serializer):
+#         session_id = self.kwargs.get('session_pk')
+#         if session_id:
+#             serializer.save(session_id=session_id)
+#         else:
+#             serializer.save()
