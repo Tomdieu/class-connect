@@ -160,6 +160,9 @@ export const createForumMessage = async (
     const form = new FormData();
     form.append("forum", forumId.toString());
     form.append("content", data.content);
+    if(data.parent){
+      form.append("parent_id",data.parent.toString())
+    }
 
     if (data.file) {
       form.append("file", data.file);
@@ -218,10 +221,9 @@ export const updateForumMessage = async (
     const form = new FormData();
     form.append("forum", forumId);
     form.append("content", data.content);
-    if (session.user.id) {
-      form.append("sender_id", session.user.id.toString());
-    } else {
-      throw JSON.stringify({ sender_id: "User not found!" });
+    
+    if(data.parent){
+      form.append("parent_id",data.parent.toString())
     }
     if (data.file) {
       form.append("file", data.file);
@@ -296,36 +298,3 @@ export const listUsersWhoSawMessage = async (forumId:string,messageId:string)=>{
         throw JSON.stringify({ message: "An unexpected error occurred" });
       } 
 }
-
-export const replyToForumMessage = async (
-  forumId: string | number,
-  replyToMessageId: string,
-  data: MessageCreateType
-) => {
-  try {
-    const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
-    const form = new FormData();
-    form.append("forum", forumId.toString());
-    form.append("content", data.content);
-    form.append("reply_to", replyToMessageId);
-
-    if (data.file) {
-      form.append("file", data.file);
-    }
-
-    const response = await api.post(`/api/forums/${forumId}/messages/`, form, {
-      headers: {
-        Authorization: `Bearer ${session?.user.accessToken}`,
-      },
-    });
-    return response.data as MessagesType;
-  } catch (error: unknown) {
-    const axiosError = error as AxiosError;
-    if (axiosError.response?.data) {
-        console.log(axiosError.response.data)
-      throw JSON.stringify(axiosError.response.data);
-    }
-    throw JSON.stringify({ message: "An unexpected error occurred" });
-  }
-};
