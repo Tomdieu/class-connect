@@ -64,13 +64,17 @@ function Hero() {
 
           {/* Right side - Illustration */}
           <div className="flex-1 relative h-[400px] w-full max-w-xl">
-            <Image
-              src="/images/hero-ilustration.png" // Add your illustration
-              alt="Education Illustration"
-              fill
-              className="object-contain"
-              priority
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src="/images/hero-ilustration.png"
+                alt="Education Illustration"
+                width={600}
+                height={400}
+                className="w-full h-full object-contain"
+                priority
+                suppressHydrationWarning
+              />
+            </div>
           </div>
         </div>
 
