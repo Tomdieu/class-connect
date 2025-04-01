@@ -10,6 +10,7 @@ python3 manage.py create_classes
 python3 manage.py create_admin_users
 python3 manage.py create_public_forum
 python3 manage.py create_subscription_plans
+python3 manage.py generate_school_year
 
 python3 run_daphne.py
 # daphne -b 0.0.0.0 -p 8001 backend.asgi:application
