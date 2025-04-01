@@ -11,6 +11,7 @@ import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import React, { ReactElement } from "react";
 import InactivityProvider from "@/providers/InactivityProvider";
 import HelmetWrapper from "@/providers/HelmetWrapperProvider";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 // Optimize font loading
 const Inter = localFont({
@@ -317,6 +318,8 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
         />
+
+
       </head>
       <body
         className={`antialiased overflow-y-auto flex flex-col ${Inter.variable} font-inter h-screen w-full`}
@@ -339,6 +342,7 @@ export default async function RootLayout({
             </ReactQueryProvider>
           </SessionProvider>
         </ThemeProvider>
+        <GoogleAnalytics measurementId="G-H8NMLWT2HV" />
       </body>
     </html>
   );
