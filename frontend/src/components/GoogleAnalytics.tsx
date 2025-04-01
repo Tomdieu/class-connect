@@ -18,6 +18,16 @@ export default function GoogleAnalytics({ measurementId }: { measurementId: stri
           gtag('config', '${measurementId}');
         `}
       </Script>
+      <Script
+        id="consent-manager"
+        type="text/javascript"
+        data-cmp-ab="1"
+        src="https://cdn.consentmanager.net/delivery/autoblocking/c88b9ba39230e.js"
+        data-cmp-host="d.delivery.consentmanager.net"
+        data-cmp-cdn="cdn.consentmanager.net"
+        data-cmp-codesrc="16"
+        strategy="afterInteractive"
+      />
     </>
   );
 }
