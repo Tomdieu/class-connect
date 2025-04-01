@@ -9,8 +9,9 @@ export default function GoogleAnalytics({ measurementId }: { measurementId: stri
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
         strategy="afterInteractive"
+        suppressHydrationWarning
       />
-      <Script id="google-analytics" strategy="afterInteractive">
+      <Script id="google-analytics" strategy="afterInteractive" suppressHydrationWarning>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -27,6 +28,7 @@ export default function GoogleAnalytics({ measurementId }: { measurementId: stri
         data-cmp-cdn="cdn.consentmanager.net"
         data-cmp-codesrc="16"
         strategy="afterInteractive"
+        suppressHydrationWarning
       />
     </>
   );
