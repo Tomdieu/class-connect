@@ -31,7 +31,7 @@ URLS = [
 ]
 DELAY_RANGE = (5, 15)  # Seconds between actions
 VISITS_PER_SESSION = 3
-RUN_EVERY_MINUTES = 60  # Run every hour
+RUN_EVERY_MINUTES = 1  # Run every hour
 
 def get_driver():
     """Create a headless Chrome driver with random user agent"""
