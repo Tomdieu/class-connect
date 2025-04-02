@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from courses.models import Subject,TeacherStudentEnrollment
 
 User = get_user_model()
 
@@ -12,9 +11,8 @@ class VideoConferenceSession(models.Model):
         ('CANCELLED', 'Cancelled'),
     ]
     
-    teacher_student_enrollment = models.ForeignKey(TeacherStudentEnrollment,on_delete=models.CASCADE,null=True,blank=True,related_name='online_course')
-    subject = models.ForeignKey(Subject,on_delete=models.CASCADE,related_name='online_course')
-    instructor = models.ForeignKey(User,on_delete=models.CASCADE,related_name='online_course')
+    instructor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='online_course')
+    attendees = models.ManyToManyField(User, related_name='attended_sessions', blank=True)
     title = models.CharField(max_length=200)
     description = models.TextField()
     start_time = models.DateTimeField()
@@ -23,6 +21,7 @@ class VideoConferenceSession(models.Model):
     meeting_link = models.URLField()
     recording_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    calendar_event_id = models.CharField(max_length=255, blank=True, null=True)
     
     def __str__(self):
         return self.title
