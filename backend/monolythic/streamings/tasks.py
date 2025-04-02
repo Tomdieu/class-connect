@@ -14,7 +14,7 @@ User = get_user_model()
 @shared_task
 def add_meeting_to_google_calendar(session_id, title, description, start_time, duration_minutes, meeting_link):
     """
-    Celery task to add a Google Meet session to the calendars of students in the same class as the course.
+    Celery task to add a Google Meet session to the calendar of the instructor and attendees.
     
     Parameters:
     - session_id: ID of the VideoConferenceSession
@@ -28,37 +28,8 @@ def add_meeting_to_google_calendar(session_id, title, description, start_time, d
         # Get the session
         session = VideoConferenceSession.objects.get(id=session_id)
         
-        # Find students who are in the same subject
-        # This assumes there's a way to find students for a subject
-        # You might need to adjust this based on your actual data model
-        subject = session.subject
-        class_level = subject.class_level
-        
-        # Get students from this class/subject
-        # Here we would query based on your app's specific relationships
-        # This is a simplified example - you'll need to adapt it to your data model
-        from courses.models import TeacherStudentEnrollment, CourseOffering
-        
-        # Find course offerings for this subject and class
-        course_offerings = CourseOffering.objects.filter(
-            subject=subject,
-            class_level=class_level,
-            is_available=True
-        )
-        
-        # Get students from enrollments
-        enrollments = TeacherStudentEnrollment.objects.filter(
-            offer__in=course_offerings,
-            status="ACTIVE"
-        )
-        
-        # Collect unique students (the ones who should receive calendar invites)
-        students = set()
-        for enrollment in enrollments:
-            students.add(enrollment.offer.student)
-        
-        # Add the instructor as well
-        students.add(session.instructor)
+        # Collect participants (instructor and attendees)
+        participants = [session.instructor] + list(session.attendees.all())
         
         # Process start time
         start_time_dt = datetime.fromisoformat(start_time)
@@ -94,17 +65,15 @@ def add_meeting_to_google_calendar(session_id, title, description, start_time, d
             }
         }
         
-        # Add attendees (if they have Google accounts/emails)
+        # Add attendees
         attendees = []
-        for user in students:
+        for user in participants:
             attendees.append({'email': user.email})
         
         if attendees:
             event['attendees'] = attendees
         
         # Insert the event
-        # Note: In a real implementation, you would need to access each user's calendar
-        # This example assumes a service account with delegated access or a shared calendar
         created_event = service.events().insert(
             calendarId='primary',
             body=event,
@@ -114,8 +83,67 @@ def add_meeting_to_google_calendar(session_id, title, description, start_time, d
         
         logger.info(f"Event created: {created_event.get('htmlLink')}")
         
+        # Store the event ID in the session for future reference
+        session.calendar_event_id = created_event.get('id')
+        session.save(update_fields=['calendar_event_id'])
+        
         return created_event.get('id')
         
     except Exception as e:
         logger.error(f"Error creating calendar event: {str(e)}")
+        raise
+
+@shared_task
+def update_calendar_event_attendees(session_id):
+    """
+    Update the attendees of a calendar event when they change in the session
+    """
+    try:
+        # Get the session
+        session = VideoConferenceSession.objects.get(id=session_id)
+        
+        # If there's no stored calendar event ID, we can't update
+        if not hasattr(session, 'calendar_event_id') or not session.calendar_event_id:
+            logger.warning(f"No calendar event ID for session {session_id}, can't update attendees")
+            return
+        
+        # Collect participants (instructor and attendees)
+        participants = [session.instructor] + list(session.attendees.all())
+        
+        # Configure the Google Calendar API
+        SCOPES = ['https://www.googleapis.com/auth/calendar']
+        credentials = service_account.Credentials.from_service_account_file(
+            settings.GOOGLE_SERVICE_ACCOUNT_FILE,
+            scopes=SCOPES
+        )
+        
+        service = build('calendar', 'v3', credentials=credentials)
+        
+        # Get the current event
+        event = service.events().get(
+            calendarId='primary',
+            eventId=session.calendar_event_id
+        ).execute()
+        
+        # Update attendees
+        attendees = []
+        for user in participants:
+            attendees.append({'email': user.email})
+        
+        event['attendees'] = attendees
+        
+        # Update the event
+        updated_event = service.events().update(
+            calendarId='primary',
+            eventId=session.calendar_event_id,
+            body=event,
+            sendUpdates='all'  # Send emails to new/removed attendees
+        ).execute()
+        
+        logger.info(f"Event updated: {updated_event.get('htmlLink')}")
+        
+        return updated_event.get('id')
+        
+    except Exception as e:
+        logger.error(f"Error updating calendar event attendees: {str(e)}")
         raise
