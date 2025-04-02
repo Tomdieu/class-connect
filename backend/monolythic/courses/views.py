@@ -769,7 +769,7 @@ class CourseDeclarationDirectViewSet(viewsets.ModelViewSet):
         Ensure user can only see their own declarations if not staff
         """
         if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
-            return CourseDeclarationSerializer.objects.none()
+            return CourseDeclaration.objects.none()
         queryset = super().get_queryset()
         user = self.request.user
         
