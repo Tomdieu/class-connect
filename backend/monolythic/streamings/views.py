@@ -8,10 +8,13 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
 from .models import VideoConferenceSession
-from .serializers import VideoConferenceSessionSerializer
+from .serializers import VideoConferenceSessionSerializer, SessionAttendeeSerializer
 from .filters import VideoConferenceSessionFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
     queryset = VideoConferenceSession.objects.all()
@@ -62,23 +65,53 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
         
         meeting_link = self.create_google_meet_link(title, start_time, duration_minutes)
         serializer.save(meeting_link=meeting_link)
-
-# class SessionParticipantViewSet(viewsets.ModelViewSet):
-#     serializer_class = SessionParticipantSerializer
-#     filterset_class = SessionParticipantFilter
-    
-#     def get_queryset(self):
-#         if getattr(self, 'swagger_fake_view', False):  # Check if this is a swagger request
-#             return SessionParticipant.objects.none()  # Return empty queryset for swagger
+        
+    @action(detail=True, methods=['post'], url_path='add-attendees')
+    def add_attendees(self, request, pk=None):
+        """
+        Add attendees to a video conference session
+        """
+        session = self.get_object()
+        serializer = SessionAttendeeSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            user_ids = serializer.validated_data['user_ids']
+            users = User.objects.filter(id__in=user_ids)
             
-#         session_id = self.kwargs.get('session_pk')
-#         if session_id:
-#             return SessionParticipant.objects.filter(session_id=session_id)
-#         return SessionParticipant.objects.all()
+            # Add users as attendees
+            session.attendees.add(*users)
+            
+            # Trigger calendar update if needed
+            from .tasks import update_calendar_event_attendees
+            update_calendar_event_attendees.delay(
+                session_id=str(session.id)
+            )
+            
+            return Response({'status': 'attendees added'}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-#     def perform_create(self, serializer):
-#         session_id = self.kwargs.get('session_pk')
-#         if session_id:
-#             serializer.save(session_id=session_id)
-#         else:
-#             serializer.save()
+    @action(detail=True, methods=['post'], url_path='remove-attendees')
+    def remove_attendees(self, request, pk=None):
+        """
+        Remove attendees from a video conference session
+        """
+        session = self.get_object()
+        serializer = SessionAttendeeSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            user_ids = serializer.validated_data['user_ids']
+            users = User.objects.filter(id__in=user_ids)
+            
+            # Remove users from attendees
+            session.attendees.remove(*users)
+            
+            # Trigger calendar update if needed
+            from .tasks import update_calendar_event_attendees
+            update_calendar_event_attendees.delay(
+                session_id=str(session.id)
+            )
+            
+            return Response({'status': 'attendees removed'}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
