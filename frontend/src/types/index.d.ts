@@ -710,3 +710,37 @@ export declare interface SeenType {
   user: UserType;
   created_at: string;
 }
+
+export type OnlineCourseStatus = "SCHEDULED"| "ONGOING"| "COMPLETED"| "CANCELLED"
+
+export declare interface OnlineCourseType{
+  id:number;
+  meeting_link?:string;
+  instructor_id:string;
+  instructor:UserType;
+  attendees:UserType[];
+  title:string;
+  description:string;
+  start_time:string;
+  duration_minutes:number;
+  status:OnlineCourseStatus;
+  recording_url:string;
+  created_at:string;
+  calendar_event_id:string;
+}
+
+export declare interface OnlineCourseCreateType{
+  id:number;
+  meeting_link?:string;
+  instructor_id:string;
+  title:string;
+  description:string;
+  start_time:string;
+  duration_minutes:number;
+  status:OnlineCourseStatus;
+  calendar_event_id?:string;
+}
+
+export declare interface Attendees{
+  user_ids:number[]
+}
