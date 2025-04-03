@@ -254,7 +254,7 @@ export default {
   "dashboardSidebar.myAvailabilities": "Mes Disponibilités",
   "dashboardSidebar.myPayments": "Mes Paiements",
   "dashboardSidebar.myResources": "Mes Ressources",
-  "dashboardSidebar.forum":"Forums",
+  "dashboardSidebar.forum": "Forums",
   "dashboardSidebar.contactUs": "Nous Contacter",
   "dashboardSidebar.myCourseOfferings": "Mes offres de cours",
   "dashboardPage.welcome": "Bienvenue sur votre tableau de bord",
@@ -1171,7 +1171,7 @@ export default {
 
   // Commun
   "common.saving": "Enregistrement en cours...",
-  
+
   // Add missing translations for AdminPersonalInfoForm
   "profile.firstNamePlaceholder": "Entrez votre prénom",
   "profile.lastNamePlaceholder": "Entrez votre nom",
@@ -1179,7 +1179,7 @@ export default {
   "profile.phoneNumberPlaceholder": "Entrez votre numéro de téléphone",
   "profile.selectLanguage": "Sélectionnez une langue",
   "profile.townPlaceholder": "Entrez votre ville",
-  "profile.quarterPlaceholder": "Entrez votre quartier", 
+  "profile.quarterPlaceholder": "Entrez votre quartier",
   "profile.enterpriseNamePlaceholder": "Entrez le nom de votre entreprise",
   "profile.platformUsageReason": "Raison d'utilisation de la plateforme",
   "profile.platformUsageReasonPlaceholder": "Expliquez pourquoi vous utilisez la plateforme",
@@ -1189,7 +1189,7 @@ export default {
   "admin.permissions": "Permissions administratives",
   "admin.isStaff": "Privilèges du personnel (peut accéder à la zone d'administration)",
   "admin.isSuperuser": "Privilèges super-utilisateur (accès complet au système)",
-  
+
   // Email change form translations
   "profile.currentEmailDescription": "Votre adresse e-mail actuelle que vous utilisez pour vous connecter",
   "profile.emailChangeInfo": "Après avoir changé votre e-mail, vous devrez vérifier votre nouvelle adresse",
@@ -1199,7 +1199,6 @@ export default {
   "student.dashboard.myVideos": "Mes vidéos",
   "student.dashboard.myTeachers": "Mes profs",
   "student.dashboard.chat": "Forum",
-
 
   "resource.completed": "Terminé",
   "resource.inProgress": "En cours",
@@ -1218,7 +1217,7 @@ export default {
   "filter.allStatuses": "Tous les statuts",
   "filter.apply": "Appliquer",
   "filter.reset": "Réinitialiser",
-  
+
   // Status translations
   "status.pending": "En attente",
   "status.approved": "Approuvé",
@@ -1227,4 +1226,28 @@ export default {
   // Breadcrumb translations
   "breadcrumb.class": "Classe",
   "breadcrumb.dashboard": "Tableau de bord",
+  "users.userCounts": "Nombre d'utilisateurs par type",
+  "users.filterByType": "Filtrer par type",
+  "subscription.filters": "Filtres d'abonnement",
+  "users.educationFilters": "Filtres d'éducation",
+  "users.educationLevel": "Niveau d'éducation",
+  "users.college": "Collège",
+  "users.lycee": "Lycée",
+  "users.university": "Université",
+  "users.clearFilters": "Effacer les filtres",
+  "users.collegeClass": "Classe de collège",
+  "users.lyceeClass": "Classe de lycée",
+  "users.lyceeSpeciality": "Spécialité de lycée",
+  "users.scientific": "Scientifique",
+  "users.literary": "Littéraire",
+  "users.universityLevel": "Niveau universitaire",
+  "users.universityYear": "Année universitaire",
+  "users.selectUniversityLevel": "Sélectionnez d'abord un niveau universitaire",
+  "users.count": "Nombre",
+  "users.percentage": "Pourcentage",
+  "users.summary": "Résumé de l'utilisateur",
+  "users.distributionDescription": "Répartition des utilisateurs selon les différents types d'utilisateurs",
+  "users.totalUsers": "Nombre total d'utilisateurs",
+  "users.scientifique": "Scientifique",
+  "users.litteraire": "Littéraire",
 } as const;
