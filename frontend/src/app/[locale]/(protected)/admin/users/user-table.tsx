@@ -2,7 +2,7 @@
 import { getUsers } from "@/actions/accounts";
 import { DataTable } from "@/components/dashboard/global/DataTable";
 import CustomPagination from "@/components/dashboard/global/Pagination";
-import { UserType } from "@/types";
+import { UserParams, UserType } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -16,19 +16,74 @@ function UserTable() {
   const searchParams = useSearchParams();
   const page = searchParams.get("page") || "1";
   const userType = searchParams.get("type") || "all";
+  const subscriptionStatus = searchParams.get("subscription") || "all";
+  const subscriptionPlan = searchParams.get("subscription_plan") || "";
+  
+  // Education level filters
+  const educationLevel = searchParams.get("education_level") || "";
+  const collegeClass = searchParams.get("college_class") || "";
+  const lyceeClass = searchParams.get("lycee_class") || "";
+  const lyceeSpeciality = searchParams.get("lycee_speciality") || "";
+  const universityLevel = searchParams.get("university_level") || "";
+  const universityYear = searchParams.get("university_year") || "";
   
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["users", "page", page, "type", userType],
+    queryKey: [
+      "users", 
+      "page", page, 
+      "type", userType, 
+      "subscription", subscriptionStatus,
+      "subscription_plan", subscriptionPlan,
+      "education_level", educationLevel,
+      "college_class", collegeClass,
+      "lycee_class", lyceeClass,
+      "lycee_speciality", lyceeSpeciality,
+      "university_level", universityLevel,
+      "university_year", universityYear
+    ],
     queryFn: () => {
-      // Create params object with correct boolean flags based on user type
-      const params: Record<string, any> = { page };
+      // Create params object with correct boolean flags based on user type and subscription status
+      const params: UserParams = { page: Number(page) };
       
+      // Handle user type filters
       if (userType === "student") {
         params.is_student = true;
       } else if (userType === "professional") {
         params.is_professional = true;
       } else if (userType === "admin") {
         params.is_admin = true;
+      }
+      
+      // Handle subscription status filters
+      if (subscriptionStatus === "active") {
+        params.has_subscription = true;
+      } else if (subscriptionStatus === "expiring") {
+        params.subscription_expiring = true;
+      } else if (subscriptionStatus === "expired") {
+        params.subscription_expired = true;
+      }
+      
+      // Handle subscription plan filter
+      if (subscriptionPlan && ["BASIC", "STANDARD", "PREMIUM"].includes(subscriptionPlan)) {
+        params.subscription_plan = subscriptionPlan as "BASIC" | "STANDARD" | "PREMIUM";
+      }
+      
+      // Handle education level filters
+      if (educationLevel) {
+        params.education_level = educationLevel;
+        
+        // Add specific education level filters
+        if (educationLevel === "COLLEGE" && collegeClass) {
+          params.college_class = collegeClass;
+        } 
+        else if (educationLevel === "LYCEE") {
+          if (lyceeClass) params.lycee_class = lyceeClass;
+          if (lyceeSpeciality) params.lycee_speciality = lyceeSpeciality;
+        } 
+        else if (educationLevel === "UNIVERSITY") {
+          if (universityLevel) params.university_level = universityLevel;
+          if (universityYear) params.university_year = universityYear;
+        }
       }
       
       return getUsers({ params });
