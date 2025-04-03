@@ -13,6 +13,7 @@ from .filters import VideoConferenceSessionFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
+from drf_yasg.utils import swagger_auto_schema
 
 User = get_user_model()
 
@@ -66,6 +67,15 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
         meeting_link = self.create_google_meet_link(title, start_time, duration_minutes)
         serializer.save(meeting_link=meeting_link)
         
+    @swagger_auto_schema(
+        method='post',
+        request_body=SessionAttendeeSerializer,
+        responses={
+            200: 'Attendees added successfully',
+            400: 'Invalid request data'
+        },
+        operation_description="Add attendees to a video conference session"
+    )
     @action(detail=True, methods=['post'], url_path='add-attendees')
     def add_attendees(self, request, pk=None):
         """
@@ -91,6 +101,15 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @swagger_auto_schema(
+        method='post',
+        request_body=SessionAttendeeSerializer,
+        responses={
+            200: 'Attendees removed successfully',
+            400: 'Invalid request data'
+        },
+        operation_description="Remove attendees from a video conference session"
+    )
     @action(detail=True, methods=['post'], url_path='remove-attendees')
     def remove_attendees(self, request, pk=None):
         """
