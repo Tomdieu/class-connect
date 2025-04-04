@@ -31,15 +31,17 @@ import {
 import { ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-interface DataTableProps<TData, TValue>{
+interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onChange?: (value: string) => void;
   onRowSelect?: (rows: object) => void;
   showInput?: boolean;
-  query?:string,
+  query?: string;
   inputProps?: React.ComponentProps<"input">;
-} 
+  onRowClick?: (row: TData) => void;
+  rowClassName?: string;
+}
 
 export function DataTable<TData, TValue>({
   columns,
@@ -47,8 +49,10 @@ export function DataTable<TData, TValue>({
   onChange,
   onRowSelect,
   showInput = true,
-  query='',
-  inputProps
+  query = "",
+  inputProps,
+  onRowClick,
+  rowClassName,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -64,7 +68,6 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -81,9 +84,40 @@ export function DataTable<TData, TValue>({
     if (onRowSelect) {
       onRowSelect(rowSelection);
     }
-  }, [rowSelection,onRowSelect]);
+  }, [rowSelection, onRowSelect]);
 
   const [value, setValue] = useState(query);
+
+  // Improved function to handle row clicks
+  const handleRowClick = (event: React.MouseEvent, row: TData) => {
+    if (!onRowClick) return;
+
+    // Only block clicks on specific interactive elements
+    const target = event.target as HTMLElement;
+    const clickedElement = target.tagName.toLowerCase();
+    const closestButton = target.closest("button");
+    const closestA = target.closest("a");
+    const closestInput = target.closest("input, select, textarea");
+
+    // If clicked directly on or inside an interactive element, don't trigger row click
+    if (
+      clickedElement === "button" ||
+      clickedElement === "a" ||
+      clickedElement === "input" ||
+      closestButton ||
+      closestA ||
+      closestInput ||
+      // Special case for dropdown triggers and checkboxes
+      target.closest('[data-state="open"]') ||
+      target.closest('[role="checkbox"]')
+    ) {
+      return;
+    }
+
+    // Safe to proceed with row click
+    console.log("Row click detected, navigating...");
+    onRowClick(row);
+  };
 
   return (
     <div className="rounded-md border p-3 w-full">
@@ -101,7 +135,6 @@ export function DataTable<TData, TValue>({
             }}
             className="max-w-sm"
             {...inputProps}
-            
           />
         )}
 
@@ -158,6 +191,12 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={(e) => handleRowClick(e, row.original)}
+                  className={
+                    onRowClick
+                      ? `${rowClassName || "cursor-pointer hover:bg-muted/50"} relative`
+                      : undefined
+                  }
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -167,6 +206,9 @@ export function DataTable<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
+                  {onRowClick && (
+                    <div className="absolute inset-0 z-0" aria-hidden="true" />
+                  )}
                 </TableRow>
               ))
             ) : (
@@ -182,30 +224,6 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      {/* <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div> */}
     </div>
   );
 }
