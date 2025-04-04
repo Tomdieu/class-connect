@@ -21,9 +21,9 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { Helmet } from "react-helmet-async";
 
@@ -33,12 +33,24 @@ export default function LoginPage() {
   const locale = useCurrentLocale();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
+  const { status } = useSession();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Check if user is already logged in and redirect accordingly
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (callbackUrl) {
+        router.push(decodeURIComponent(callbackUrl));
+      } else {
+        router.push("/redirect");
+      }
+    }
+  }, [status, callbackUrl, router]);
 
   // Base URL with locale
   const baseUrl = `https://www.classconnect.cm/${locale}`;
