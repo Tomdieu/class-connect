@@ -257,6 +257,7 @@ export default {
   "dashboardSidebar.forum": "Forums",
   "dashboardSidebar.contactUs": "Nous Contacter",
   "dashboardSidebar.myCourseOfferings": "Mes offres de cours",
+  "dashboardSidebar.onlineMeetings": "Réunions en Ligne",
   "dashboardPage.welcome": "Bienvenue sur votre tableau de bord",
   "dashboardPage.overview": "Vue d'ensemble",
   "dashboardPage.recentActivities": "Activités Récentes",
@@ -526,6 +527,7 @@ export default {
   "users.table.actions.update": "Mettre à jour",
   "users.table.actions.delete": "Supprimer",
   "users.table.actions.detail": "Détails",
+  "users.table.actions.back": "Retour",
   "users.delete.title": "Supprimer l'utilisateur",
   "users.delete.description":
     "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action ne peut pas être annulée.",
