@@ -201,3 +201,37 @@ def retry_failed_payments():
         'retried_count': len(results),
         'results': results
     }
+
+@shared_task
+def check_stalled_transactions():
+    """
+    Check for transactions that have been in PENDING state for more than 30 minutes
+    and mark them as FAILED.
+    """
+    try:
+        # Calculate the cutoff time (30 minutes ago)
+        cutoff_time = timezone.now() - timezone.timedelta(minutes=30)
+        
+        # Find pending transactions older than the cutoff time
+        stalled_transactions = Transaction.objects.filter(
+            status='PENDING',
+            created_at__lt=cutoff_time
+        )
+        
+        count = stalled_transactions.count()
+        logger.info(f"Found {count} stalled transactions older than 30 minutes")
+        
+        # Update them to FAILED status
+        stalled_transactions.update(status='FAILED')
+        
+        return {
+            'status': 'success',
+            'message': f'Marked {count} stalled transactions as FAILED',
+            'count': count
+        }
+    except Exception as e:
+        logger.exception(f"Error checking stalled transactions: {str(e)}")
+        return {
+            'status': 'error',
+            'message': f'Error checking stalled transactions: {str(e)}'
+        }
