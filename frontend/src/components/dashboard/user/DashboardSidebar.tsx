@@ -55,7 +55,7 @@ export default function DashboardSidebar() {
     },
     {
       title: t("dashboardSidebar.myResources"),
-      url: "#",
+      url: "/dashboard/resources",
       icon: IoLibrarySharp,
     },
     {
