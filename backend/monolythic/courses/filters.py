@@ -105,13 +105,15 @@ class CourseOfferingActionFilter(django_filters.FilterSet):
         fields = ['teacher', 'offer', 'action']
 
 class TeacherStudentEnrollmentFilter(django_filters.FilterSet):
+    teacher_id = django_filters.UUIDFilter(field_name='teacher__id')
+    student_id = django_filters.UUIDFilter(field_name='offer__student__id')
     school_year = django_filters.CharFilter(method='filter_by_school_year')
     created_at = django_filters.DateTimeFromToRangeFilter()
     has_class_end = django_filters.BooleanFilter()
 
     class Meta:
         model = TeacherStudentEnrollment
-        fields = ['teacher', 'has_class_end','status']
+        fields = ['teacher', 'teacher_id', 'student_id', 'has_class_end', 'status']
         
     def filter_by_school_year(self, queryset, name, value):
         """
