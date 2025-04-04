@@ -744,3 +744,16 @@ export declare interface OnlineCourseCreateType{
 export declare interface Attendees{
   user_ids:number[]
 }
+
+export declare interface ActivityLogType {
+  id: number;
+  action: string;
+  ip_address: string;
+  user_agent: string;
+  request_method: string;
+  request_path: string;
+  referrer: string;
+  extra_data: Record<string, string>; // Key-value pair object
+  timestamp: string; // ISO 8601 format
+  user: string;
+}
