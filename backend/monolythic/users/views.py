@@ -173,10 +173,20 @@ class UserViewSet(ActivityLoggingMixin,viewsets.ModelViewSet):
         student_education_levels = ['COLLEGE', 'LYCEE', 'UNIVERSITY']
         
         # Count students (users with education level in student levels)
-        total_students = User.objects.filter(education_level__in=student_education_levels).count()
+        # Exclude staff and superusers
+        total_students = User.objects.filter(
+            education_level__in=student_education_levels,
+            is_staff=False,
+            is_superuser=False
+        ).count()
         
         # Count professionals (users with education level PROFESSIONAL)
-        total_professionals = User.objects.filter(education_level='PROFESSIONAL').count()
+        # Exclude staff and superusers
+        total_professionals = User.objects.filter(
+            education_level='PROFESSIONAL',
+            is_staff=False,
+            is_superuser=False
+        ).count()
         
         # Count admins (users who are staff OR superusers)
         total_admins = User.objects.filter(Q(is_staff=True) | Q(is_superuser=True)).count()
