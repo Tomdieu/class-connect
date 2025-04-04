@@ -1224,6 +1224,7 @@ export default {
   "status.pending": "En attente",
   "status.approved": "Approuvé",
   "status.rejected": "Rejeté",
+  "status.paid": "Payé",
 
   // Breadcrumb translations
   "breadcrumb.class": "Classe",
@@ -1305,4 +1306,5 @@ export default {
     "onlineMeetings.validation.durationMinimum": "La durée doit être d'au moins 15 minutes",
     "onlineMeetings.createSuccess": "Réunion créée avec succès",
     "onlineMeetings.createError": "Échec de la création de la réunion",
+
 } as const;

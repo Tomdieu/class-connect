@@ -75,7 +75,8 @@ export default {
   "about.conclusion":
     "ClassConnect isn't just a platform, it's a revolution in education. Join us to transform your way of learning and achieve your academic or professional goals.",
   "subscriptionPlans.title": "Our Subscription Plans",
-  "subscriptionPlans.subtitle": "Choose an affordable plan that's packed with the best features for engaging your audience, creating customer loyalty, and driving sales.",
+  "subscriptionPlans.subtitle":
+    "Choose an affordable plan that's packed with the best features for engaging your audience, creating customer loyalty, and driving sales.",
   "subscriptionPlans.basic.name": "Basic",
   "subscriptionPlans.basic.description": "Perfect to get started",
   "subscriptionPlans.basic.features": [
@@ -260,7 +261,7 @@ export default {
   "dashboardSidebar.myAvailabilities": "My Availabilities",
   "dashboardSidebar.myPayments": "My Payments",
   "dashboardSidebar.myResources": "My Resources",
-  "dashboardSidebar.forum":"Forums",
+  "dashboardSidebar.forum": "Forums",
   "dashboardSidebar.contactUs": "Contact Us",
   "dashboardSidebar.myCourseOfferings": "My Course Offerings",
   "dashboardSidebar.onlineMeetings": "Online Meetings",
@@ -354,12 +355,15 @@ export default {
   "class.detail.schoolYear": "School Year",
   "class.detail.selectSchoolYear": "Select school year",
   "class.detail.enrolledStudents": "Enrolled Students",
-  "class.detail.enrolledStudentsFor": "Students currently enrolled in this class for the {year} school year",
+  "class.detail.enrolledStudentsFor":
+    "Students currently enrolled in this class for the {year} school year",
   "class.detail.noSubjects": "No subjects available",
-  "class.detail.noSubjectsDesc": "This class doesn't have any subjects yet. Add your first subject to start creating educational content.",
+  "class.detail.noSubjectsDesc":
+    "This class doesn't have any subjects yet. Add your first subject to start creating educational content.",
   "class.detail.addFirstSubject": "Add your first subject",
   "class.detail.noStudents": "No students enrolled",
-  "class.detail.noStudentsDesc": "There are currently no students enrolled in this class for the {year} school year.",
+  "class.detail.noStudentsDesc":
+    "There are currently no students enrolled in this class for the {year} school year.",
   "class.detail.loadingSubjects": "Loading subjects...",
   "class.detail.loadingStudents": "Loading students...",
   "class.detail.studentInfo": "Student",
@@ -767,7 +771,6 @@ export default {
   "student.dashboard.myTeachers": "My Teachers",
   "student.dashboard.chat": "Forum",
 
-
   // Student classes page translations
   "student.classes.title": "My Classes",
   "student.classes.description":
@@ -982,23 +985,27 @@ export default {
 
   // Subscribe page translations
   "subscribe.title": "Subscribe to {plan}",
-  "subscribe.subtitle": "Complete your subscription to access premium features.",
+  "subscribe.subtitle":
+    "Complete your subscription to access premium features.",
   "subscribe.planDetails": "Plan Details",
   "subscribe.planDetailsDesc": "Review your selected plan details",
   "subscribe.price": "Price",
   "subscribe.duration": "Duration",
   "subscribe.features": "Features",
   "subscribe.currentSubscription": "Current Subscription",
-  "subscribe.currentSubscriptionDesc": "You already have an active subscription",
+  "subscribe.currentSubscriptionDesc":
+    "You already have an active subscription",
   "subscribe.activePlanAlert": "Active Plan",
-  "subscribe.activePlanAlertDesc": "You currently have an active subscription. You'll need to wait for it to expire before subscribing to a new plan.",
+  "subscribe.activePlanAlertDesc":
+    "You currently have an active subscription. You'll need to wait for it to expire before subscribing to a new plan.",
   "subscribe.currentPlan": "Current Plan",
   "subscribe.startDate": "Start Date",
   "subscribe.endDate": "End Date",
 
   // Payment success/failure page translations
   "payment.success.title": "Payment Successful!",
-  "payment.success.description": "Your payment was processed successfully. Your subscription is now active and you can enjoy all the benefits.",
+  "payment.success.description":
+    "Your payment was processed successfully. Your subscription is now active and you can enjoy all the benefits.",
   "payment.success.viewSubscription": "View My Subscription",
   "payment.success.backToDashboard": "Back to Dashboard",
   "payment.success.reference": "Transaction Reference:",
@@ -1011,8 +1018,10 @@ export default {
   "payment.success.customer": "Customer",
 
   "payment.failed.title": "Payment Failed",
-  "payment.failed.description": "We couldn't process your payment. Please try again or contact support if the issue persists.",
-  "payment.failed.defaultError": "An error occurred during the payment process.",
+  "payment.failed.description":
+    "We couldn't process your payment. Please try again or contact support if the issue persists.",
+  "payment.failed.defaultError":
+    "An error occurred during the payment process.",
   "payment.failed.tryAgain": "Try Again",
   "payment.failed.contactSupport": "Contact Support",
   "payment.failed.backToDashboard": "Back to Dashboard",
@@ -1032,20 +1041,24 @@ export default {
   "courseOfferings.actions.cancel": "Cancel",
   "courseOfferings.actions.create": "Envoyer une demande",
   "courseOfferings.actions.success.deleted": "Request deleted successfully",
-  "courseOfferings.actions.error.deleted": "An error occurred while attempting to delete.",
+  "courseOfferings.actions.error.deleted":
+    "An error occurred while attempting to delete.",
   "courseOfferings.actions.success.created": "Request send successfully",
-  "courseOfferings.actions.error.created": "An error occurred while attempting to send the request.",
+  "courseOfferings.actions.error.created":
+    "An error occurred while attempting to send the request.",
   "courseOfferings.confirm.cancelDescription": "Description",
 
   "availability.studentAvailability": "Student Availability",
-  "availability.studentNotVisibleWarning": "The student's availabilities are not visible.",
+  "availability.studentNotVisibleWarning":
+    "The student's availabilities are not visible.",
 
   // StudentsPage translations
   "studentsPage.title": "My Students",
   "studentsPage.schoolYear": "School Year",
   "studentsPage.selectSchoolYear": "Select a school year",
   "studentsPage.activeStudentsOnly": "Active students only",
-  "studentsPage.uncheckToShowAll": "Uncheck to show students whose courses have ended.",
+  "studentsPage.uncheckToShowAll":
+    "Uncheck to show students whose courses have ended.",
   "studentsPage.loading": "Loading students...",
   "studentsPage.noStudentsFound": "No students found for this school year.",
   "error.failedToLoadStudents": "Failed to load students",
@@ -1078,7 +1091,9 @@ export default {
   "validation.currentPasswordRequired": "Current password is required",
   "validation.passwordMinLength": "Password must be at least 8 characters",
   "breadcrumb.class": "Class",
-  "breadcrumb.dashboard": "Dashboard", "validation.passwordRequirements": "Password must include uppercase, lowercase letters and numbers",
+  "breadcrumb.dashboard": "Dashboard",
+  "validation.passwordRequirements":
+    "Password must include uppercase, lowercase letters and numbers",
   "validation.confirmPasswordRequired": "Please confirm your password",
   "validation.passwordsDoNotMatch": "Passwords do not match",
   "validation.emailRequired": "Email is required",
@@ -1096,7 +1111,8 @@ export default {
   "profile.emailUpdated": "Email updated successfully",
   "profile.emailUpdateFailed": "Failed to update email",
   "profile.personalInfoUpdated": "Personal information updated successfully",
-  "profile.passwordRequirementsInfo": "Password must be at least 8 characters and include uppercase, lowercase letters and numbers.",
+  "profile.passwordRequirementsInfo":
+    "Password must be at least 8 characters and include uppercase, lowercase letters and numbers.",
   "profile.currentPassword": "Current Password",
   "profile.newPassword": "New Password",
   "profile.confirmPassword": "Confirm New Password",
@@ -1124,7 +1140,8 @@ export default {
   "profile.quarterPlaceholder": "Enter your quarter",
   "profile.enterpriseNamePlaceholder": "Enter your enterprise name",
   "profile.platformUsageReason": "Platform Usage Reason",
-  "profile.platformUsageReasonPlaceholder": "Explain why you are using the platform",
+  "profile.platformUsageReasonPlaceholder":
+    "Explain why you are using the platform",
   "profile.currentEmail": "Current Email Address",
 
   // Admin-specific translations
@@ -1133,8 +1150,10 @@ export default {
   "admin.isSuperuser": "Superuser privileges (full system access)",
 
   // Email change form translations
-  "profile.currentEmailDescription": "Your current email address that you use to log in",
-  "profile.emailChangeInfo": "After changing your email, you'll need to verify your new address",
+  "profile.currentEmailDescription":
+    "Your current email address that you use to log in",
+  "profile.emailChangeInfo":
+    "After changing your email, you'll need to verify your new address",
   "profile.newEmailPlaceholder": "Enter your new email address",
   "profile.confirmEmailPlaceholder": "Confirm your new email address",
 
@@ -1151,6 +1170,7 @@ export default {
   "status.pending": "Pending",
   "status.approved": "Approved",
   "status.rejected": "Rejected",
+  "status.paid": "Paid",
 
   // Breadcrumb translations
   "users.userCounts": "User counts by type",
@@ -1173,59 +1193,70 @@ export default {
   "users.count": "Count",
   "users.percentage": "Percentage",
   "users.summary": "User Summary",
-  "users.distributionDescription": "Distribution of users across different user types",
+  "users.distributionDescription":
+    "Distribution of users across different user types",
   "users.totalUsers": "Total Users",
-
   // Online meetings translations
-"onlineMeetings.title": "Online Meetings",
-"onlineMeetings.description": "Create and manage your online meetings and virtual classrooms",
-"onlineMeetings.createNew": "Create New Meeting",
-"onlineMeetings.upcoming": "Upcoming Meetings",
-"onlineMeetings.past": "Past Meetings",
-"onlineMeetings.noUpcoming": "You have no upcoming meetings",
-"onlineMeetings.noPast": "You have no past meetings",
-"onlineMeetings.createFirst": "Create your first meeting",
-"onlineMeetings.viewAll": "View All",
-"onlineMeetings.form.title": "Meeting Title",
-"onlineMeetings.form.titlePlaceholder": "Enter a title for your meeting",
-"onlineMeetings.form.description": "Description",
-"onlineMeetings.form.descriptionPlaceholder": "Describe the purpose of this meeting",
-"onlineMeetings.form.startTime": "Start Time",
-"onlineMeetings.form.duration": "Duration (minutes)",
-"onlineMeetings.form.durationPlaceholder": "Enter the duration in minutes",
-"onlineMeetings.form.createButton": "Create Meeting",
-"onlineMeetings.form.cancelButton": "Cancel",
-"onlineMeetings.details.title": "Meeting Details",
-"onlineMeetings.details.createdBy": "Created by",
-"onlineMeetings.details.startTime": "Start Time",
-"onlineMeetings.details.duration": "Duration",
-"onlineMeetings.details.status": "Status",
-"onlineMeetings.details.attendees": "Attendees",
-"onlineMeetings.details.noAttendees": "No attendees have been added yet",
-"onlineMeetings.details.addAttendees": "Add Attendees",
-"onlineMeetings.details.meetingLink": "Meeting Link",
-"onlineMeetings.details.copy": "Copy Link",
-"onlineMeetings.details.copied": "Link copied to clipboard!",
-"onlineMeetings.details.joinMeeting": "Join Meeting",
-"onlineMeetings.details.deleteMeeting": "Delete Meeting",
-"onlineMeetings.details.deleteConfirm": "Are you sure you want to delete this meeting?",
-"onlineMeetings.details.deleteSuccess": "Meeting deleted successfully",
-"onlineMeetings.details.deleteError": "Failed to delete meeting",
-"onlineMeetings.attendees.searchPlaceholder": "Search for users to add",
-"onlineMeetings.attendees.noResults": "No users found",
-"onlineMeetings.attendees.add": "Add",
-"onlineMeetings.attendees.added": "Added",
-"onlineMeetings.attendees.remove": "Remove",
-"onlineMeetings.status.scheduled": "Scheduled",
-"onlineMeetings.status.ongoing": "Ongoing",
-"onlineMeetings.status.completed": "Completed",
-"onlineMeetings.status.cancelled": "Cancelled",
-"onlineMeetings.duration.minutes": "minutes",
-"onlineMeetings.validation.titleRequired": "Meeting title is required",
-"onlineMeetings.validation.startTimeRequired": "Start time is required",
-"onlineMeetings.validation.startTimeInFuture": "Start time must be in the future",
-"onlineMeetings.validation.durationRequired": "Duration is required",
-"onlineMeetings.validation.durationMinimum": "Duration must be at least 15 minutes",
-"onlineMeetings.createSuccess": "Meeting created successfully",
-"onlineMeetings.createError": "Failed to create meeting"
+  "onlineMeetings.title": "Online Meetings",
+  "onlineMeetings.description":
+    "Create and manage your online meetings and virtual classrooms",
+  "onlineMeetings.createNew": "Create New Meeting",
+  "onlineMeetings.upcoming": "Upcoming Meetings",
+  "onlineMeetings.past": "Past Meetings",
+  "onlineMeetings.noUpcoming": "You have no upcoming meetings",
+  "onlineMeetings.noPast": "You have no past meetings",
+  "onlineMeetings.createFirst": "Create your first meeting",
+  "onlineMeetings.viewAll": "View All",
+  "onlineMeetings.form.title": "Meeting Title",
+  "onlineMeetings.form.titlePlaceholder": "Enter a title for your meeting",
+  "onlineMeetings.form.description": "Description",
+  "onlineMeetings.form.descriptionPlaceholder":
+    "Describe the purpose of this meeting",
+  "onlineMeetings.form.startTime": "Start Time",
+  "onlineMeetings.form.duration": "Duration (minutes)",
+  "onlineMeetings.form.durationPlaceholder": "Enter the duration in minutes",
+  "onlineMeetings.form.createButton": "Create Meeting",
+  "onlineMeetings.form.cancelButton": "Cancel",
+  "onlineMeetings.details.title": "Meeting Details",
+  "onlineMeetings.details.createdBy": "Created by",
+  "onlineMeetings.details.startTime": "Start Time",
+  "onlineMeetings.details.duration": "Duration",
+  "onlineMeetings.details.status": "Status",
+  "onlineMeetings.details.attendees": "Attendees",
+  "onlineMeetings.details.noAttendees": "No attendees have been added yet",
+  "onlineMeetings.details.addAttendees": "Add Attendees",
+  "onlineMeetings.details.meetingLink": "Meeting Link",
+  "onlineMeetings.details.copy": "Copy Link",
+  "onlineMeetings.details.copied": "Link copied to clipboard!",
+  "onlineMeetings.details.joinMeeting": "Join Meeting",
+  "onlineMeetings.details.deleteMeeting": "Delete Meeting",
+  "onlineMeetings.details.deleteConfirm":
+    "Are you sure you want to delete this meeting?",
+  "onlineMeetings.details.deleteSuccess": "Meeting deleted successfully",
+  "onlineMeetings.details.deleteError": "Failed to delete meeting",
+  "onlineMeetings.attendees.searchPlaceholder": "Search for users to add",
+  "onlineMeetings.attendees.noResults": "No users found",
+  "onlineMeetings.attendees.add": "Add",
+  "onlineMeetings.attendees.added": "Added",
+  "onlineMeetings.attendees.remove": "Remove",
+  "onlineMeetings.status.scheduled": "Scheduled",
+  "onlineMeetings.status.ongoing": "Ongoing",
+  "onlineMeetings.status.completed": "Completed",
+  "onlineMeetings.status.cancelled": "Cancelled",
+  "onlineMeetings.duration.minutes": "minutes",
+  "onlineMeetings.validation.titleRequired": "Meeting title is required",
+  "onlineMeetings.validation.startTimeRequired": "Start time is required",
+  "onlineMeetings.validation.startTimeInFuture":
+    "Start time must be in the future",
+  "onlineMeetings.validation.durationRequired": "Duration is required",
+  "onlineMeetings.validation.durationMinimum":
+    "Duration must be at least 15 minutes",
+  "onlineMeetings.createSuccess": "Meeting created successfully",
+  "onlineMeetings.createError": "Failed to create meeting",
+
+
+  // 
+  "pagination.showing":"Showing",
+  "pagination.of":"of",
+  "pagination.perPage":"per page",
 } as const;
