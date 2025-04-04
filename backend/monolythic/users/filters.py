@@ -53,12 +53,22 @@ class UserFilter(django_filters.FilterSet):
         
         if is_student:
             # If True, return only users who have education_level in student levels
-            result = queryset.filter(education_level__in=student_education_levels)
+            # Exclude staff and superusers
+            result = queryset.filter(
+                education_level__in=student_education_levels, 
+                is_staff=False, 
+                is_superuser=False
+            )
             logger.debug(f"is_student filter returned {result.count()} records")
             return result
         else:
             # If False, return only users who don't have education_level in student levels
-            result = queryset.exclude(education_level__in=student_education_levels)
+            # Or are staff/superusers
+            result = queryset.filter(
+                Q(~Q(education_level__in=student_education_levels)) | 
+                Q(is_staff=True) | 
+                Q(is_superuser=True)
+            )
             logger.debug(f"is_student filter returned {result.count()} records")
             return result
     
@@ -72,12 +82,22 @@ class UserFilter(django_filters.FilterSet):
         
         if is_professional:
             # If True, return only professionals
-            result = queryset.filter(education_level='PROFESSIONAL')
+            # Exclude staff and superusers
+            result = queryset.filter(
+                education_level='PROFESSIONAL',
+                is_staff=False,
+                is_superuser=False
+            )
             logger.debug(f"is_professional filter returned {result.count()} records")
             return result
         else:
             # If False, return only non-professionals
-            result = queryset.exclude(education_level='PROFESSIONAL')
+            # Or are staff/superusers
+            result = queryset.filter(
+                Q(~Q(education_level='PROFESSIONAL')) | 
+                Q(is_staff=True) | 
+                Q(is_superuser=True)
+            )
             logger.debug(f"is_professional filter returned {result.count()} records")
             return result
             
