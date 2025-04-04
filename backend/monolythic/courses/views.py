@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions = IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import (
@@ -618,6 +618,16 @@ class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = TeacherStudentEnrollmentFilter
     
+    def get_queryset(self):
+        qs = TeacherStudentEnrollment.objects.all()
+        teacher_id = self.request.query_params.get('teacher_id')
+        student_id = self.request.query_params.get('student_id')
+        if teacher_id:
+            qs = qs.filter(teacher__id=teacher_id)
+        if student_id:
+            qs = qs.filter(offer__student__id=student_id)
+        return qs
+
     @action(detail=True,methods=['post'])
     def complete(self,request):
         instance = self.get_object()
