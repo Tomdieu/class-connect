@@ -3,10 +3,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
-from .models import User, UserPasswordResetToken
+from .models import User, UserPasswordResetToken, UserActivityLog
 from .serializers import (
     PasswordResetConfirmSerializer,
     PhoneNumberValidationSerializer,
+    UserActivityLogSerializer,
     UserSerializer,
     UserRegistrationSerializer,
     ChangePasswordSerializer,
@@ -817,3 +818,15 @@ class UserStatsView(APIView):
             return '+0%' if current == 0 else '+100%'
         growth = ((current - previous) / previous) * 100
         return f"{'+' if growth >= 0 else ''}{growth:.1f}%"
+
+
+class UserActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset that provides `list` and `retrieve` actions for UserActivityLog.
+    Allows filtering by user.
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = UserActivityLog.objects.all()
+    serializer_class = UserActivityLogSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['user']

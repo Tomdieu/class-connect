@@ -11,6 +11,7 @@ from .views import (
     ResendVerificationEmailView,
     PasswordResetConfirmView,
     UserStatsView,
+    UserActivityLogViewSet,  # added new viewset
 )
 
 router = DefaultRouter()
@@ -61,6 +62,17 @@ urlpatterns = [
                     "resend-verification/",
                     ResendVerificationEmailView.as_view(),
                     name="resend-verification-email",
+                ),
+                # New URL patterns for activity logs:
+                path(
+                    "activity-logs/",
+                    UserActivityLogViewSet.as_view({'get': 'list'}),
+                    name="activity-log-list",
+                ),
+                path(
+                    "activity-logs/<str:pk>/",
+                    UserActivityLogViewSet.as_view({'get': 'retrieve'}),
+                    name="activity-log-detail",
                 ),
             ]
         ),
