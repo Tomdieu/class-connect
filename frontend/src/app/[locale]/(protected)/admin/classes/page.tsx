@@ -141,7 +141,7 @@ function CoursesPages() {
           onClick={onAdd}
           className="bg-default hover:bg-default/90 text-white"
         >
-          {t("plans.actions.add")}
+          {t("class.actions.add")}
         </Button>
       </div>
 
