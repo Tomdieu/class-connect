@@ -267,6 +267,7 @@ export default {
   "userDialog.subtitle": "Modifier les détails de l'utilisateur ci-dessous",
   "userDialog.submitButton": "Mettre à jour",
   "class.title": "Classe",
+  "class.actions.add": "Ajouter une Class",
   educationLevels: {
     lycee: "Lycée",
     university: "Université",
