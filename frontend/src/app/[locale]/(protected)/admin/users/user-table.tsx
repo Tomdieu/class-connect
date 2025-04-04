@@ -4,7 +4,7 @@ import { DataTable } from "@/components/dashboard/global/DataTable";
 import CustomPagination from "@/components/dashboard/global/Pagination";
 import { UserParams, UserType } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { userColumns } from "./_components/columns";
 import { useI18n } from '@/locales/client';
@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 function UserTable() {
   const t = useI18n();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const page = searchParams.get("page") || "1";
   const userType = searchParams.get("type") || "all";
@@ -114,6 +115,11 @@ function UserTable() {
     }
   };
 
+  const handleRowClick = (row: UserType) => {
+    console.log("Row clicked:", row.id); // Debug log
+    router.push(`/admin/users/${row.id}`);
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4 w-full">
@@ -160,7 +166,16 @@ function UserTable() {
   if (data) {
     return (
       <div className="space-y-4 w-full overflow-x-auto">
-        <DataTable onChange={handleFilter} columns={userColumns} data={users} />
+        <div className="bg-gray-50 px-4 py-2 text-sm text-gray-500 rounded-t-lg border border-b-0 border-gray-200">
+          <p>Click on any row to view user details</p>
+        </div>
+        <DataTable 
+          onChange={handleFilter} 
+          columns={userColumns} 
+          data={users}
+          onRowClick={handleRowClick}
+          rowClassName="cursor-pointer hover:bg-blue-50 transition-colors"
+        />
         <DeleteConfirmationModal />
       </div>
     );
