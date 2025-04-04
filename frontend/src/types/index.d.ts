@@ -753,7 +753,7 @@ export declare interface ActivityLogType {
   request_method: string;
   request_path: string;
   referrer: string;
-  extra_data: Record<string, string>; // Key-value pair object
+  extra_data?: Record<string, string>; // Key-value pair object
   timestamp: string; // ISO 8601 format
   user: string;
 }
