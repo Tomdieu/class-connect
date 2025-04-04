@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User,UserPasswordResetToken
+from .models import User, UserPasswordResetToken, UserActivityLog
 from django.utils import timezone
 import datetime
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -152,3 +152,8 @@ class PhoneNumberValidationSerializer(serializers.Serializer):
 class VerifyPasswordSerializer(serializers.Serializer):
 
     password = serializers.CharField(max_length=120)
+
+class UserActivityLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserActivityLog
+        fields = '__all__'
