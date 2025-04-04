@@ -176,7 +176,7 @@ export async function getStudentsByClass(classId: string, schoolYearId?: number)
     });
 
     return res.data as UserClassType[];
-  } catch (error: any) {
+  } catch (error: unknown) {
     const axiosError = error as AxiosError;
     if (axiosError.response?.data) {
       throw JSON.stringify(axiosError.response.data);
