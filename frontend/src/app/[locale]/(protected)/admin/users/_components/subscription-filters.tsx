@@ -4,9 +4,15 @@ import { useI18n } from "@/locales/client";
 import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { CreditCard, Calendar, AlertCircle, CheckCircle2, Crown, Star, Award } from "lucide-react";
+import { CreditCard, Calendar, AlertCircle, CheckCircle2, Crown, Star, Award, ChevronDown } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const SubscriptionFilters = () => {
   const t = useI18n();
@@ -84,7 +90,6 @@ const SubscriptionFilters = () => {
     },
   ];
 
-
   // Update URL when tab changes
   const createQueryString = (params: Record<string, string | null>) => {
     const newParams = new URLSearchParams(searchParams);
@@ -105,98 +110,102 @@ const SubscriptionFilters = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg border shadow-sm p-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
-        <h3 className="text-lg font-medium mb-2 sm:mb-0">{t('subscription.filters')}</h3>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
-          <TabsList>
-            <TabsTrigger value="status">Status</TabsTrigger>
-            <TabsTrigger value="plan">Plan Type</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      
-      {activeTab === "status" ? (
-        <div className="flex flex-wrap gap-3">
-          {statusFilters.map((filter) => {
-            const isActive = subscriptionStatus === filter.value;
-            
-            return (
-              <Link
-                key={filter.value}
-                href={`${pathname}?${createQueryString({ 
-                  subscription: filter.value,
-                  // Don't reset plan filter when changing status
-                  subscription_plan: searchParams.get("subscription_plan") || null
-                })}`}
-                className={cn(
-                  "flex-1 min-w-[140px] flex flex-col items-center p-3 rounded-lg transition-all border",
-                  isActive 
-                    ? "bg-primary/10 border-primary shadow-sm" 
-                    : "bg-white hover:bg-gray-50 border-gray-100 hover:border-gray-200"
-                )}
-              >
-                <filter.icon 
-                  className={cn(
-                    "h-5 w-5 mb-1", 
-                    isActive ? "text-primary" : filter.color || "text-gray-500"
-                  )} 
-                />
-                <span className={cn(
-                  "font-medium text-sm", 
-                  isActive ? "text-primary" : "text-gray-700"
-                )}>
-                  {filter.label}
-                </span>
-                <span className="text-xs text-gray-500 mt-1 text-center">
-                  {filter.description}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="flex flex-wrap gap-3">
-          {planFilters.map((filter) => {
-            const isActive = subscriptionPlan === filter.value;
-            
-            return (
-              <Link
-                key={filter.value}
-                href={`${pathname}?${createQueryString({ 
-                  subscription_plan: filter.value === "all" ? null : filter.value,
-                  // Don't reset status filter when changing plan
-                  subscription: searchParams.get("subscription") || null
-                })}`}
-                className={cn(
-                  "flex-1 min-w-[140px] flex flex-col items-center p-3 rounded-lg transition-all border",
-                  isActive 
-                    ? "bg-primary/10 border-primary shadow-sm" 
-                    : "bg-white hover:bg-gray-50 border-gray-100 hover:border-gray-200"
-                )}
-              >
-                <filter.icon 
-                  className={cn(
-                    "h-5 w-5 mb-1", 
-                    isActive ? "text-primary" : filter.color || "text-gray-500"
-                  )} 
-                />
-                <span className={cn(
-                  "font-medium text-sm", 
-                  isActive ? "text-primary" : "text-gray-700"
-                )}>
-                  {filter.label}
-                </span>
-                <span className="text-xs text-gray-500 mt-1 text-center">
-                  {filter.description}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-    </div>
+    <Accordion type="single" collapsible className="bg-white rounded-lg border shadow-sm" defaultValue="subscriptionFilters">
+      <AccordionItem value="subscriptionFilters" className="border-0">
+        <AccordionTrigger className="px-4 py-3 hover:bg-gray-50 hover:no-underline">
+          <div className="flex items-center">
+            <CreditCard className="h-4 w-4 mr-2 text-primary" />
+            <h3 className="text-lg font-medium">{t('subscription.filters') || 'Subscription Filters'}</h3>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-4 pb-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-4">
+            <TabsList className="w-full">
+              <TabsTrigger value="status" className="flex-1">Status</TabsTrigger>
+              <TabsTrigger value="plan" className="flex-1">Plan Type</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
+          {activeTab === "status" ? (
+            <div className="flex flex-wrap gap-3">
+              {statusFilters.map((filter) => {
+                const isActive = subscriptionStatus === filter.value;
+                
+                return (
+                  <Link
+                    key={filter.value}
+                    href={`${pathname}?${createQueryString({ 
+                      subscription: filter.value,
+                      subscription_plan: searchParams.get("subscription_plan") || null
+                    })}`}
+                    className={cn(
+                      "flex-1 min-w-[140px] flex flex-col items-center p-3 rounded-lg transition-all border",
+                      isActive 
+                        ? "bg-primary/10 border-primary shadow-sm" 
+                        : "bg-white hover:bg-gray-50 border-gray-100 hover:border-gray-200"
+                    )}
+                  >
+                    <filter.icon 
+                      className={cn(
+                        "h-5 w-5 mb-1", 
+                        isActive ? "text-primary" : filter.color || "text-gray-500"
+                      )} 
+                    />
+                    <span className={cn(
+                      "font-medium text-sm", 
+                      isActive ? "text-primary" : "text-gray-700"
+                    )}>
+                      {filter.label}
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1 text-center">
+                      {filter.description}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-3">
+              {planFilters.map((filter) => {
+                const isActive = subscriptionPlan === filter.value;
+                
+                return (
+                  <Link
+                    key={filter.value}
+                    href={`${pathname}?${createQueryString({ 
+                      subscription_plan: filter.value === "all" ? null : filter.value,
+                      subscription: searchParams.get("subscription") || null
+                    })}`}
+                    className={cn(
+                      "flex-1 min-w-[140px] flex flex-col items-center p-3 rounded-lg transition-all border",
+                      isActive 
+                        ? "bg-primary/10 border-primary shadow-sm" 
+                        : "bg-white hover:bg-gray-50 border-gray-100 hover:border-gray-200"
+                    )}
+                  >
+                    <filter.icon 
+                      className={cn(
+                        "h-5 w-5 mb-1", 
+                        isActive ? "text-primary" : filter.color || "text-gray-500"
+                      )} 
+                    />
+                    <span className={cn(
+                      "font-medium text-sm", 
+                      isActive ? "text-primary" : "text-gray-700"
+                    )}>
+                      {filter.label}
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1 text-center">
+                      {filter.description}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
 
