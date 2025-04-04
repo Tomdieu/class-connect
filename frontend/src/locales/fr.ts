@@ -1115,7 +1115,6 @@ export default {
   "form.selectDuration": "Sélectionner la durée",
   "form.submit": "Soumettre",
   "form.submitting": "Soumission en cours...",
-  "form.submit": "Soumettre",
   "followUps.content": "Le contenu des suivis va ici...",
   "contactInfo.content": "Le contenu des informations de contact va ici...",
 
@@ -1312,4 +1311,28 @@ export default {
 
   "toast.courseDeclared": "Cours déclaré avec succès !",
   "toast.courseDeclarationFailed": "Échec de la déclaration du cours.",
+
+  "stats.dashboardTitle": "Statistiques du tableau de bord",
+  "stats.userGrowth": "Croissance des utilisateurs",
+  "stats.daily": "Quotidien",
+  "stats.monthly": "Mensuel",
+  "stats.yearly": "Annuel",
+  "stats.students": "Étudiants",
+  "stats.professionals": "Professionnels",
+  "stats.subscriptionDistribution": "Distribution des abonnements",
+  "stats.revenue": "Revenu",
+  "stats.topPayingUsers": "Meilleurs utilisateurs payants",
+  "stats.userName": "Nom d'utilisateur",
+  "stats.email": "Email",
+  "stats.totalPayments": "Total des paiements",
+  "stats.totalAmount": "Montant total",
+  "stats.lastPayment": "Dernier paiement",
+  "stats.subscriptionStatus": "Statut de l'abonnement",
+  "stats.noPlan": "Aucun plan",
+  "stats.activePlan": "Plan actif",
+  "stats.noPaymentsRecorded": "Aucun paiement enregistré",
+  "stats.withPlans": "Avec plans",
+  "stats.withoutPlans": "Sans plans",
+
+  "enrollments":"Inscription Enseignant-Étudiant"
 } as const;

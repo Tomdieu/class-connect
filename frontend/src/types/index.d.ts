@@ -47,6 +47,8 @@ export declare interface UserCreateType {
   is_superuser?: boolean;
 }
 
+export declare interface HasSub { active: boolean; plan: string; expires_at: string }
+export declare interface NoSub { active: boolean }
 export declare interface UserType {
   id: string;
   email: string;
@@ -77,8 +79,8 @@ export declare interface UserType {
   date_joined: string;
   college_class: CollegeClass | null;
   subscription_status:
-    | { active: boolean; plan: string; expires_at: string }
-    | { active: boolean };
+    | HasSub
+    | NoSub
   class_display: string;
 }
 
@@ -619,6 +621,11 @@ export interface MonthStat {
 export interface Stats {
   total_users: number;
   monthly_stats: MonthStat[];
+  user_growth:string;
+  monthly_revenue:number;
+  revenue_growth:string;
+  conversion_rate:number;
+  conversion_growth:string;
 }
 
 export declare const NOTICATION_TYPES: readonly [

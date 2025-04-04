@@ -1080,7 +1080,6 @@ export default {
   "form.selectDuration": "Select duration",
   "form.submit": "Submit",
   "form.submitting": "Submitting...",
-  "form.submit": "Submit",
   "followUps.content": "Follow-ups content goes here...",
   "contactInfo.content": "Contact info content goes here...",
 
@@ -1266,4 +1265,29 @@ export default {
   "pagination.showing":"Showing",
   "pagination.of":"of",
   "pagination.perPage":"per page",
+
+  // Statistics page translations
+  "stats.dashboardTitle": "Dashboard Statistics",
+  "stats.userGrowth": "User Growth",
+  "stats.daily": "Daily",
+  "stats.monthly": "Monthly",
+  "stats.yearly": "Yearly",
+  "stats.students": "Students",
+  "stats.professionals": "Professionals",
+  "stats.subscriptionDistribution": "Subscription Distribution",
+  "stats.revenue": "Revenue",
+  "stats.topPayingUsers": "Top Paying Users",
+  "stats.userName": "User Name",
+  "stats.email": "Email",
+  "stats.totalPayments": "Total Payments",
+  "stats.totalAmount": "Total Amount",
+  "stats.lastPayment": "Last Payment",
+  "stats.subscriptionStatus": "Subscription Status",
+  "stats.noPlan": "No Plan",
+  "stats.activePlan": "Active Plan",
+  "stats.noPaymentsRecorded": "No payments recorded",
+  "stats.withPlans": "With Plans",
+  "stats.withoutPlans": "Without Plans",
+
+  "enrollments":"Teacher-Student Enrollment"
 } as const;
