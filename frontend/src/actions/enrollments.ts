@@ -35,6 +35,8 @@ type EnrollmentParams = {
   has_class_end: boolean;
   created_at: string;
   school_year: string;
+  teacher_id: string;
+  student_id: string;
 };
 
 export const listEnrollments = async (params?: Partial<EnrollmentParams>) => {
@@ -82,7 +84,7 @@ export const getMyTeachers = async () => {
     if (!session?.user) throw Error("Unauthorize user!");
     const response = await api.get("/api/enrollments/my-teachers/", {
       headers: {
-        Authorization: `Bearer ${session.user.accessToken}`,
+        Authorization: `Bearer ${session.user.accessToken}`
       },
     });
     return response.data as TeacherStudentEnrollmentType[];
