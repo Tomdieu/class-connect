@@ -329,8 +329,8 @@ RABBITMQ_USERNAME = env("RABBITMQ_USERNAME", default="classconnect")
 RABBITMQ_PASSWORD = env("RABBITMQ_PASSWORD", default="classconnect")
 
 # Google Service Account
-GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv(
-    "GOOGLE_SERVICE_ACCOUNT_FILE", BASE_DIR / "secret/google-secret.json"
+GOOGLE_SERVICE_ACCOUNT_FILE = env(
+    "GOOGLE_SERVICE_ACCOUNT_FILE", default=BASE_DIR / "secret/google-secret.json"
 )
 
 # Caching
@@ -396,3 +396,6 @@ FRONTEND_HOST=env('FRONTEND_HOST',default='http://localhost:3000')
 
 CLASSCONNECT_CLIENT_SECRETE=env('CLASSCONNECT_CLIENT_SECRETE',default='classconnect')
 CLASSCONNECT_CLIENT_ID=env('CLASSCONNECT_CLIENT_ID',default='classconnect')
+
+
+ENABLE_GOOGLE_MEET = True
