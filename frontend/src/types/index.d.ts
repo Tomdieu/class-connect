@@ -598,6 +598,7 @@ export interface TransactionFilterParams {
   operator?: "MTN" | "ORANGE";
   phone_number?: string;
   created_at?: DateRangeFilter;
+  user_id?:string;//user id
 
   // Search parameter (from search_fields)
   search?: string; // Will search in phone_number and reference
