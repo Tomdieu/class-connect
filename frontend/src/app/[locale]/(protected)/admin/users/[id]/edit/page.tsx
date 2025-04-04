@@ -266,7 +266,7 @@ export default function UserEditPage() {
               <FormControl>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  defaultValue={field.value ?? ""}
                 >
                   <SelectTrigger>
                     <SelectValue
@@ -303,7 +303,7 @@ export default function UserEditPage() {
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value ?? ""}
                   >
                     <SelectTrigger>
                       <SelectValue
@@ -336,7 +336,7 @@ export default function UserEditPage() {
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value ?? ""}
                   >
                     <SelectTrigger>
                       <SelectValue
@@ -376,7 +376,7 @@ export default function UserEditPage() {
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value ?? ""}
                   >
                     <SelectTrigger>
                       <SelectValue
@@ -407,7 +407,7 @@ export default function UserEditPage() {
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value ?? ""}
                   >
                     <SelectTrigger>
                       <SelectValue
@@ -438,7 +438,7 @@ export default function UserEditPage() {
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value ?? ""}
                   >
                     <SelectTrigger>
                       <SelectValue
@@ -477,6 +477,7 @@ export default function UserEditPage() {
                   <Input
                     placeholder={t("registerDialog.enterpriseNameLabel")}
                     {...field}
+                    value={field.value ?? ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -496,6 +497,7 @@ export default function UserEditPage() {
                     rows={5}
                     placeholder={t("registerDialog.platformUsageReasonLabel")}
                     {...field}
+                    value={field.value || ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -637,7 +639,7 @@ export default function UserEditPage() {
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      defaultValue={field.value ?? undefined}
                     >
                       <SelectTrigger>
                         <SelectValue
@@ -689,12 +691,13 @@ export default function UserEditPage() {
                     <Input
                       placeholder={t("registerDialog.townLabel")}
                       {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
-            />
+              />
             <FormField
               control={form.control}
               name="quarter"
@@ -705,6 +708,7 @@ export default function UserEditPage() {
                     <Input
                       placeholder={t("registerDialog.quarterLabel")}
                       {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
