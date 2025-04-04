@@ -41,8 +41,7 @@ export const userColumns: ColumnDef<UserType>[] = [
       );
     },
     cell: ({ row }) => (
-      <div>
-        {" "}
+      <div onClick={(e) => e.stopPropagation()}>
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -88,7 +87,7 @@ export const userColumns: ColumnDef<UserType>[] = [
     },
     cell: ({ row }) => {
       const user = row.original;
-      return <a href={`mailto:${user.email}`}>{user.email}</a>;
+      return <span>{user.email}</span>;
     },
   },
   {
@@ -100,7 +99,7 @@ export const userColumns: ColumnDef<UserType>[] = [
     },
     cell: ({ row }) => {
       const user = row.original;
-      return <a href={`tel:${user.phone_number}`}>{user.phone_number}</a>;
+      return <span>{user.phone_number}</span>;
     },
   },
   {
@@ -123,7 +122,7 @@ export const userColumns: ColumnDef<UserType>[] = [
     },
     cell: ({ row }) => {
       const user = row.original;
-      return <span>{user.lycee_class}</span>;
+      return <span>{user.class_display}</span>;
     },
   },
   {
@@ -152,7 +151,7 @@ export const userColumns: ColumnDef<UserType>[] = [
       const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(false);
       const { data: session } = useSession();
-      const router = useRouter()
+      const router = useRouter();
 
       const handleDelete = async () => {
         try {
@@ -173,7 +172,11 @@ export const userColumns: ColumnDef<UserType>[] = [
       }
 
       return (
-        <>
+        <div 
+          onClick={(e) => e.stopPropagation()} 
+          data-no-row-click="true" 
+          className="relative z-10"
+        >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -190,11 +193,7 @@ export const userColumns: ColumnDef<UserType>[] = [
                 <RefreshCw className="w-4 h-4 mr-2" />
                 <span>{t("users.table.actions.update")}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  goToDetail()
-                }}
-              >
+              <DropdownMenuItem onClick={goToDetail}>
                 <Eye className="w-4 h-4 mr-2" />
                 <span>{t("users.table.actions.detail")}</span>
               </DropdownMenuItem>
@@ -221,7 +220,7 @@ export const userColumns: ColumnDef<UserType>[] = [
             description={t("users.delete.description")}
             isLoading={isLoading}
           />
-        </>
+        </div>
       );
     },
   },
