@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, MessageSquare, X } from "lucide-react";
+import { BookOpen, MessageSquare, Video, X } from "lucide-react";
 import { TiHome } from "react-icons/ti";
 import { FaCalendarCheck, FaTasks } from "react-icons/fa";
 import { FaEuroSign } from "react-icons/fa";
@@ -41,12 +41,17 @@ export default function DashboardSidebar() {
     {
       title: t("dashboardSidebar.myCourseOfferings"),
       url: "/dashboard/course-offering",
-      icon: FaTasks
+      icon: FaTasks,
     },
     {
       title: t("dashboardSidebar.myAvailabilities"),
       url: "/dashboard/my-availabilities",
       icon: FaCalendarCheck,
+    },
+    {
+      title: t("dashboardSidebar.onlineMeetings"),
+      url: "/dashboard/online-meetings",
+      icon: Video,
     },
     {
       title: t("dashboardSidebar.myPayments"),
