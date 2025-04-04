@@ -232,7 +232,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.university_level = None
             self.university_year = None
 
-    def get_class_level(self) -> int | None:
+    def get_class_level(self):
         """
         Returns the numeric level of the user's class.
         College: 1-4 (6eme-3eme)
@@ -251,7 +251,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                 return self.CLASS_LEVELS.get(self.university_year)
         return None
     
-    def can_access_class_level(self, target_level: int) -> bool:
+    def can_access_class_level(self, target_level: int):
         """
         Determines if the user can access content for a specific class level
         based on their subscription and current level.
@@ -279,7 +279,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             # Basic users can only access their current level
             return target_level == current_level
     
-    def get_accessible_levels(self) -> list[int]:
+    def get_accessible_levels(self):
         """
         Returns a list of class levels the user can access based on their
         subscription and current level.
@@ -349,7 +349,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return self.can_access_class_level(content_level)
     
-    def get_class_display(self) -> str:
+    def get_class_display(self):
         """
         Returns a formatted string of the user's education level and class
         """
