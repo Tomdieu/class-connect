@@ -11,6 +11,7 @@ jobs:
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
             cd /home/ubuntu/class-connect/frontend &&
+            git fetch origin && git reset --hard origin/main &&
             git pull origin main || echo "Failed to pull latest changes in frontend"
           '
       - name: Run execute.sh in frontend directory as root
