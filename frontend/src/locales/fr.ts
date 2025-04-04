@@ -1113,6 +1113,8 @@ export default {
   "form.duration": "Durée",
   "form.selectDuration": "Sélectionner la durée",
   "form.submit": "Soumettre",
+  "form.submitting": "Soumission en cours...",
+  "form.submit": "Soumettre",
   "followUps.content": "Le contenu des suivis va ici...",
   "contactInfo.content": "Le contenu des informations de contact va ici...",
 

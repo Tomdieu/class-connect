@@ -1077,6 +1077,8 @@ export default {
   "form.duration": "Duration",
   "form.selectDuration": "Select duration",
   "form.submit": "Submit",
+  "form.submitting": "Submitting...",
+  "form.submit": "Submit",
   "followUps.content": "Follow-ups content goes here...",
   "contactInfo.content": "Contact info content goes here...",
 
