@@ -15,8 +15,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   
   // Auth routes
   const authRoutes = [
-    { path: 'auth/login', priority: 0.7 },
-    { path: 'auth/register', priority: 0.7 },
+    { path: 'auth/login', priority: 0.89 },
+    { path: 'auth/register', priority: 0.89 },
   ];
 
   const sitemap: MetadataRoute.Sitemap = [];
@@ -35,7 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         url: `${baseUrl}/${lang}${route ? `/${route}` : ''}`,
         lastModified: new Date(),
         changeFrequency: route === '' ? 'daily' : 'weekly',
-        priority: route === '' ? 1.0 : 0.8,
+        priority: route === '' ? 1.0 : 0.89,
         alternates: {
           languages: languageAlternates
         }
@@ -59,7 +59,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       const entry: MetadataRoute.Sitemap[0] = {
         url: `${baseUrl}/${lang}/${route.path}`,
         lastModified: new Date(),
-        changeFrequency: 'monthly',
+        changeFrequency: 'daily',
         priority: route.priority,
         alternates: {
           languages: languageAlternates
@@ -77,8 +77,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   sitemap.push({
     url: `${baseUrl}/manifest.webmanifest`,
     lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.5
+    changeFrequency: 'daily',
+    priority: 0.89,
   });
 
   return sitemap;
