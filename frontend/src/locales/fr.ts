@@ -1307,4 +1307,6 @@ export default {
     "onlineMeetings.createSuccess": "Réunion créée avec succès",
     "onlineMeetings.createError": "Échec de la création de la réunion",
 
+  "toast.courseDeclared": "Cours déclaré avec succès !",
+  "toast.courseDeclarationFailed": "Échec de la déclaration du cours.",
 } as const;

@@ -1254,6 +1254,9 @@ export default {
   "onlineMeetings.createSuccess": "Meeting created successfully",
   "onlineMeetings.createError": "Failed to create meeting",
 
+  // Toast messages
+  "toast.courseDeclared": "Course declared successfully!",
+  "toast.courseDeclarationFailed": "Failed to declare course.",
 
   // 
   "pagination.showing":"Showing",
