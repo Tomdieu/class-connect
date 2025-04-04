@@ -177,14 +177,14 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
 
   const formSchema = z.object({
     declaration_date: z.string().nonempty({ message: t("form.errors.dateRequired") }),
-    duration: z.number().min(1).max(5, { message: t("form.errors.durationRange") }),
+    duration: z.coerce.number().min(1).max(5, { message: t("form.errors.durationRange") }),
   });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       declaration_date: "",
-      duration: 1,
+      duration: "1",
     },
   });
 
@@ -192,7 +192,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
     mutationFn: (data: { enrollmentId: number, data: { duration: number, declaration_date: string } }) => 
       createEnrollmentDeclaration(data),
     onSuccess: () => {
-      // Handle success (e.g., close dialog, show success message)
+      setIsOpen(false);
     },
     onError: () => {
       // Handle error (e.g., show error message)
@@ -203,7 +203,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
     mutation.mutate({
       enrollmentId: student.id,
       data: {
-        duration: values.duration * 60, // Convert hours to minutes
+        duration: Number(values.duration) * 60, // Convert hours to minutes
         declaration_date: values.declaration_date,
       },
     });
