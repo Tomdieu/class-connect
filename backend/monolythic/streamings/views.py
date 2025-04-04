@@ -25,14 +25,14 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def create_google_meet_link(self, title, start_time, duration_minutes):
+        import logging
+        logger = logging.getLogger(__name__)
         SCOPES = ['https://www.googleapis.com/auth/calendar']
         credentials = service_account.Credentials.from_service_account_file(
             settings.GOOGLE_SERVICE_ACCOUNT_FILE,
             scopes=SCOPES
         )
-        
         service = build('calendar', 'v3', credentials=credentials)
-        
         event = {
             'summary': title,
             'start': {
@@ -43,21 +43,46 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
                 'dateTime': (start_time + timedelta(minutes=duration_minutes)).isoformat(),
                 'timeZone': 'UTC',
             },
-            'conferenceData': {
+        }
+        # Only add conferenceData if enabled and supported
+        if getattr(settings, 'ENABLE_GOOGLE_MEET', False):
+            event['conferenceData'] = {
                 'createRequest': {
+                    'conferenceSolutionKey': {'type': 'hangoutsMeet'},  # leave as is if supported by your Google Workspace domain
                     'requestId': f"meet_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-                    'conferenceSolutionKey': {'type': 'hangoutsMeet'}
                 }
             }
-        }
-        
-        event = service.events().insert(
-            calendarId='primary',
-            conferenceDataVersion=1,
-            body=event
-        ).execute()
-        
-        return event.get('hangoutLink')
+            conference_version = 1
+        else:
+            conference_version = 0
+
+        try:
+            created_event = service.events().insert(
+                calendarId='primary',
+                conferenceDataVersion=conference_version,
+                body=event
+            ).execute()
+            link = created_event.get('hangoutLink', '')
+            # Fallback: search in conferenceData.entryPoints if hangoutLink is empty
+            if not link and created_event.get('conferenceData'):
+                for entry in created_event['conferenceData'].get('entryPoints', []):
+                    if entry.get('entryPointType') == 'video' and entry.get('uri'):
+                        link = entry.get('uri')
+                        break
+            return link
+        except Exception as e:
+            logger.error(f"Error creating meeting event: {str(e)}")
+            # Fallback: create event without conference data if error relates to conference
+            if conference_version == 1:
+                logger.info("Retrying without conferenceData")
+                event.pop('conferenceData', None)
+                created_event = service.events().insert(
+                    calendarId='primary',
+                    conferenceDataVersion=0,
+                    body=event
+                ).execute()
+                return created_event.get('hangoutLink', '')
+            raise
 
     def perform_create(self, serializer):
         title = serializer.validated_data.get('title')
