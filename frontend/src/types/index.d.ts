@@ -674,51 +674,6 @@ export declare interface UserStats {
   total_users: number;
 }
 
-
-export declare interface ForumType {
-  id:string;
-  name:string;
-  created_at:string;
-}
-
-export declare interface ForumCreateType {
-  name:string;
-}
-
-export declare interface ParentMessageType {
-  id: string;
-  sender: UserType;
-  content: string;
-  file?: string;
-  created_at: string;
-  forum: number | string;
-}
-
-export declare interface MessagesType {
-  id: string;
-  parent?: ParentMessageType; // parent message that this is replying to
-  forum: number | string;
-  sender: UserType;
-  content: string;
-  file?: string;
-  created_at: string;
-  seen_by: string[]; // users id of users who saw the message
-  replies: MessagesType[];
-}
-
-export declare interface MessageCreateType {
-  content: string;
-  parent?: number; // parent here represent the reply message id
-  file?: File;
-}
-
-export declare interface SeenType {
-  id: string;
-  message: string;
-  user: UserType;
-  created_at: string;
-}
-
 export type OnlineCourseStatus = "SCHEDULED"| "ONGOING"| "COMPLETED"| "CANCELLED"
 
 export declare interface OnlineCourseType{
@@ -764,4 +719,209 @@ export declare interface ActivityLogType {
   extra_data?: Record<string, string>; // Key-value pair object
   timestamp: string; // ISO 8601 format
   user: string;
+}
+
+
+// export declare interface ForumType {
+//   id:string;
+//   name:string;
+//   created_at:string;
+// }
+
+// export declare interface ForumCreateType {
+//   name:string;
+// }
+
+// export declare interface ParentMessageType {
+//   id: string;
+//   sender: UserType;
+//   content: string;
+//   file?: string;
+//   created_at: string;
+//   forum: number | string;
+// }
+
+// export declare interface MessagesType {
+//   id: string;
+//   parent?: ParentMessageType; // parent message that this is replying to
+//   forum: number | string;
+//   sender: UserType;
+//   content: string;
+//   file?: string;
+//   created_at: string;
+//   seen_by: string[]; // users id of users who saw the message
+//   replies: MessagesType[];
+// }
+
+// export declare interface MessageCreateType {
+//   content: string;
+//   parent?: number; // parent here represent the reply message id
+//   file?: File;
+// }
+
+// export declare interface SeenType {
+//   id: string;
+//   message: string;
+//   user: UserType;
+//   created_at: string;
+// }
+
+
+// Forum
+export interface ForumType {
+  id: number;
+  name: string;
+  created_at: string;
+}
+
+export declare interface ForumCreateType {
+  name: string;
+}
+
+// Reaction Types
+export declare enum ReactionType {
+  LIKE = 'LIKE',
+  LOVE = 'LOVE',
+  HAHA = 'HAHA',
+  WOW = 'WOW',
+  SAD = 'SAD',
+  ANGRY = 'ANGRY'
+}
+
+// Reaction Count
+export interface ReactionCountType {
+  reaction_type: string;
+  count: number;
+}
+
+// Reaction
+export interface Reaction {
+  id: number;
+  post: number;
+  user: User;
+  reaction_type: ReactionType;
+  created_at: string;
+  reaction_choices?: Record<string, string>;
+}
+
+// Comment
+export interface CommentType {
+  id: number;
+  sender: User;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  file?: string | null;
+  image?: string | null;
+  reaction_counts: ReactionCount[];
+  user_reaction: Reaction | null;
+}
+
+// Post
+export interface PostType {
+  id: number;
+  forum: number;
+  sender: User;
+  content: string;
+  file?: string | null;
+  image?: string | null;
+  created_at: string;
+  updated_at: string;
+  comments: PostType[];
+  comment_count: number;
+  reaction_counts: ReactionCount[];
+  user_reaction: Reaction | null;
+  seen_by: number[];
+  view_count: number;
+  parent?:PostType
+}
+
+// For backward compatibility, if needed
+export type Message = Post; // This is a proxy model in Django, so it has the same fields as Post
+
+// Seen
+export interface SeenType {
+  post: number;
+  user: User;
+  created_at: string;
+}
+
+// Notification types
+export enum PostNotificationType {
+  REACTION = 'REACTION',
+  COMMENT = 'COMMENT',
+  REPLY = 'REPLY',
+  MENTION = 'MENTION'
+}
+
+// Notification
+export interface ForumNotification {
+  id: number;
+  recipient: number;
+  sender: UserType;
+  post: PostType | null;
+  notification_type: PostNotificationType;
+  read: boolean;
+  created_at: string;
+}
+
+// Request interfaces for creating/updating resources
+
+export interface CreatePostRequestType {
+  forum: number;
+  content: string;
+  file?: File | null;
+  image?: File | null;
+  parent?: number | null; // For comments
+}
+
+export interface UpdatePostRequestType {
+  content?: string;
+  file?: File | null;
+  image?: File | null;
+}
+
+export interface CreateReactionRequestType {
+  post: number;
+  user_id: string;
+  reaction_type: ReactionType;
+}
+
+export interface CreateSeenRequestType {
+  post: number;
+}
+
+export interface UpdateNotificationRequestType {
+  read: boolean;
+}
+
+// Response interfaces for API endpoints
+
+export interface ForumListResponseType {
+  results: Forum[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+}
+
+export interface PostListResponseType {
+  results: Post[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+}
+
+export interface NotificationListResponseType {
+  results: Notification[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+}
+
+// Utility type for API responses with pagination
+export interface PaginatedResponse<T> {
+  results: T[];
+  count: number;
+  next: string | null;
+  previous: string | null;
 }
