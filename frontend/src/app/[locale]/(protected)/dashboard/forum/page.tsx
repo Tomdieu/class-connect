@@ -43,6 +43,8 @@ import {
 } from "@/components/ui/popover";
 import { formatDistanceToNow } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
@@ -128,10 +130,11 @@ export default function ForumPage() {
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      if (!lastPage.next) return undefined;
-      const url = new URL(lastPage.next);
-      return url.searchParams.get("page");
-    },
+        if (!lastPage.next) return undefined;
+        const url = new URL(lastPage.next);
+        const page = url.searchParams.get("page");
+        return page ? parseInt(page, 10) : undefined;
+      },
     enabled: true,
   });
 
@@ -422,18 +425,16 @@ export default function ForumPage() {
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0">
                           <div className="h-9 w-9 rounded-full overflow-hidden">
-                            {notification.sender.avatar ? (
-                              <img 
+                            <Avatar className="h-full w-full">
+                              <AvatarImage 
                                 src={notification.sender.avatar} 
-                                alt={`${notification.sender.first_name} ${notification.sender.last_name}`} 
-                                className="h-full w-full object-cover"
+                                alt={`${notification.sender.first_name} ${notification.sender.last_name}`}
                               />
-                            ) : (
-                              <div className="bg-primary text-white h-full w-full flex items-center justify-center text-sm font-medium">
+                              <AvatarFallback className="bg-primary text-white">
                                 {notification.sender.first_name?.[0]}
                                 {notification.sender.last_name?.[0]}
-                              </div>
-                            )}
+                              </AvatarFallback>
+                            </Avatar>
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
@@ -496,10 +497,12 @@ export default function ForumPage() {
               {imageFile && (
                 <div className="relative group">
                   <div className="border rounded-md overflow-hidden h-24 w-24">
-                    <img
+                    <Image
                       src={URL.createObjectURL(imageFile)}
                       alt="Image preview"
                       className="object-cover h-full w-full"
+                      width={96}
+                      height={96}
                     />
                   </div>
                   <button
@@ -606,7 +609,7 @@ export default function ForumPage() {
               {t("common.tryAgain")}
             </Button>
           </div>
-        ) : feedsQuery.data.pages[0].results.length === 0 ? (
+        ) : feedsQuery.data?.pages[0].results.length === 0 ? (
           <div className="text-center my-12 bg-muted/50 py-16 rounded-lg">
             <h3 className="font-semibold text-lg mb-2">
               {t("forum.noPostsYet")}
@@ -618,7 +621,7 @@ export default function ForumPage() {
         ) : (
           <>
             {/* Map through all pages and their results */}
-            {feedsQuery.data.pages.map((page, i) => (
+            {feedsQuery.data?.pages.map((page, i) => (
               <div key={i} className="space-y-6">
                 {page.results.map((post: PostType) => (
                   <PostCard 
