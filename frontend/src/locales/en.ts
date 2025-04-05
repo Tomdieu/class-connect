@@ -1289,5 +1289,61 @@ export default {
   "stats.withPlans": "With Plans",
   "stats.withoutPlans": "Without Plans",
 
-  "enrollments":"Teacher-Student Enrollment"
+  "enrollments":"Teacher-Student Enrollment",
+
+  // Forum translations
+  "forum.title": "Community Forum",
+  "forum.selectForum": "Select a forum",
+  "forum.pleaseSelectForum": "Please select a forum to post in",
+  "forum.selectForumError": "Forum selection required",
+  "forum.postCreated": "Post created",
+  "forum.postCreatedSuccess": "Your post was published successfully",
+  "forum.error": "Error",
+  "forum.postCreationFailed": "Failed to create post. Please try again.",
+  "forum.whatsOnYourMind": "What's on your mind?",
+  "forum.writeComment": "Write a comment...",
+  "forum.photo": "Photo",
+  "forum.file": "File",
+  "forum.posting": "Posting...",
+  "forum.post": "Post",
+  "forum.like": "Like",
+  "forum.comment": "Comment",
+  "forum.noPostsYet": "No posts yet",
+  "forum.beTheFirstToPost": "Be the first to share something with the community",
+  "forum.loadMore": "Load More",
+  "forum.noComments": "No comments yet. Be the first to comment!",
+  "forum.postNotFound": "The post you're looking for could not be found",
+  "forum.somethingWentWrong": "Something went wrong",
+  "forum.backToForum": "Back to Forum",
+  "forum.reply": "Reply",
+  "forum.replyingTo": "Replying to",
+  "forum.writeReply": "Write a reply...",
+  
+  // Forum notifications
+  "forum.notifications.title": "Notifications",
+  "forum.notifications.markAllRead": "Mark all as read",
+  "forum.notifications.empty": "No notifications yet",
+  "forum.notifications.reaction": "{name} reacted to your post",
+  "forum.notifications.comment": "{name} commented on your post",
+  "forum.notifications.reply": "{name} replied to your comment",
+  "forum.notifications.mention": "{name} mentioned you in a post",
+  "forum.notifications.default": "{name} interacted with your post",
+  "forum.notifications.viewPost": "View post",
+  
+  // Reactions
+  "reactions.like": "Like",
+  "reactions.love": "Love",
+  "reactions.haha": "Haha",
+  "reactions.wow": "Wow",
+  "reactions.sad": "Sad",
+  "reactions.angry": "Angry",
+
+  // Comments translations
+  "forum.commentCreated": "Comment added",
+  "forum.commentCreatedSuccess": "Your comment was published successfully",
+  "forum.commentCreationFailed": "Failed to add comment. Please try again.",
+
+  // Forum validation translations
+  "forum.contentRequired": "Content is required for all posts",
+  "forum.maxFileSize": "Maximum file sizes: Images ({image}), Files ({file})",
 } as const;
