@@ -1505,4 +1505,20 @@ export default {
   "admin.forumDetail.forumActivity": "Activité du Forum",
   "admin.forumDetail.forumActivityDesc": "Voir l'engagement du forum au fil du temps",
   "admin.forumDetail.activityChart": "Le graphique d'activité apparaîtrait ici",
+
+  // Additional forum post editing/deleting translations
+  "forum.editPost": "Modifier la Publication",
+  "forum.editPostDescription": "Effectuez des modifications à votre publication ci-dessous.",
+  "forum.deletePost": "Supprimer la Publication",
+  "forum.deletePostWarning": "Cette action ne peut pas être annulée. Cette opération supprimera définitivement votre publication et tous ses commentaires.",
+  "forum.updating": "Mise à jour...",
+  "forum.deleting": "Suppression...",
+  "forum.saveChanges": "Enregistrer les Modifications",
+  "forum.postUpdated": "Publication Mise à Jour",
+  "forum.postUpdatedSuccess": "Votre publication a été mise à jour avec succès",
+  "forum.postUpdateFailed": "Échec de la mise à jour de la publication. Veuillez réessayer.",
+  "forum.postDeleted": "Publication Supprimée",
+  "forum.postDeletedSuccess": "Votre publication a été supprimée avec succès",
+  "forum.postDeleteFailed": "Échec de la suppression de la publication. Veuillez réessayer.",
+  "forum.scrollToTop": "Remonter en haut",
 } as const;

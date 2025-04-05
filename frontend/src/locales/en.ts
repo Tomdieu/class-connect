@@ -1463,4 +1463,20 @@ export default {
   "admin.forumDetail.forumActivity": "Forum Activity",
   "admin.forumDetail.forumActivityDesc": "View forum engagement over time",
   "admin.forumDetail.activityChart": "Activity chart would appear here",
+
+  // Additional forum post editing/deleting translations
+  "forum.editPost": "Edit Post",
+  "forum.editPostDescription": "Make changes to your post below.",
+  "forum.deletePost": "Delete Post",
+  "forum.deletePostWarning": "This action cannot be undone. This will permanently delete your post and all of its comments.",
+  "forum.updating": "Updating...",
+  "forum.deleting": "Deleting...",
+  "forum.saveChanges": "Save Changes",
+  "forum.postUpdated": "Post Updated",
+  "forum.postUpdatedSuccess": "Your post was updated successfully",
+  "forum.postUpdateFailed": "Failed to update post. Please try again.",
+  "forum.postDeleted": "Post Deleted",
+  "forum.postDeletedSuccess": "Your post was deleted successfully",
+  "forum.postDeleteFailed": "Failed to delete post. Please try again.",
+  "forum.scrollToTop": "Scroll to top",
 } as const;
