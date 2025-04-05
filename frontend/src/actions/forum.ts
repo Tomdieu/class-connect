@@ -503,6 +503,7 @@ export const addPostComments = async (
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorized user!");
+    console.log({postId,data})
 
     // Create FormData object
     const formData = new FormData();
@@ -511,6 +512,9 @@ export const addPostComments = async (
     if (data.content !== undefined) {
       formData.append("content", data.content);
     }
+
+    // No need to append parent as the backend handles this
+    // The postId parameter is used in the URL, and the backend will use it as the parent post
 
     // Handle file field - if null is explicitly passed, we're removing the file
     if (data.file === null) {
@@ -621,6 +625,27 @@ export const markPostAsViewed = async (postId: number) => {
       headers: {
         Authorization: `Bearer ${session?.user.accessToken}`,
         "Content-Type": "application/json",
+      },
+    });
+
+    return response.data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+export const deletePost = async (postId: number) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorized user!");
+
+    const response = await api.delete(`/api/posts/${postId}/`, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
       },
     });
 
