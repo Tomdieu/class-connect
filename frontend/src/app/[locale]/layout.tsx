@@ -11,7 +11,6 @@ import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import React, { ReactElement } from "react";
 import InactivityProvider from "@/providers/InactivityProvider";
 import HelmetWrapper from "@/providers/HelmetWrapperProvider";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 // Optimize font loading
 const Inter = localFont({

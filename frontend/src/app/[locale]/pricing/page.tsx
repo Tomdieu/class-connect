@@ -54,8 +54,8 @@ const PricingPage = () => {
       <main className="flex-1">
         <div className="py-12 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-center mb-4">{t("pricing.title")}</h1>
-            <p className="text-gray-600 text-center mb-12">{t("pricing.subtitle")}</p>
+            {/* <h1 className="text-4xl font-bold text-center mb-4">{t("pricing.title")}</h1>
+            <p className="text-gray-600 text-center mb-12">{t("pricing.subtitle")}</p> */}
             <SubscriptionPlans />
           </div>
         </div>
