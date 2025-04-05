@@ -9,6 +9,8 @@ import { Bell, Check, MessageSquare, ThumbsUp, User } from "lucide-react";
 import Link from "next/link";
 import { useI18n } from "@/locales/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@/hooks/useUser";
+import { useSession } from "next-auth/react";
 
 interface ForumNotificationsProps {
   notifications: ForumNotification[];
@@ -19,6 +21,17 @@ export default function ForumNotifications({ notifications, onNotificationRead }
   const t = useI18n();
   const queryClient = useQueryClient();
   const unreadCount = notifications.filter(n => !n.read).length;
+  const {data:session} = useSession()
+
+  const getPath = ()=>{
+    if(session?.user?.role === "admin"){
+      return "/admin/forum"
+    }else if(session?.user?.role === "student"){
+      return "/student/forum"
+    }else if(session?.user?.role === "teacher"){
+      return "/dashboard/forum"
+    }
+  }
 
   // Use TanStack Query for mutations
   const markAsReadMutation = useMutation({
@@ -149,7 +162,7 @@ export default function ForumNotifications({ notifications, onNotificationRead }
                   
                   {notification.post && (
                     <Link 
-                      href={`/dashboard/forum/post/${notification.post.id}`}
+                      href={`${getPath}/post/${notification.post.id}`}
                       className="mt-2 block text-xs text-blue-600 hover:underline"
                     >
                       {t("forum.notifications.viewPost")}
