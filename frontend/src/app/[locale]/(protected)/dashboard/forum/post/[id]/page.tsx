@@ -3,7 +3,6 @@
 import { getFeedById, markPostAsViewed } from "@/actions/forum";
 import PostCard from "@/components/forum/PostCard";
 import { Button } from "@/components/ui/button";
-import { PostType } from "@/types";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";

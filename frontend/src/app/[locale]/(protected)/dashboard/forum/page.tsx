@@ -171,8 +171,8 @@ export default function ForumPage() {
     },
     onSuccess: () => {
       // Show success toast
-      toast.success("Post Updated", {
-        description: "Your post was updated successfully",
+      toast.success(t("forum.postUpdated"), {
+        description: t("forum.postUpdatedSuccess"),
       });
 
       // Reset edit state
@@ -185,7 +185,7 @@ export default function ForumPage() {
     },
     onError: () => {
       toast.error(t("forum.error"), {
-        description: "Failed to update post. Please try again.",
+        description: t("forum.postUpdateFailed"),
       });
     },
   });
@@ -197,8 +197,8 @@ export default function ForumPage() {
     },
     onSuccess: () => {
       // Show success toast
-      toast.success("Post Deleted", {
-        description: "Your post was deleted successfully",
+      toast.success(t("forum.postDeleted"), {
+        description: t("forum.postDeletedSuccess"),
       });
 
       // Reset delete state
@@ -210,7 +210,7 @@ export default function ForumPage() {
     },
     onError: () => {
       toast.error(t("forum.error"), {
-        description: "Failed to delete post. Please try again.",
+        description: t("forum.postDeleteFailed"),
       });
     },
   });
@@ -499,7 +499,7 @@ export default function ForumPage() {
                   <div className="border rounded-md overflow-hidden h-24 w-24">
                     <Image
                       src={URL.createObjectURL(imageFile)}
-                      alt="Image preview"
+                      alt={t("forum.imagePreview")}
                       className="object-cover h-full w-full"
                       width={96}
                       height={96}
@@ -645,7 +645,7 @@ export default function ForumPage() {
                   {feedsQuery.isFetchingNextPage ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Loading...
+                      {t("forum.loading")}
                     </>
                   ) : (
                     t("forum.loadMore")
@@ -661,9 +661,9 @@ export default function ForumPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Post</DialogTitle>
+            <DialogTitle>{t("forum.editPost")}</DialogTitle>
             <DialogDescription>
-              Make changes to your post below.
+              {t("forum.editPostDescription")}
             </DialogDescription>
           </DialogHeader>
           <Textarea
@@ -676,7 +676,7 @@ export default function ForumPage() {
               variant="outline" 
               onClick={() => setIsEditDialogOpen(false)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button 
               onClick={handleEditSubmit}
@@ -685,10 +685,10 @@ export default function ForumPage() {
               {updatePostMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Updating...
+                  {t("forum.updating")}
                 </>
               ) : (
-                "Save Changes"
+                t("forum.saveChanges")
               )}
             </Button>
           </DialogFooter>
@@ -699,13 +699,13 @@ export default function ForumPage() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Post</AlertDialogTitle>
+            <AlertDialogTitle>{t("forum.deletePost")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your post and all of its comments.
+              {t("forum.deletePostWarning")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteConfirm}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -713,10 +713,10 @@ export default function ForumPage() {
               {deletePostMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
+                  {t("forum.deleting")}
                 </>
               ) : (
-                "Delete"
+                t("common.delete")
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -728,7 +728,7 @@ export default function ForumPage() {
         <Button
           onClick={scrollToTop}
           className="fixed bottom-8 right-8 z-50 rounded-full shadow-lg size-12 p-0"
-          aria-label="Scroll to top"
+          aria-label={t("forum.scrollToTop")}
         >
           <ArrowUp className="h-5 w-5" />
         </Button>
