@@ -1369,6 +1369,10 @@ export default {
   "forum.notifications.mention": "{name} vous a mentionné dans une publication",
   "forum.notifications.default": "{name} a interagi avec votre publication",
   "forum.notifications.viewPost": "Voir la publication",
+  "forum.noReplies": "Pas encore de réponses",
+  "forum.viewReplies": "Voir {count} réponses",
+  "forum.viewOneReply": "Voir 1 réponse",
+  "forum.hideReplies": "Masquer les réponses",
   // Reactions
   "reactions.like": "J'aime",
   "reactions.love": "J'adore",

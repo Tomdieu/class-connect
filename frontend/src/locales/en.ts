@@ -1318,6 +1318,10 @@ export default {
   "forum.reply": "Reply",
   "forum.replyingTo": "Replying to",
   "forum.writeReply": "Write a reply...",
+  "forum.noReplies": "No replies yet",
+  "forum.viewReplies": "View {count} replies",
+  "forum.viewOneReply": "View 1 reply",
+  "forum.hideReplies": "Hide replies",
   
   // Forum notifications
   "forum.notifications.title": "Notifications",
