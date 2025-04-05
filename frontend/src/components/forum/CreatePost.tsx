@@ -6,7 +6,7 @@ import { ForumType, CreatePostRequestType } from "@/types";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { FileImage, Paperclip, X } from "lucide-react";
+import { X, FileImage, Paperclip, ImageIcon, FileText } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -85,13 +85,35 @@ export default function CreatePost({
     setValidationErrors({});
     
     try {
-      // Validate using Zod schema
-      createPostSchema.parse({
-        content: data.content,
-        forum: data.forum || 0,
-        image: data.image,
-        file: data.file,
-      });
+      // If this is a reply/comment (has parentId), don't validate forum selection
+      if (parentId) {
+        // For replies, only validate content and file sizes
+        const isContentValid = data.content.trim().length > 0;
+        const isImageValid = !data.image || data.image.size <= MAX_IMAGE_SIZE;
+        const isFileValid = !data.file || data.file.size <= MAX_FILE_SIZE;
+        
+        if (!isContentValid) {
+          setValidationErrors(prev => ({ ...prev, content: "Content is required" }));
+        }
+        
+        if (!isImageValid) {
+          setValidationErrors(prev => ({ ...prev, image: `Image file size must be less than 8MB` }));
+        }
+        
+        if (!isFileValid) {
+          setValidationErrors(prev => ({ ...prev, file: `File size must be less than 100MB` }));
+        }
+        
+        return isContentValid && isImageValid && isFileValid;
+      } else {
+        // For new posts, use the original schema that requires forum selection
+        createPostSchema.parse({
+          content: data.content,
+          forum: data.forum || 0,
+          image: data.image,
+          file: data.file,
+        });
+      }
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -184,6 +206,15 @@ export default function CreatePost({
   const handleSubmit = async () => {
     const activeForumId = forumId || selectedForum;
     
+    // For debugging
+    console.log("Submitting post:", {
+      content,
+      forum: activeForumId,
+      parentId,
+      image: image ? image.name : null,
+      file: file ? file.name : null
+    });
+    
     // Validate the form data
     const isValid = validatePostData({
       content,
@@ -199,9 +230,20 @@ export default function CreatePost({
           description: "Please enter some content for your post."
         });
       }
-      if (validationErrors.forum) {
+      // Only show forum error if this is not a reply/comment
+      if (validationErrors.forum && !parentId) {
         toast.error("Forum Required", {
           description: "Please select a forum for your post."
+        });
+      }
+      if (validationErrors.image) {
+        toast.error("Image Too Large", {
+          description: validationErrors.image
+        });
+      }
+      if (validationErrors.file) {
+        toast.error("File Too Large", {
+          description: validationErrors.file
         });
       }
       return;
@@ -221,8 +263,14 @@ export default function CreatePost({
     
     try {
       const formData = new FormData();
-      formData.append("forum", activeForumId?.toString() || "0");
+      
+      // Always append content
       formData.append("content", content);
+      
+      // Only append forum if this is a new post (not a reply)
+      if (!parentId) {
+        formData.append("forum", activeForumId?.toString() || "0");
+      }
       
       if (image) {
         formData.append("image", image);
@@ -232,8 +280,15 @@ export default function CreatePost({
         formData.append("file", file);
       }
 
+      // Log the form data entries for debugging
+      console.log("Form data entries:");
+      for (const pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
       if (parentId) {
         // If this is a comment, use API directly with upload progress
+        console.log(`Posting comment to parent ID: ${parentId}`);
         const response = await api.post(`/api/posts/${parentId}/comment/`, formData, {
           headers: {
             Authorization: `Bearer ${session?.user.accessToken}`,
@@ -246,10 +301,12 @@ export default function CreatePost({
           },
         });
 
+        console.log("Comment response:", response.data);
         // Invalidate the specific post's comments query to refresh the comments list
         queryClient.invalidateQueries({ queryKey: ["postComments", parentId] });
       } else {
         // If this is a new post, use API directly with upload progress
+        console.log("Posting new post");
         const response = await api.post(`/api/posts/`, formData, {
           headers: {
             Authorization: `Bearer ${session?.user.accessToken}`,
@@ -261,6 +318,8 @@ export default function CreatePost({
             setUploadProgress(percentCompleted);
           },
         });
+        
+        console.log("Post response:", response.data);
       }
 
       // Set progress to 100% when complete
@@ -292,6 +351,11 @@ export default function CreatePost({
         }
       );
     } catch (error: any) {
+      console.error(
+        parentId ? "Error creating comment:" : "Error creating post:",
+        error
+      );
+      
       setShowProgress(false);
       
       // Check for file size error from server
@@ -300,10 +364,6 @@ export default function CreatePost({
           description: "The file exceeds the maximum size limit. Please select a smaller file.",
         });
       } else {
-        console.error(
-          parentId ? "Error creating comment:" : "Error creating post:",
-          error
-        );
         toast.error(t("forum.error"), {
           description: parentId
             ? t("forum.commentCreationFailed")
@@ -418,8 +478,10 @@ export default function CreatePost({
 
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
         <div className="flex gap-2">
-          <label className="cursor-pointer p-2 rounded-md hover:bg-gray-100">
-            <FileImage className="h-5 w-5 text-blue-500" />
+          <label className="cursor-pointer p-2 rounded-md hover:bg-gray-100 transition duration-200">
+            <ImageIcon 
+              className="h-5 w-5 text-blue-600"
+            />
             <input
               type="file"
               className="hidden"
@@ -429,8 +491,10 @@ export default function CreatePost({
             />
           </label>
 
-          <label className="cursor-pointer p-2 rounded-md hover:bg-gray-100">
-            <Paperclip className="h-5 w-5 text-green-500" />
+          <label className="cursor-pointer p-2 rounded-md hover:bg-gray-100 transition duration-200">
+            <FileText 
+              className="h-5 w-5 text-green-600"
+            />
             <input
               type="file"
               className="hidden"
@@ -441,15 +505,11 @@ export default function CreatePost({
         </div>
 
         <div className="flex items-center gap-2">
-          {isComment && (
+          {onClose && (
             <Button
               variant="outline"
               size="default"
-              onClick={() => {
-                if (onClose) {
-                  onClose();
-                }
-              }}
+              onClick={onClose}
               disabled={isSubmitting}
             >
               {t("common.cancel")}
