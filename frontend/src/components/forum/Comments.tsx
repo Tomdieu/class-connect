@@ -1,166 +1,301 @@
 "use client";
 
-import { PostType } from "@/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import CreatePost from "./CreatePost";
-import PostCard from "./PostCard";
-import { getPostComments } from "@/actions/forum";
 import { useI18n } from "@/locales/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { PostType } from "@/types";
+import { addPostComments, getPostComments } from "@/actions/forum";
+import { toast } from "sonner";
+import PostCard from "./PostCard";
 import { Button } from "../ui/button";
-import { X } from "lucide-react";
-import { Separator } from "../ui/separator";
+import { Textarea } from "../ui/textarea";
+import { Loader2 } from "lucide-react";
 
 interface CommentsProps {
   post: PostType;
+  onEdit?: (post: PostType) => void;
+  onDelete?: (post: PostType) => void;
 }
 
-export default function Comments({ post }: CommentsProps) {
+// New component to handle display of nested replies
+const CommentWithReplies = ({ comment, onEdit, onDelete, level = 0 }: 
+  { comment: PostType; onEdit?: (post: PostType) => void; onDelete?: (post: PostType) => void; level?: number }) => {
+  const [isReplying, setIsReplying] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [showReplies, setShowReplies] = useState(false);
   const t = useI18n();
   const queryClient = useQueryClient();
-  const [commentInputVisible, setCommentInputVisible] = useState(false);
-  const [replyToComment, setReplyToComment] = useState<PostType | null>(null);
 
-  // Use TanStack Query to fetch comments
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["postComments", post.id],
+  // Fetch replies for this comment
+  const { data: replies, isLoading: loadingReplies } = useQuery({
+    queryKey: ["commentReplies", comment.id],
     queryFn: async () => {
-      const data = await getPostComments(post.id);
-      // The API returns a paginated structure with results array
+      const data = await getPostComments(comment.id);
       return data.results || [];
     },
-    initialData: [],
+    enabled: showReplies, // Only fetch when replies are toggled on
   });
 
-  const comments = data || [];
+  // Add reply mutation
+  const replyMutation = useMutation({
+    mutationFn: async (text: string) => {
+      return await addPostComments(comment.id, { content: text, forum: comment.forum });
+    },
+    onSuccess: () => {
+      // Reset reply form
+      setReplyText("");
+      setIsReplying(false);
 
-  const handleCommentCreated = () => {
-    // Hide the comment input after successful submission
-    setCommentInputVisible(false);
-    setReplyToComment(null);
+      // Show success toast
+      toast.success(t("forum.commentCreated"), {
+        description: t("forum.commentCreatedSuccess")
+      });
 
-    // Refetch comments to get the latest data
-    refetch();
+      // Invalidate queries to refetch comments
+      queryClient.invalidateQueries({ queryKey: ["commentReplies", comment.id] });
+      queryClient.invalidateQueries({ queryKey: ["postComments", comment.parent?.id] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+    },
+    onError: () => {
+      toast.error(t("forum.error"), {
+        description: t("forum.commentCreationFailed")
+      });
+    },
+  });
 
-    // Also invalidate the main feed to update comment counts
-    queryClient.invalidateQueries({ queryKey: ["forumPosts"] });
+  const handleReplyClick = () => {
+    setIsReplying(true);
+    // Also show existing replies when replying
+    setShowReplies(true);
   };
 
-  const handleReplyClick = (comment: PostType) => {
-    setReplyToComment(comment);
-    setCommentInputVisible(true);
+  const cancelReply = () => {
+    setIsReplying(false);
+    setReplyText("");
   };
 
-  const handleCloseReply = () => {
-    setReplyToComment(null);
-    setCommentInputVisible(false);
+  const handleSubmitReply = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!replyText.trim()) return;
+    
+    replyMutation.mutate(replyText);
+  };
+
+  // Toggle display of replies
+  const toggleReplies = () => {
+    setShowReplies(!showReplies);
   };
 
   return (
-    <div className="space-y-4">
-      {replyToComment ? (
-        <div className="mb-4 relative">
-          <div className="bg-gray-50 p-3 rounded-lg mb-3 relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-1 right-1 h-6 w-6"
-              onClick={handleCloseReply}
-            >
-              <X className="h-3 w-3" />
-            </Button>
-            <p className="text-sm text-gray-600 mb-1">
-              {t("forum.replyingTo")}:
-            </p>
-            <div className="pl-2 border-l-2 border-gray-300">
-              <p className="text-sm font-medium">
-                {replyToComment.sender.first_name}{" "}
-                {replyToComment.sender.last_name}
-              </p>
-              <p className="text-sm text-gray-700 line-clamp-2">
-                {replyToComment.content}
-              </p>
+    <div className="comment-thread">
+      {/* Original comment */}
+      <PostCard
+        post={comment}
+        isComment={true}
+        isReply={level > 0}
+        onReplyClick={handleReplyClick}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+
+      {/* Show number of replies if any and not already expanded */}
+      {comment.comment_count > 0 && !showReplies && (
+        <div className="ml-8 mt-1 text-sm text-blue-600 cursor-pointer hover:underline" onClick={toggleReplies}>
+          {comment.comment_count === 1 
+            ? t("forum.viewOneReply") 
+            : t("forum.viewReplies", { count: comment.comment_count })
+          }
+        </div>
+      )}
+
+      {/* Container for replies with left border styling */}
+      <div className={`pl-8 ${level < 2 ? "border-l-2 border-gray-100 ml-6" : ""}`}>
+        {/* Reply form */}
+        {isReplying && (
+          <form onSubmit={handleSubmitReply} className="mt-2 space-y-2">
+            <Textarea
+              placeholder={t("forum.writeReply")}
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              className="resize-none text-sm"
+              rows={2}
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={cancelReply}
+              >
+                {t("common.cancel")}
+              </Button>
+              <Button
+                type="submit"
+                disabled={replyMutation.isPending || !replyText.trim()}
+                size="sm"
+              >
+                {replyMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : null}
+                {t("forum.reply")}
+              </Button>
             </div>
+          </form>
+        )}
+
+        {/* Replies list */}
+        {showReplies && (
+          <div className="mt-2 space-y-3">
+            {loadingReplies ? (
+              <div className="flex justify-center my-2">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              </div>
+            ) : replies && replies.length > 0 ? (
+              replies.map((reply) => (
+                <CommentWithReplies
+                  key={reply.id}
+                  comment={reply}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  level={level + 1}
+                />
+              ))
+            ) : (
+              <div className="text-center text-muted-foreground text-xs py-2">
+                {t("forum.noReplies")}
+              </div>
+            )}
           </div>
-          <CreatePost
-            onPostCreated={handleCommentCreated}
-            parentId={replyToComment.id}
-            forumId={post.forum}
-            placeholder={t("forum.writeReply")}
-          />
+        )}
+      </div>
+
+      {/* Hide replies button */}
+      {showReplies && comment.comment_count > 0 && (
+        <div className="ml-8 mt-1 text-sm text-blue-600 cursor-pointer hover:underline" onClick={toggleReplies}>
+          {t("forum.hideReplies")}
         </div>
-      ) : commentInputVisible ? (
-        <div className="mb-4 relative">
-          {/* <Button 
-            variant="ghost" 
-            size="icon" 
-            className="absolute top-0 right-0 z-10" 
-            onClick={handleCloseReply}
+      )}
+    </div>
+  );
+};
+
+export default function Comments({ post, onEdit, onDelete }: CommentsProps) {
+  const [commentText, setCommentText] = useState("");
+  const [replyTo, setReplyTo] = useState<PostType | null>(null);
+  const t = useI18n();
+  const queryClient = useQueryClient();
+
+  // Fetch comments for this post
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["postComments", post.id],
+    queryFn: async () => {
+      const data = await getPostComments(post.id);
+      return data.results || [];
+    },
+  });
+
+  // Create comment mutation
+  const commentMutation = useMutation({
+    mutationFn: async (comment: string) => {
+      // If replyTo is set, we're replying to a comment, so pass that comment's ID
+      // Otherwise, we're commenting on the main post, so pass the main post's ID
+      const targetPostId = replyTo ? replyTo.id : post.id;
+      
+      return await addPostComments(targetPostId, { 
+        content: comment, 
+        forum: post.forum
+      });
+    },
+    onSuccess: () => {
+      // Reset comment form
+      setCommentText("");
+      setReplyTo(null);
+
+      // Show success toast
+      toast.success(t("forum.commentCreated"), {
+        description: t("forum.commentCreatedSuccess")
+      });
+
+      // Invalidate queries to refetch comments
+      queryClient.invalidateQueries({ queryKey: ["postComments", post.id] });
+
+      // Also invalidate feed queries to update the comment count
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+    },
+    onError: () => {
+      toast.error(t("forum.error"), {
+        description: t("forum.commentCreationFailed")
+      });
+    },
+  });
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    
+    commentMutation.mutate(commentText);
+  };
+
+  // If loading, show loading indicator
+  if (isLoading) {
+    return (
+      <div className="flex justify-center my-4">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // If error, show error message
+  if (error) {
+    return (
+      <div className="text-destructive my-4 text-center">
+        {t("forum.somethingWentWrong")}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-2 space-y-4">
+      {/* Comment form */}
+      <form onSubmit={handleSubmitComment} className="space-y-2">
+        <Textarea
+          placeholder={t("forum.writeComment")}
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+          className="resize-none"
+          rows={3}
+        />
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            disabled={commentMutation.isPending || !commentText.trim()}
+            size="sm"
           >
-            <X className="h-4 w-4" />
-          </Button> */}
-          <CreatePost
-            onClose={handleCloseReply}
-            onPostCreated={handleCommentCreated}
-            parentId={post.id}
-            forumId={post.forum}
-          />
+            {commentMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : null}
+            {t("forum.comment")}
+          </Button>
         </div>
-      ) : (
-        <button
-          onClick={() => setCommentInputVisible(true)}
-          className="text-sm text-blue-600 hover:text-blue-800 hover:underline mb-2"
-        >
-          {t("forum.writeComment")}
-        </button>
-      )}
+      </form>
 
-      {isLoading ? (
-        <div className="flex justify-center p-4">
-          <div className="animate-spin h-5 w-5 border-2 border-blue-500 rounded-full border-t-transparent"></div>
-        </div>
-      ) : isError ? (
-        <div className="text-center p-4">
-          <p className="text-red-500 mb-2">Error loading comments</p>
-          <button className="text-blue-500 underline" onClick={() => refetch()}>
-            Try again
-          </button>
-        </div>
-      ) : comments.length > 0 ? (
-        <div className="space-y-4">
-          <Separator className="my-2" />
-          {comments.map((comment) => (
-            <div key={comment.id} className="space-y-3">
-              <PostCard
-                post={comment}
-                isComment={true}
-                showComments={false}
-                onReplyClick={() => handleReplyClick(comment)}
-              />
-
-              {/* Render nested replies if they exist */}
-              {comment.comments && comment.comments.length > 0 && (
-                <div className="pl-8 space-y-3 mt-2">
-                  {comment.comments.map((reply) => (
-                    <PostCard
-                      key={reply.id}
-                      post={reply}
-                      isComment={true}
-                      showComments={false}
-                      isReply={true}
-                      onReplyClick={() => handleReplyClick(reply)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-3 text-sm text-gray-500">
-          {t("forum.noComments")}
-        </div>
-      )}
+      {/* Comments list */}
+      <div className="space-y-4 mt-4">
+        {data && data.length > 0 ? (
+          data.map((comment) => (
+            <CommentWithReplies
+              key={comment.id}
+              comment={comment}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))
+        ) : (
+          <div className="text-center text-muted-foreground text-sm py-3">
+            {t("forum.noComments")}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

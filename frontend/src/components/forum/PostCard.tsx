@@ -4,7 +4,7 @@ import { PostType, ReactionType } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
-import { Download, MessageCircle, PaperclipIcon, Reply } from "lucide-react";
+import { Download, Edit, MessageCircle, MoreVertical, PaperclipIcon, Reply, Trash } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { addReaction, markPostAsViewed, removeReaction, getPostComments } from "@/actions/forum";
@@ -15,6 +15,15 @@ import { useI18n } from "@/locales/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { VideoPlayer } from "../ui/video-player";
+import { useSession } from "next-auth/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+// Using Sonner toast instead of the UI toast component
+import { toast } from "sonner";
 
 interface PostCardProps {
   post: PostType;
@@ -22,6 +31,8 @@ interface PostCardProps {
   isReply?: boolean;
   showComments?: boolean;
   onReplyClick?: () => void;
+  onEdit?: (post: PostType) => void;
+  onDelete?: (post: PostType) => void;
 }
 
 export default function PostCard({ 
@@ -29,13 +40,19 @@ export default function PostCard({
   isComment = false, 
   isReply = false,
   showComments = true, 
-  onReplyClick 
+  onReplyClick,
+  onEdit,
+  onDelete
 }: PostCardProps) {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [currentPost, setCurrentPost] = useState<PostType>(post);
   const t = useI18n();
   const viewMarked = useRef(false);
   const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  // Check if the current user is the post owner
+  const isOwner = session?.user?.id === post.sender.id;
 
   // Set up intersection observer to detect when post is viewed
   const { ref, inView } = useInView({
@@ -74,11 +91,9 @@ export default function PostCard({
       }
     },
     onSuccess: (data, variables) => {
-      // Update local state based on the mutation result
       const { reactionType, isRemove } = variables;
       
       if (isRemove) {
-        // Remove reaction
         const updatedReactionCounts = currentPost.reaction_counts.map(count => 
           count.reaction_type === reactionType 
             ? { ...count, count: Math.max(0, count.count - 1) } 
@@ -91,13 +106,10 @@ export default function PostCard({
           reaction_counts: updatedReactionCounts
         });
       } else {
-        // Add/change reaction
         const oldReactionType = currentPost.user_reaction?.reaction_type;
         
-        // Update reaction counts
         let updatedReactionCounts = [...currentPost.reaction_counts];
         
-        // If there was a previous reaction, decrement that count
         if (oldReactionType) {
           updatedReactionCounts = updatedReactionCounts.map(count => 
             count.reaction_type === oldReactionType 
@@ -106,7 +118,6 @@ export default function PostCard({
           );
         }
         
-        // Check if the new reaction type exists in counts
         const existingReaction = updatedReactionCounts.find(
           c => c.reaction_type === reactionType
         );
@@ -137,10 +148,8 @@ export default function PostCard({
   });
 
   const handleToggleComments = () => {
-    // Toggle comments visibility
     setIsCommentsOpen(!isCommentsOpen);
     
-    // If we're opening comments, prefetch them
     if (!isCommentsOpen) {
       queryClient.prefetchQuery({
         queryKey: ['postComments', currentPost.id],
@@ -153,7 +162,6 @@ export default function PostCard({
   };
 
   const handleReaction = async (reactionType: ReactionType) => {
-    // Check if removing or adding/changing reaction
     const isRemove = currentPost.user_reaction?.reaction_type === reactionType;
     
     reactionMutation.mutate({
@@ -163,7 +171,22 @@ export default function PostCard({
     });
   };
 
-  // Function to check if string is a video URL
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(currentPost);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(currentPost);
+    } else {
+      toast.error(t("forum.postCreationFailed"), {
+        description: t("forum.error")
+      });
+    }
+  };
+
   const isVideoUrl = (url: string) => {
     if (!url) return false;
     const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.wmv', '.mkv'];
@@ -174,25 +197,47 @@ export default function PostCard({
     <Card 
       className={`${isComment ? "shadow-none border-0 bg-transparent" : "shadow-md"} 
       ${isReply ? "ml-0" : ""}`}
-      ref={!isComment ? ref : undefined} // Only track main posts for view counting
+      ref={!isComment ? ref : undefined}
     >
       <CardHeader className={isComment ? `pb-2 pt-2 px-0 ${isReply ? "py-1" : ""}` : undefined}>
-        <div className="flex items-center gap-3">
-          <Avatar className={isReply ? "h-7 w-7" : "h-9 w-9"}>
-            <AvatarImage src={post.sender.avatar} />
-            <AvatarFallback>
-              {post.sender.first_name?.[0]}
-              {post.sender.last_name?.[0]}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <div className={`font-medium ${isReply ? "text-sm" : ""}`}>
-              {post.sender.first_name} {post.sender.last_name}
-            </div>
-            <div className={`text-xs text-muted-foreground ${isReply ? "text-[10px]" : ""}`}>
-              {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Avatar className={isReply ? "h-7 w-7" : "h-9 w-9"}>
+              <AvatarImage src={post.sender.avatar} />
+              <AvatarFallback>
+                {post.sender.first_name?.[0]}
+                {post.sender.last_name?.[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <div className={`font-medium ${isReply ? "text-sm" : ""}`}>
+                {post.sender.first_name} {post.sender.last_name}
+              </div>
+              <div className={`text-xs text-muted-foreground ${isReply ? "text-[10px]" : ""}`}>
+                {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+              </div>
             </div>
           </div>
+          
+          {isOwner && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
+                  <Edit className="mr-2 h-4 w-4" />
+                  <span>Edit</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDelete} className="cursor-pointer text-destructive">
+                  <Trash className="mr-2 h-4 w-4" />
+                  <span>Delete</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </CardHeader>
       
@@ -292,10 +337,13 @@ export default function PostCard({
         </div>
       </CardFooter>
       
-      {/* Show comments section for main posts */}
       {!isComment && showComments && isCommentsOpen && (
         <div className="px-6 pb-4">
-          <Comments post={currentPost} />
+          <Comments 
+            post={currentPost} 
+            onEdit={onEdit} 
+            onDelete={onDelete}
+          />
         </div>
       )}
     </Card>
