@@ -1,5 +1,5 @@
 "use client";
-import { Users, BookOpen, BarChart3, Settings, CreditCard,Rss, Bell, GraduationCap } from "lucide-react";
+import { Users, BookOpen, BarChart3, Settings, CreditCard, Rss, Bell, GraduationCap } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -31,7 +31,6 @@ export const AdminSidebar = () => {
         { title: t("adminSidebar.items.courseOfferings"), icon: GraduationCap, url: "/admin/course-offerings" },
         { title: t("adminSidebar.items.payments"), icon: CreditCard, url: "/admin/payments" },
         { title: t("adminSidebar.items.forum"), icon: Rss, url: "/admin/forum" },
-
       ],
     },
     {
@@ -64,7 +63,12 @@ export const AdminSidebar = () => {
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => (
-                  <SidebarMenuItem key={item.title} className={`hover:text-primary/80 hover:bg-primary/5 ${correctPath.startsWith(item.url) ? "text-primary bg-primary/5 font-semibold" : ""}`}>
+                  <SidebarMenuItem
+                    key={item.title}
+                    className={`hover:text-primary/80 hover:bg-primary/5 ${
+                      correctPath.startsWith(item.url) ? "text-primary bg-primary/5 font-semibold" : ""
+                    }`}
+                  >
                     <SidebarMenuButton asChild>
                       <a href={item.url}>
                         <item.icon className="h-4 w-4" />

@@ -9,6 +9,7 @@ import {
   X,
   Video,
   Users,
+  Rss,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -27,7 +28,6 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { HiChatAlt2 } from "react-icons/hi";
 
 export function StudentSidebar() {
   const t = useI18n();
@@ -67,8 +67,8 @@ export function StudentSidebar() {
     },
     {
       title: t("student.dashboard.chat"),
-      icon: HiChatAlt2,
-      href: "/students/chat"
+      icon: Rss,
+      href: "/students/forum"
     },
 
     // {
