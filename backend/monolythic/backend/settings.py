@@ -399,3 +399,21 @@ CLASSCONNECT_CLIENT_ID=env('CLASSCONNECT_CLIENT_ID',default='classconnect')
 
 
 ENABLE_GOOGLE_MEET = True
+
+# File upload settings for 1GB uploads
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1073741824  # 1GB (1024 * 1024 * 1024)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1073741824  # 1GB (1024 * 1024 * 1024)
+
+# For very large files, it's better to use chunked uploads
+# These settings ensure Django handles the upload efficiently
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]
+
+# Configure longer timeouts for large file uploads
+# This affects how long Django will wait for the upload to complete
+WSGI_REQUEST_TIMEOUT = 1800  # 30 minutes
+
+# If using gunicorn, add these to your gunicorn.conf.py or command line:
+# --timeout 1800
