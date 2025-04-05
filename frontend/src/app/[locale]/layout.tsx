@@ -318,7 +318,7 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
         />
-        <GoogleAnalytics measurementId="G-H8NMLWT2HV" />
+        {/* <GoogleAnalytics measurementId="G-H8NMLWT2HV" /> */}
       </head>
       <body
         className={`antialiased overflow-y-auto flex flex-col ${Inter.variable} font-inter h-screen w-full`}
