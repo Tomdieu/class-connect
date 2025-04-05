@@ -6,20 +6,31 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useI18n } from "@/locales/client";
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useRouter } from 'next/navigation';
+import { useSubscriptionStore } from '@/store/subscriptionStore';
 
 function BrowseClassesPage() {
+  const router = useRouter();
+  const { isLoading, hasActiveSubscription } = useSubscriptionStore();
+
+  useEffect(() => {
+    if (!isLoading && hasActiveSubscription === false) {
+      router.push('/students/subscriptions');
+    }
+  }, [isLoading, hasActiveSubscription, router]);
+
   const t = useI18n();
   
-  const { data: myClasses, isLoading, error } = useQuery({
+  const { data: myClasses, isLoading: classesLoading, error } = useQuery({
     queryKey: ['myClasses'],
     queryFn: () => getMyClass(),
   });
   
-  if (isLoading) {
+  if (classesLoading) {
     return (
       <div className="container mx-auto py-6">
         <Skeleton className="h-10 w-40 mb-4" />
@@ -74,57 +85,59 @@ function BrowseClassesPage() {
   }
   
   return (
-    <div className="container mx-auto py-6 flex-1 w-full h-full">
-      <DashboardHeader
-        title={t('student.classes.title')}
-        description={t('student.classes.description')}
-        icon={<BookOpen className="h-6 w-6" />}
-        showNavigation={true}
-        currentPath={t('student.classes.title')}
-      />
-      
-      <Button variant="outline" size="sm" asChild className="mb-6">
-        <Link href="/students">
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          {t('common.back')} {t('common.dashboard')}
-        </Link>
-      </Button>
+    <div style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}>
+      <div className="container mx-auto py-6 flex-1 w-full h-full">
+        <DashboardHeader
+          title={t('student.classes.title')}
+          description={t('student.classes.description')}
+          icon={<BookOpen className="h-6 w-6" />}
+          showNavigation={true}
+          currentPath={t('student.classes.title')}
+        />
+        
+        <Button variant="outline" size="sm" asChild className="mb-6">
+          <Link href="/students">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            {t('common.back')} {t('common.dashboard')}
+          </Link>
+        </Button>
 
-      {myClasses && myClasses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {myClasses.map((classItem) => (
-            <Card 
-              key={classItem.id} 
-              className="hover:shadow-md transition-all"
-            >
-              <CardHeader>
-                <CardTitle>{classItem.class_level.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  School Year: {classItem.school_year.formatted_year}
-                </p>
-                <Button asChild>
-                  <Link href={`/students/classes/${classItem.id}`}>
-                    {t('student.classes.viewSubjects')}
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12 border rounded-lg mt-6">
-          <h3 className="text-xl font-semibold mb-2">{t('student.classes.noClasses')}</h3>
-          <p className="text-muted-foreground mb-4">
-            {t('student.classes.notEnrolled')}
-          </p>
-          <Button asChild>
-            <Link href="/students/enroll">{t('student.dashboard.enroll')}</Link>
-          </Button>
-        </div>
-      )}
-    </div> 
+        {myClasses && myClasses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {myClasses.map((classItem) => (
+              <Card 
+                key={classItem.id} 
+                className="hover:shadow-md transition-all"
+              >
+                <CardHeader>
+                  <CardTitle>{classItem.class_level.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-4">
+                    School Year: {classItem.school_year.formatted_year}
+                  </p>
+                  <Button asChild>
+                    <Link href={`/students/classes/${classItem.id}`}>
+                      {t('student.classes.viewSubjects')}
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 border rounded-lg mt-6">
+            <h3 className="text-xl font-semibold mb-2">{t('student.classes.noClasses')}</h3>
+            <p className="text-muted-foreground mb-4">
+              {t('student.classes.notEnrolled')}
+            </p>
+            <Button asChild>
+              <Link href="/students/enroll">{t('student.dashboard.enroll')}</Link>
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

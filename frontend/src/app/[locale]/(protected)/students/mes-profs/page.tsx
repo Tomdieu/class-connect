@@ -7,21 +7,32 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Users } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSubscriptionStore } from '@/store/subscriptionStore';
 import { useI18n } from "@/locales/client";
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getInitials } from '@/lib/utils';
 
 function MyTeachersPage() {
+  const router = useRouter();
+  const { isLoading, hasActiveSubscription } = useSubscriptionStore();
+
+  useEffect(() => {
+    if (!isLoading && hasActiveSubscription === false) {
+      router.push('/students/subscriptions');
+    }
+  }, [isLoading, hasActiveSubscription, router]);
+
   const t = useI18n();
   
-  const { data: teachers, isLoading, error } = useQuery({
+  const { data: teachers, isLoading: teachersLoading, error } = useQuery({
     queryKey: ['myTeachers'],
     queryFn: () => getMyTeachers(),
   });
   
-  if (isLoading) {
+  if (teachersLoading) {
     return (
       <div className="container mx-auto py-6">
         <Skeleton className="h-10 w-40 mb-4" />
@@ -77,65 +88,67 @@ function MyTeachersPage() {
   }
   
   return (
-    <div className="container mx-auto py-6 flex-1 w-full h-full">
-      <DashboardHeader
-        title={t('student.dashboard.myTeachers')}
-        description="Connect with your teachers and access their courses"
-        icon={<Users className="h-6 w-6" />}
-        showNavigation={true}
-        currentPath={t('student.dashboard.myTeachers')}
-      />
-      
-      <Button variant="outline" size="sm" asChild className="mb-6">
-        <Link href="/students">
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          {t('common.back')} {t('common.dashboard')}
-        </Link>
-      </Button>
+    <div style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}>
+      <div className="container mx-auto py-6 flex-1 w-full h-full">
+        <DashboardHeader
+          title={t('student.dashboard.myTeachers')}
+          description="Connect with your teachers and access their courses"
+          icon={<Users className="h-6 w-6" />}
+          showNavigation={true}
+          currentPath={t('student.dashboard.myTeachers')}
+        />
+        
+        <Button variant="outline" size="sm" asChild className="mb-6">
+          <Link href="/students">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            {t('common.back')} {t('common.dashboard')}
+          </Link>
+        </Button>
 
-      {teachers && teachers.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {teachers.map((enrollment) => {
-            const teacher = enrollment.teacher;
-            return (
-              <Card 
-                key={enrollment.id} 
-                className="hover:shadow-md transition-all"
-              >
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={teacher.avatar} alt={`${teacher.first_name} ${teacher.last_name}`} />
-                    <AvatarFallback>{getInitials(`${teacher.first_name} ${teacher.last_name}`)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <CardTitle>{teacher.first_name} {teacher.last_name}</CardTitle>
-                    <CardDescription>{enrollment.subject?.name || enrollment.offer.subject?.name || "Subject"}</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-muted-foreground mb-4">
-                    <p>Class: {enrollment.class_level?.name || enrollment.offer.class_level?.name || "Class"}</p>
-                    <p>Email: {teacher.email}</p>
-                    <p>Started: {new Date(enrollment.created_at).toLocaleDateString()}</p>
-                  </div>
-                  <Button asChild variant="outline">
-                    <Link href={`/students/teachers/${enrollment.id}`}>
-                      View Details
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="text-center py-12 border rounded-lg mt-6">
-          <h3 className="text-xl font-semibold mb-2">No Teachers Found</h3>
-          <p className="text-muted-foreground mb-4">
-            You don&apos;t have any teachers assigned yet.
-          </p>
-        </div>
-      )}
+        {teachers && teachers.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {teachers.map((enrollment) => {
+              const teacher = enrollment.teacher;
+              return (
+                <Card 
+                  key={enrollment.id} 
+                  className="hover:shadow-md transition-all"
+                >
+                  <CardHeader className="flex flex-row items-center gap-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={teacher.avatar} alt={`${teacher.first_name} ${teacher.last_name}`} />
+                      <AvatarFallback>{getInitials(`${teacher.first_name} ${teacher.last_name}`)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <CardTitle>{teacher.first_name} {teacher.last_name}</CardTitle>
+                      <CardDescription>{enrollment.offer.subject?.name || enrollment.offer.subject?.name || "Subject"}</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm text-muted-foreground mb-4">
+                      <p>Class: {enrollment.offer.class_level?.level || enrollment.offer.class_level?.name || "Class"}</p>
+                      <p>Email: {teacher.email}</p>
+                      <p>Started: {new Date(enrollment.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <Button asChild variant="outline">
+                      <Link href={`/students/teachers/${enrollment.id}`}>
+                        View Details
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12 border rounded-lg mt-6">
+            <h3 className="text-xl font-semibold mb-2">No Teachers Found</h3>
+            <p className="text-muted-foreground mb-4">
+              You don&apos;t have any teachers assigned yet.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

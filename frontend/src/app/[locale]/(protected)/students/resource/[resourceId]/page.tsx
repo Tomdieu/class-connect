@@ -10,13 +10,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, BookOpen, File, FileText, ScrollText, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useI18n } from '@/locales/client';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { PDFResourceType, VideoResourceType, ExerciseResourceType, RevisionResourceType } from '@/types';
 import { toast } from 'sonner';
+import { useSubscriptionStore } from '@/store/subscriptionStore';
 
 export default function ResourceView() {
   const t = useI18n();
@@ -24,6 +25,13 @@ export default function ResourceView() {
   const router = useRouter();
   const resourceId = params.resourceId as string;
   const [isProgressTracking, setIsProgressTracking] = useState<boolean>(false);
+  const { isLoading, hasActiveSubscription } = useSubscriptionStore();
+
+  useEffect(() => {
+    if (!isLoading && hasActiveSubscription === false) {
+      router.push('/students/subscriptions');
+    }
+  }, [isLoading, hasActiveSubscription, router]);
 
   // Fetch resource data
   const { data: resource, isLoading: resourceLoading, error: resourceError } = useQuery({
@@ -230,64 +238,66 @@ export default function ResourceView() {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <Button variant="outline" size="sm" asChild className="mb-6">
-        <Link href="/students">
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          {t('common.back')}
-        </Link>
-      </Button>
-      
-      {/* Display progress indicator if available */}
-      {progress && (
-        <div className="mb-4 flex items-center gap-2">
-          <div className="w-full bg-gray-200 h-2 rounded-full">
-            <div 
-              className="bg-primary h-2 rounded-full transition-all duration-300" 
-              style={{ width: `${progress.progress_percentage}%` }}
-            />
+    <div style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}>
+      <div className="container mx-auto py-6">
+        <Button variant="outline" size="sm" asChild className="mb-6">
+          <Link href="/students">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            {t('common.back')}
+          </Link>
+        </Button>
+        
+        {/* Display progress indicator if available */}
+        {progress && (
+          <div className="mb-4 flex items-center gap-2">
+            <div className="w-full bg-gray-200 h-2 rounded-full">
+              <div 
+                className="bg-primary h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${progress.progress_percentage}%` }}
+              />
+            </div>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+              {progress.progress_percentage}% {progress.completed ? t('resource.completed') : t('resource.inProgress')}
+            </span>
           </div>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
-            {progress.progress_percentage}% {progress.completed ? t('resource.completed') : t('resource.inProgress')}
-          </span>
+        )}
+        
+        {/* Continue reading/watching hint */}
+        {progress && !progress.completed && (
+          <div className="mb-4 text-sm text-muted-foreground bg-primary/5 p-2 rounded">
+            {resource?.resource_type === 'PDFResource' && progress.current_page ?
+              <span>{t('resource.continueReading', { page: progress.current_page })}</span>
+              : resource?.resource_type === 'VideoResource' && progress.current_time ?
+              <span>{t('resource.continueWatching', { time: new Date(progress.current_time * 1000).toISOString().substr(14, 5) })}</span>
+              : null
+            }
+          </div>
+        )}
+        
+        <div className="flex items-center gap-4 mb-6">
+          {getResourceIcon()}
+          <div>
+            <h1 className="text-2xl font-bold">{resource?.title}</h1>
+            {resource?.created_at && (
+              <p className="text-sm text-muted-foreground">
+                {format(new Date(resource.created_at), 'MMM d, yyyy')}
+              </p>
+            )}
+          </div>
         </div>
-      )}
-      
-      {/* Continue reading/watching hint */}
-      {progress && !progress.completed && (
-        <div className="mb-4 text-sm text-muted-foreground bg-primary/5 p-2 rounded">
-          {resource?.resource_type === 'PDFResource' && progress.current_page ?
-            <span>{t('resource.continueReading', { page: progress.current_page })}</span>
-            : resource?.resource_type === 'VideoResource' && progress.current_time ?
-            <span>{t('resource.continueWatching', { time: new Date(progress.current_time * 1000).toISOString().substr(14, 5) })}</span>
-            : null
-          }
-        </div>
-      )}
-      
-      <div className="flex items-center gap-4 mb-6">
-        {getResourceIcon()}
-        <div>
-          <h1 className="text-2xl font-bold">{resource?.title}</h1>
-          {resource?.created_at && (
-            <p className="text-sm text-muted-foreground">
-              {format(new Date(resource.created_at), 'MMM d, yyyy')}
-            </p>
-          )}
-        </div>
+        
+        {resource?.description && (
+          <div className="mb-6 bg-gray-50 p-4 rounded-md">
+            <p className="text-muted-foreground">{resource.description}</p>
+          </div>
+        )}
+        
+        <Card>
+          <CardContent className="p-0">
+            {renderResourceViewer()}
+          </CardContent>
+        </Card>
       </div>
-      
-      {resource?.description && (
-        <div className="mb-6 bg-gray-50 p-4 rounded-md">
-          <p className="text-muted-foreground">{resource.description}</p>
-        </div>
-      )}
-      
-      <Card>
-        <CardContent className="p-0">
-          {renderResourceViewer()}
-        </CardContent>
-      </Card>
     </div>
   );
 }

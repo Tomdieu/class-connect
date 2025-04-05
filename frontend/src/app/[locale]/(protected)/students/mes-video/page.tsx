@@ -14,6 +14,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VideoResourceType } from '@/types';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
+import { useSubscriptionStore } from '@/store/subscriptionStore';
 
 // Define a type for the nested video resource structure
 interface VideoResponse {
@@ -22,6 +24,15 @@ interface VideoResponse {
 }
 
 function MyVideosPage() {
+  const router = useRouter();
+  const { isLoading, hasActiveSubscription } = useSubscriptionStore();
+
+  useEffect(() => {
+    if (!isLoading && hasActiveSubscription === false) {
+      router.push('/students/subscriptions');
+    }
+  }, [isLoading, hasActiveSubscription, router]);
+
   const t = useI18n();
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [processedVideos, setProcessedVideos] = useState<VideoResourceType[]>([]);
@@ -78,7 +89,7 @@ function MyVideosPage() {
   }
   
   return (
-    <div className="container mx-auto py-6">
+    <div style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }} className="container mx-auto py-6">
       <DashboardHeader
         title={t('student.dashboard.myVideos')}
         description="Access all your educational videos"

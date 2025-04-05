@@ -15,6 +15,8 @@ import { useI18n } from "@/locales/client";
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
+import { useSubscriptionStore } from '@/store/subscriptionStore';
 
 // Define a type for the nested resource structure
 interface ResourceResponse {
@@ -23,6 +25,17 @@ interface ResourceResponse {
 }
 
 function MyCourses() {
+  const router = useRouter();
+  const { isLoading, hasActiveSubscription } = useSubscriptionStore();
+
+  useEffect(() => {
+    // If subscription info is loaded and there is no active subscription,
+    // redirect the user to subscriptions page.
+    if (!isLoading && hasActiveSubscription === false) {
+      router.push('/students/subscriptions');
+    }
+  }, [isLoading, hasActiveSubscription, router]);
+
   const t = useI18n();
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [activeTab, setActiveTab] = useState<string>("all");
@@ -104,7 +117,7 @@ function MyCourses() {
   }
   
   return (
-    <div className="container mx-auto py-6">
+    <div style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}>
       <DashboardHeader
         title={t('student.dashboard.myCourses')}
         description="Access all your course materials"
