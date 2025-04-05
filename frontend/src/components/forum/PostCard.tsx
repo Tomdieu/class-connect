@@ -51,8 +51,10 @@ export default function PostCard({
   const queryClient = useQueryClient();
   const { data: session } = useSession();
 
-  // Check if the current user is the post owner
+  // Check if the current user is the post owner or an admin
   const isOwner = session?.user?.id === post.sender.id;
+  const isAdmin = session?.user?.role === "admin";
+  const canModify = isOwner || isAdmin;
 
   // Set up intersection observer to detect when post is viewed
   const { ref, inView } = useInView({
@@ -219,7 +221,7 @@ export default function PostCard({
             </div>
           </div>
           
-          {isOwner && (
+          {canModify && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -227,10 +229,12 @@ export default function PostCard({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
-                  <Edit className="mr-2 h-4 w-4" />
-                  <span>Edit</span>
-                </DropdownMenuItem>
+                {isOwner && ( // Only owner can edit their own post
+                  <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
+                    <Edit className="mr-2 h-4 w-4" />
+                    <span>Edit</span>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleDelete} className="cursor-pointer text-destructive">
                   <Trash className="mr-2 h-4 w-4" />
                   <span>Delete</span>
