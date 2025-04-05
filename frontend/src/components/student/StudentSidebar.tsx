@@ -70,12 +70,6 @@ export function StudentSidebar() {
       icon: Rss,
       href: "/students/forum"
     },
-
-    // {
-    //   title: t('student.dashboard.recentActivity'),
-    //   icon: Clock, 
-    //   href: '/students/activities',
-    // },
     {
       title: t("nav.subscriptions"),
       icon: Receipt,
@@ -89,11 +83,6 @@ export function StudentSidebar() {
       icon: User,
       href: "/students/profile",
     },
-    // {
-    //   title: t('dashboardPage.settings'),
-    //   icon: Settings,
-    //   href: '/students/settings',
-    // },
   ];
 
   return (
