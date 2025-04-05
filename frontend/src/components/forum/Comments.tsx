@@ -5,10 +5,9 @@ import { useState } from "react";
 import { useI18n } from "@/locales/client";
 import { PostType } from "@/types";
 import { getPostComments } from "@/actions/forum";
-import { toast } from "sonner";
 import PostCard from "./PostCard";
 import { Button } from "../ui/button";
-import { Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import CreatePost from "./CreatePost";
 
 interface CommentsProps {
@@ -36,6 +35,7 @@ export default function Comments({ post, onEdit, onDelete }: CommentsProps) {
     { comment: PostType; onEdit?: (post: PostType) => void; onDelete?: (post: PostType) => void; level?: number }) => {
     const [isReplying, setIsReplying] = useState(false);
     const [showReplies, setShowReplies] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     
     // Query client for invalidating queries
     const queryClient = useQueryClient();
@@ -45,11 +45,22 @@ export default function Comments({ post, onEdit, onDelete }: CommentsProps) {
       setIsReplying(true);
       // Also show existing replies when replying
       setShowReplies(true);
+      // Ensure comment is expanded when replying
+      setIsCollapsed(false);
     };
 
     // Handle close reply form
     const handleCloseReply = () => {
       setIsReplying(false);
+    };
+    
+    // Toggle comment expansion/collapse
+    const toggleCollapse = () => {
+      setIsCollapsed(!isCollapsed);
+      // When expanding, close reply form as a UX improvement
+      if (isCollapsed) {
+        setIsReplying(false);
+      }
     };
     
     // Fetch replies for this comment
@@ -63,8 +74,26 @@ export default function Comments({ post, onEdit, onDelete }: CommentsProps) {
     });
 
     return (
-      <div className="comment-thread">
-        {/* Original comment */}
+      <div className="comment-thread relative">
+        {/* Only show collapse/expand button if the comment has replies */}
+        {comment.comment_count > 0 && (
+          <div className="absolute left-[-24px] top-3 z-10">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-6 w-6 p-0 rounded-full hover:bg-gray-100"
+              onClick={toggleCollapse}
+            >
+              {isCollapsed ? (
+                <ChevronDown className="h-4 w-4 text-gray-400" />
+              ) : (
+                <ChevronUp className="h-4 w-4 text-gray-400" />
+              )}
+            </Button>
+          </div>
+        )}
+        
+        {/* Original comment - not clickable for collapse/expand */}
         <PostCard
           post={comment}
           isComment={true}
@@ -74,74 +103,85 @@ export default function Comments({ post, onEdit, onDelete }: CommentsProps) {
           onDelete={onDelete}
         />
 
-        {/* Show number of replies if any and not already expanded */}
-        {comment.comment_count > 0 && !showReplies && (
-          <div className="ml-8 mt-1 text-sm text-blue-600 cursor-pointer hover:underline" onClick={() => setShowReplies(true)}>
-            {comment.comment_count === 1 
-              ? t("forum.viewOneReply") 
-              : t("forum.viewReplies", { count: comment.comment_count })
-            }
-          </div>
-        )}
-
-        {/* Container for replies with left border styling */}
-        <div className={`pl-8 ${level < 2 ? "border-l-2 border-gray-100 ml-6" : ""}`}>
-          {/* Reply form - Use CreatePost with direct API call to show progress */}
-          {isReplying && (
-            <CreatePost 
-              parentId={comment.id} 
-              forumId={comment.forum}
-              placeholder={t("forum.writeReply")}
-              onPostCreated={() => {
-                setIsReplying(false);
-                // Ensure replies are visible after posting
-                setShowReplies(true);
-                // Invalidate queries to refresh comments
-                queryClient.invalidateQueries({ queryKey: ["commentReplies", comment.id] });
-                // Also invalidate parent's comments if this is a nested reply
-                if (comment.parent) {
-                  queryClient.invalidateQueries({ 
-                    queryKey: ["commentReplies", comment.parent.id] 
-                  });
+        {/* Collapsible content */}
+        {!isCollapsed && (
+          <>
+            {/* Show number of replies if any and not already expanded */}
+            {comment.comment_count > 0 && !showReplies && (
+              <div 
+                className="ml-8 mt-1 text-sm text-blue-600 cursor-pointer hover:underline" 
+                onClick={() => setShowReplies(true)}
+              >
+                {comment.comment_count === 1 
+                  ? t("forum.viewOneReply") 
+                  : t("forum.viewReplies", { count: comment.comment_count })
                 }
-                // Also invalidate the top-level comments
-                queryClient.invalidateQueries({ queryKey: ["postComments", post.id] });
-              }}
-              onClose={handleCloseReply}
-            />
-          )}
+              </div>
+            )}
 
-          {/* Replies list */}
-          {showReplies && (
-            <div className="mt-2 space-y-3">
-              {loadingReplies ? (
-                <div className="flex justify-center my-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                </div>
-              ) : replies && replies.length > 0 ? (
-                replies.map((reply) => (
-                  <CommentWithReplies
-                    key={reply.id}
-                    comment={reply}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                    level={level + 1}
-                  />
-                ))
-              ) : (
-                <div className="text-center text-muted-foreground text-xs py-2">
-                  {t("forum.noReplies")}
+            {/* Container for replies with left border styling */}
+            <div className={`pl-8 ${level < 2 ? "border-l-2 border-gray-100 ml-6" : ""}`}>
+              {/* Reply form - Use CreatePost with direct API call to show progress */}
+              {isReplying && (
+                <CreatePost 
+                  parentId={comment.id} 
+                  forumId={comment.forum}
+                  placeholder={t("forum.writeReply")}
+                  onPostCreated={() => {
+                    setIsReplying(false);
+                    // Ensure replies are visible after posting
+                    setShowReplies(true);
+                    // Invalidate queries to refresh comments
+                    queryClient.invalidateQueries({ queryKey: ["commentReplies", comment.id] });
+                    // Also invalidate parent's comments if this is a nested reply
+                    if (comment.parent) {
+                      queryClient.invalidateQueries({ 
+                        queryKey: ["commentReplies", comment.parent.id] 
+                      });
+                    }
+                    // Also invalidate the top-level comments
+                    queryClient.invalidateQueries({ queryKey: ["postComments", post.id] });
+                  }}
+                  onClose={handleCloseReply}
+                />
+              )}
+
+              {/* Replies list */}
+              {showReplies && (
+                <div className="mt-2 space-y-3">
+                  {loadingReplies ? (
+                    <div className="flex justify-center my-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    </div>
+                  ) : replies && replies.length > 0 ? (
+                    replies.map((reply) => (
+                      <CommentWithReplies
+                        key={reply.id}
+                        comment={reply}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        level={level + 1}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center text-muted-foreground text-xs py-2">
+                      {t("forum.noReplies")}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-        </div>
 
-        {/* Hide replies button */}
-        {showReplies && comment.comment_count > 0 && (
-          <div className="ml-8 mt-1 text-sm text-blue-600 cursor-pointer hover:underline" onClick={() => setShowReplies(false)}>
-            {t("forum.hideReplies")}
-          </div>
+            {/* Hide replies button */}
+            {showReplies && comment.comment_count > 0 && (
+              <div 
+                className="ml-8 mt-1 text-sm text-blue-600 cursor-pointer hover:underline" 
+                onClick={() => setShowReplies(false)}
+              >
+                {t("forum.hideReplies")}
+              </div>
+            )}
+          </>
         )}
       </div>
     );
@@ -181,7 +221,7 @@ export default function Comments({ post, onEdit, onDelete }: CommentsProps) {
       />
 
       {/* Comments list */}
-      <div className="space-y-4 mt-4">
+      <div className="space-y-4 mt-4 relative pl-6">
         {data && data.length > 0 ? (
           data.map((comment) => (
             <CommentWithReplies
