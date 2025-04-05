@@ -1019,6 +1019,8 @@ export default {
   "payment.success.phoneNumber": "Phone Number",
   "payment.success.transactionCode": "Transaction Code",
   "payment.success.customer": "Customer",
+  "payment.success.accountUpdated": "Account information updated",
+  "payment.success.updateError": "Failed to refresh account information",
 
   "payment.failed.title": "Payment Failed",
   "payment.failed.description":
@@ -1479,4 +1481,5 @@ export default {
   "forum.postDeletedSuccess": "Your post was deleted successfully",
   "forum.postDeleteFailed": "Failed to delete post. Please try again.",
   "forum.scrollToTop": "Scroll to top",
+  "common.updating": "Updating...",
 } as const;

@@ -1055,6 +1055,8 @@ export default {
   "payment.success.phoneNumber": "Numéro de Téléphone",
   "payment.success.transactionCode": "Code de Transaction",
   "payment.success.customer": "Client",
+  "payment.success.accountUpdated": "Informations du compte mises à jour",
+  "payment.success.updateError": "Échec de l'actualisation des informations du compte",
 
   "payment.failed.title": "Paiement Échoué",
   "payment.failed.description":
@@ -1521,4 +1523,5 @@ export default {
   "forum.postDeletedSuccess": "Votre publication a été supprimée avec succès",
   "forum.postDeleteFailed": "Échec de la suppression de la publication. Veuillez réessayer.",
   "forum.scrollToTop": "Remonter en haut",
+  "common.updating": "Mise à jour en cours...",
 } as const;
