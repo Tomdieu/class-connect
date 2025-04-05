@@ -32,8 +32,18 @@ class ReactionCountSerializer(serializers.Serializer):
     reaction_type = serializers.CharField()
     count = serializers.IntegerField()
 
+class SimpleCommentSerializer(serializers.ModelSerializer):
+    """A simplified serializer for nested replies to avoid recursion"""
+    sender = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = Post
+        fields = ["id", "sender", "content", "created_at", "file", "image"]
+
 class CommentSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
+    comments = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
     reaction_counts = serializers.SerializerMethodField()
     user_reaction = serializers.SerializerMethodField()
 
@@ -47,9 +57,21 @@ class CommentSerializer(serializers.ModelSerializer):
             "updated_at", 
             "file", 
             "image",
+            "comments",
+            "comment_count",
             "reaction_counts",
             "user_reaction"
         ]
+    
+    def get_comments(self, obj):
+        # Get replies to this comment (limited to avoid too much nesting)
+        replies = Post.objects.filter(parent=obj).order_by('-created_at')[:2]
+        # Use simplified serializer for replies to prevent recursion
+        return SimpleCommentSerializer(replies, many=True, context=self.context).data
+    
+    def get_comment_count(self, obj):
+        # Count of replies to this comment
+        return Post.objects.filter(parent=obj).count()
     
     def get_reaction_counts(self, obj):
         counts = obj.reaction_counts
