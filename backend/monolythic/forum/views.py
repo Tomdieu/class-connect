@@ -278,7 +278,13 @@ class PostViewSet(viewsets.ModelViewSet):
         if getattr(self, "swagger_fake_view", False):
             return Post.objects.none()
 
-        return Post.objects.filter(parent=None).order_by("-created_at")
+        # For detail actions (like retrieve, comments, etc.), we need access to ALL posts
+        # For list actions, we only want top-level posts
+        if self.action in ['retrieve', 'update', 'partial_update', 'destroy', 'comment', 'react', 'unreact', 'comments', 'view']:
+            return Post.objects.all().order_by('-created_at')
+        else:
+            # Default behavior for list - only show top-level posts
+            return Post.objects.filter(parent=None).order_by("-created_at")
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
@@ -419,6 +425,8 @@ class PostViewSet(viewsets.ModelViewSet):
     def comment(self, request, pk=None):
         parent_post = self.get_object()
         user = request.user
+        
+        print("Parent post : ",parent_post, " user : ", user)
 
         serializer = CommentSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
@@ -428,6 +436,19 @@ class PostViewSet(viewsets.ModelViewSet):
                 parent=parent_post,
                 forum=parent_post.forum  # Add the forum from parent post
             )
+            
+            # Create notification for post owner if not the same user
+            if parent_post.sender != user:
+                notification_type = 'COMMENT'
+                if parent_post.parent:  # This is a reply to a comment
+                    notification_type = 'REPLY'
+                    
+                Notification.objects.create(
+                    recipient=parent_post.sender,
+                    sender=user,
+                    post=comment,
+                    notification_type=notification_type
+                )
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
