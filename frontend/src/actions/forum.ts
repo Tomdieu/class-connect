@@ -368,6 +368,28 @@ export const getPosts = async (params?: Partial<PostParams>) => {
   }
 };
 
+
+export const getPostById = async (id:number) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.get(`/api/posts/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data as PostType;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+
 export const createPost = async (data: CreatePostRequestType) => {
   try {
     const session = await auth();
