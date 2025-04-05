@@ -129,8 +129,31 @@ class NewsFeedViewSet(viewsets.ReadOnlyModelViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        operation_description="Get a specific post",
+        responses={200: PostSerializer(), 404: "Post not found"},
+    )
     def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+        try:
+            # First try to get the post directly, regardless of parent
+            post = Post.objects.get(pk=kwargs["pk"])
+
+            # If it's a comment (has a parent), redirect to the top-level parent
+            if post.parent:
+                # Find the topmost parent (in case of nested comments)
+                top_parent = post
+                while top_parent.parent:
+                    top_parent = top_parent.parent
+
+                # Update the kwargs to use the parent's ID instead
+                kwargs["pk"] = top_parent.pk
+
+            return super().retrieve(request, *args, **kwargs)
+
+        except Post.DoesNotExist:
+            return Response(
+                {"detail": "Post not found."}, status=status.HTTP_404_NOT_FOUND
+            )
 
     def get_queryset(self):
         """
@@ -143,7 +166,11 @@ class NewsFeedViewSet(viewsets.ReadOnlyModelViewSet):
         if getattr(self, "swagger_fake_view", False):
             return Post.objects.none()
 
-        # Base queryset - only top-level posts (not comments)
+        # For retrieve action, we need access to ALL posts including comments
+        if self.action == "retrieve":
+            return Post.objects.all()  # Don't filter by parent=None for retrieval
+
+        # Base queryset - only top-level posts (not comments) for list view
         queryset = Post.objects.filter(parent=None)
 
         # Get time threshold for "recent" posts (last 7 days)
