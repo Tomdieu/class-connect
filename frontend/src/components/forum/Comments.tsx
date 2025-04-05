@@ -93,7 +93,7 @@ export default function Comments({ post, onEdit, onDelete }: CommentsProps) {
           </div>
         )}
         
-        {/* Original comment - not clickable for collapse/expand */}
+        {/* PostCard component with all its original design and functionality */}
         <PostCard
           post={comment}
           isComment={true}
