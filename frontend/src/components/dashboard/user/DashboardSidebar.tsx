@@ -65,7 +65,7 @@ export default function DashboardSidebar() {
     },
     {
       title: t("dashboardSidebar.forum"),
-      url: "/dashboard/chat",
+      url: "/dashboard/forum",
       icon: MessageSquare,
     },
     {
