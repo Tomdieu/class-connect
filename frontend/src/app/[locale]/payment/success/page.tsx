@@ -8,6 +8,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Confetti from 'react-confetti';
 import { useWindowSize } from "@/hooks/use-window-size";
+import { getAccountInfor } from "@/actions/accounts";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 export default function PaymentSuccessPage() {
   const t = useI18n();
@@ -15,6 +18,8 @@ export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
   const [showConfetti, setShowConfetti] = useState(true);
   const { width, height } = useWindowSize();
+  const { data: session, update } = useSession();
+  const [isUpdatingSession, setIsUpdatingSession] = useState(false);
   
   // Extract payment information from query parameters
   const reference = searchParams.get("reference") || "-";
@@ -34,6 +39,37 @@ export default function PaymentSuccessPage() {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   });
+  
+  // Update session with fresh user data
+  useEffect(() => {
+    const updateUserSession = async () => {
+      if (session?.user?.accessToken && !isUpdatingSession) {
+        try {
+          setIsUpdatingSession(true);
+          // Fetch the latest user information including subscription status
+          const userData = await getAccountInfor(session.user.accessToken);
+          
+          // Update the session with new user data
+          await update({
+            user: {
+              ...session.user,
+              ...userData,
+              subscription_status: userData.subscription_status
+            }
+          });
+          
+          toast.success(t("payment.success.accountUpdated") || "Account information updated");
+        } catch (error) {
+          console.error("Failed to update user session:", error);
+          toast.error(t("payment.success.updateError") || "Failed to refresh account information");
+        } finally {
+          setIsUpdatingSession(false);
+        }
+      }
+    };
+    
+    updateUserSession();
+  }, [session, update, t, isUpdatingSession]);
   
   // Hide confetti after 5 seconds
   useEffect(() => {
@@ -125,14 +161,18 @@ export default function PaymentSuccessPage() {
             <Button
               className="w-full bg-primary hover:bg-primary/90 text-white"
               onClick={() => router.push("/students/subscriptions")}
+              disabled={isUpdatingSession}
             >
-              {t("payment.success.viewSubscription")}
+              {isUpdatingSession 
+                ? t("common.updating") || "Updating..." 
+                : t("payment.success.viewSubscription")}
             </Button>
             
             <Button
               variant="outline"
               className="w-full"
               onClick={() => router.push("/redirect")}
+              disabled={isUpdatingSession}
             >
               {t("payment.success.backToDashboard")}
             </Button>
