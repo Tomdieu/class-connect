@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { Play, UserCheck, Users, GraduationCap } from "lucide-react";
+import { Play, UserCheck, Users } from "lucide-react";
 import { AboutContent } from "./AboutContent";
 import { useI18n } from "@/locales/client";
 import { useRouter } from "next/navigation";
