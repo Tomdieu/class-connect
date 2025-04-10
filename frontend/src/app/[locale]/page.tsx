@@ -70,7 +70,13 @@ interface TestimonialCardProps {
   delay?: number;
 }
 
-const TestimonialCard: React.FC<TestimonialCardProps> = ({ name, role, quote, avatarUrl, delay = 0 }) => {
+const TestimonialCard: React.FC<TestimonialCardProps> = ({
+  name,
+  role,
+  quote,
+  avatarUrl,
+  delay = 0,
+}) => {
   return (
     <RevealOnScroll direction="up" delay={delay}>
       <motion.div
@@ -106,7 +112,12 @@ interface StatCardProps {
   delay?: number;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ icon, value, label, delay = 0 }) => {
+const StatCard: React.FC<StatCardProps> = ({
+  icon,
+  value,
+  label,
+  delay = 0,
+}) => {
   return (
     <RevealOnScroll direction="up" delay={delay}>
       <motion.div
@@ -136,11 +147,6 @@ function LandingPage() {
         ? "ClassConnect - Plateforme d'Apprentissage en Ligne"
         : "ClassConnect - Online Learning Platform",
     description: t("hero.subtitle"),
-    provider: {
-      "@type": "Organization",
-      name: "ClassConnect",
-      sameAs: ["https://www.classconnect.cm"],
-    },
     offers: {
       "@type": "AggregateOffer",
       offers: [
