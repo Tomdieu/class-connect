@@ -683,7 +683,7 @@ def delete_user_active_token(sender, instance, **kwargs):
         UserActiveToken.objects.filter(user=instance.user).delete()
 
 
-class UserStatsView(APIView):
+class UserStatsView(ActivityLoggingMixin, APIView):
     permission_classes = [IsAuthenticated]
     swagger_tags = ["Users Stats"]
 
@@ -813,6 +813,8 @@ class UserStatsView(APIView):
             for stat in monthly_stats
         ]
 
+        self.log_activity(request, "Retrieved user dashboard statistics")
+
         return Response({
             'total_users': total_users,
             'user_growth': user_growth,
@@ -830,7 +832,7 @@ class UserStatsView(APIView):
         return f"{'+' if growth >= 0 else ''}{growth:.1f}%"
 
 
-class UserActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
+class UserActivityLogViewSet(ActivityLoggingMixin, viewsets.ReadOnlyModelViewSet):
     """
     A viewset that provides `list` and `retrieve` actions for UserActivityLog.
     Allows filtering by user.
@@ -840,3 +842,11 @@ class UserActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserActivityLogSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['user']
+    
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed user activity logs")
+        return super().list(request, *args, **kwargs)
+        
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed specific activity log", {"log_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
