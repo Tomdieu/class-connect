@@ -10,6 +10,7 @@ from django.db.models import Count, Q, F, Case, When, IntegerField, Value
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from datetime import timedelta
+from utils.mixins import ActivityLoggingMixin
 
 from .models import Forum, Post, Messages, Seen, Reaction, Notification, ReactionType
 from .serializers import (
@@ -33,7 +34,7 @@ class PostPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class ForumViewSet(viewsets.ModelViewSet):
+class ForumViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for forum management.
     """
@@ -48,6 +49,7 @@ class ForumViewSet(viewsets.ModelViewSet):
         responses={200: ForumSerializer(many=True)},
     )
     def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed list of forums")
         return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -56,13 +58,16 @@ class ForumViewSet(viewsets.ModelViewSet):
         responses={201: ForumSerializer()},
     )
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
+        self.log_activity(request, "Created a new forum", {"forum_id": response.data.get('id')})
+        return response
 
     @swagger_auto_schema(
         operation_description="Get forum details",
         responses={200: ForumSerializer(), 404: "Forum not found"},
     )
     def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed forum details", {"forum_id": kwargs.get('pk')})
         return super().retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -75,7 +80,9 @@ class ForumViewSet(viewsets.ModelViewSet):
         },
     )
     def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
+        self.log_activity(request, "Updated forum", {"forum_id": kwargs.get('pk')})
+        return response
 
     @swagger_auto_schema(
         operation_description="Partially update forum details",
@@ -87,17 +94,21 @@ class ForumViewSet(viewsets.ModelViewSet):
         },
     )
     def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
+        response = super().partial_update(request, *args, **kwargs)
+        self.log_activity(request, "Partially updated forum", {"forum_id": kwargs.get('pk')})
+        return response
 
     @swagger_auto_schema(
         operation_description="Delete a forum",
         responses={204: "Forum deleted successfully", 404: "Forum not found"},
     )
     def destroy(self, request, *args, **kwargs):
+        forum_id = kwargs.get('pk')
+        self.log_activity(request, "Deleted forum", {"forum_id": forum_id})
         return super().destroy(request, *args, **kwargs)
 
 
-class PublicChatViewSet(viewsets.GenericViewSet):
+class PublicChatViewSet(ActivityLoggingMixin, viewsets.GenericViewSet):
     """
     API endpoint for public chat forum.
     """
@@ -113,10 +124,11 @@ class PublicChatViewSet(viewsets.GenericViewSet):
     def list(self, request):
         public_forum, created = Forum.objects.get_or_create(name="Public Forum")
         serializer = self.get_serializer(public_forum)
+        self.log_activity(request, "Accessed public chat forum")
         return Response(serializer.data)
 
 
-class NewsFeedViewSet(viewsets.ReadOnlyModelViewSet):
+class NewsFeedViewSet(ActivityLoggingMixin, viewsets.ReadOnlyModelViewSet):
     """
     API endpoint for the news feed (Facebook-style posts)
     """
@@ -127,6 +139,7 @@ class NewsFeedViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = PostPagination
 
     def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed news feed")
         return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -137,6 +150,9 @@ class NewsFeedViewSet(viewsets.ReadOnlyModelViewSet):
         try:
             # First try to get the post directly, regardless of parent
             post = Post.objects.get(pk=kwargs["pk"])
+            
+            # Log the activity
+            self.log_activity(request, "Viewed post details", {"post_id": kwargs["pk"]})
 
             # If it's a comment (has a parent), redirect to the top-level parent
             if post.parent:
@@ -197,6 +213,7 @@ class NewsFeedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=["get"])
     def trending(self, request):
+        self.log_activity(request, "Viewed trending posts")
         recent_threshold = timezone.now() - timedelta(hours=24)
 
         # Get posts with reactions or comments in last 24 hours
@@ -232,7 +249,7 @@ class NewsFeedViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class PostViewSet(viewsets.ModelViewSet):
+class PostViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for posts (replaces message API)
     """
@@ -246,6 +263,7 @@ class PostViewSet(viewsets.ModelViewSet):
     pagination_class = PostPagination
 
     def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed list of posts")
         return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -254,13 +272,16 @@ class PostViewSet(viewsets.ModelViewSet):
         responses={201: PostSerializer(), 400: "Invalid request data"},
     )
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
+        self.log_activity(request, "Created a new post", {"post_id": response.data.get('id')})
+        return response
 
     @swagger_auto_schema(
         operation_description="Get a specific post",
         responses={200: PostSerializer(), 404: "Post not found"},
     )
     def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed post details", {"post_id": kwargs.get('pk')})
         return super().retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -274,7 +295,9 @@ class PostViewSet(viewsets.ModelViewSet):
         },
     )
     def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
+        self.log_activity(request, "Updated post", {"post_id": kwargs.get('pk')})
+        return response
 
     @swagger_auto_schema(
         operation_description="Partially update a post",
@@ -287,7 +310,9 @@ class PostViewSet(viewsets.ModelViewSet):
         },
     )
     def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
+        response = super().partial_update(request, *args, **kwargs)
+        self.log_activity(request, "Partially updated post", {"post_id": kwargs.get('pk')})
+        return response
 
     @swagger_auto_schema(
         operation_description="Delete a post",
@@ -298,6 +323,8 @@ class PostViewSet(viewsets.ModelViewSet):
         },
     )
     def destroy(self, request, *args, **kwargs):
+        post_id = kwargs.get('pk')
+        self.log_activity(request, "Deleted post", {"post_id": post_id})
         return super().destroy(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -381,7 +408,11 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             response_data["action"] = "updated"
             response_data["message"] = f"Changed reaction from {previous_reaction} to {reaction_type}"
-            
+        
+        self.log_activity(request, "Reacted to post", {
+            "post_id": str(post.id), 
+            "reaction_type": reaction_type
+        })
         return Response(response_data)
 
     @swagger_auto_schema(
@@ -395,7 +426,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
         try:
             reaction = Reaction.objects.get(post=post, user=user)
+            reaction_type = reaction.reaction_type
             reaction.delete()
+            self.log_activity(request, "Removed reaction from post", {
+                "post_id": str(post.id),
+                "reaction_type": reaction_type
+            })
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Reaction.DoesNotExist:
             return Response(
@@ -429,6 +465,7 @@ class PostViewSet(viewsets.ModelViewSet):
             )
             serialized_data = serializer.data
             print(f"Serialized data length: {len(serialized_data)}")
+            self.log_activity(request, "Viewed comments on post", {"post_id": str(post.id)})
             return self.get_paginated_response(serialized_data)
 
         # If no pagination, return all comments
@@ -437,6 +474,7 @@ class PostViewSet(viewsets.ModelViewSet):
         )
         serialized_data = serializer.data
         print(f"Serialized data length (no pagination): {len(serialized_data)}")
+        self.log_activity(request, "Viewed comments on post", {"post_id": str(post.id)})
         return Response(serialized_data)
 
     @swagger_auto_schema(
@@ -477,6 +515,7 @@ class PostViewSet(viewsets.ModelViewSet):
                     notification_type=notification_type
                 )
 
+            self.log_activity(request, "Commented on post", {"post_id": str(parent_post.id)})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -505,11 +544,12 @@ class PostViewSet(viewsets.ModelViewSet):
         if created:
             post.view_count = F("view_count") + 1
             post.save(update_fields=["view_count"])
+            self.log_activity(request, "Viewed post content", {"post_id": str(post.id)})
 
         return Response({"status": "success"})
 
 
-class MessageAPIView(APIView):
+class MessageAPIView(ActivityLoggingMixin, APIView):
     """
     API view for listing and creating messages (for backward compatibility).
     """
@@ -521,6 +561,8 @@ class MessageAPIView(APIView):
     def get(self, request, forum_id):
         """List all messages for a forum"""
         forum = get_object_or_404(Forum, id=forum_id)
+        self.log_activity(request, "Viewed forum messages", {"forum_id": str(forum_id)})
+        
         messages = Post.objects.filter(forum=forum).order_by("-created_at")
         serializer = PostSerializer(messages, many=True, context={"request": request})
         return Response(serializer.data)
@@ -540,13 +582,17 @@ class MessageAPIView(APIView):
 
         if serializer.is_valid():
             # We override forum just to be safe, using the one from the URL path
-            serializer.save(forum=forum, sender=request.user)
+            message = serializer.save(forum=forum, sender=request.user)
+            self.log_activity(request, "Posted message in forum", {
+                "forum_id": str(forum_id),
+                "message_id": str(message.id)
+            })
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MessageDetailAPIView(APIView):
+class MessageDetailAPIView(ActivityLoggingMixin, APIView):
     """
     API view for message details (for backward compatibility).
     """
@@ -567,6 +613,12 @@ class MessageDetailAPIView(APIView):
         """Get a specific message"""
         forum = get_object_or_404(Forum, id=forum_id)
         message = get_object_or_404(Post, id=message_id, forum=forum)
+        
+        self.log_activity(request, "Viewed message details", {
+            "forum_id": str(forum_id),
+            "message_id": str(message_id)
+        })
+        
         serializer = PostSerializer(message, context={"request": request})
         return Response(serializer.data)
 
@@ -599,6 +651,10 @@ class MessageDetailAPIView(APIView):
         )
         if serializer.is_valid():
             serializer.save()
+            self.log_activity(request, "Updated message partially", {
+                "forum_id": str(forum_id),
+                "message_id": str(message_id)
+            })
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -631,6 +687,10 @@ class MessageDetailAPIView(APIView):
         )
         if serializer.is_valid():
             serializer.save()
+            self.log_activity(request, "Updated message", {
+                "forum_id": str(forum_id),
+                "message_id": str(message_id)
+            })
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -654,11 +714,15 @@ class MessageDetailAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+        self.log_activity(request, "Deleted message", {
+            "forum_id": str(forum_id),
+            "message_id": str(message_id)
+        })
         message.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class MessageSeenAPIView(APIView):
+class MessageSeenAPIView(ActivityLoggingMixin, APIView):
     """
     API view for tracking message views (for backward compatibility).
     """
@@ -686,6 +750,10 @@ class MessageSeenAPIView(APIView):
         if created:
             message.view_count = F("view_count") + 1
             message.save(update_fields=["view_count"])
+            self.log_activity(request, "Marked message as seen", {
+                "forum_id": str(forum_id),
+                "message_id": str(message_id)
+            })
 
         serializer = SeenSerializer(seen)
         return Response(serializer.data)
@@ -705,12 +773,17 @@ class MessageSeenAPIView(APIView):
         forum = get_object_or_404(Forum, id=forum_id)
         message = get_object_or_404(Post, id=message_id, forum=forum)
 
+        self.log_activity(request, "Viewed message seen status", {
+            "forum_id": str(forum_id),
+            "message_id": str(message_id)
+        })
+        
         seen_records = Seen.objects.filter(post=message)
         serializer = SeenSerializer(seen_records, many=True)
         return Response(serializer.data)
 
 
-class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
+class NotificationViewSet(ActivityLoggingMixin, viewsets.ReadOnlyModelViewSet):
     """
     API endpoint for user notifications
     """
@@ -721,9 +794,11 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
 
     
     def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed notifications")
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed notification details", {"notification_id": kwargs.get('pk')})
         return super().retrieve(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -753,6 +828,7 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
         notification = self.get_object()
         notification.read = True
         notification.save()
+        self.log_activity(request, "Marked notification as read", {"notification_id": pk})
         return Response({"status": "notification marked as read"})
 
     @swagger_auto_schema(
@@ -770,4 +846,5 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=["post"])
     def mark_all_read(self, request):
         self.get_queryset().update(read=True)
+        self.log_activity(request, "Marked all notifications as read")
         return Response({"status": "all notifications marked as read"})
