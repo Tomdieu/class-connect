@@ -14,10 +14,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from drf_yasg.utils import swagger_auto_schema
+from utils.mixins import ActivityLoggingMixin
 
 User = get_user_model()
 
-class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
+class VideoConferenceSessionViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     queryset = VideoConferenceSession.objects.all()
     serializer_class = VideoConferenceSessionSerializer
     filterset_class = VideoConferenceSessionFilter
@@ -90,7 +91,46 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
         duration_minutes = serializer.validated_data.get('duration_minutes')
         
         meeting_link = self.create_google_meet_link(title, start_time, duration_minutes)
-        serializer.save(meeting_link=meeting_link)
+        session = serializer.save(meeting_link=meeting_link)
+        
+        # Log the activity
+        self.log_activity(self.request, "Created new video conference session", {
+            "session_id": str(session.id),
+            "title": title,
+            "start_time": str(start_time)
+        })
+    
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed list of video conference sessions")
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        self.log_activity(request, "Viewed video conference session details", {
+            "session_id": kwargs.get('pk')
+        })
+        return response
+        
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        self.log_activity(request, "Updated video conference session", {
+            "session_id": kwargs.get('pk')
+        })
+        return response
+        
+    def partial_update(self, request, *args, **kwargs):
+        response = super().partial_update(request, *args, **kwargs)
+        self.log_activity(request, "Partially updated video conference session", {
+            "session_id": kwargs.get('pk')
+        })
+        return response
+        
+    def destroy(self, request, *args, **kwargs):
+        session_id = kwargs.get('pk')
+        self.log_activity(request, "Deleted video conference session", {
+            "session_id": session_id
+        })
+        return super().destroy(request, *args, **kwargs)
         
     @swagger_auto_schema(
         method='post',
@@ -121,6 +161,12 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
             update_calendar_event_attendees.delay(
                 session_id=str(session.id)
             )
+            
+            # Log the activity
+            self.log_activity(request, "Added attendees to video conference session", {
+                "session_id": pk,
+                "user_ids": [str(uid) for uid in user_ids]
+            })
             
             return Response({'status': 'attendees added'}, status=status.HTTP_200_OK)
         
@@ -155,6 +201,12 @@ class VideoConferenceSessionViewSet(viewsets.ModelViewSet):
             update_calendar_event_attendees.delay(
                 session_id=str(session.id)
             )
+            
+            # Log the activity
+            self.log_activity(request, "Removed attendees from video conference session", {
+                "session_id": pk,
+                "user_ids": [str(uid) for uid in user_ids]
+            })
             
             return Response({'status': 'attendees removed'}, status=status.HTTP_200_OK)
         
