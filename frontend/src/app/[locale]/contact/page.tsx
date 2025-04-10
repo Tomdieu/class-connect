@@ -14,11 +14,11 @@ const ContactPage = () => {
     "@type": "ContactPage",
     "name": "Contact ClassConnect",
     "description": "Get in touch with ClassConnect support team",
-    "publisher": {
-      "@type": "Organization",
-      "name": "ClassConnect",
-      "sameAs": ["https://www.classconnect.cm"]
-    },
+    // "publisher": {
+    //   "@type": "Organization",
+    //   "name": "ClassConnect",
+    //   "sameAs": ["https://www.classconnect.cm"]
+    // },
     "mainEntity": {
       "@type": "ContactPoint",
       "contactType": "customer support",

@@ -12,11 +12,11 @@ const PrivacyPage = () => {
     "@type": "WebPage",
     "name": "Privacy Policy - ClassConnect",
     "description": "ClassConnect's privacy policy and data protection information",
-    "publisher": {
-      "@type": "Organization",
-      "name": "ClassConnect",
-      "sameAs": ["https://www.classconnect.cm"]
-    }
+    // "publisher": {
+    //   "@type": "Organization",
+    //   "name": "ClassConnect",
+    //   "sameAs": ["https://www.classconnect.cm"]
+    // }
   };
 
   return (

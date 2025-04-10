@@ -14,11 +14,6 @@ const HelpPage = () => {
     "@type": "WebPage",
     "name": "Help Center - ClassConnect",
     "description": "Get help with using ClassConnect platform",
-    "publisher": {
-      "@type": "Organization",
-      "name": "ClassConnect",
-      "sameAs": ["https://www.classconnect.cm"]
-    },
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": [
