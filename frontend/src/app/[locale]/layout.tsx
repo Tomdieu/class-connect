@@ -259,13 +259,11 @@ export default async function RootLayout({
       "High School Education",
       "Middle School Education",
       "University Level Education",
-      "Professional Development",
     ],
     educationalLevel: [
       "Middle School",
       "High School",
       "University",
-      "Professional Development",
     ],
     availableLanguage: ["French", "English"],
     offers: {
@@ -279,7 +277,7 @@ export default async function RootLayout({
       "@type": "ContactPoint",
       contactType: "customer support",
       availableLanguage: ["French", "English"],
-      email: "contact@classconnect.cm", // Add actual contact email
+      email: "support@classconnect.cm", // Add actual contact email
     },
   };
 
