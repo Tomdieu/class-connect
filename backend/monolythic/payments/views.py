@@ -24,8 +24,9 @@ from rest_framework.authentication import TokenAuthentication
 from django.core.cache import cache
 from .pagination import CustomPagination
 from rest_framework.decorators import action
+from utils.mixins import ActivityLoggingMixin
 
-class SubscriptionPlanViewSet(viewsets.ModelViewSet):
+class SubscriptionPlanViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     queryset = SubscriptionPlan.objects.filter(active=True)
     serializer_class = SubscriptionPlanSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -55,8 +56,29 @@ class SubscriptionPlanViewSet(viewsets.ModelViewSet):
 
         # If not found or not numeric, try slug
         return self.queryset.get(slug=lookup_value)
+    
+    # Add logging for authenticated actions
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        self.log_activity(request, "Created a new subscription plan", {"plan_id": response.data.get('id')})
+        return response
+    
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        self.log_activity(request, "Updated subscription plan", {"plan_id": kwargs.get('pk')})
+        return response
+    
+    def partial_update(self, request, *args, **kwargs):
+        response = super().partial_update(request, *args, **kwargs)
+        self.log_activity(request, "Partially updated subscription plan", {"plan_id": kwargs.get('pk')})
+        return response
+    
+    def destroy(self, request, *args, **kwargs):
+        plan_id = kwargs.get('pk')
+        self.log_activity(request, "Deleted subscription plan", {"plan_id": plan_id})
+        return super().destroy(request, *args, **kwargs)
 
-class PaymentLinkView(APIView):
+class PaymentLinkView(ActivityLoggingMixin, APIView):
     permission_classes = [IsAuthenticated]
     
     @swagger_auto_schema(
@@ -310,6 +332,12 @@ class PaymentLinkView(APIView):
                         'warning': f'Payment link created, but transaction recording failed: {str(tx_error)}'
                     })
                 
+                # Log the payment link creation attempt
+                self.log_activity(request, "Generated payment link", {
+                    "plan_id": plan_id,
+                    "amount": str(plan.price) if 'plan' in locals() else None
+                })
+                
                 return Response({
                     'payment_link': payment_link['link'],
                     'transaction_id': internal_reference,
@@ -341,7 +369,7 @@ class PaymentLinkView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-class CurrentSubscriptionView(APIView):
+class CurrentSubscriptionView(ActivityLoggingMixin, APIView):
     permission_classes = [IsAuthenticated]
     
     @swagger_auto_schema(
@@ -361,6 +389,7 @@ class CurrentSubscriptionView(APIView):
         }
     )
     def get(self, request):
+        self.log_activity(request, "Checked current subscription status")
         try:
             subscription = Subscription.objects.filter(
                 user=request.user,
@@ -378,7 +407,7 @@ class CurrentSubscriptionView(APIView):
                 'has_active_subscription': False
             }, status=status.HTTP_200_OK)
 
-class SubscriptionHistoryView(APIView):
+class SubscriptionHistoryView(ActivityLoggingMixin, APIView):
     permission_classes = [IsAuthenticated]
     
     @swagger_auto_schema(
@@ -442,6 +471,7 @@ class SubscriptionHistoryView(APIView):
         }
     )
     def get(self, request):
+        self.log_activity(request, "Viewed subscription history")
         subscriptions = Subscription.objects.filter(
             user=request.user
         ).order_by('-created_at')
@@ -452,7 +482,7 @@ class SubscriptionHistoryView(APIView):
         serializer = SubscriptionDetailSerializer(paginated_subscriptions, many=True)
         return paginator.get_paginated_response(serializer.data)
 
-class SubscriptionViewSet(viewsets.ReadOnlyModelViewSet):
+class SubscriptionViewSet(ActivityLoggingMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = SubscriptionFilter
     
@@ -466,13 +496,22 @@ class SubscriptionViewSet(viewsets.ReadOnlyModelViewSet):
             return Subscription.objects.none()  # Return empty queryset for swagger
         return Subscription.objects.filter(user=self.request.user)
     
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed list of subscriptions")
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed subscription details", {"subscription_id": kwargs.get('pk')})
+        return super().retrieve(request, *args, **kwargs)
+    
     @action(methods=['GET'], detail=False,url_path='my-subscriptions',url_name='my-subscriptions')
     def my_subscriptions(self,request):
+        self.log_activity(request, "Viewed personal subscriptions")
         subscriptions = Subscription.objects.filter(user=request.user)
         serializer = SubscriptionDetailSerializer(subscriptions, many=True)
         return Response(serializer.data)
 
-class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
+class PaymentViewSet(ActivityLoggingMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = PaymentFilter
@@ -482,7 +521,15 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
             return Payment.objects.none()  # Return empty queryset for swagger
         return Payment.objects.filter(user=self.request.user)
     
-class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed payment history")
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed payment details", {"payment_id": kwargs.get('pk')})
+        return super().retrieve(request, *args, **kwargs)
+    
+class TransactionViewSet(ActivityLoggingMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = TransactionSerializer
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = TransactionFilter
@@ -516,7 +563,12 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
         ]
     )
     def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed transaction list")
         return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed transaction details", {"transaction_id": kwargs.get('pk')})
+        return super().retrieve(request, *args, **kwargs)
 
 @csrf_exempt
 @api_view(['POST', 'GET'])
