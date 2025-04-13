@@ -47,7 +47,7 @@ export default function NotFound() {
             className="px-6 py-3 bg-white border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
           >
             {t('notFound.goBack')}
-          </button>
+          </button> 
           
           <button 
             onClick={() => router.push('/')}
