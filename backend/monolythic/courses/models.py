@@ -541,6 +541,10 @@ class CourseDeclaration(models.Model):
     accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_declarations')
     status = models.CharField(max_length=20, choices=ACTIONS, default=PENDING)
     updated_at = models.DateTimeField(auto_now=True)
+    proof_of_payment = models.FileField(upload_to='declarations/', blank=True, null=True)
+    payment_comment = models.TextField(blank=True, null=True)
+    payment_date = models.DateField(_("Payment Date"), blank=True, null=True)
+    paid_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='paid_declarations')
 
     def __str__(self):
         return f"{self.teacher_student_enrollment} - {self.status}"
