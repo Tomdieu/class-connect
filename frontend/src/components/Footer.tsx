@@ -17,6 +17,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">{t("footer.quickLinks")}</h3>
             <ul className="space-y-2">
+              <li><Link href="/about" className="text-gray-400 hover:text-white">{t("about.pageTitle")}</Link></li>
               <li><Link href="/pricing" className="text-gray-400 hover:text-white">{t("footer.pricing")}</Link></li>
               <li><Link href="/contact" className="text-gray-400 hover:text-white">{t("footer.contact")}</Link></li>
             </ul>

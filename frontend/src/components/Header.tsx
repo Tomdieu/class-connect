@@ -138,7 +138,7 @@ function Header({ className }: { className?: string }) {
                 <Button variant="ghost" className="p-1 sm:p-2 h-auto flex items-center gap-2 hover:bg-primary/10 rounded-full sm:rounded-lg">
                   <Avatar className="h-8 w-8 border border-border">
                     <AvatarImage 
-                      src={session.user.image || undefined} 
+                      src={session.user.avatar || undefined} 
                       alt={session.user.name || "User"}
                     />
                     <AvatarFallback className="bg-primary/20 text-primary font-medium">
@@ -157,8 +157,9 @@ function Header({ className }: { className?: string }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <div className="px-2 py-2 text-sm font-medium text-center text-muted-foreground">
-                  {session.user.email}
+                <div className="px-2 py-2 text-sm flex flex-col font-medium text-center text-muted-foreground">
+                  <span className="font-bold text-sm">{session.user.first_name} {session.user.last_name}</span>
+                  <span>{session.user.email}</span>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push("/redirect")} className="cursor-pointer">
