@@ -8,10 +8,12 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-muted/30">
-      <Header/>
-      {children}
-      <Footer/>
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex flex-col">
+      <Header className="bg-transparent" />
+      <main className="">
+        {children}
+      </main>
+      <Footer />
     </div>
   );
 }

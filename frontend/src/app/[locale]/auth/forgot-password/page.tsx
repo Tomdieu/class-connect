@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { 
   ArrowLeft, 
   BookOpen, 
@@ -197,30 +196,30 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-full bg-background px-4">
-      <Helmet>
-        <title>
-          {locale === "fr"
-            ? "Mot de passe oublié | ClassConnect"
-            : "Forgot Password | ClassConnect"}
-        </title>
-        <meta name="description" content={t("passwordReset.requestDescription")} />
-        <meta
-          property="og:title"
-          content={
-            locale === "fr"
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
+      <div className="container max-w-md mx-auto py-10 px-4">
+        <Helmet>
+          <title>
+            {locale === "fr"
               ? "Mot de passe oublié | ClassConnect"
-              : "Forgot Password | ClassConnect"
-          }
-        />
-        <meta property="og:description" content={t("passwordReset.requestDescription")} />
-        <link rel="canonical" href={`${baseUrl}/auth/forgot-password`} />
-        <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
-      </Helmet>
+              : "Forgot Password | ClassConnect"}
+          </title>
+          <meta name="description" content={t("passwordReset.requestDescription")} />
+          <meta
+            property="og:title"
+            content={
+              locale === "fr"
+                ? "Mot de passe oublié | ClassConnect"
+                : "Forgot Password | ClassConnect"
+            }
+          />
+          <meta property="og:description" content={t("passwordReset.requestDescription")} />
+          <link rel="canonical" href={`${baseUrl}/auth/forgot-password`} />
+          <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
+        </Helmet>
 
-      <div className="w-full max-w-md">
         <div className="mb-6">
-          <Button variant="ghost" size="sm" asChild>
+          <Button variant="ghost" size="sm" asChild className="hover:bg-primary/10">
             <Link href="/auth/login">
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t("passwordReset.backToLogin")}
@@ -228,10 +227,15 @@ export default function ForgotPasswordPage() {
           </Button>
         </div>
 
-        <Card className="w-full">
-          <CardHeader className="space-y-1 text-center">
-            <div className="text-default text-center w-full flex items-center justify-center">
-              <BookOpen className="h-7 w-7 sm:h-10 sm:w-10" />
+        <Card className="shadow-lg border-primary/20 overflow-hidden bg-card/95 backdrop-blur">
+          <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/30 rounded-bl-full z-0 opacity-20"></div>
+          <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/20 rounded-tr-full z-0 opacity-20"></div>
+
+          <CardHeader className="space-y-1 text-center relative z-10">
+            <div className="text-center w-full flex items-center justify-center mb-2">
+              <div className="rounded-full bg-primary/10 p-3">
+                <BookOpen className="h-8 w-8 text-primary" />
+              </div>
             </div>
             <CardTitle className="text-2xl font-bold">
               {resetRequested ? t("passwordReset.resetTitle") : t("passwordReset.requestTitle")}
@@ -241,7 +245,7 @@ export default function ForgotPasswordPage() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 relative z-10">
             {/* Success message after password reset */}
             {resetSuccess && (
               <Alert className="bg-primary/10 border-primary/20">
@@ -258,7 +262,7 @@ export default function ForgotPasswordPage() {
               <Form {...emailForm}>
                 <form onSubmit={emailForm.handleSubmit(handleRequestReset)} className="space-y-4">
                   {error && (
-                    <div className="p-3 text-sm bg-destructive/15 text-destructive rounded-md">
+                    <div className="p-4 text-sm bg-destructive/15 text-destructive rounded-md border border-destructive/30 shadow-sm">
                       {error}
                     </div>
                   )}
@@ -268,19 +272,22 @@ export default function ForgotPasswordPage() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("loginDialog.emailLabel")}</FormLabel>
-                        <div className="relative">
-                          <FormControl>
-                            <Input
-                              placeholder="example@email.com"
-                              className="pl-10"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <MailIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
-                        </div>
-                        <p className="text-xs text-muted-foreground">
+                        <FormLabel className="flex items-center gap-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                            <rect width="20" height="16" x="2" y="4" rx="2" />
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                          </svg>
+                          {t("loginDialog.emailLabel")}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="example@email.com"
+                            className="bg-background"
+                            disabled={isLoading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-muted-foreground mt-1">
                           {t("passwordReset.enterEmailInstructions")}
                         </p>
                         <FormMessage />
@@ -288,14 +295,17 @@ export default function ForgotPasswordPage() {
                     )}
                   />
 
-                  <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+                  <Button type="submit" className="w-full mt-2 bg-primary hover:bg-primary/90 transition-colors" disabled={isLoading}>
                     {isLoading ? (
                       <div className="flex items-center">
                         <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                         {t("passwordReset.sending")}
                       </div>
                     ) : (
-                      t("passwordReset.sendLink")
+                      <div className="flex items-center">
+                        <MailIcon className="mr-2 h-4 w-4" />
+                        {t("passwordReset.sendLink")}
+                      </div>
                     )}
                   </Button>
                 </form>
@@ -305,9 +315,9 @@ export default function ForgotPasswordPage() {
             {/* Code verification and password reset form */}
             {resetRequested && !resetSuccess && (
               <Form {...resetPasswordForm}>
-                <form autoComplete="false" onSubmit={resetPasswordForm.handleSubmit(handleResetPassword)} className="space-y-4">
+                <form autoComplete="off" onSubmit={resetPasswordForm.handleSubmit(handleResetPassword)} className="space-y-4">
                   {error && (
-                    <div className="p-3 text-sm bg-destructive/15 text-destructive rounded-md">
+                    <div className="p-4 text-sm bg-destructive/15 text-destructive rounded-md border border-destructive/30 shadow-sm">
                       {error}
                     </div>
                   )}
@@ -325,28 +335,28 @@ export default function ForgotPasswordPage() {
                     name="resetCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("passwordReset.codeLabel")}</FormLabel>
-                        <div className="relative">
-                          <FormControl>
-                            <Input
-                              placeholder={t("passwordReset.codePlaceholder")}
-                              className="pl-10"
-                              disabled={isLoading}
-                              maxLength={6}
-                              inputMode="numeric"
-                              pattern="[0-9]*"
-                              onKeyPress={(e) => {
-                                // Allow only numeric input
-                                if (!/[0-9]/.test(e.key)) {
-                                  e.preventDefault();
-                                }
-                              }}
-                              {...field}
-                            />
-                          </FormControl>
-                          <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
-                        </div>
-                        <p className="text-xs text-muted-foreground">
+                        <FormLabel className="flex items-center gap-1">
+                          <ShieldCheck className="h-3.5 w-3.5 text-muted-foreground" />
+                          {t("passwordReset.codeLabel")}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t("passwordReset.codePlaceholder")}
+                            className="bg-background"
+                            disabled={isLoading}
+                            maxLength={6}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            onKeyPress={(e) => {
+                              // Allow only numeric input
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            {...field}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-muted-foreground mt-1">
                           {t("passwordReset.codeInstructions")}
                         </p>
                         <FormMessage />
@@ -359,36 +369,36 @@ export default function ForgotPasswordPage() {
                     name="newPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("passwordReset.newPassword")}</FormLabel>
-                        <div className="relative">
-                          <FormControl>
-                            <Input
-                              type={showPassword ? "text" : "password"}
-                              placeholder="••••••••"
-                              className="pl-10"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <KeyIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="flex items-center gap-1">
+                            <KeyIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                            {t("passwordReset.newPassword")}
+                          </FormLabel>
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon"
-                            className="absolute right-0 top-0 h-full px-3 py-2"
+                            size="sm"
+                            className="p-0 h-auto text-xs text-primary hover:text-primary/80 hover:bg-transparent"
                             onClick={() => setShowPassword(!showPassword)}
                           >
                             {showPassword ? (
-                              <EyeOffIcon className="h-4 w-4" />
+                              <EyeOffIcon className="h-3.5 w-3.5 mr-1" />
                             ) : (
-                              <EyeIcon className="h-4 w-4" />
+                              <EyeIcon className="h-3.5 w-3.5 mr-1" />
                             )}
-                            <span className="sr-only">
-                              {showPassword ? "Hide password" : "Show password"}
-                            </span>
+                            {showPassword ? "Hide" : "Show"}
                           </Button>
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <FormControl>
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            className="bg-background"
+                            disabled={isLoading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-muted-foreground mt-1">
                           {t("registerDialog.errors.passwordMin")}
                         </p>
                         <FormMessage />
@@ -401,32 +411,39 @@ export default function ForgotPasswordPage() {
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("passwordReset.confirmPassword")}</FormLabel>
-                        <div className="relative">
-                          <FormControl>
-                            <Input
-                              type={showPassword ? "text" : "password"}
-                              placeholder="••••••••"
-                              className="pl-10"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <KeyIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
-                        </div>
+                        <FormLabel className="flex items-center gap-1">
+                          <KeyIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                          {t("passwordReset.confirmPassword")}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            className="bg-background"
+                            disabled={isLoading}
+                            {...field}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+                  <Button 
+                    type="submit" 
+                    className="w-full mt-2 bg-primary hover:bg-primary/90 transition-colors" 
+                    disabled={isLoading}
+                  >
                     {isLoading ? (
                       <div className="flex items-center">
                         <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                         {t("passwordReset.resetting")}
                       </div>
                     ) : (
-                      t("passwordReset.resetButton")
+                      <div className="flex items-center">
+                        <ShieldCheck className="mr-2 h-4 w-4" />
+                        {t("passwordReset.resetButton")}
+                      </div>
                     )}
                   </Button>
 
@@ -436,7 +453,7 @@ export default function ForgotPasswordPage() {
                       variant="link" 
                       onClick={resendResetEmail}
                       disabled={isLoading}
-                      className="p-0 mt-1"
+                      className="p-0 mt-1 text-primary hover:text-primary/90"
                     >
                       {isLoading ? t("passwordReset.resending") : t("passwordReset.resendLink")}
                     </Button>
@@ -445,6 +462,16 @@ export default function ForgotPasswordPage() {
               </Form>
             )}
           </CardContent>
+
+          {!resetRequested && !resetSuccess && (
+            <CardFooter className="flex justify-center relative z-10">
+              <div className="text-center text-sm">
+                <Link href="/auth/login" className="text-primary hover:underline font-medium">
+                  {t("passwordReset.backToLogin")}
+                </Link>
+              </div>
+            </CardFooter>
+          )}
         </Card>
       </div>
     </div>
