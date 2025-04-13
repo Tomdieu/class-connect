@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import api from "@/services/api";
 import {
   ActionStatus,
+  CourseDeclarationCreateType,
   CourseDeclarationType,
   PaginationType,
   SchoolYearType,
@@ -269,6 +270,40 @@ export const updateEnrollmentDeclaration = async ({id,declarationId,data}:{id:nu
     throw JSON.stringify({message:"An unexpected error occurred"});
   }
 }
+
+export const updateEnrollmentDeclarationPaid = async ({
+  id,
+  data,
+  declarationId,
+}: {
+  id: number;
+  declarationId: number;
+  data: { proof_of_payment: File; payment_comment: string };
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const formData = new FormData()
+    formData.append('proof_of_payment',data.proof_of_payment)
+    formData.append('payment_comment',data.payment_comment)
+    const response = await api.post(
+      `/api/enrollments/${id}/declarations/${declarationId}/mark-as-paid/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session.user.accessToken}`,
+        },
+      }
+    );
+    return response.data as CourseDeclarationType;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
 
 export const deleteEnrollmentDeclaration = async (id:number,declarationId:number)=>{
   try{
