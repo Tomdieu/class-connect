@@ -380,6 +380,7 @@ export declare interface CourseOfferingActionCreateType {
 }
 
 export declare interface SchoolYearType {
+  id:number;
   start_year: number;
   end_year: number;
   is_active: boolean;
@@ -425,6 +426,10 @@ export declare interface CourseDeclarationType {
   accepted_by: User | null;
   status: ActionStatus;
   updated_at: string;
+  proof_of_payment: string | null;
+  payment_comment: string | null;
+  payment_date: string | null;
+  paid_by: User | null;
 }
 
 export declare interface CourseDeclarationCreateType {
@@ -690,6 +695,7 @@ export declare interface OnlineCourseType{
   recording_url:string;
   created_at:string;
   calendar_event_id:string;
+  code:string;
 }
 
 export declare interface OnlineCourseCreateType{
