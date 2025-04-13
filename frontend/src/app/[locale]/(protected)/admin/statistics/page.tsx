@@ -88,6 +88,25 @@ const StatisticsPage = () => {
 
   const isLoading = statsLoading || usersLoading || transactionsLoading || schoolYearsLoading || enrollmentsLoading;
 
+  // New function to generate data for the last 7 days
+  const generateLast7Days = () => {
+    const days = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(today.getDate() - i);
+      days.push({
+        date: format(date, "yyyy-MM-dd"),
+        dateLabel: format(date, "dd MMM"),
+        students: 0,
+        professionals: 0,
+        total: 0,
+      });
+    }
+    return days;
+  };
+
   const generateLast12Months = () => {
     const months = [];
     const today = new Date();
@@ -108,7 +127,11 @@ const StatisticsPage = () => {
   };
 
   const chartData = useMemo(() => {
-    if (!users) return { daily: [], monthly: generateLast12Months(), yearly: [] };
+    if (!users) return { 
+      daily: generateLast7Days(), 
+      monthly: generateLast12Months(), 
+      yearly: [] 
+    };
 
     const sortedUsers = [...users].sort(
       (a, b) => new Date(a.date_joined).getTime() - new Date(b.date_joined).getTime()
@@ -134,14 +157,23 @@ const StatisticsPage = () => {
       }
     });
 
-    const dailyData = Array.from(new Set([...studentsByDate.keys(), ...professionalsByDate.keys()]))
-      .map((date) => ({
-        date,
-        students: studentsByDate.get(date) || 0,
-        professionals: professionalsByDate.get(date) || 0,
-        total: (studentsByDate.get(date) || 0) + (professionalsByDate.get(date) || 0),
-      }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Generate last 7 days data structure
+    const last7Days = generateLast7Days();
+    const last7DaysMap = new Map(last7Days.map(day => [day.date, { ...day }]));
+
+    // Populate with actual data where available
+    last7Days.forEach(day => {
+      const dateKey = day.date;
+      const dayData = last7DaysMap.get(dateKey);
+      
+      if (dayData) {
+        dayData.students = studentsByDate.get(dateKey) || 0;
+        dayData.professionals = professionalsByDate.get(dateKey) || 0;
+        dayData.total = (studentsByDate.get(dateKey) || 0) + (professionalsByDate.get(dateKey) || 0);
+      }
+    });
+
+    const dailyData = Array.from(last7DaysMap.values());
 
     const monthlyData = generateLast12Months();
     const monthMap = new Map(monthlyData.map((item) => [item.monthKey, item]));
