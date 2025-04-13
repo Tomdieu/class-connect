@@ -1,3 +1,4 @@
+import datetime
 from rest_framework import serializers
 
 from .models import (
@@ -339,6 +340,18 @@ class CourseDeclarationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseDeclaration
         fields = "__all__"
+        
+class PaymentProofSerializer(serializers.ModelSerializer):
+    """
+    Serializer for uploading payment proof documents and related payment information
+    """
+    proof_of_payment = serializers.FileField(required=True)
+    payment_comment = serializers.CharField(required=False, allow_blank=True)
+    payment_date = serializers.DateField(required=False, default=datetime.date.today)
+    
+    class Meta:
+        model = CourseDeclaration
+        fields = ['proof_of_payment', 'payment_comment', 'payment_date']
 
 
 class UserProgressSerializer(serializers.ModelSerializer):
