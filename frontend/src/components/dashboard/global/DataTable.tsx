@@ -206,9 +206,9 @@ export function DataTable<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
-                  {onRowClick && (
+                  {/* {onRowClick && (
                     <div className="absolute inset-0 z-0" aria-hidden="true" />
-                  )}
+                  )} */}
                 </TableRow>
               ))
             ) : (

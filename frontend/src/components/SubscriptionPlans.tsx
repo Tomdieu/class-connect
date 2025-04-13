@@ -1,301 +1,259 @@
 "use client";
-import { Check, Sparkles, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import { useI18n } from "@/locales/client";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useAuthDialog } from "@/hooks/use-auth-dialog";
-import { useEffect, useState } from "react";
-import { getSubscriptionPlanByIdorSlug } from "@/actions/payments";
-import { SubscriptionPlan } from "@/types";
+import { Button } from "@/components/ui/button";
+import { CheckCheck, ChevronRight, Crown, Shield, Star, Users, Sparkle, Check } from "lucide-react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
+import { useMemo } from "react";
 
-export const SubscriptionPlans = () => {
+export function SubscriptionPlans() {
   const t = useI18n();
-  const router = useRouter();
-  const { data: session } = useSession();
-  const { openLogin } = useAuthDialog();
-  
-  // State for fetched plan data
-  const [planData, setPlanData] = useState<Record<string, SubscriptionPlan | null>>({
-    basic: null,
-    standard: null,
-    premium: null,
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
-  const [selectedPlanIndex, setSelectedPlanIndex] = useState<number>(1); // Default to standard plan
 
-  // Animation variants
-  const cardVariants = {
-    selected: {
-      scale: 1.05,
-      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-      transition: { type: "spring", stiffness: 300, damping: 15 }
-    },
-    notSelected: {
-      scale: 1,
-      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-      transition: { type: "spring", stiffness: 300, damping: 15 }
-    }
-  };
-
-  // Fetch plan data on component mount
-  useEffect(() => {
-    const fetchPlans = async () => {
-      setIsLoading(true);
-      setError(false);
-      
-      try {
-        // Fetch plans in parallel
-        const results = await Promise.allSettled([
-          getSubscriptionPlanByIdorSlug("basic"),
-          getSubscriptionPlanByIdorSlug("standard"),
-          getSubscriptionPlanByIdorSlug("premium"),
-        ]);
-        
-        const newPlanData: Record<string, SubscriptionPlan | null> = {
-          basic: null,
-          standard: null,
-          premium: null,
-        };
-        
-        // Process results
-        if (results[0].status === 'fulfilled') newPlanData.basic = results[0].value;
-        if (results[1].status === 'fulfilled') newPlanData.standard = results[1].value;
-        if (results[2].status === 'fulfilled') newPlanData.premium = results[2].value;
-        
-        setPlanData(newPlanData);
-      } catch (err) {
-        console.error("Failed to fetch plan data:", err);
-        setError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchPlans();
-  }, []);
-
-  const handleSubscribe = (planType: "basic" | "standard" | "premium", index: number) => {
-    setSelectedPlanIndex(index);
-    
-    // Add a small delay to show the animation before navigating
-    setTimeout(() => {
-      if (!session?.user) {
-        router.replace("/");
-        openLogin();
-        return;
-      }
-      router.push(`/subscribe/${planType}`);
-    }, 300);
-  };
-
-  const plans = [
+  // Mock data for when API data isn't available
+  const plansMockData = useMemo(() => [
     {
+      id: "basic",
       name: t("subscriptionPlans.basic.name"),
       description: t("subscriptionPlans.basic.description"),
+      price: "2 000",
+      currency: "FCFA",
+      period: "/month",
       features: [
-        t("subscriptionPlans.basic.features.0"),
-        t("subscriptionPlans.basic.features.1"),
-        t("subscriptionPlans.basic.features.2"),
+        "Accès aux cours de base",
+        "Forum communautaire",
+        "Ressources d'apprentissage limitées",
       ],
-      // Use fetched price if available, otherwise fall back to default
-      price: planData.basic ? Math.floor(planData.basic.price).toLocaleString() : "5,000",
-      period: "month",
-      gradient: "from-blue-50 to-blue-100/50",
-      popular: false,
-      keyName:"basic",
-      badgeText: "",
+      highlightFeatures: [] as number[],
+      variant: "basic",
+      icon: <Shield className="h-5 w-5" />,
+      gradient: "from-blue-400 to-blue-600",
+      bgClass: "bg-gradient-to-br from-blue-50 to-blue-100/50",
+      buttonClass: "bg-blue-500 hover:bg-blue-600",
+      headerClass: "bg-gradient-to-r from-blue-400 to-blue-600",
     },
     {
+      id: "standard",
       name: t("subscriptionPlans.standard.name"),
       description: t("subscriptionPlans.standard.description"),
+      price: "5 000",
+      currency: "FCFA",
+      period: "/month",
       features: [
-        t("subscriptionPlans.standard.features.0"),
-        t("subscriptionPlans.standard.features.1"),
-        t("subscriptionPlans.standard.features.2"),
-        t("subscriptionPlans.standard.features.3"),
+        "Toutes les fonctionnalités Basiques",
+        "Accès à plus de cours",
+        "Sessions Q&R hebdomadaires",
+        "Téléchargement des ressources",
       ],
-      // Use fetched price if available, otherwise fall back to default
-      price: planData.standard ? Math.floor(planData.standard.price).toLocaleString() : "10,000",
-      period: "month",
-      gradient: "from-blue-100 to-blue-200/50",
+      highlightFeatures: [1, 2] as number[],
       popular: true,
-      keyName:"standard",
-      badgeText: "Most Popular",
+      variant: "standard",
+      icon: <Star className="h-5 w-5" />,
+      gradient: "from-primary-500 to-primary-600",
+      bgClass: "bg-green-500",
+      buttonClass: "bg-primary hover:bg-primary/90",
+      headerClass: "bg-gradient-to-r from-primary-500 to-primary-600",
     },
     {
+      id: "premium",
       name: t("subscriptionPlans.premium.name"),
       description: t("subscriptionPlans.premium.description"),
+      price: "10 000",
+      currency: "FCFA",
+      period: "/month",
       features: [
-        t("subscriptionPlans.premium.features.0"),
-        t("subscriptionPlans.premium.features.1"),
-        t("subscriptionPlans.premium.features.2"),
-        t("subscriptionPlans.premium.features.3"),
-        t("subscriptionPlans.premium.features.4"),
+        "Toutes les fonctionnalités Standard",
+        "Accès à tous les cours",
+        "Sessions vidéo illimitées",
+        "Support prioritaire",
+        "Contenu exclusif",
       ],
-      // Use fetched price if available, otherwise fall back to default
-      price: planData.premium ? Math.floor(planData.premium.price).toLocaleString() : "15,000",
-      period: "month",
-      gradient: "from-blue-200 to-blue-300/50",
-      popular: false,
-      keyName:"premium",
-      badgeText: "Best Value",
+      highlightFeatures: [2, 3, 4] as number[],
+      bestValue: true,
+      variant: "premium",
+      icon: <Crown className="h-5 w-5" />,
+      gradient: "from-amber-400 to-amber-600",
+      bgClass: "bg-gradient-to-br from-amber-50 to-amber-100/50",
+      buttonClass: "bg-amber-500 hover:bg-amber-600",
+      headerClass: "bg-gradient-to-r from-amber-400 to-amber-600",
     },
-  ];
-
-  // Features that standard and premium have, but basic doesn't
-  const basicMissingFeatures = [
-    "Weekly Q&A sessions",
-    "Resource downloads",
-    "Unlimited video sessions",
-    "Priority support",
-    "Exclusive content",
-  ];
+  ], [t]);
 
   return (
-    <div className="py-24 relative overflow-hidden" id="pricing">
-      {/* Background decorations */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-0 w-72 h-72 bg-blue-200/20 rounded-full filter blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-72 h-72 bg-indigo-200/20 rounded-full filter blur-3xl"></div>
-        <div className="absolute top-1/4 right-1/4 w-48 h-48 bg-purple-100/20 rounded-full filter blur-3xl"></div>
+    <section className="relative py-20 md:py-32 overflow-hidden" id="pricing">
+      {/* Enhanced Background Elements with interactive particles */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/80 z-0"></div>
+      
+      {/* Decorative circles */}
+      <div className="absolute -top-40 left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+      <div className="absolute top-1/3 right-5 w-72 h-72 bg-amber-500/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
+      
+      {/* Animated particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="particles-container">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full bg-primary/20"
+              style={{
+                width: Math.random() * 10 + 5,
+                height: Math.random() * 10 + 5,
+                x: Math.random() * 100 - 50 + "%",
+                y: Math.random() * 100 + "%",
+              }}
+              animate={{
+                y: [null, "-100%"],
+                opacity: [0, 0.5, 0],
+              }}
+              transition={{
+                duration: Math.random() * 10 + 20,
+                repeat: Infinity,
+                ease: "linear",
+                delay: Math.random() * 20,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="container mx-auto px-4 relative">
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          transition={{ duration: 0.7 }}
+          className="text-center max-w-3xl mx-auto mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <span className="text-primary font-semibold tracking-wider uppercase mb-3 inline-block">
+            {t("pricing")}
+          </span>
+          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-5 tracking-tight">
             {t("subscriptionPlans.title")}
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
+          <div className="w-24 h-1.5 bg-primary mx-auto rounded-full mb-6"></div>
+          <p className="text-lg text-gray-600 leading-relaxed">
             {t("subscriptionPlans.subtitle")}
           </p>
-          <div className="w-24 h-1 bg-default mx-auto rounded-full"></div>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {plans.map((plan, index) => (
+        {/* Enhanced plan cards with interactive elements */}
+        <div className="grid md:grid-cols-3 gap-x-8 gap-y-12 max-w-7xl mx-auto">
+          {plansMockData.map((plan, index) => (
             <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 20 }}
+              key={plan.id || `plan-${index}`}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              variants={cardVariants}
-              animate={selectedPlanIndex === index ? "selected" : "notSelected"}
-              whileHover={{ y: -10 }}
-              className="h-full"
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.7, delay: index * 0.15 }}
+              className={`relative ${plan.popular ? 'md:-mt-6 z-10' : ''}`}
             >
-              <Card
-                className={`relative flex flex-col h-full border-0 shadow-lg backdrop-blur-sm bg-gradient-to-br ${
-                  plan.gradient
-                } ${plan.popular ? "" : ""}`}
+              <motion.div 
+                whileHover={{ y: -8 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className={`relative rounded-2xl shadow-xl overflow-hidden h-full border border-gray-100 bg-white ${
+                  plan.popular ? 'ring-2 ring-primary md:scale-105' : ''
+                }`}
               >
-                {plan.badgeText && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge variant={index === 1 ? "default" : "secondary"} className={`px-4 py-1 text-sm font-medium flex items-center gap-1 ${index === 1 ? 'bg-default text-white' : 'bg-purple-600 text-white'}`}>
-                      {index === 1 && <Sparkles className="h-4 w-4" />}
-                      {plan.badgeText}
-                    </Badge>
+                {/* Popular Badge */}
+                {plan.popular && (
+                  <div className="absolute -top-5 -right-5">
+                    <div className="relative">
+                      <div className="absolute -inset-3 bg-primary/20 rounded-full blur-xl opacity-70"></div>
+                      <div className="relative bg-gradient-to-r from-primary to-primary-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                        <Sparkle className="h-3.5 w-3.5 inline-block mr-1 text-yellow-200" />
+                        {t("most popular")}
+                      </div>
+                    </div>
                   </div>
                 )}
-                <CardHeader className="text-center pb-8 pt-10">
-                  <CardTitle className="text-3xl font-bold text-gray-900">
-                    {plan.name}
-                  </CardTitle>
-                  <CardDescription className="text-gray-600 mt-2">
-                    {plan.description}
-                  </CardDescription>
-                  <div className="mt-6">
-                    <span className="text-4xl font-bold text-gray-900">
-                      {plan.price} FCFA
-                    </span>
-                    <span className="text-gray-600">/{plan.period}</span>
+
+                {/* Header with gradient */}
+                <div className={`${plan.headerClass} bg-green-500 text-white p-8 relative overflow-hidden`}>
+                  {/* Abstract shape for visual interest */}
+                  <div className="absolute -right-16 -bottom-16 w-48 h-48 bg-white/10 rounded-full"></div>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-white/20"></div>
+                  
+                  {/* Plan title and icon */}
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <h3 className="text-2xl md:text-3xl font-bold mb-1">{plan.name}</h3>
+                      <p className="opacity-80 font-medium">{plan.description}</p>
+                    </div>
+                    <div className="bg-white/20 rounded-full p-3 backdrop-blur-sm">
+                      {plan.icon}
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent className="flex-grow px-8">
+
+                  {/* Price block with enhanced typography */}
+                  <div className="mb-2">
+                    <div className="flex items-baseline">
+                      <span className="text-4xl md:text-5xl font-extrabold tracking-tight">{plan.price}</span>
+                      <div className="ml-2">
+                        <span className="text-xl font-semibold">{plan.currency}</span>
+                        <span className="opacity-70 text-sm ml-1">{plan.period}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Features with improved visuals */}
+                <div className="p-8">
+                  <h4 className="text-sm uppercase tracking-wider text-gray-500 mb-4 font-medium">
+                    {t("features.title")}
+                  </h4>
                   <ul className="space-y-4">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-3">
-                        <div className="flex-shrink-0 pt-1 text-default">
-                          <Check className="h-5 w-5 text-default" />
+                    {Array.isArray(plan.features) && plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-start">
+                        <div className={`flex-shrink-0 ${
+                          plan.highlightFeatures?.includes(featureIndex) 
+                            ? `text-${plan.variant === 'basic' ? 'blue' : plan.variant === 'standard' ? 'primary' : 'amber'}-500` 
+                            : 'text-gray-400'
+                        }`}>
+                          <Check className="h-5 w-5 mr-3" />
                         </div>
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                    
-                    {/* Show what's missing for the basic plan */}
-                    {index === 0 && basicMissingFeatures.map((feature, i) => (
-                      <li key={`missing-${i}`} className="flex items-start gap-3 opacity-50">
-                        <div className="flex-shrink-0 pt-1">
-                          <X className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <span className="text-gray-400">{feature}</span>
+                        <span className={`text-gray-700 ${
+                          plan.highlightFeatures?.includes(featureIndex) ? 'font-medium' : ''
+                        }`}>
+                          {feature}
+                        </span>
                       </li>
                     ))}
                   </ul>
-                </CardContent>
-                <CardFooter className="pb-8 px-8">
-                  <motion.div 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-full"
-                  >
-                    <Button
-                      className={`w-full h-12 text-lg font-medium rounded-xl transition-all duration-300 ${
-                        plan.popular || selectedPlanIndex === index
-                          ? "bg-default hover:bg-default/90 text-white"
-                          : "bg-white hover:bg-gray-50 text-default border-2 border-default"
-                      }`}
-                      onClick={() =>
-                        handleSubscribe(
-                          plan.keyName.toLowerCase() as
-                            | "basic"
-                            | "standard"
-                            | "premium",
-                          index
-                        )
-                      }
-                    >
-                      {t("subscriptionPlans.choose")}
-                    </Button>
-                  </motion.div>
-                </CardFooter>
-              </Card>
+                  
+                  {/* CTA Button */}
+                  <div className="mt-8 pt-6 border-t border-gray-100">
+                    <Link href={`/subscribe/${plan.id}`}>
+                      <motion.div
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button 
+                          className={`w-full ${plan.buttonClass} text-white py-6 rounded-xl transition-all duration-300 font-semibold text-base`}
+                        >
+                          {t("subscriptionPlans.choose")}
+                          <ChevronRight className="h-4 w-4 ml-2 opacity-70" />
+                        </Button>
+                      </motion.div>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Best Value badge - inside the card */}
+                {plan.bestValue && (
+                  <div className="absolute top-3 left-0 w-full">
+                    <div className="-mt-3 mx-auto w-fit bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                      <Crown className="h-3.5 w-3.5 inline-block mr-1" />
+                      BEST VALUE
+                    </div>
+                  </div>
+                )}
+              </motion.div>
             </motion.div>
           ))}
         </div>
-        
-        {/* <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="mt-16 text-center text-gray-500"
-        >
-          <p>
-            {t("subscriptionPlans.title") === "Our Subscription Plans" 
-              ? "All plans include a 7-day free trial. No credit card required." 
-              : "Tous les forfaits incluent un essai gratuit de 7 jours. Aucune carte de crédit requise."}
-          </p>
-        </motion.div> */}
+
       </div>
-    </div>
+    </section>
   );
-};
+}
