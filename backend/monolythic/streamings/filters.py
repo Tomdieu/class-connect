@@ -8,7 +8,8 @@ class VideoConferenceSessionFilter(django_filters.FilterSet):
     status = django_filters.ChoiceFilter(choices=VideoConferenceSession.SESSION_STATUS)
     start_time = django_filters.DateTimeFromToRangeFilter()
     instructor = django_filters.ModelChoiceFilter(queryset=User.objects.all())
+    code = django_filters.CharFilter(lookup_expr='exact')
     
     class Meta:
         model = VideoConferenceSession
-        fields = ['instructor', 'status','duration_minutes',]
+        fields = ['instructor', 'status', 'duration_minutes', 'code',]

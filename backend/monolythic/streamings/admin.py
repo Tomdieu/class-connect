@@ -3,9 +3,9 @@ from .models import VideoConferenceSession
 
 @admin.register(VideoConferenceSession)
 class VideoConferenceSessionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'instructor', 'start_time', 'status')
+    list_display = ('title', 'instructor', 'start_time', 'status', 'code')
     list_filter = ('status', 'start_time')
-    search_fields = ('title', 'description')
+    search_fields = ('title', 'description', 'code')
     filter_horizontal = ('attendees',)  # Adds a nice widget for managing many-to-many relationships
     
     def get_attendee_count(self, obj):
@@ -18,6 +18,6 @@ class VideoConferenceSessionAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         return qs.prefetch_related('attendees')
     
-    # You might also want to add a calendar event ID display
-    readonly_fields = ('calendar_event_id',)
+    # Make calendar_event_id and code readonly after creation
+    readonly_fields = ('calendar_event_id', 'code')
 

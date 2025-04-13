@@ -7,6 +7,8 @@ from django.conf import settings
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
+import string
+import random
 from .models import VideoConferenceSession
 from .serializers import VideoConferenceSessionSerializer, SessionAttendeeSerializer
 from .filters import VideoConferenceSessionFilter
@@ -25,7 +27,25 @@ class VideoConferenceSessionViewSet(ActivityLoggingMixin, viewsets.ModelViewSet)
     filter_backends = [DjangoFilterBackend]
     permission_classes = [IsAuthenticated]
 
+    def generate_unique_code(self, length=10):
+        """Generate a unique code for the meeting session"""
+        chars = string.ascii_letters + string.digits
+        while True:
+            # Generate a random string of specified length
+            code = ''.join(random.choice(chars) for _ in range(length))
+            
+            # Check if code is unique
+            if not VideoConferenceSession.objects.filter(code=code).exists():
+                return code
+
+    def create_jitsi_meeting_link(self, code):
+        """Create a Jitsi meeting link using the unique code"""
+        # Use the configured Jitsi server or default to meet.jit.si
+        jitsi_server = getattr(settings, 'JITSI_SERVER', 'meet.jit.si')
+        return f"https://{jitsi_server}/{code}"
+
     def create_google_meet_link(self, title, start_time, duration_minutes):
+        """Create a Google Meet link for the session (kept for future use)"""
         import logging
         logger = logging.getLogger(__name__)
         SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -90,14 +110,22 @@ class VideoConferenceSessionViewSet(ActivityLoggingMixin, viewsets.ModelViewSet)
         start_time = serializer.validated_data.get('start_time')
         duration_minutes = serializer.validated_data.get('duration_minutes')
         
-        meeting_link = self.create_google_meet_link(title, start_time, duration_minutes)
-        session = serializer.save(meeting_link=meeting_link)
+        # Save the session first to generate the code using the model's default
+        session = serializer.save()
+        
+        # Create a Jitsi meeting link using the generated code
+        meeting_link = self.create_jitsi_meeting_link(session.code)
+        
+        # Update the session with the meeting link
+        session.meeting_link = meeting_link
+        session.save()
         
         # Log the activity
         self.log_activity(self.request, "Created new video conference session", {
             "session_id": str(session.id),
             "title": title,
-            "start_time": str(start_time)
+            "start_time": str(start_time),
+            "meeting_code": session.code
         })
     
     def list(self, request, *args, **kwargs):
@@ -211,3 +239,33 @@ class VideoConferenceSessionViewSet(ActivityLoggingMixin, viewsets.ModelViewSet)
             return Response({'status': 'attendees removed'}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @swagger_auto_schema(
+        method='get',
+        responses={
+            200: VideoConferenceSessionSerializer,
+            404: 'Session not found'
+        },
+        operation_description="Retrieve a session by its unique code"
+    )
+    @action(detail=False, methods=['get'], url_path='code/(?P<code>[^/.]+)')
+    def get_by_code(self, request, code=None):
+        """
+        Get a video conference session by its unique code
+        """
+        try:
+            session = VideoConferenceSession.objects.get(code=code)
+            serializer = self.get_serializer(session)
+            
+            # Log the activity
+            self.log_activity(request, "Retrieved video conference session by code", {
+                "session_id": str(session.id),
+                "code": code
+            })
+            
+            return Response(serializer.data)
+        except VideoConferenceSession.DoesNotExist:
+            return Response(
+                {"detail": "Session with this code does not exist."}, 
+                status=status.HTTP_404_NOT_FOUND
+            )

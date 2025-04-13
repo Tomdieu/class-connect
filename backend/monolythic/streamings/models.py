@@ -1,7 +1,22 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+import string
+import random
 
 User = get_user_model()
+
+def generate_unique_meeting_code():
+    """Generate a unique meeting code for VideoConferenceSession"""
+    chars = string.ascii_letters + string.digits
+    code_length = 10
+    
+    while True:
+        # Generate a random string
+        code = ''.join(random.choice(chars) for _ in range(code_length))
+        
+        # Check if code is unique
+        if not VideoConferenceSession.objects.filter(code=code).exists():
+            return code
 
 class VideoConferenceSession(models.Model):
     SESSION_STATUS = [
@@ -18,6 +33,14 @@ class VideoConferenceSession(models.Model):
     start_time = models.DateTimeField()
     duration_minutes = models.IntegerField()
     status = models.CharField(max_length=20, choices=SESSION_STATUS, default='SCHEDULED')
+    code = models.CharField(
+        max_length=20, 
+        unique=True, 
+        default=generate_unique_meeting_code,
+        help_text="Unique code for joining the meeting",
+        blank=True,
+        null=True
+    )
     meeting_link = models.URLField()
     recording_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
