@@ -13,7 +13,7 @@ from .models import (
     VideoResource, RevisionResource, PDFResource, ExerciseResource, UserClass
 )
 from .serializers import (
-    CourseCategorySerializer, ClassSerializer, SchoolYearSerializer, SubjectSerializer,
+    CourseCategorySerializer, ClassSerializer, PaymentProofSerializer, SchoolYearSerializer, SubjectSerializer,
     ChapterSerializer, TopicSerializer, PolymorphicResourceSerializer, UserAvailabilityCreateSerializer,
     UserProgressSerializer,UserAvailabilitySerializer,
     CourseOfferingSerializer, CourseOfferingActionSerializer,
@@ -31,8 +31,9 @@ from .filters import (
 from django.utils.decorators import method_decorator
 # from django.views.decorators.cache import cache_page
 from rest_framework import serializers
+from utils.mixins import ActivityLoggingMixin
 
-class CourseCategoryViewSet(viewsets.ModelViewSet):
+class CourseCategoryViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing course categories.
     """
@@ -43,8 +44,28 @@ class CourseCategoryViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = CourseCategoryFilter
 
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed course categories")
+        return super().list(request, *args, **kwargs)
 
-class ClassViewSet(viewsets.ModelViewSet):
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed course category details", {"category_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new course category")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated course category", {"category_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted course category", {"category_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
+
+class ClassViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing classes.
     """
@@ -264,11 +285,25 @@ class ClassViewSet(viewsets.ModelViewSet):
     
     # @method_decorator(cache_page(60*60*2,key_prefix='class_list'))
     def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed classes")
         return super().list(request, *args, **kwargs)
     
     # @method_decorator(cache_page(60*60*2,key_prefix='class_detail'))
     def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed class details", {"class_id": kwargs.get("pk")})
         return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new class")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated class", {"class_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted class", {"class_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
 
     @swagger_auto_schema(
         method='get',
@@ -334,7 +369,7 @@ class ClassViewSet(viewsets.ModelViewSet):
         serializer = VideoResourceSerializer(videos, many=True, context={'request': request})
         return Response(serializer.data)
 
-class SubjectViewSet(viewsets.ModelViewSet):
+class SubjectViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing subjects within a class.
     """
@@ -350,11 +385,31 @@ class SubjectViewSet(viewsets.ModelViewSet):
         queryset = Subject.objects.filter(class_level=self.kwargs['class_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed subjects")
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed subject details", {"subject_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new subject")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated subject", {"subject_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted subject", {"subject_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
     # @method_decorator(cache_page(60*60*2,key_prefix='subjects_list'))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-class ChapterViewSet(viewsets.ModelViewSet):
+class ChapterViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing chapters within a subject.
     """
@@ -370,8 +425,28 @@ class ChapterViewSet(viewsets.ModelViewSet):
         queryset = Chapter.objects.filter(subject=self.kwargs['subject_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed chapters")
+        return super().list(request, *args, **kwargs)
 
-class TopicViewSet(viewsets.ModelViewSet):
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed chapter details", {"chapter_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new chapter")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated chapter", {"chapter_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted chapter", {"chapter_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
+
+class TopicViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing topics within a chapter.
     """
@@ -387,8 +462,28 @@ class TopicViewSet(viewsets.ModelViewSet):
         queryset = Topic.objects.filter(chapter=self.kwargs['chapter_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed topics")
+        return super().list(request, *args, **kwargs)
 
-class ResourceViewSet(viewsets.ModelViewSet):
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed topic details", {"topic_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new topic")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated topic", {"topic_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted topic", {"topic_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
+
+class ResourceViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing resources within a topic.
     """
@@ -404,8 +499,28 @@ class ResourceViewSet(viewsets.ModelViewSet):
         queryset = AbstractResource.objects.filter(topic=self.kwargs['topic_pk'])
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed resources")
+        return super().list(request, *args, **kwargs)
 
-class DirectResourceViewSet(viewsets.ModelViewSet):
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed resource details", {"resource_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new resource")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated resource", {"resource_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted resource", {"resource_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
+
+class DirectResourceViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for directly accessing resources by ID.
     """
@@ -421,10 +536,26 @@ class DirectResourceViewSet(viewsets.ModelViewSet):
         operation_description="Get a resource directly by ID"
     )
     def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed resource directly", {"resource_id": kwargs.get("pk")})
         return super().retrieve(request, *args, **kwargs)
+    
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed all resources directly")
+        return super().list(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created resource directly")
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated resource directly", {"resource_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted resource directly", {"resource_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
 
-
-class UserProgressViewSet(viewsets.ModelViewSet):
+class UserProgressViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing user progress.
     """
@@ -435,6 +566,26 @@ class UserProgressViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = UserProgressFilter
     filterset_fields = ['user', 'topic', 'completed']
+
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed user progress")
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed user progress details", {"progress_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created user progress")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated user progress", {"progress_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted user progress", {"progress_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
 
     @swagger_auto_schema(
         method='get',
@@ -471,7 +622,7 @@ class UserProgressViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class UserAvailabilityViewSet(viewsets.ModelViewSet):
+class UserAvailabilityViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     queryset = UserAvailability.objects.all()
@@ -486,6 +637,26 @@ class UserAvailabilityViewSet(viewsets.ModelViewSet):
         user_type = 'TEACHER' if self.request.user.education_level == "PROFESSIONAL" else 'STUDENT'
         serializer.save(user=self.request.user, user_type=user_type)
     
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed user availability")
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed user availability details", {"availability_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created user availability")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated user availability", {"availability_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted user availability", {"availability_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
     @swagger_auto_schema(
         method='get',
         responses={200: UserAvailabilitySerializer(many=False)},
@@ -540,7 +711,7 @@ class UserAvailabilityViewSet(viewsets.ModelViewSet):
         return Response({'error': 'user_id is required'}, status=400)
 
 
-class CourseOfferingViewSet(viewsets.ModelViewSet):
+class CourseOfferingViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing course offerings.
     """
@@ -565,6 +736,26 @@ class CourseOfferingViewSet(viewsets.ModelViewSet):
         
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed course offerings")
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed course offering details", {"offering_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created course offering")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated course offering", {"offering_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted course offering", {"offering_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
     @swagger_auto_schema(
         method='get',
         responses={200: CourseOfferingSerializer(many=True)}
@@ -576,7 +767,7 @@ class CourseOfferingViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-class CourseOfferingActionViewSet(viewsets.ModelViewSet):
+class CourseOfferingActionViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing course offering actions.
     """
@@ -598,7 +789,27 @@ class CourseOfferingActionViewSet(viewsets.ModelViewSet):
             offer_id=self.kwargs['offering_pk']
         )
         
-class SchoolYearViewSet(viewsets.ModelViewSet):
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed course offering actions")
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed course offering action details", {"action_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created course offering action")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated course offering action", {"action_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted course offering action", {"action_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
+class SchoolYearViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint to list school year
     """
@@ -606,8 +817,27 @@ class SchoolYearViewSet(viewsets.ModelViewSet):
     queryset = SchoolYear.objects.all()
     serializer_class = SchoolYearSerializer
     
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed school years")
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed school year details", {"school_year_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new school year")
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated school year", {"school_year_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted school year", {"school_year_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
 
-class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
+class TeacherStudentEnrollmentViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing teacher-student enrollments.
     """
@@ -627,6 +857,26 @@ class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
         if student_id:
             qs = qs.filter(offer__student__id=student_id)
         return qs
+
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed teacher-student enrollments")
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed teacher-student enrollment details", {"enrollment_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created teacher-student enrollment")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated teacher-student enrollment", {"enrollment_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted teacher-student enrollment", {"enrollment_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
 
     @action(detail=True,methods=['post'])
     def complete(self,request):
@@ -708,7 +958,7 @@ class TeacherStudentEnrollmentViewSet(viewsets.ModelViewSet):
         serializer = CourseDeclarationSerializer(course_declaration,many=True)
         return Response(serializer.data)
 
-class CourseDeclarationViewSet(viewsets.ModelViewSet):
+class CourseDeclarationViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing course declarations for a specific teacher-student enrollment.
     """
@@ -728,8 +978,28 @@ class CourseDeclarationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(teacher_student_enrollment_id=self.kwargs['enrollment_pk'])
 
-    @action(detail=True, methods=['post'])
-    def update_status(self, request, pk=None):
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed course declarations")
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed course declaration details", {"declaration_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created course declaration")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated course declaration", {"declaration_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted course declaration", {"declaration_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
+    @action(detail=True, methods=['patch'], url_path='status')
+    def update_status(self, request, pk=None, enrollment_pk=None):
         """Update the status of a course declaration."""
         declaration = self.get_object()
         status = request.data.get('status')
@@ -738,8 +1008,48 @@ class CourseDeclarationViewSet(viewsets.ModelViewSet):
             declaration.save()
             return Response({'status': 'updated'})
         return Response({'error': 'Invalid status'}, status=400)
+    
+    @swagger_auto_schema(
+        method='post',
+        request_body=PaymentProofSerializer,
+        responses={
+            200: CourseDeclarationSerializer(),
+            400: 'Invalid request or missing proof of payment file'
+        },
+        operation_description="Mark a course declaration as paid with proof of payment document"
+    )
+    @action(detail=True, methods=['post'], url_path='mark-as-paid')
+    def mark_as_paid(self, request, pk=None, enrollment_pk=None):
+        """Mark a course declaration as paid and upload proof of payment."""
+        declaration = self.get_object()
+        serializer = PaymentProofSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            # Update the declaration with all payment information
+            declaration.proof_of_payment = serializer.validated_data['proof_of_payment']
+            declaration.status = CourseDeclaration.PAID
+            declaration.paid_by = request.user
+            
+            # Add the payment comment if provided
+            if 'payment_comment' in serializer.validated_data:
+                declaration.payment_comment = serializer.validated_data['payment_comment']
+                
+            # Add the payment date if provided
+            if 'payment_date' in serializer.validated_data:
+                declaration.payment_date = serializer.validated_data['payment_date']
+            else:
+                declaration.payment_date = datetime.date.today()
+                
+            declaration.save()
+            
+            self.log_activity(request, "Marked course declaration as paid", 
+                            {"declaration_id": declaration.id})
+            
+            return Response(CourseDeclarationSerializer(declaration).data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class CourseDeclarationDirectViewSet(viewsets.ModelViewSet):
+class CourseDeclarationDirectViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for directly accessing course declarations with filtering by user ID.
     This allows retrieving all declarations made by a professional user.
@@ -772,7 +1082,64 @@ class CourseDeclarationDirectViewSet(viewsets.ModelViewSet):
         """
         Get course declarations with optional filtering by user ID
         """
+        self.log_activity(request, "Viewed course declarations directly")
         return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed course declaration details directly", {"declaration_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created course declaration directly")
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated course declaration directly", {"declaration_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted course declaration directly", {"declaration_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+    
+    @swagger_auto_schema(
+        method='post',
+        request_body=PaymentProofSerializer,
+        responses={
+            200: CourseDeclarationSerializer(),
+            400: 'Invalid request or missing proof of payment file'
+        },
+        operation_description="Mark a course declaration as paid with proof of payment document"
+    )
+    @action(detail=True, methods=['post'], url_path='mark-as-paid')
+    def mark_as_paid(self, request, pk=None, enrollment_pk=None):
+        """Mark a course declaration as paid and upload proof of payment."""
+        declaration = self.get_object()
+        serializer = PaymentProofSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            # Update the declaration with proof of payment
+            declaration.proof_of_payment = serializer.validated_data['proof_of_payment']
+            declaration.status = CourseDeclaration.PAID
+            declaration.paid_by = request.user
+            
+            # Add the payment comment if provided
+            if 'payment_comment' in serializer.validated_data:
+                declaration.payment_comment = serializer.validated_data['payment_comment']
+                
+            # Add the payment date if provided
+            if 'payment_date' in serializer.validated_data:
+                declaration.payment_date = serializer.validated_data['payment_date']
+            else:
+                declaration.payment_date = datetime.date.today()
+                
+            declaration.save()
+            
+            self.log_activity(request, "Marked course declaration as paid", 
+                             {"declaration_id": declaration.id})
+            
+            return Response(CourseDeclarationSerializer(declaration).data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get_queryset(self):
         """
@@ -794,7 +1161,7 @@ class CourseDeclarationDirectViewSet(viewsets.ModelViewSet):
             # Students can see declarations made for them
             return queryset.filter(teacher_student_enrollment__offer__student=user)
 
-class VideoResourceViewSet(viewsets.ModelViewSet):
+class VideoResourceViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing video resources.
     """
@@ -804,8 +1171,28 @@ class VideoResourceViewSet(viewsets.ModelViewSet):
     serializer_class = VideoResourceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ResourceFilter
+    
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed all video resources")
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed video resource details", {"video_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new video resource")
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated video resource", {"video_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted video resource", {"video_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
 
-class RevisionResourceViewSet(viewsets.ModelViewSet):
+class RevisionResourceViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing revision resources.
     """
@@ -815,8 +1202,28 @@ class RevisionResourceViewSet(viewsets.ModelViewSet):
     serializer_class = RevisionResourceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ResourceFilter
+    
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed all revision resources")
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed revision resource details", {"revision_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new revision resource")
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated revision resource", {"revision_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted revision resource", {"revision_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
 
-class PDFResourceViewSet(viewsets.ModelViewSet):
+class PDFResourceViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing PDF resources.
     """
@@ -826,9 +1233,28 @@ class PDFResourceViewSet(viewsets.ModelViewSet):
     serializer_class = PDFResourceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ResourceFilter
+    
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed all PDF resources")
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed PDF resource details", {"pdf_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new PDF resource")
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated PDF resource", {"pdf_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted PDF resource", {"pdf_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
 
-class ExerciseResourceViewSet(viewsets.ModelViewSet):
-
+class ExerciseResourceViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing exercise resources.
     """
@@ -838,6 +1264,26 @@ class ExerciseResourceViewSet(viewsets.ModelViewSet):
     serializer_class = ExerciseResourceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ResourceFilter
+    
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed all exercise resources")
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed exercise resource details", {"exercise_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new exercise resource")
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated exercise resource", {"exercise_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted exercise resource", {"exercise_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
 
 # class QuizResourceViewSet(viewsets.ModelViewSet):
 #     """
@@ -956,7 +1402,7 @@ class ExerciseResourceViewSet(viewsets.ModelViewSet):
 #     filter_backends = [DjangoFilterBackend]
 #     filterset_fields = ['attempt', 'question', 'is_correct']
 
-class UserClassViewSet(viewsets.ModelViewSet):
+class UserClassViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint for managing user classes.
     """
@@ -1008,6 +1454,26 @@ class UserClassViewSet(viewsets.ModelViewSet):
             
         serializer.save()
     
+    def list(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed user classes")
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.log_activity(request, "Viewed user class details", {"user_class_id": kwargs.get("pk")})
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        self.log_activity(request, "Created a new user class")
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.log_activity(request, "Updated user class", {"user_class_id": kwargs.get("pk")})
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.log_activity(request, "Deleted user class", {"user_class_id": kwargs.get("pk")})
+        return super().destroy(request, *args, **kwargs)
+
     @swagger_auto_schema(
         method='get',
         manual_parameters=[
