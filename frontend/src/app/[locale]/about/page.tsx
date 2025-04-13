@@ -13,6 +13,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 function AboutPage() {
   const t = useI18n();
@@ -478,9 +479,16 @@ function AboutPage() {
             >
               <motion.div variants={fadeIn} className="md:col-span-1">
                 <Card className="overflow-hidden border-primary/20">
-                  <div className="relative h-48 bg-primary/10 flex items-center justify-center">
+                  <div className="relative h-48 flex items-center justify-center">
                     {/* Replace with actual developer image */}
-                    <Code className="h-20 w-20 text-primary/50" />
+                    {/* <Code className="h-20 w-20 text-primary/50" /> */}
+                    <Image 
+                      src="https://avatars.githubusercontent.com/u/77198289?v=4"
+                      alt={developer.name}
+                      width={200}
+                      height={200}
+                      className="object-center"
+                    />
                   </div>
                   <CardContent className="pt-6">
                     <h3 className="text-2xl font-bold mb-2">{developer.name}</h3>
@@ -565,7 +573,7 @@ function AboutPage() {
                     
                     <div className="pt-4">
                       <Button asChild variant="outline" className="gap-2">
-                        <Link href="mailto:contact@classconnect.cm">
+                        <Link href="mailto:ivan.tomdieu@gmail.com">
                           <Mail className="h-4 w-4" />
                           {t('about.developer.contact')}
                         </Link>
