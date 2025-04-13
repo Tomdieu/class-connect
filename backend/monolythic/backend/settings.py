@@ -417,3 +417,5 @@ WSGI_REQUEST_TIMEOUT = 1800  # 30 minutes
 
 # If using gunicorn, add these to your gunicorn.conf.py or command line:
 # --timeout 1800
+
+JITSI_SERVER=env('JITSI_SERVER',default='meet.jit.si')
