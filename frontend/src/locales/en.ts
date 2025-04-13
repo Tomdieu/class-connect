@@ -6,25 +6,105 @@ export default {
   "nav.profile": "Profile",
   "hero.title": "Learn at your own pace with ClassConnect",
   "hero.subtitle":
-    "An online learning platform tailored to your needs, with quality courses and personalized monitoring.",
+    "An online learning platform tailored to your needs, with quality courses and personalized tracking.",
   "hero.start": "Get Started",
   "hero.learnMore": "Learn More",
   "features.interactive": "Interactive Courses",
   "features.interactive.desc":
     "Learn with multimedia content and practical exercises",
-  "features.personalized": "Personalized Monitoring",
+  "features.personalized": "Personalized Tracking",
   "features.personalized.desc":
     "Progress at your own pace with tailored recommendations",
   "features.community": "Active Community",
   "features.community.desc": "Exchange with other learners and experts",
+
+  // About page translations
+  "about.pageTitle": "About Us",
+  "about.pageDescription":
+    "Learn about ClassConnect and the team behind the platform.",
   "about.title": "Welcome to ClassConnect",
   "about.subtitle":
     "The online learning platform designed to revolutionize education in Africa and beyond.",
+  "about.tabs.platform": "About Platform",
+  "about.tabs.features": "Features",
+  "about.tabs.developer": "Developer",
   "about.whatIs.title": "What is ClassConnect?",
   "about.whatIs.desc1":
     "ClassConnect is an online learning platform dedicated to middle school, high school, university students and professionals. It offers modern tools for effective learning, course tracking, access to personalized resources, and interaction with teachers or experts in various fields.",
   "about.whatIs.desc2":
-    "Whether you're a student preparing for an exam or a professional looking to acquire new skills, ClassConnect is designed to support you on your journey.",
+    "Whether you're a student preparing for an exam or a professional looking to acquire new skills, ClassConnect is designed to support you in your journey.",
+  "about.howItWorks.title": "How It Works",
+  "about.howItWorks.registration": "Easy Registration",
+  "about.howItWorks.steps": [
+    "Create an account by providing your information",
+    "Receive a confirmation email",
+    "Choose your subscription",
+    "Access your courses",
+    "Participate in live sessions",
+  ],
+
+  "about.platform.learn.title": "Learning Experience",
+  "about.platform.learn.description":
+    "Our platform offers a comprehensive learning experience designed to help you succeed.",
+  "about.platform.learn.points": [
+    "Structured courses by education level",
+    "Interactive multimedia content",
+    "Practice exercises and assessments",
+    "Live and recorded sessions",
+  ],
+
+  "about.platform.grow.title": "Grow Your Skills",
+  "about.platform.grow.description":
+    "ClassConnect helps you develop the skills you need for academic and professional success.",
+  "about.platform.grow.startNow": "Start your learning journey now",
+
+  "about.conclusion.title": "Join the ClassConnect Community",
+  "about.conclusion.text":
+    "ClassConnect is not just a platform; it's a revolution in education. Join us to transform the way you learn and achieve your academic or professional goals.",
+  "about.conclusion.joinUs": "Join Us Today",
+
+  // Developer information translations
+  "about.developer.title": "Full Stack Developer & EdTech Enthusiast",
+  "about.developer.description":
+    "The mastermind behind ClassConnect's technical architecture and user experience design.",
+  "about.developer.location": "Cameroon",
+  "about.developer.aboutTitle": "About the Developer",
+  "about.developer.bio":  
+    "Tomdieu Ivan is a passionate full-stack developer enthusiastic about educational technologies. Drawing on his expertise in modern web technologies, he designed and developed ClassConnect from A to Z, focusing on creating an intuitive, accessible, and powerful learning platform for students across Africa.",
+  "about.developer.skills": "Technical Skills",
+  "about.developer.skillsList": [
+    "React",
+    "Next.js",
+    "TypeScript",
+    "Node.js",
+    "Python",
+    "Django",
+    "PostgreSQL",
+    "UI/UX Design",
+    "RESTful APIs",
+    "GraphQL",
+    "Docker",
+    "Cloud Infrastructure",
+  ],
+  "about.developer.projectRole": "Role in ClassConnect",
+  "about.developer.responsibilities": [
+    "Platform architecture and development",
+    "User interface design and implementation",
+    "Database design and optimization",
+    "API development and integration",
+    "Performance optimization and security",
+    "Localization and accessibility features",
+  ],
+  "about.developer.contact": "Contact Developer",
+
+  // Features section descriptions
+  "features.courseManagement.desc": "Interactive course management platform",
+  "features.virtualClassroom.desc": "Engaging virtual classroom environment",
+  "features.experience.desc": "Tailored learning experiences for all levels",
+  "features.subscriptions.desc": "Flexible subscription plans for everyone",
+  "features.payments.desc": "Secure and convenient payment options",
+  "features.support.desc": "Dedicated support whenever you need it",
+
   "about.features.title": "Main Features",
   "about.features.courseManagement": "Course Management",
   "about.features.courseManagement.desc": [
@@ -62,15 +142,6 @@ export default {
   "about.features.support.desc": [
     "Live Chat: Responsive support to answer your questions",
     "FAQ and Guides: A comprehensive knowledge base to assist you",
-  ],
-  "about.howItWorks.title": "How It Works?",
-  "about.howItWorks.registration": "Easy Registration",
-  "about.howItWorks.steps": [
-    "Create an account by providing your information",
-    "Receive a confirmation email",
-    "Choose your subscription",
-    "Access your courses",
-    "Participate in live sessions",
   ],
   "about.conclusion":
     "ClassConnect isn't just a platform, it's a revolution in education. Join us to transform your way of learning and achieve your academic or professional goals.",
@@ -275,7 +346,12 @@ export default {
   "userDialog.submitButton": "Update",
   "class.title": "Class",
   "class.actions.add": "Add Class",
-
+  "class.student": "student",
+  "class.students": "students",
+  "class.singular": "class",
+  "class.plural": "classes",
+  "class.noDescription": "No description available",
+  loading: "Loading",
   educationLevels: {
     college: "Middle School",
     lycee: "High School",
@@ -372,6 +448,20 @@ export default {
   "class.detail.studentEmail": "Email",
   "class.detail.studentEnrollmentDate": "Enrolled On",
   "class.detail.viewChapters": "View Chapters",
+
+  // Add new translations for Add Student functionality
+  "class.detail.addStudent": "Add Student to Class",
+  "class.detail.addStudentDesc":
+    "Select a student to add to {name} for the {year} school year.",
+  "class.detail.studentLabel": "Student",
+  "class.detail.selectStudent": "Select a student",
+  "class.detail.searchStudents": "Search students...",
+  "class.detail.noStudentsFound": "No students found",
+  "class.detail.addStudentButton": "Add Student",
+  "class.detail.studentAdded": "Student added successfully",
+  "class.detail.studentAddFailed": "Failed to add student",
+  "class.detail.selectSchoolYearFirst": "Please select a school year first",
+  "class.detail.invalidSchoolYear": "Invalid school year selected",
   "chapter.title": "Chapter",
   "chapter.topics": "Topics",
   "chapter.add": "Add Chapter",
@@ -619,7 +709,6 @@ export default {
   "topic.noTopics":
     "This chapter has no topics yet. Add a topic to get started.",
   "topic.order": "Order",
-  "topic.description": "Description",
   "availability.title": "My Availabilities",
   "availability.error": "Error",
   "availability.close": "Close",
@@ -1264,10 +1353,10 @@ export default {
   "toast.courseDeclared": "Course declared successfully!",
   "toast.courseDeclarationFailed": "Failed to declare course.",
 
-  // 
-  "pagination.showing":"Showing",
-  "pagination.of":"of",
-  "pagination.perPage":"per page",
+  //
+  "pagination.showing": "Showing",
+  "pagination.of": "of",
+  "pagination.perPage": "per page",
 
   // Statistics page translations
   "stats.dashboardTitle": "Dashboard Statistics",
@@ -1292,7 +1381,7 @@ export default {
   "stats.withPlans": "With Plans",
   "stats.withoutPlans": "Without Plans",
 
-  "enrollments":"Teacher-Student Enrollment",
+  enrollments: "Teacher-Student Enrollment",
 
   // Forum translations
   "forum.title": "Community Forum",
@@ -1312,7 +1401,8 @@ export default {
   "forum.like": "Like",
   "forum.comment": "Comment",
   "forum.noPostsYet": "No posts yet",
-  "forum.beTheFirstToPost": "Be the first to share something with the community",
+  "forum.beTheFirstToPost":
+    "Be the first to share something with the community",
   "forum.loadMore": "Load More",
   "forum.noComments": "No comments yet. Be the first to comment!",
   "forum.postNotFound": "The post you're looking for could not be found",
@@ -1325,7 +1415,7 @@ export default {
   "forum.viewReplies": "View {count} replies",
   "forum.viewOneReply": "View 1 reply",
   "forum.hideReplies": "Hide replies",
-  
+
   // Forum notifications
   "forum.notifications.title": "Notifications",
   "forum.notifications.markAllRead": "Mark all as read",
@@ -1336,7 +1426,7 @@ export default {
   "forum.notifications.mention": "{name} mentioned you in a post",
   "forum.notifications.default": "{name} interacted with your post",
   "forum.notifications.viewPost": "View post",
-  
+
   // Reactions
   "reactions.like": "Like",
   "reactions.love": "Love",
@@ -1356,24 +1446,28 @@ export default {
 
   // Forum Admin translations
   "admin.forum.title": "Forum Management",
-  "admin.forum.description": "Manage forums, posts, and discussions on your platform",
+  "admin.forum.description":
+    "Manage forums, posts, and discussions on your platform",
   "admin.forum.createForum": "Create Forum",
-  "admin.forum.createForumDescription": "Add a new discussion forum to your platform",
+  "admin.forum.createForumDescription":
+    "Add a new discussion forum to your platform",
   "admin.forum.forumName": "Forum Name",
   "admin.forum.enterForumName": "Enter forum name",
   "admin.forum.forumNameRequired": "Forum name must be at least 3 characters",
   "admin.forum.createButton": "Create Forum",
   "admin.forum.creatingButton": "Creating...",
   "admin.forum.createSuccess": "Forum created successfully",
-  "admin.forum.createDescription": "The forum \"{name}\" has been created",
+  "admin.forum.createDescription": 'The forum "{name}" has been created',
   "admin.forum.createError": "Failed to create forum",
   "admin.forum.unexpectedError": "An unexpected error occurred",
   "admin.forum.allForums": "All Forums",
   "admin.forum.posts": "Posts",
   "admin.forum.searchForums": "Search forums...",
   "admin.forum.noForumsFound": "No Forums Found",
-  "admin.forum.noForumsMatchSearch": "No forums match your search for \"{search}\"",
-  "admin.forum.noForumsYet": "You haven't created any forums yet. Create your first forum to start discussions.",
+  "admin.forum.noForumsMatchSearch":
+    'No forums match your search for "{search}"',
+  "admin.forum.noForumsYet":
+    "You haven't created any forums yet. Create your first forum to start discussions.",
   "admin.forum.createFirstForum": "Create Your First Forum",
   "admin.forum.forumId": "ID: {id}",
   "admin.forum.createdOn": "Created {date}",
@@ -1383,13 +1477,14 @@ export default {
   "admin.forum.allForumPosts": "All Forum Posts",
   "admin.forum.viewAllPosts": "View All Posts",
   "admin.forum.quickAccess": "Quick Access",
-  "admin.forum.forumPostsDescription": "View and manage all posts across forums",
+  "admin.forum.forumPostsDescription":
+    "View and manage all posts across forums",
   "admin.forum.forumNotificationsDescription": "View your forum notifications",
   "admin.forum.createPostDescription": "Create a new post in any forum",
   "admin.forum.viewAllPostsButton": "View All Posts",
   "admin.forum.viewNotificationsButton": "View Notifications",
   "admin.forum.createPostButton": "Create Post",
-  
+
   // Forum Post Management
   "admin.posts.title": "Forum Posts",
   "admin.posts.description": "View and manage posts across all forums",
@@ -1408,12 +1503,14 @@ export default {
   "admin.posts.hasImage": "Has image",
   "admin.posts.hasFile": "Has file",
   "admin.posts.deleteConfirmation": "Delete Post",
-  "admin.posts.deleteWarning": "Are you sure you want to delete this post? This action cannot be undone.",
-  "admin.posts.commentDeleteWarning": "Warning: This post has {count} {count, plural, one {comment} other {comments}} that will also be deleted!",
+  "admin.posts.deleteWarning":
+    "Are you sure you want to delete this post? This action cannot be undone.",
+  "admin.posts.commentDeleteWarning":
+    "Warning: This post has {count} {count, plural, one {comment} other {comments}} that will also be deleted!",
   "admin.posts.deleting": "Deleting...",
   "admin.posts.cancel": "Cancel",
   "admin.posts.confirmDelete": "Delete",
-  
+
   // Forum Post Detail
   "admin.post.title": "Post Details",
   "admin.post.backToPosts": "Back to Posts",
@@ -1428,16 +1525,17 @@ export default {
   "admin.post.comments": "Comments ({count})",
   "admin.post.noComments": "No Comments Yet",
   "admin.post.noCommentsDesc": "This post has no comments or replies yet.",
-  
+
   // Forum Create Post
   "admin.createPost.title": "Create New Post",
   "admin.createPost.backToPosts": "Back to Posts",
   "admin.createPost.postContent": "Post Content",
-  "admin.createPost.postContentDesc": "Create a new post to share with your community",
+  "admin.createPost.postContentDesc":
+    "Create a new post to share with your community",
   "admin.createPost.selectForum": "Select Forum",
   "admin.createPost.selectAForum": "Select a forum",
   "admin.createPost.postContentLabel": "Post Content",
-  "admin.createPost.whatsOnYourMind": "What's on your mind?",
+    "admin.createPost.whatsOnYourMind": "What's on your mind?",
   "admin.createPost.imageOptional": "Image (Optional)",
   "admin.createPost.uploadImage": "Upload Image",
   "admin.createPost.changeImage": "Change Image",
@@ -1445,7 +1543,7 @@ export default {
   "admin.createPost.uploadFile": "Upload File",
   "admin.createPost.changeFile": "Change File",
   "admin.createPost.clear": "Clear",
-  
+
   // Forum Detail
   "admin.forumDetail.title": "Forum: {name}",
   "admin.forumDetail.back": "Back",
@@ -1456,7 +1554,8 @@ export default {
   "admin.forumDetail.stats": "Forum Stats",
   "admin.forumDetail.searchPosts": "Search posts...",
   "admin.forumDetail.noPosts": "No Posts Found",
-  "admin.forumDetail.noPostsDesc": "There are no posts in this forum yet. Create the first post to start the discussion.",
+  "admin.forumDetail.noPostsDesc":
+    "There are no posts in this forum yet. Create the first post to start the discussion.",
   "admin.forumDetail.totalPosts": "Total Posts",
   "admin.forumDetail.activeUsers": "Active Users",
   "admin.forumDetail.uniquePosters": "Unique posters",
@@ -1470,7 +1569,8 @@ export default {
   "forum.editPost": "Edit Post",
   "forum.editPostDescription": "Make changes to your post below.",
   "forum.deletePost": "Delete Post",
-  "forum.deletePostWarning": "This action cannot be undone. This will permanently delete your post and all of its comments.",
+  "forum.deletePostWarning":
+    "This action cannot be undone. This will permanently delete your post and all of its comments.",
   "forum.updating": "Updating...",
   "forum.deleting": "Deleting...",
   "forum.saveChanges": "Save Changes",
@@ -1482,4 +1582,33 @@ export default {
   "forum.postDeleteFailed": "Failed to delete post. Please try again.",
   "forum.scrollToTop": "Scroll to top",
   "common.updating": "Updating...",
+  "about.team.description":
+    "ClassConnect was built by a passionate developer dedicated to improving educational access through technology.",
+  "about.developer.name": "Tomdieu Ivan",
+  "about.developer.role": "Fullstack Developer & Founder",
+  "about.connect": "Connect with us",
+  "about.followOn": "Follow on",
+  "about.contactUs": "Contact Us",
+  "about.contactUs.description":
+    "Have questions or feedback? We'd love to hear from you!",
+  "about.email": "Email",
+  "about.phone": "Phone",
+  "about.address": "Address",
+  "about.technology.title": "Our Technology",
+  "about.technology.description":
+    "ClassConnect is built with modern technologies to ensure a seamless and responsive learning experience:",
+  "about.technology.frontend": "Frontend",
+  "about.technology.backend": "Backend",
+  "about.technology.database": "Database",
+  "about.technology.hosting": "Hosting",
+
+
+  // About page feature titles (English)
+  "about.features.courseManagement.title": "Course Management",
+  "about.features.virtualClassroom.title": "Virtual Classroom",
+  "about.features.experience.title": "Personalized Experience",
+  "about.features.subscriptions.title": "Tailored Subscriptions",
+  "about.features.payments.title": "Secure Payments",
+  "about.features.support.title": "Personalized Support",
+
 } as const;
