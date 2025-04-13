@@ -11,10 +11,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'privacy',
     'pricing',
     'contact',
+    'about',
   ];
   
   // Auth routes
   const authRoutes = [
+    { path: 'auth/', priority: 1 },
     { path: 'auth/login', priority: 0.89 },
     { path: 'auth/register', priority: 0.89 },
   ];
@@ -35,7 +37,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         url: `${baseUrl}/${lang}${route ? `/${route}` : ''}`,
         lastModified: new Date(),
         changeFrequency: route === '' ? 'daily' : 'weekly',
-        priority: route === '' ? 1.0 : 0.89,
+        priority: route === '' ? 1.0 : 0.99,
         alternates: {
           languages: languageAlternates
         }
