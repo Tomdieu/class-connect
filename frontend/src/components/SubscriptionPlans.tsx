@@ -6,9 +6,20 @@ import { CheckCheck, ChevronRight, Crown, Shield, Star, Users, Sparkle, Check } 
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useMemo } from "react";
+import { useSession } from "next-auth/react";
 
 export function SubscriptionPlans() {
   const t = useI18n();
+
+  const {data:session} = useSession()
+
+  const getUrl = (path:string) =>{
+    if(session?.user){
+      return path
+    }else{
+      return `/auth/register?callbackUrl=${path}`
+    }
+  }
 
   // Mock data for when API data isn't available
   const plansMockData = useMemo(() => [
@@ -223,7 +234,7 @@ export function SubscriptionPlans() {
                   
                   {/* CTA Button */}
                   <div className="mt-8 pt-6 border-t border-gray-100">
-                    <Link href={`/subscribe/${plan.id}`}>
+                    <Link href={getUrl(`/subscribe/${plan.id}`)}>
                       <motion.div
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}
