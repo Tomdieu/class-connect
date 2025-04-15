@@ -32,7 +32,7 @@ export default function LoginPage() {
   const router = useRouter();
   const locale = useCurrentLocale();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl");
+  const callbackUrl = searchParams?.get("callbackUrl");
   const { status } = useSession();
 
   const [email, setEmail] = useState("");

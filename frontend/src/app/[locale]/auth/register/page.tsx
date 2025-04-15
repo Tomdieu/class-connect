@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { InputPhone } from "@/components/ui/input-phone";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, BookOpen, Calendar, Mail, User, Lock, School, Building, MapPin, Phone, ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -46,6 +46,8 @@ export default function RegisterPage() {
   const t = useI18n();
   const router = useRouter();
   const locale = useCurrentLocale();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams?.get("callbackUrl");
   const [additionalFieldsTab, setAdditionalFieldsTab] = useState<string>("college");
   
   // Base URL with locale
@@ -330,7 +332,13 @@ export default function RegisterPage() {
     mutationFn: (data: UserCreateType) => registerUser(data),
     onSuccess: () => {
       toast.success("Registration successful! Please check your email to verify your account.");
-      router.push('/auth/login');
+      if(callbackUrl){
+        router.push(decodeURIComponent(callbackUrl))
+      }
+      else{
+
+        router.push('/auth/login');
+      }
     },
     onError: (error) => {
       try {
