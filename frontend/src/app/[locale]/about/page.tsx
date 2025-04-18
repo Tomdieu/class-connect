@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Github, Linkedin, Twitter, Youtube, Mail, 
-  BookOpen, Users, Binary, Code, Briefcase, MapPin, 
+  BookOpen, Users, Binary, Briefcase, MapPin, 
   CheckCircle2
 } from 'lucide-react';
 import Link from 'next/link';
@@ -57,13 +57,18 @@ function AboutPage() {
   // Base URL with locale for canonical and JSON-LD
   const baseUrl = `https://www.classconnect.cm/${locale}`;
   
+  // Define SEO metadata variables
+  const pageTitle = t('about.pageTitle');
+  const pageDescription = t('about.pageDescription');
+  const pageUrl = `${baseUrl}/about`;
+  
   // JSON-LD structured data for about page
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": t('about.pageTitle'),
-    "description": t('about.pageDescription'),
-    "url": `${baseUrl}/about`,
+    "name": pageTitle,
+    "description": pageDescription,
+    "url": pageUrl,
     "mainEntity": {
       "@type": "Organization",
       "name": "ClassConnect",
@@ -103,8 +108,8 @@ function AboutPage() {
         {
           "@type": "ListItem",
           "position": 2,
-          "name": t('about.pageTitle'),
-          "item": `${baseUrl}/about`
+          "name": pageTitle,
+          "item": pageUrl
         }
       ]
     }
@@ -113,10 +118,29 @@ function AboutPage() {
   return (
     <div className="min-h-screen pb-16">
       <Helmet>
-        <title>{t('about.pageTitle')} | ClassConnect</title>
-        <meta name="description" content={t('about.pageDescription')} />
-        <link rel="canonical" href={`${baseUrl}/about`} />
+        <title>{pageTitle} | ClassConnect</title>
+        <meta name="description" content={pageDescription} />
+        <meta name='keywords' content='ClassConnect, Tomdieu Ivan, Tomdieu, Full Stack Developer, E-learning Platform, Online Education, Cameroon,'/>
+        <link rel="canonical" href={pageUrl} />
         <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
+        
+        {/* SEO: Open Graph tags for social sharing */}
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:image" content={`https://www.classconnect.cm/logo.png`} /> 
+
+        {/* SEO: Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={`https://www.classconnect.cm/logo.png`} />
+        
+        {/* Additional metadata for better SEO */}
+        <meta name="author" content="Tomdieu Ivan" />
+        <meta name="robots" content="index, follow" />
+        <meta name="language" content={locale} />
       </Helmet>
 
       {/* Hero Section */}
