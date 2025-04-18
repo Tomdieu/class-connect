@@ -2,11 +2,12 @@
 
 import { useI18n } from "@/locales/client";
 import { Button } from "@/components/ui/button";
-import { CheckCheck, ChevronRight, Crown, Shield, Star, Users, Sparkle, Check } from "lucide-react";
+import { ChevronRight, Crown, Shield, Star, Sparkle, Check } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { getSubscriptionPlanByIdorSlug } from "@/actions/payments";
 
 export function SubscriptionPlans() {
   const t = useI18n();
@@ -89,6 +90,25 @@ export function SubscriptionPlans() {
       headerClass: "bg-gradient-to-r from-amber-400 to-amber-600",
     },
   ], [t]);
+
+  const [planPrices, setPlanPrices] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    async function fetchPrices() {
+      try {
+        const entries = await Promise.all(
+          plansMockData.map(async plan => {
+            const apiPlan = await getSubscriptionPlanByIdorSlug(plan.id);
+            return [plan.id, apiPlan.price] as [string, number];
+          })
+        );
+        setPlanPrices(Object.fromEntries(entries));
+      } catch {
+        // optionally handle errors
+      }
+    }
+    fetchPrices();
+  }, [plansMockData]);
 
   return (
     <section className="relative py-20 md:py-32 overflow-hidden" id="pricing">
@@ -199,7 +219,9 @@ export function SubscriptionPlans() {
                   {/* Price block with enhanced typography */}
                   <div className="mb-2">
                     <div className="flex items-baseline">
-                      <span className="text-4xl md:text-5xl font-extrabold tracking-tight">{plan.price}</span>
+                      <span className="text-4xl md:text-5xl font-extrabold tracking-tight">
+                        {planPrices[plan.id] ?? plan.price}
+                      </span>
                       <div className="ml-2">
                         <span className="text-xl font-semibold">{plan.currency}</span>
                         <span className="opacity-70 text-sm ml-1">{plan.period}</span>
