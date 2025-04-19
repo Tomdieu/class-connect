@@ -1666,4 +1666,18 @@ export default {
 
   "educationLevels.other": "Other",
   "stats.userCounts": "User Counts",
+
+  "student.myCourses.description": "Access all your course materials",
+"student.myCourses.selectClass": "Select a class to view course materials:",
+"student.myCourses.selectClassPlaceholder": "Select a class",
+"student.myCourses.noClassesAvailable": "No classes available",
+
+"student.myVideos.description": "Access all your educational videos",
+"student.myVideos.selectClass": "Select a class to view videos:",
+"student.myVideos.selectClassPlaceholder": "Select a class",
+"student.myVideos.noClassesAvailable": "No classes available",
+"student.myVideos.noClassSelected": "Select a class",
+"student.myVideos.selectClassDesc": "Please select a class to view available videos",
+"student.myVideos.noVideosAvailableTitle": "No Videos Available",
+"student.myVideos.noVideosAvailableDesc": "There are no videos available for this class yet.",
 } as const;

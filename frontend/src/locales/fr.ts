@@ -1656,5 +1656,18 @@ export default {
 "educationLevels.other": "Autre",
 "stats.userCounts": "Nombre d'utilisateurs par type",
 
+"student.myCourses.description": "Accédez à tous vos supports de cours",
+"student.myCourses.selectClass": "Sélectionnez une classe pour voir les supports de cours :",
+"student.myCourses.selectClassPlaceholder": "Sélectionner une classe",
+"student.myCourses.noClassesAvailable": "Aucune classe disponible",
+
+"student.myVideos.description": "Accédez à toutes vos vidéos pédagogiques",
+"student.myVideos.selectClass": "Sélectionnez une classe pour regarder les vidéos :",
+"student.myVideos.selectClassPlaceholder": "Sélectionner une classe",
+"student.myVideos.noClassesAvailable": "Aucune classe disponible",
+"student.myVideos.noClassSelected": "Sélectionnez une classe",
+"student.myVideos.selectClassDesc": "Veuillez sélectionner une classe pour consulter les vidéos disponibles",
+"student.myVideos.noVideosAvailableTitle": "Aucune vidéo disponible",
+"student.myVideos.noVideosAvailableDesc": "Il n'y a pas encore de vidéos disponibles pour cette classe.",
 
 } as const;
