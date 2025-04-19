@@ -14,7 +14,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/locales/client";
 import { CreatePostRequestType, ForumNotification, ForumType, PostType } from "@/types";
-import { AlertCircle, ArrowUp, Bell, BellOff, Image as ImageIcon, Loader2, PaperclipIcon } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowUp, Bell, BellOff, Image as ImageIcon, Loader2, MessageSquare, PaperclipIcon } from "lucide-react";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, useRef, useCallback } from "react";
 import {
@@ -45,10 +45,34 @@ import { formatDistanceToNow } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 const SCROLL_THRESHOLD = 300; // Show scroll-to-top button after scrolling this many pixels
+
+// Add animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 },
+};
+
+const fadeInVariants = {
+  hidden: { opacity: 0 },
+  show: { 
+    opacity: 1,
+    transition: { duration: 0.5 }
+  }
+};
 
 export default function ForumPage() {
   const t = useI18n();
@@ -370,291 +394,352 @@ export default function ForumPage() {
   const unreadCount = notificationsQuery.data?.filter(n => !n.read).length || 0;
 
   return (
-    <div className="container mx-auto py-6 max-w-4xl">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">{t("forum.title")}</h1>
-        
-        {/* Notifications */}
-        <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-0" align="end">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h4 className="font-medium">{t("forum.notifications.title")}</h4>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleMarkAllRead}
-                disabled={!notificationsQuery.data?.length || markAllReadMutation.isPending}
-              >
-                {markAllReadMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  t("forum.notifications.markAllRead")
-                )}
-              </Button>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
+    >
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        className="w-full max-w-[2400px] mx-auto mb-6"
+      >
+        <Button variant="outline" size="sm" asChild className="hover:bg-primary/10 transition-all">
+          <Link href="/students">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            {t('common.back')} {t('common.dashboard')}
+          </Link>
+        </Button>
+      </motion.div>
+
+      <div className="w-full mx-auto">
+        <motion.div 
+          className="relative flex flex-col items-center justify-between mb-10 pb-4 border-b border-primary/10"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
+          <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full z-0 opacity-10"></div>
+          
+          <div className="flex items-center justify-between mb-4 relative z-10 w-full">
+            <div className="flex items-center">
+              <div className="bg-primary/10 p-3 rounded-full mr-4">
+                <MessageSquare className="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                  {t("forum.title")}
+                </h1>
+                <p className="text-sm text-gray-600">{t("forum.description")}</p>
+              </div>
             </div>
-            <ScrollArea className="h-[300px]">
-              {notificationsQuery.isLoading ? (
-                <div className="flex justify-center items-center h-20">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                </div>
-              ) : !notificationsQuery.data?.length ? (
-                <div className="flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
-                  <BellOff className="h-8 w-8 mb-2" />
-                  <p>{t("forum.notifications.empty")}</p>
-                </div>
-              ) : (
-                <div>
-                  {notificationsQuery.data.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
-                        !notification.read ? "bg-blue-50" : ""
-                      }`}
-                      onClick={() => handleNotificationClick(notification)}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0">
-                          <div className="h-9 w-9 rounded-full overflow-hidden">
-                            <Avatar className="h-full w-full">
-                              <AvatarImage 
-                                src={notification.sender.avatar} 
-                                alt={`${notification.sender.first_name} ${notification.sender.last_name}`}
-                              />
-                              <AvatarFallback className="bg-primary text-white">
-                                {notification.sender.first_name?.[0]}
-                                {notification.sender.last_name?.[0]}
-                              </AvatarFallback>
-                            </Avatar>
-                          </div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium">
-                            {getNotificationMessage(notification)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
-                          </p>
-                        </div>
-                        {!notification.read && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
-          </PopoverContent>
-        </Popover>
-      </div>
-
-      {/* Post creation form */}
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Forum selector */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                {t("forum.selectForum")}
-              </label>
-              <Select 
-                onValueChange={handleForumSelect} 
-                value={selectedForum}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("forum.selectForum")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {forumsQuery.data?.map((forum: ForumType) => (
-                    <SelectItem key={forum.id} value={forum.id.toString()}>
-                      {forum.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Content textarea */}
-            <Textarea
-              placeholder={t("forum.whatsOnYourMind")}
-              className="min-h-[120px]"
-              value={content}
-              onChange={handleContentChange}
-            />
-
-            {/* Attachment previews */}
-            <div className="flex gap-4 flex-wrap">
-              {imageFile && (
-                <div className="relative group">
-                  <div className="border rounded-md overflow-hidden h-24 w-24">
-                    <Image
-                      src={URL.createObjectURL(imageFile)}
-                      alt={t("forum.imagePreview")}
-                      className="object-cover h-full w-full"
-                      width={96}
-                      height={96}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center"
-                    onClick={() => setImageFile(null)}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-
-              {fileAttachment && (
-                <div className="relative group">
-                  <div className="border rounded-md p-2 h-24 w-32 flex flex-col items-center justify-center">
-                    <PaperclipIcon className="h-8 w-8 text-gray-500" />
-                    <span className="text-xs truncate max-w-full">
-                      {fileAttachment.name}
+            
+            {/* Notifications button */}
+            <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="icon" className="relative hover:bg-primary/10 transition-all">
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {unreadCount}
                     </span>
-                  </div>
-                  <button
-                    type="button"
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center"
-                    onClick={() => setFileAttachment(null)}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex items-center justify-between pt-2 border-t">
-              <div className="flex space-x-2">
-                <input
-                  type="file"
-                  ref={imageInputRef}
-                  onChange={handleImageUpload}
-                  accept="image/*"
-                  className="hidden"
-                />
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => imageInputRef.current?.click()}
-                  disabled={Boolean(fileAttachment) || createPostMutation.isPending}
-                >
-                  <ImageIcon className="h-4 w-4 mr-2" />
-                  {t("forum.photo")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={Boolean(imageFile) || createPostMutation.isPending}
-                >
-                  <PaperclipIcon className="h-4 w-4 mr-2" />
-                  {t("forum.file")}
-                </Button>
-              </div>
-              <Button
-                type="submit"
-                disabled={
-                  !content.trim() ||
-                  !selectedForum ||
-                  createPostMutation.isPending
-                }
-              >
-                {createPostMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {t("forum.posting")}
-                  </>
-                ) : (
-                  t("forum.post")
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Posts feed */}
-      <div className="space-y-6">
-        {feedsQuery.isLoading ? (
-          <div className="flex justify-center my-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : feedsQuery.error ? (
-          <div className="text-center my-12">
-            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h3 className="font-semibold text-lg mb-2">
-              {t("forum.somethingWentWrong")}
-            </h3>
-            <Button onClick={() => feedsQuery.refetch()}>
-              {t("common.tryAgain")}
-            </Button>
-          </div>
-        ) : feedsQuery.data?.pages[0].results.length === 0 ? (
-          <div className="text-center my-12 bg-muted/50 py-16 rounded-lg">
-            <h3 className="font-semibold text-lg mb-2">
-              {t("forum.noPostsYet")}
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              {t("forum.beTheFirstToPost")}
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* Map through all pages and their results */}
-            {feedsQuery.data?.pages.map((page, i) => (
-              <div key={i} className="space-y-6">
-                {page.results.map((post: PostType) => (
-                  <PostCard 
-                    key={post.id} 
-                    post={post} 
-                    onEdit={handleEditPost}
-                    onDelete={handleDeletePost}
-                  />
-                ))}
-              </div>
-            ))}
-
-            {/* Load more button */}
-            {feedsQuery.hasNextPage && (
-              <div className="text-center mt-6">
-                <Button
-                  onClick={() => feedsQuery.fetchNextPage()}
-                  disabled={feedsQuery.isFetchingNextPage}
-                  variant="outline"
-                >
-                  {feedsQuery.isFetchingNextPage ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      {t("forum.loading")}
-                    </>
-                  ) : (
-                    t("forum.loadMore")
                   )}
                 </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0" align="end">
+                <div className="flex items-center justify-between p-4 border-b">
+                  <h4 className="font-medium">{t("forum.notifications.title")}</h4>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleMarkAllRead}
+                    disabled={!notificationsQuery.data?.length || markAllReadMutation.isPending}
+                  >
+                    {markAllReadMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      t("forum.notifications.markAllRead")
+                    )}
+                  </Button>
+                </div>
+                <ScrollArea className="h-[300px]">
+                  {notificationsQuery.isLoading ? (
+                    <div className="flex justify-center items-center h-20">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    </div>
+                  ) : !notificationsQuery.data?.length ? (
+                    <div className="flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
+                      <BellOff className="h-8 w-8 mb-2" />
+                      <p>{t("forum.notifications.empty")}</p>
+                    </div>
+                  ) : (
+                    <div>
+                      {notificationsQuery.data.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className={`p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
+                            !notification.read ? "bg-blue-50" : ""
+                          }`}
+                          onClick={() => handleNotificationClick(notification)}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0">
+                              <div className="h-9 w-9 rounded-full overflow-hidden">
+                                <Avatar className="h-full w-full">
+                                  <AvatarImage 
+                                    src={notification.sender.avatar} 
+                                    alt={`${notification.sender.first_name} ${notification.sender.last_name}`}
+                                  />
+                                  <AvatarFallback className="bg-primary text-white">
+                                    {notification.sender.first_name?.[0]}
+                                    {notification.sender.last_name?.[0]}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium">
+                                {getNotificationMessage(notification)}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                              </p>
+                            </div>
+                            {!notification.read && (
+                              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="space-y-8"
+        >
+          {/* Post creation form */}
+          <motion.div variants={sectionVariants}>
+            <Card className="shadow-lg border-primary/20 overflow-hidden bg-card/95 backdrop-blur">
+              <CardContent className="pt-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Forum selector */}
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {t("forum.selectForum")}
+                    </label>
+                    <Select 
+                      onValueChange={handleForumSelect} 
+                      value={selectedForum}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("forum.selectForum")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {forumsQuery.data?.map((forum: ForumType) => (
+                          <SelectItem key={forum.id} value={forum.id.toString()}>
+                            {forum.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Content textarea */}
+                  <Textarea
+                    placeholder={t("forum.whatsOnYourMind")}
+                    className="min-h-[120px]"
+                    value={content}
+                    onChange={handleContentChange}
+                  />
+
+                  {/* Attachment previews */}
+                  <div className="flex gap-4 flex-wrap">
+                    {imageFile && (
+                      <div className="relative group">
+                        <div className="border rounded-md overflow-hidden h-24 w-24">
+                          <Image
+                            src={URL.createObjectURL(imageFile)}
+                            alt={t("forum.imagePreview")}
+                            className="object-cover h-full w-full"
+                            width={96}
+                            height={96}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center"
+                          onClick={() => setImageFile(null)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+
+                    {fileAttachment && (
+                      <div className="relative group">
+                        <div className="border rounded-md p-2 h-24 w-32 flex flex-col items-center justify-center">
+                          <PaperclipIcon className="h-8 w-8 text-gray-500" />
+                          <span className="text-xs truncate max-w-full">
+                            {fileAttachment.name}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center"
+                          onClick={() => setFileAttachment(null)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <div className="flex space-x-2">
+                      <input
+                        type="file"
+                        ref={imageInputRef}
+                        onChange={handleImageUpload}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => imageInputRef.current?.click()}
+                        disabled={Boolean(fileAttachment) || createPostMutation.isPending}
+                      >
+                        <ImageIcon className="h-4 w-4 mr-2" />
+                        {t("forum.photo")}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={Boolean(imageFile) || createPostMutation.isPending}
+                      >
+                        <PaperclipIcon className="h-4 w-4 mr-2" />
+                        {t("forum.file")}
+                      </Button>
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={
+                        !content.trim() ||
+                        !selectedForum ||
+                        createPostMutation.isPending
+                      }
+                    >
+                      {createPostMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          {t("forum.posting")}
+                        </>
+                      ) : (
+                        t("forum.post")
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Posts feed */}
+          <motion.div variants={sectionVariants} className="space-y-6">
+            {feedsQuery.isLoading ? (
+              <div className="flex justify-center my-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
+            ) : feedsQuery.error ? (
+              <Card className="shadow-lg border-primary/20 overflow-hidden bg-card/95 backdrop-blur text-center py-12">
+                <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+                <h3 className="font-semibold text-lg mb-2">
+                  {t("forum.somethingWentWrong")}
+                </h3>
+                <Button onClick={() => feedsQuery.refetch()}>
+                  {t("common.tryAgain")}
+                </Button>
+              </Card>
+            ) : feedsQuery.data?.pages[0].results.length === 0 ? (
+              <Card className="shadow-lg border-primary/20 overflow-hidden bg-card/95 backdrop-blur text-center py-12">
+                <h3 className="font-semibold text-lg mb-2">
+                  {t("forum.noPostsYet")}
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  {t("forum.beTheFirstToPost")}
+                </p>
+              </Card>
+            ) : (
+              <>
+                {/* Map through all pages and their results */}
+                {feedsQuery.data?.pages.map((page, i) => (
+                  <motion.div 
+                    key={i} 
+                    variants={sectionVariants}
+                    className="space-y-6"
+                  >
+                    {page.results.map((post: PostType, index: number) => (
+                      <motion.div
+                        key={post.id}
+                        variants={fadeInVariants}
+                        custom={index}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <PostCard 
+                          post={post} 
+                          onEdit={handleEditPost}
+                          onDelete={handleDeletePost}
+                          className="shadow-lg border-primary/20 overflow-hidden bg-card/95 backdrop-blur"
+                        />
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                ))}
+
+                {/* Load more button */}
+                {feedsQuery.hasNextPage && (
+                  <div className="text-center mt-6">
+                    <Button
+                      onClick={() => feedsQuery.fetchNextPage()}
+                      disabled={feedsQuery.isFetchingNextPage}
+                      variant="outline"
+                    >
+                      {feedsQuery.isFetchingNextPage ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          {t("forum.loading")}
+                        </>
+                      ) : (
+                        t("forum.loadMore")
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Edit dialog */}
@@ -745,6 +830,6 @@ export default function ForumPage() {
           100% { background-color: transparent; }
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 }
