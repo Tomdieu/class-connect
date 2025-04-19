@@ -32,7 +32,7 @@ function ChangeLanguage() {
                 <span className='capitalize font-bold'>{value}</span>
                 {/* <SelectValue placeholder="Lang" className='mr-1' /> */}
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className='z-[999999999999999999]'>
                 <SelectItem value="en">English</SelectItem>
                 <SelectItem value="fr">Français</SelectItem>
             </SelectContent>
