@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { useMediaQuery } from "usehooks-ts";
 import ChangeLanguage from "./ChangeLanguage";
 import { cn } from "@/lib/utils";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useI18n } from "@/locales/client";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -72,8 +72,10 @@ function Header({ className }: { className?: string }) {
 
   // Handle logout
   const handleLogout = () => {
-    router.push("/api/auth/signout");
+    // router.push("/api/auth/signout");
+    signOut({redirectTo:'/'})
   };
+
 
   // Get user initials for avatar fallback
   const getUserInitials = () => {
