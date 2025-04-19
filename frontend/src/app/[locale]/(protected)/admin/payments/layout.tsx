@@ -3,11 +3,15 @@ import PaymentSidebar from "./_component/Sidebar";
 
 function PaymentLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={"flex flex-col md:flex-row h-full w-full gap-5 container mx-auto pt-6"}>
-      <div className="w-full md:w-2/12">
-        <PaymentSidebar />
+    <div className="h-full w-full">
+      <div className="flex gap-3">
+        <div className="hidden md:block w-64 shrink-0">
+          <PaymentSidebar />
+        </div>
+        <div className="flex-1 w-full">
+          {children}
+        </div>
       </div>
-      <div className="w-full md:w-10/12">{children}</div>
     </div>
   );
 }
