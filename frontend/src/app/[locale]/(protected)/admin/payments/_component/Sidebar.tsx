@@ -118,7 +118,7 @@ function PaymentSidebar() {
 
       <div className="hidden md:block h-px bg-gray-200 my-3"></div>
 
-      <div className="hidden md:block p-4 bg-primary/5 rounded-lg border border-primary/10 mt-auto">
+      {/* <div className="hidden md:block p-4 bg-primary/5 rounded-lg border border-primary/10 mt-auto">
         <div className="flex items-center gap-2 mb-2">
           <ArrowUpDown className="h-4 w-4 text-primary" />
           <h4 className="font-medium text-sm text-gray-800">Payment Stats</h4>
@@ -134,7 +134,7 @@ function PaymentSidebar() {
             <div className="text-xs text-gray-500">Transactions</div>
           </div>
         </div>
-      </div>
+      </div> */}
     </motion.div>
   )
 }
