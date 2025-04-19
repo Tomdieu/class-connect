@@ -3,11 +3,23 @@
 import { createForum, listForums, updateForum, deleteForum } from "@/actions/forum";
 import { ForumType } from "@/types";
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Check, Edit, Plus, Search, Trash } from "lucide-react";
+import { 
+  AlertCircle, 
+  MessagesSquare, 
+  MessageCircle,
+  Plus, 
+  Search, 
+  Settings, 
+  Shield, 
+  Trash, 
+  Bell, 
+  Edit, 
+  Eye
+} from "lucide-react";
 import { useI18n } from "@/locales/client";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +39,21 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
 export default function AdminForumPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -196,18 +223,40 @@ export default function AdminForumPage() {
   );
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t("admin.forum.title")}</h1>
-          <p className="text-muted-foreground">
-            {t("admin.forum.description")}
-          </p>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="w-full px-4 sm:px-6 py-8 bg-gradient-to-b from-primary/5 via-background to-background min-h-screen"
+    >
+      <motion.div 
+        className="relative flex flex-col sm:flex-row items-center justify-between mb-8 pb-4 border-b border-primary/10"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
+        <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full z-0 opacity-10"></div>
+        
+        <div className="flex items-center mb-4 sm:mb-0 relative z-10">
+          <div className="hidden sm:flex bg-primary/10 sm:p-3 rounded-full sm:mr-4">
+            <MessagesSquare className="h-7 w-7 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              {t("admin.forum.title")}
+            </h1>
+            <p className="text-sm text-gray-600">{t("admin.forum.description")}</p>
+          </div>
         </div>
+
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> {t("admin.forum.createForum")}
+            <Button 
+              className="w-full sm:w-fit bg-primary hover:bg-primary/90 text-white flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow rounded-lg px-6 py-6 relative z-10"
+              size="lg"
+            >
+              <Plus size={20} /> {t("admin.forum.createForum")}
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -328,117 +377,163 @@ export default function AdminForumPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </motion.div>
 
-      <Tabs defaultValue="all" className="space-y-4" onValueChange={setActiveTab}>
-        <div className="flex justify-between items-center">
-          <TabsList>
-            <TabsTrigger value="all">{t("admin.forum.allForums")}</TabsTrigger>
-            <TabsTrigger value="posts">{t("admin.forum.posts")}</TabsTrigger>
+      <Tabs defaultValue="all" className="space-y-6" onValueChange={setActiveTab}>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <TabsList className="sm:min-w-[300px] bg-primary/10">
+            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              <MessagesSquare className="h-4 w-4 mr-2" />
+              {t("admin.forum.allForums")}
+            </TabsTrigger>
+            <TabsTrigger value="posts" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              {t("admin.forum.posts")}
+            </TabsTrigger>
           </TabsList>
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder={t("admin.forum.searchForums")}
-              className="w-[250px] pl-8"
+              className="w-full sm:w-[300px] pl-8"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
         
-        <TabsContent value="all" className="space-y-4">
+        <TabsContent value="all" className="space-y-6">
           {isLoading ? (
             <div className="flex justify-center items-center py-10">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
             </div>
           ) : filteredForums.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-10">
-                <div className="rounded-full bg-muted p-3">
-                  <AlertCircle className="h-6 w-6" />
+            <Card className="border border-primary/20 shadow-lg">
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <div className="rounded-full bg-primary/10 p-4 mb-4">
+                  <AlertCircle className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold">{t("admin.forum.noForumsFound")}</h3>
-                <p className="text-sm text-muted-foreground text-center max-w-[500px] mt-2">
+                <h3 className="mt-2 text-xl font-semibold">{t("admin.forum.noForumsFound")}</h3>
+                <p className="text-base text-muted-foreground text-center max-w-[500px] mt-3">
                   {searchQuery 
                     ? t("admin.forum.noForumsMatchSearch", { search: searchQuery })
                     : t("admin.forum.noForumsYet")}
                 </p>
                 {!searchQuery && (
-                  <Button className="mt-4" onClick={() => setDialogOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" /> {t("admin.forum.createFirstForum")}
+                  <Button className="mt-6 bg-primary hover:bg-primary/90 text-white" onClick={() => setDialogOpen(true)}>
+                    <Plus className="mr-2 h-5 w-5" /> {t("admin.forum.createFirstForum")}
                   </Button>
                 )}
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
+            >
               {filteredForums.map((forum) => (
-                <Card key={forum.id} className="overflow-hidden">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-xl">{forum.name}</CardTitle>
-                      <Badge variant="outline" className="font-normal">
-                        {t("admin.forum.forumId", { id: forum.id })}
-                      </Badge>
-                    </div>
-                    <CardDescription>
-                      {t("admin.forum.createdOn", { date: new Date(forum.created_at).toLocaleDateString() })}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex justify-between items-center">
-                      <Link href={`/admin/forum/${forum.id}`}>
-                        <Button variant="default">
-                          {t("admin.forum.manageForum")}
+                <motion.div variants={itemVariants} key={forum.id}>
+                  <Card className="overflow-hidden border border-primary/20 h-full transition-all hover:shadow-lg">
+                    <CardHeader className="pb-2 relative">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-10"></div>
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-xl font-bold">{forum.name}</CardTitle>
+                        <Badge variant="outline" className="font-normal bg-primary/5">
+                          {t("admin.forum.forumId", { id: forum.id })}
+                        </Badge>
+                      </div>
+                      <CardDescription className="flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"/>
+                          <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        {t("admin.forum.createdOn", { date: new Date(forum.created_at).toLocaleDateString() })}
+                      </CardDescription>
+                    </CardHeader>
+                    
+                    <CardFooter className="flex flex-col pt-4 gap-3">
+                      <div className="flex w-full gap-2">
+                        <Button 
+                          variant="default"
+                          className="flex-1 bg-primary hover:bg-primary/90 text-white"
+                          asChild
+                        >
+                          <Link href={`/admin/forum/${forum.id}`}>
+                            <Shield className="h-4 w-4 mr-1" />
+                            {t("admin.forum.manageForum")}
+                          </Link>
                         </Button>
-                      </Link>
-                      <div className="flex gap-2">
+                        
                         <Button 
                           variant="outline"
-                          size="icon"
+                          className="flex-shrink-0 bg-background hover:bg-muted"
+                          asChild
+                        >
+                          <Link href={`/forum/${forum.id}`} target="_blank">
+                            <Eye className="h-4 w-4" />
+                            <span className="sr-only">View Forum</span>
+                          </Link>
+                        </Button>
+                      </div>
+
+                      <div className="flex justify-between w-full gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="flex-1 hover:bg-blue-50 hover:text-blue-500"
                           onClick={() => {
                             setSelectedForum(forum);
                             setIsEditDialogOpen(true);
                           }}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
                         </Button>
+                        
                         <Button 
-                          variant="outline"
-                          size="icon"
-                          className="text-destructive"
+                          variant="ghost"
+                          size="sm"
+                          className="flex-1 hover:bg-red-50 hover:text-red-500"
                           onClick={() => {
                             setForumToDelete(forum);
                             setIsDeleteDialogOpen(true);
                           }}
                         >
-                          <Trash className="h-4 w-4" />
+                          <Trash className="h-4 w-4 mr-1" />
+                          Delete
                         </Button>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardFooter>
+                  </Card>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </TabsContent>
         
         <TabsContent value="posts">
-          <Card>
+          <Card className="border border-primary/20 shadow-md">
             <CardHeader>
-              <CardTitle>{t("admin.forum.allForumPosts")}</CardTitle>
+              <div className="flex items-center">
+                <MessageCircle className="h-5 w-5 mr-2 text-primary" />
+                <CardTitle>{t("admin.forum.allForumPosts")}</CardTitle>
+              </div>
               <CardDescription>
                 {t("admin.forum.forumPostsDescription")}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex justify-center items-center">
+            <CardContent className="space-y-4">
+              <div className="flex justify-center py-4">
                 <Button 
                   variant="default" 
                   onClick={() => router.push('/admin/forum/posts')}
+                  className="bg-primary hover:bg-primary/90 text-white px-6"
+                  size="lg"
                 >
+                  <MessageCircle className="h-4 w-4 mr-2" />
                   {t("admin.forum.viewAllPosts")}
                 </Button>
               </div>
@@ -447,53 +542,58 @@ export default function AdminForumPage() {
         </TabsContent>
       </Tabs>
       
-      <div className="mt-8">
-        <Separator className="my-4" />
-        <h2 className="text-xl font-semibold mb-4">{t("admin.forum.quickAccess")}</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader className="pb-2">
+      <div className="mt-12">
+        <Separator className="my-6" />
+        <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+          <Settings className="h-5 w-5 text-primary" />
+          {t("admin.forum.quickAccess")}
+        </h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="border border-primary/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-3">
+              <div className="bg-primary/10 p-3 rounded-full w-fit mb-2">
+                <MessageCircle className="h-5 w-5 text-primary" />
+              </div>
               <CardTitle className="text-lg">{t("admin.forum.posts")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
+              <CardDescription className="line-clamp-2">
                 {t("admin.forum.forumPostsDescription")}
-              </p>
-              <Button onClick={() => router.push('/admin/forum/posts')} variant="outline" className="w-full">
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="pt-0">
+              <Button 
+                onClick={() => router.push('/admin/forum/posts')}
+                variant="outline" 
+                className="w-full border-primary/20 hover:bg-primary/5 hover:text-primary"
+              >
+                <Eye className="mr-2 h-4 w-4" />
                 {t("admin.forum.viewAllPostsButton")}
               </Button>
-            </CardContent>
+            </CardFooter>
           </Card>
           
-          <Card>
-            <CardHeader className="pb-2">
+          <Card className="border border-primary/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-3">
+              <div className="bg-blue-100 p-3 rounded-full w-fit mb-2">
+                <Bell className="h-5 w-5 text-blue-600" />
+              </div>
               <CardTitle className="text-lg">{t("forum.notifications.title")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
+              <CardDescription className="line-clamp-2">
                 {t("admin.forum.forumNotificationsDescription")}
-              </p>
-              <Button onClick={() => router.push('/admin/forum/notifications')} variant="outline" className="w-full">
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="pt-0">
+              <Button 
+                onClick={() => router.push('/admin/forum/notifications')}
+                variant="outline" 
+                className="w-full border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <Eye className="mr-2 h-4 w-4" />
                 {t("admin.forum.viewNotificationsButton")}
               </Button>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">{t("forum.post")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                {t("admin.forum.createPostDescription")}
-              </p>
-              <Button onClick={() => router.push('/admin/forum/posts/create')} variant="outline" className="w-full">
-                {t("admin.forum.createPostButton")}
-              </Button>
-            </CardContent>
+            </CardFooter>
           </Card>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
