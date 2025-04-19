@@ -312,10 +312,14 @@ class EnhancedTeacherEnrollmentSerializer(TeacherStudentEnrollmentSerializer):
         ]
 
     def get_subject(self, obj):
-        return obj.offer.subject if obj.offer else None
+        if obj.offer and obj.offer.subject:
+            return SubjectSerializer(obj.offer.subject).data
+        return None
 
     def get_class_level(self, obj):
-        return obj.offer.class_level if obj.offer else None
+        if obj.offer and obj.offer.class_level:
+            return ClassSerializer(obj.offer.class_level).data
+        return None
 
     def get_hourly_rate(self, obj):
         return obj.offer.hourly_rate if obj.offer else None
