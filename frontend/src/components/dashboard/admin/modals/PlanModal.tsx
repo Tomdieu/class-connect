@@ -142,7 +142,7 @@ function PlanModal() {
 
   return (
     <Credenza open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <CredenzaContent>
+      <CredenzaContent className='p-3'>
         <CredenzaHeader>
           <CredenzaTitle>
             {plan ? t("plan.modal.title.edit") : t("plan.modal.title.add")}
