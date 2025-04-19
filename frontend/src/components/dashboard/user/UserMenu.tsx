@@ -37,7 +37,7 @@ export function UserMenu() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56 z-[999999999999999999]">
         <div className="flex items-center justify-start gap-2 p-2">
           <Avatar className="h-8 w-8 cursor-pointer select-none">
             <AvatarImage src={user?.avatar || ""} alt={userName} />
@@ -55,7 +55,7 @@ export function UserMenu() {
           <Link href={`/students/profile`}>{t("nav.profile")}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="cursor-pointer">
-          <Link href={`/students/chat`}>{t("student.dashboard.chat")}</Link>
+          <Link href={`/students/forum`}>{t("student.dashboard.chat")}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={`/students/subscriptions`}>{t("nav.subscriptions")}</Link>
