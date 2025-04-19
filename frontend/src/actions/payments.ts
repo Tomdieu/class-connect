@@ -311,7 +311,7 @@ export const listTransactions = async ({
     if (!session?.user) throw Error("Unauthorize user!");
     const response = await api.get("/api/transactions/", {
       headers: {
-        Authorization: `Bearer ${session.user.accessToken}`,
+        Authorization: `Bearer ${session.user.accessToken}`,  
       },
       params,
     });
