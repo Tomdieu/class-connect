@@ -33,7 +33,7 @@ export default async function StudentLayout({
         <div className="relative flex min-h-screen w-full">
           <StudentSidebar />
           <main className="flex-1 h-full flex w-full flex-col relative overflow-x-hidden">
-            <div className="flex shadow-lg sticky top-0 z-10 border-b border-white/20 backdrop-blur-md bg-white/10 items-center py-3 justify-between px-4">
+            <div className="flex shadow-lg sticky top-0 z-[9999999999] border-b border-white/20 backdrop-blur-md bg-white/10 items-center py-3 justify-between px-4">
               <SidebarTrigger className="" />
               <div className="flex items-center gap-4">
                 <UserMenu />
@@ -43,7 +43,7 @@ export default async function StudentLayout({
               </div>
             </div>
 
-            <div className="flex-1 p-6">{children}</div>
+            <div className="flex-1">{children}</div>
             
           </main>
         </div>
