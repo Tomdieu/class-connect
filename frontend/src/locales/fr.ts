@@ -1141,6 +1141,16 @@ export default {
   "courseOfferings.actions.error.created":
     "Une erreur est survenue lors de la tentative d'envoie de demande.",
   "courseOfferings.confirm.cancelDescription": "Description",
+  "courseOfferings.emptyStateDescription": "Créez votre première offre de cours pour commencer à entrer en contact avec des étudiants. Définissez votre emploi du temps, vos tarifs et vos préférences.",
+"courseOfferings.createFirst": "Créez votre première offre",
+"courseOfferings.getStartedGuide": "Besoin d'aide pour démarrer ? Consultez notre guide sur la création d'offres de cours efficaces.",
+"courseOfferings.benefits.flexibility": "Horaires flexibles",
+"courseOfferings.benefits.flexibilityDesc": "Définissez vos propres heures et emploi du temps",
+"courseOfferings.benefits.targeting": "Ciblez votre expertise",
+"courseOfferings.benefits.targetingDesc": "Concentrez-vous sur les matières et niveaux dans lesquels vous excellez",
+"courseOfferings.benefits.earnings": "Maximisez vos revenus",
+"courseOfferings.benefits.earningsDesc": "Fixez des tarifs compétitifs en fonction de votre expertise",
+
 
   "studentsPage.title": "Mes étudiants",
   "studentsPage.schoolYear": "Année scolaire",
@@ -1597,4 +1607,54 @@ export default {
   "about.features.subscriptions.title": "Abonnements Adaptés",
   "about.features.payments.title": "Paiements Sécurisés",
   "about.features.support.title": "Assistance Personnalisée",
+
+  // Class sections
+"class.status.active": "Actif",
+"class.status.draft": "Brouillon",
+"class.status.archived": "Archivé",
+"class.status.nonActive": "Inactif",
+"class.metrics.students": "Étudiants",
+"class.metrics.classes": "Cours",
+"class.metrics.completion": "Taux d'achèvement",
+"class.subtitle": "Gérez et organisez vos cours",
+"class.empty.title": "Aucun cours pour le moment",
+"class.empty.description": "Commencez par ajouter votre premier cours pour créer du contenu éducatif",
+
+// Navigation
+"nav.sections": "Sections",
+"nav.levels": "Niveaux d'éducation",
+
+// Section descriptions
+"section.anglophone.description": "Programme éducatif en langue anglaise",
+"section.francophone.description": "Programme éducatif en langue française",
+
+// Education level descriptions
+"educationLevel.college.description": "Éducation au collège (Forme 1-4)",
+"educationLevel.lycee.description": "Éducation au lycée (Forme 5 - 6e supérieure)",
+"educationLevel.university.description": "Programmes d'enseignement supérieur",
+
+// Action messages
+"action.addFirst": "Ajouter le premier {item}",
+"action.viewAll": "Voir tous les {item}",
+"action.manage": "Gérer les {item}",
+
+// Status indicators
+"status.active": "Actif",
+"status.inactive": "Inactif",
+"status.draft": "Brouillon",
+
+// Metrics
+"metrics.total": "Total des {item}",
+"metrics.active": "{item} actifs",
+"metrics.completion": "Taux d'achèvement",
+
+// Empty states
+"empty.noData": "Aucun {item} disponible",
+"empty.noDataDescription": "Commencez par ajouter votre premier {item}",
+
+// Dashboard and statistics
+"educationLevels.other": "Autre",
+"stats.userCounts": "Nombre d'utilisateurs par type",
+
+
 } as const;

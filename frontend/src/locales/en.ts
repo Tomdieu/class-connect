@@ -1141,6 +1141,15 @@ export default {
   "courseOfferings.actions.error.created":
     "An error occurred while attempting to send the request.",
   "courseOfferings.confirm.cancelDescription": "Description",
+  "courseOfferings.emptyStateDescription": "Create your first course offering to start connecting with students. Set your schedule, rates, and preferences.",
+  "courseOfferings.createFirst": "Create Your First Offering",
+  "courseOfferings.getStartedGuide": "Need help getting started? Check out our guide on creating effective course offerings.",
+  "courseOfferings.benefits.flexibility": "Flexible Scheduling",
+  "courseOfferings.benefits.flexibilityDesc": "Set your own hours and teaching schedule",
+  "courseOfferings.benefits.targeting": "Target Your Expertise",
+  "courseOfferings.benefits.targetingDesc": "Focus on subjects and levels you excel in",
+  "courseOfferings.benefits.earnings": "Maximize Earnings",
+  "courseOfferings.benefits.earningsDesc": "Set competitive rates for your expertise",
 
   "availability.studentAvailability": "Student Availability",
   "availability.studentNotVisibleWarning":
@@ -1611,4 +1620,50 @@ export default {
   "about.features.payments.title": "Secure Payments",
   "about.features.support.title": "Personalized Support",
 
+  // Class sections
+  "class.status.active": "Active",
+  "class.status.draft": "Draft",
+  "class.status.archived": "Archived",
+  "class.status.nonActive": "Non-active",
+  "class.metrics.students": "Students",
+  "class.metrics.classes": "Classes",
+  "class.metrics.completion": "Completion Rate",
+  "class.subtitle": "Manage and organize your classes",
+  "class.empty.title": "No Classes Yet",
+  "class.empty.description": "Start by adding your first class to begin creating educational content",
+
+  // Navigation
+  "nav.sections": "Sections",
+  "nav.levels": "Education Levels",
+
+  // Section descriptions
+  "section.anglophone.description": "English language education curriculum",
+  "section.francophone.description": "French language education curriculum",
+
+  // Education level descriptions
+  "educationLevel.college.description": "Middle school education (Form 1-4)",
+  "educationLevel.lycee.description": "High school education (Form 5-Upper 6th)",
+  "educationLevel.university.description": "Higher education programs",
+
+  // Action messages
+  "action.addFirst": "Add First {item}",
+  "action.viewAll": "View All {item}",
+  "action.manage": "Manage {item}",
+
+  // Status indicators
+  "status.active": "Active",
+  "status.inactive": "Inactive",
+  "status.draft": "Draft",
+
+  // Metrics
+  "metrics.total": "Total {item}",
+  "metrics.active": "Active {item}",
+  "metrics.completion": "Completion Rate",
+
+  // Empty states
+  "empty.noData": "No {item} available",
+  "empty.noDataDescription": "Start by adding your first {item}",
+
+  "educationLevels.other": "Other",
+  "stats.userCounts": "User Counts",
 } as const;
