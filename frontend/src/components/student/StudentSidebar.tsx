@@ -37,8 +37,6 @@ export function StudentSidebar() {
   // Use getPathAfterLanguage like AdminSidebar does
   const correctPath = getPathAfterLanguage(pathname);
 
-  // No longer need the custom isPathActive function since we'll use correctPath.startsWith
-
   const menuItems = [
     {
       title: t("common.dashboard"),
@@ -89,36 +87,42 @@ export function StudentSidebar() {
     <Sidebar
       collapsible="offcanvas"
       variant="sidebar"
-      className="border-none outline-none shadow-lg min-h-screen"
+      className="border-none outline-none shadow-lg min-h-screen bg-card/95 backdrop-blur"
     >
-      <SidebarHeader className="flex w-full py-3 bg-white items-start justify-between border-b">
-        <div className="flex flex-1 w-full items-center justify-between">
+      <SidebarHeader className="flex w-full py-3 items-start justify-between border-b border-border/50">
+        <div className="flex flex-1 w-full items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <span className="font-semibold text-lg text-primary">ClassConnect</span>
+            <div className="bg-primary/10 p-2 rounded-lg">
+              <BookOpen className="h-6 w-6 text-primary" />
+            </div>
+            <span className="font-bold text-lg bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              ClassConnect
+            </span>
           </div>
           <div
             onClick={toggleSidebar}
-            className="cursor-pointer md:hidden hover:bg-gray-100 p-2 rounded-full transition-colors"
+            className="cursor-pointer md:hidden hover:bg-primary/10 p-2 rounded-full transition-colors"
           >
             <X className="text-gray-500 size-5" />
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="bg-white">
+      <SidebarContent className="bg-transparent px-2">
         <SidebarGroup>
-          <SidebarGroupLabel>{t("common.dashboard")}</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-2 text-xs uppercase tracking-wider text-muted-foreground/70">
+            {t("common.dashboard")}
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem 
                   key={item.href} 
-                  className={`hover:text-primary/80 hover:bg-primary/5 ${
+                  className={`rounded-lg mb-1 transition-all duration-200 ${
                     (correctPath === item.href || 
                      (item.href !== "/students" && correctPath.startsWith(item.href))) 
-                      ? "text-primary bg-primary/5 font-semibold" 
-                      : ""
+                      ? "bg-primary text-primary-foreground font-medium shadow-md" 
+                      : "hover:bg-primary/10 text-foreground/70 hover:text-primary"
                   }`}
                 >
                   <SidebarMenuButton
@@ -126,8 +130,9 @@ export function StudentSidebar() {
                     isActive={correctPath === item.href || 
                               (item.href !== "/students" && correctPath.startsWith(item.href))}
                     tooltip={item.title}
+                    className="p-2"
                   >
-                    <Link href={item.href}>
+                    <Link href={item.href} className="flex items-center gap-3">
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
@@ -138,25 +143,30 @@ export function StudentSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator />
+        <SidebarSeparator className="my-4 opacity-50" />
 
         <SidebarGroup>
-          <SidebarGroupLabel>{t("profile.personalInfo")}</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-2 text-xs uppercase tracking-wider text-muted-foreground/70">
+            {t("profile.personalInfo")}
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {accountItems.map((item) => (
                 <SidebarMenuItem 
                   key={item.href}
-                  className={`hover:text-primary/80 hover:bg-primary/5 ${
-                    correctPath.startsWith(item.href) ? "text-primary bg-primary/5 font-semibold" : ""
+                  className={`rounded-lg mb-1 transition-all duration-200 ${
+                    correctPath.startsWith(item.href) 
+                      ? "bg-primary text-primary-foreground font-medium shadow-md" 
+                      : "hover:bg-primary/10 text-foreground/70 hover:text-primary"
                   }`}
                 >
                   <SidebarMenuButton
                     asChild
                     isActive={correctPath.startsWith(item.href)}
                     tooltip={item.title}
+                    className="p-2"
                   >
-                    <Link href={item.href}>
+                    <Link href={item.href} className="flex items-center gap-3">
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
@@ -166,13 +176,14 @@ export function StudentSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <div className="mt-auto w-full pt-4 border-t border-border">
-              <div className="px-4 py-3">
-                <p className="text-xs text-center text-muted-foreground">
-                  Copyright © 2024 ClassConnect
-                </p>
-              </div>
-            </div>
+
+        <div className="mt-auto w-full pt-4 border-t border-border/50">
+          <div className="px-4 py-3">
+            <p className="text-xs text-center text-muted-foreground/70">
+              Copyright © 2024 ClassConnect
+            </p>
+          </div>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
