@@ -5,6 +5,27 @@ set -o nounset
 
 export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
 
+# Check if database restore is requested
+if [ -f "/app/.restore_db" ]; then
+  BACKUP_FILE=$(cat /app/.restore_db)
+  echo "Database restore requested from backup: $BACKUP_FILE"
+  if [ -f "/backups/$BACKUP_FILE" ]; then
+    echo "Restoring database from $BACKUP_FILE"
+    # Wait for PostgreSQL to become available
+    until postgres_ready; do
+      >&2 echo "Waiting for PostgreSQL to become available before restore.....:-("
+      sleep 1
+    done
+    # Run restore script
+    /app/docker/prod/restore-backup.sh "$BACKUP_FILE"
+    # Remove restore flag
+    rm /app/.restore_db
+  else
+    echo "Warning: Requested backup file not found: $BACKUP_FILE"
+  fi
+fi
+
+# Rest of your existing entrypoint script
 postgres_ready() {
 python << END
 import sys
@@ -23,8 +44,8 @@ sys.exit(0)
 END
 }
 until postgres_ready; do
->&2 echo "Waiting for PostgreSQL to become available.....:-("
-sleep 1
+  >&2 echo "Waiting for PostgreSQL to become available.....:-("
+  sleep 1
 done
 >&2 echo "PostgreSQL is ready!!!!.....:-)"
 
