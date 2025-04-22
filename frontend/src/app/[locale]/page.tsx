@@ -241,7 +241,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
 // Enhanced stat card with dynamic colors and animations
 interface StatCardProps {
   icon: React.ReactNode;
-  value: React.ReactElement;
+  value: React.ReactNode;
   label: string;
   delay?: number;
   gradient?: string;
@@ -844,8 +844,8 @@ function LandingPage() {
                 key={i}
                 className="absolute rounded-full bg-white/20"
                 style={{
-                  width: Math.random() * 8 + 4,
-                  height: Math.random() * 8 + 4,
+                  width: Math.round(Math.random() * 8 + 4),
+                  height: Math.round(Math.random() * 8 + 4),
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
                 }}
