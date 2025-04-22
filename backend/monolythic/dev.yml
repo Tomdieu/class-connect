@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 services:
   # web:
   # build:
@@ -53,8 +53,13 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    sysctls:
-      - vm.overcommit_memory=1
+    # sysctls:
+    #   - vm.overcommit_memory=1
+    # Set explicit ulimits for file descriptors
+    ulimits:
+      nofile:
+        soft: 10032
+        hard: 10032
     networks:
       - e_learning_network
 

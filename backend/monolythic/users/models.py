@@ -39,6 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ("LYCEE", "Lycée"),
         ("UNIVERSITY", "Université"),
         ("PROFESSIONAL", "Professionnel"),
+        ("ADMIN", "Administrator"),
     ]
 
     COLLEGE_CLASSES = [
@@ -182,8 +183,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     def clean(self):
         from django.core.exceptions import ValidationError
 
-        # Skip validation for superusers and staff
+        # For superusers and staff, set a special admin education level
+        # This satisfies the database constraint while maintaining the distinction
         if self.is_superuser or self.is_staff:
+            self.education_level = "ADMIN"
+            # Clear all education specific fields for admins
+            self.college_class = None
+            self.lycee_class = None
+            self.lycee_speciality = None
+            self.university_level = None
+            self.university_year = None
+            self.enterprise_name = None
+            self.platform_usage_reason = None
             return
 
         # Validate education level for regular users

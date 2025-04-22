@@ -18,13 +18,17 @@ class Command(BaseCommand):
                 'first_name': 'Admin',
                 'last_name': 'User',
                 'phone_number': '+237699999990',
+                'is_staff': True,
+                'is_superuser': True,
             },
             {
                 'email': 'stevenoudo@yahoo.fr',
                 'password': '#Yannick25',
-                'first_name': 'Steven',
-                'last_name': 'Oudo',
+                'first_name': 'Steve',
+                'last_name': 'Noudo',
                 'phone_number': '+237699999999',
+                'is_staff': True,
+                'is_superuser': True,
             },
             # Student user
             {
@@ -56,7 +60,7 @@ class Command(BaseCommand):
         # Create admin users
         for user_data in admin_users:
             # Check if this is an admin user or a regular user
-            is_admin = not ('education_level' in user_data)
+            is_admin = user_data.get('is_staff', False) or user_data.get('is_superuser', False)
             
             defaults = {
                 'first_name': user_data['first_name'],
@@ -64,14 +68,14 @@ class Command(BaseCommand):
                 'phone_number': user_data['phone_number'],
                 'email_verified': True,
                 'date_joined': timezone.now(),
-                'is_staff': user_data.get('is_staff', True if is_admin else False),
-                'is_superuser': user_data.get('is_superuser', True if is_admin else False),
+                'is_staff': user_data.get('is_staff', False),
+                'is_superuser': user_data.get('is_superuser', False),
+                # Set education_level to ADMIN for admin users
+                'education_level': 'ADMIN' if is_admin else user_data.get('education_level'),
             }
             
             # Add education-specific fields for non-admin users
-            if 'education_level' in user_data:
-                defaults['education_level'] = user_data['education_level']
-                
+            if not is_admin and 'education_level' in user_data:
                 # Add specific fields based on education level
                 if user_data['education_level'] == 'COLLEGE' and 'college_class' in user_data:
                     defaults['college_class'] = user_data['college_class']
