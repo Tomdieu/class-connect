@@ -92,13 +92,12 @@ function Header({ className }: { className?: string }) {
 
   // Get user initials for avatar fallback
   const getUserInitials = () => {
-    if (!session?.user?.name) return "CC";
+    if (!session?.user?.first_name) return "CC";
 
-    const nameParts = session.user.name.split(" ");
-    if (nameParts.length >= 2) {
-      return `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase();
-    }
-    return nameParts[0].substring(0, 2).toUpperCase();
+    const firstInitial = session.user.first_name.charAt(0);
+    const lastInitial = session.user.last_name?.charAt(0) || firstInitial;
+    
+    return `${firstInitial}${lastInitial}`.toUpperCase();
   };
 
   return (
@@ -181,7 +180,7 @@ function Header({ className }: { className?: string }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <div className="px-2 py-2 text-sm flex flex-col font-medium text-center text-muted-foreground">
+                <div className="px-2 py-2 text-sm flex flex-col font-medium text-left text-muted-foreground">
                   <span className="font-bold text-sm">
                     {session.user.first_name} {session.user.last_name}
                   </span>
