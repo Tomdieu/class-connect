@@ -36,7 +36,7 @@ export default function InactivityProvider({
     if (timeInactive >= INACTIVITY_TIMEOUT) {
       if (session?.user && !warningShown) {
         // Instead of directly signing out, redirect to a custom sign-out page
-        router.push(`/timeout?returnUrl=${encodeURIComponent(pathname)}`);
+        router.push(`/timeout?returnUrl=${encodeURIComponent(pathname!)}`);
         setWarningShown(true);
       }
     }
