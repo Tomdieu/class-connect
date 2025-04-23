@@ -179,10 +179,6 @@ function RegisterDialog() {
     },
   });
 
-  const { errors } = form.formState;
-
-  console.log({ errors });
-
   // Add state for university level
   const [universityLevel, setUniversityLevel] = React.useState<string>("");
 
