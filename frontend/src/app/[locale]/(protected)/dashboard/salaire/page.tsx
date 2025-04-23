@@ -73,10 +73,21 @@ export default function PaymentsPage() {
   // Fetch course declarations using React Query
   const { data: declarations, isLoading, error } = useQuery({
     queryKey: ['courseDeclarations', month],
-    queryFn: () => getTeacherCourseDeclarations(dateRange)
-  })
+    queryFn: async () => {
+      try {
+        const response = await getTeacherCourseDeclarations(dateRange);
+        // Ensure we always return an array
+        return response || [];
+      } catch (error) {
+        console.error("Error fetching course declarations:", error);
+        // Return empty array on error to avoid undefined
+        return [];
+      }
+    }
+  });
   
-  // Calculate total hours from declarations
+  // Calculate total hours from declarations - no change needed here since we now guarantee
+  // declarations to be at least an empty array
   const totalHours = useMemo(() => {
     // Check if declarations exists and is an array
     if (!declarations || !Array.isArray(declarations)) return '0h00';
@@ -97,7 +108,7 @@ export default function PaymentsPage() {
       case 'Payé':
         return 'bg-green-100 text-green-800 hover:bg-green-100'
       case 'Validé':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-100'
+        return 'bg-primary/10 text-primary hover:bg-primary/10'
       case 'En attente de validation':
         return 'bg-amber-100 text-amber-800 hover:bg-amber-100'
       default:
@@ -114,8 +125,8 @@ export default function PaymentsPage() {
         onClick={() => setActiveTab(id)}
         className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
           isActive 
-            ? 'border-blue-500 text-blue-600 font-medium' 
-            : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
+            ? 'border-primary text-primary font-medium' 
+            : 'border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300'
         }`}
       >
         {icon}
@@ -150,9 +161,9 @@ export default function PaymentsPage() {
         return (
           <>
             {/* Period selector */}
-            <div className="mb-6 max-w-xs">
+            <div className="mb-6 w-full max-w-xs">
               <Select value={month} onValueChange={setMonth}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-card/95 backdrop-blur border-primary/20">
                   <SelectValue>
                     {month === 'all' ? 'Toutes les périodes' : month.charAt(0).toUpperCase() + month.slice(1)}
                   </SelectValue>
@@ -169,15 +180,15 @@ export default function PaymentsPage() {
             
             {/* Summary card */}
             {showSummary && declarations && Array.isArray(declarations) && declarations.length > 0 && (
-              <Card className="mb-6 bg-blue-50 border-blue-200">
-                <CardContent className="p-4 flex justify-between items-center">
-                  <p className="text-blue-800">
+              <Card className="mb-6 bg-primary/5 border-primary/20 backdrop-blur shadow-sm">
+                <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                  <p className="text-primary font-medium">
                     {declarations.length} cours déclarés pour un total de {totalHours}
                   </p>
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="text-blue-800 hover:bg-blue-100"
+                    className="text-primary hover:bg-primary/10"
                     onClick={() => setShowSummary(false)}
                   >
                     <X className="h-4 w-4" />
@@ -189,16 +200,17 @@ export default function PaymentsPage() {
             {/* Loading state */}
             {isLoading && (
               <div className="flex justify-center items-center py-12">
-                <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
-                <span className="ml-2 text-gray-600">Chargement des déclarations...</span>
+                <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                <span className="ml-2 text-muted-foreground">Chargement des déclarations...</span>
               </div>
             )}
 
             {/* Error state */}
             {error && (
-              <Card className="mb-6 bg-red-50 border-red-200">
+              <Card className="mb-6 bg-destructive/15 border-destructive/30">
                 <CardContent className="p-4">
-                  <p className="text-red-800">
+                  <p className="text-destructive flex items-center">
+                    <AlertCircle className="h-4 w-4 mr-2" />
                     Une erreur s&apos;est produite lors du chargement des déclarations.
                   </p>
                 </CardContent>
@@ -207,15 +219,15 @@ export default function PaymentsPage() {
             
             {/* Payment table */}
             {!isLoading && !error && declarations && (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-lg border border-primary/20 shadow-md bg-card/95 backdrop-blur">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-primary/5">
                     <TableRow>
-                      <TableHead className="w-1/8">Date déclaration</TableHead>
-                      <TableHead className="w-1/3">Élève</TableHead>
-                      <TableHead className="w-1/3">Cours</TableHead>
-                      <TableHead className="w-1/8">Heure</TableHead>
-                      <TableHead className="w-1/8">Statut</TableHead>
+                      <TableHead className="whitespace-nowrap">Date déclaration</TableHead>
+                      <TableHead className="whitespace-nowrap">Élève</TableHead>
+                      <TableHead className="whitespace-nowrap">Cours</TableHead>
+                      <TableHead className="whitespace-nowrap">Heure</TableHead>
+                      <TableHead className="whitespace-nowrap">Statut</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -238,18 +250,18 @@ export default function PaymentsPage() {
                         const status = statusMap[declaration.status] || 'En attente de validation';
                         
                         return (
-                          <TableRow key={declaration.id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
-                            <TableCell className="py-3">{formattedDate}</TableCell>
-                            <TableCell className="py-3">
+                          <TableRow key={declaration.id} className={index % 2 === 0 ? "bg-white/50" : "bg-white/80"}>
+                            <TableCell className="py-3 font-medium">{formattedDate}</TableCell>
+                            <TableCell className="py-3 max-w-[200px] sm:max-w-none truncate">
                               {`${studentName || 'Étudiant'} (${subjectName || 'Matière'} - ${className || 'Classe'})`}
                             </TableCell>
-                            <TableCell className="py-3">
+                            <TableCell className="py-3 max-w-[200px] sm:max-w-none truncate">
                               {`${formattedDay} - Durée : ${formattedDuration}`}
                             </TableCell>
                             <TableCell className="py-3 whitespace-nowrap">
                               {formattedDuration}
                               {declaration.status === 'ACCEPTED' && declaration.duration % 30 !== 0 && (
-                                <AlertCircle className="h-4 w-4 text-blue-500 inline ml-1" />
+                                <AlertCircle className="h-4 w-4 text-primary inline ml-1" />
                               )}
                             </TableCell>
                             <TableCell className="py-3">
@@ -262,7 +274,7 @@ export default function PaymentsPage() {
                       })
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                           Aucune déclaration de cours pour cette période
                         </TableCell>
                       </TableRow>
@@ -274,55 +286,104 @@ export default function PaymentsPage() {
           </>
         );
       case 'reglements':
-        return <div className="p-4 text-center text-gray-500">Contenu des règlements à venir</div>;
+        return (
+          <Card className="bg-card/95 backdrop-blur border-primary/20">
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <div className="mx-auto mb-4 rounded-full bg-primary/10 p-3 w-16 h-16 flex items-center justify-center">
+                <Euro className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-medium mb-2 text-primary">Contenu des règlements à venir</h3>
+              <p>Cette fonctionnalité sera bientôt disponible.</p>
+            </CardContent>
+          </Card>
+        );
       case 'bulletins':
-        return <div className="p-4 text-center text-gray-500">Contenu des bulletins de paie à venir</div>;
+        return (
+          <Card className="bg-card/95 backdrop-blur border-primary/20">
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <div className="mx-auto mb-4 rounded-full bg-primary/10 p-3 w-16 h-16 flex items-center justify-center">
+                <FileText className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-medium mb-2 text-primary">Contenu des bulletins de paie à venir</h3>
+              <p>Cette fonctionnalité sera bientôt disponible.</p>
+            </CardContent>
+          </Card>
+        );
       case 'recap':
-        return <div className="p-4 text-center text-gray-500">Contenu du récapitulatif annuel à venir</div>;
+        return (
+          <Card className="bg-card/95 backdrop-blur border-primary/20">
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <div className="mx-auto mb-4 rounded-full bg-primary/10 p-3 w-16 h-16 flex items-center justify-center">
+                <CheckSquare className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-medium mb-2 text-primary">Contenu du récapitulatif annuel à venir</h3>
+              <p>Cette fonctionnalité sera bientôt disponible.</p>
+            </CardContent>
+          </Card>
+        );
       case 'attestations':
-        return <div className="p-4 text-center text-gray-500">Contenu des attestations employeurs à venir</div>;
+        return (
+          <Card className="bg-card/95 backdrop-blur border-primary/20">
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <div className="mx-auto mb-4 rounded-full bg-primary/10 p-3 w-16 h-16 flex items-center justify-center">
+                <User className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-medium mb-2 text-primary">Contenu des attestations employeurs à venir</h3>
+              <p>Cette fonctionnalité sera bientôt disponible.</p>
+            </CardContent>
+          </Card>
+        );
       default:
         return null;
     }
   };
 
   return (
-    <div className="container mx-auto py-6 px-4 max-w-full">
-      <h1 className="text-3xl font-bold mb-6">Mes paiements</h1>
-      
-      {/* Custom tab navigation that matches the screenshot - with horizontal scrolling */}
-      <div className="mb-6 border-b border-gray-200 overflow-x-auto">
-        <div className="flex whitespace-nowrap min-w-max">
-          <TabItem 
-            id="historique" 
-            icon={<ExternalLink className="h-4 w-4" />} 
-            label="Historique des cours" 
-          />
-          <TabItem 
-            id="reglements" 
-            icon={<Euro className="h-4 w-4" />} 
-            label="Règlements" 
-          />
-          <TabItem 
-            id="bulletins" 
-            icon={<FileText className="h-4 w-4" />} 
-            label="Bulletins de paie" 
-          />
-          <TabItem 
-            id="recap" 
-            icon={<CheckSquare className="h-4 w-4" />} 
-            label="Récapitulatif annuel" 
-          />
-          <TabItem 
-            id="attestations" 
-            icon={<User className="h-4 w-4" />} 
-            label="Attestations employeurs" 
-          />
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
+      <div className="container mx-auto px-4 sm:px-6 py-8">
+        <div className="relative mb-8">
+          <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/30 rounded-bl-full z-0 opacity-20 hidden md:block"></div>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 relative z-10 text-primary">Mes paiements</h1>
+          <p className="text-muted-foreground relative z-10">Gérez vos déclarations de cours et vos paiements</p>
+        </div>
+        
+        {/* Custom tab navigation with horizontal scrolling */}
+        <div className="mb-6 border-b border-primary/20 overflow-x-auto">
+          <div className="flex whitespace-nowrap min-w-max">
+            <TabItem 
+              id="historique" 
+              icon={<ExternalLink className="h-4 w-4" />} 
+              label="Historique des cours" 
+            />
+            <TabItem 
+              id="reglements" 
+              icon={<Euro className="h-4 w-4" />} 
+              label="Règlements" 
+            />
+            <TabItem 
+              id="bulletins" 
+              icon={<FileText className="h-4 w-4" />} 
+              label="Bulletins de paie" 
+            />
+            <TabItem 
+              id="recap" 
+              icon={<CheckSquare className="h-4 w-4" />} 
+              label="Récapitulatif annuel" 
+            />
+            <TabItem 
+              id="attestations" 
+              icon={<User className="h-4 w-4" />} 
+              label="Attestations employeurs" 
+            />
+          </div>
+        </div>
+        
+        {/* Tab content with decoration */}
+        <div className="relative">
+          <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/20 rounded-tr-full z-0 opacity-20 hidden lg:block"></div>
+          {renderTabContent()}
         </div>
       </div>
-      
-      {/* Tab content */}
-      {renderTabContent()}
     </div>
   )
 }
