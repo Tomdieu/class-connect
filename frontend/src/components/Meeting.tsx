@@ -17,7 +17,7 @@ function Meeting({
   return (
     <div className="meeting-container w-full h-full">
       <JitsiMeeting
-        domain="meet.jit.si" // Replace with your actual Jitsi domain
+        domain="meet.classconnect.cm" // Replace with your actual Jitsi domain
         roomName={roomName}
         configOverwrite={{
           startWithAudioMuted: true,
@@ -29,7 +29,7 @@ function Meeting({
           DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
         }}
         userInfo={{
-          displayName: session?.user?.name || 'Anonymous',
+          displayName: session?.user?.first_name || 'Anonymous',
           email: session?.user?.email || ''
         }}
         onApiReady={(externalApi) => {
