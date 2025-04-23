@@ -11,14 +11,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function OnlineMeetingsPage() {
-  const t = await getI18n();
-  
+  // Since OnlineMeetingsPageClient now has its own heading and layout,
+  // we don't need to render duplicate elements here
   return (
-    <div className="container py-6">
-      <h1 className="text-2xl font-bold mb-6">{t("onlineMeetings.title")}</h1>
-      <p className="text-muted-foreground mb-8">{t("onlineMeetings.description")}</p>
-      
-      <OnlineMeetingsPageClient />
-    </div>
+    <OnlineMeetingsPageClient />
   );
 }

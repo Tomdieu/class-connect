@@ -18,8 +18,8 @@ export default async function OnlineMeetingDetailPage({
   const t = await getI18n();
   
   return (
-    <div className="container py-6">
-      <h1 className="text-2xl font-bold mb-6">{t("onlineMeetings.details.title")}</h1>
+    <div className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background px-4 py-6 md:px-6 md:py-8">
+      {/* <h1 className="text-2xl font-bold mb-6">{t("onlineMeetings.details.title")}</h1> */}
       
       <OnlineMeetingDetailClient meetingId={params.id} />
     </div>
