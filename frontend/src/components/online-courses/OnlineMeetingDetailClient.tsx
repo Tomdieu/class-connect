@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useI18n } from "@/locales/client";
 import { useQuery } from "@tanstack/react-query";
-import { getOnlineCourseFromId, deleteOnlineCourse, addAttendeeToOnlineCourse, removeAttendeeFromOnlineCourse } from "@/actions/online-courses";
+import { getOnlineCourseFromId, deleteOnlineCourse, addAttendeeToOnlineCourse, removeAttendeeFromOnlineCourse, getOnlineCourseParticipants } from "@/actions/online-courses";
 import { getUsers } from "@/actions/accounts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,6 +63,12 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
     queryKey: ["users"],
     queryFn: () => getUsers(),
     enabled: true,
+  });
+
+  // Add new query for participants
+  const { data: participants } = useQuery({
+    queryKey: ["onlineCourseParticipants", meetingId],
+    queryFn: () => getOnlineCourseParticipants(meetingId),
   });
 
   // Filter users based on search and exclude existing attendees
@@ -128,6 +134,21 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
         ? prev.filter(id => id !== userId)
         : [...prev, userId]
     );
+  };
+
+  // Format duration helper
+  const formatParticipantDuration = (durationSeconds: number) => {
+    const hours = Math.floor(durationSeconds / 3600);
+    const minutes = Math.floor((durationSeconds % 3600) / 60);
+    const seconds = Math.ceil(durationSeconds % 60);
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${seconds}s`;
+    }
+    if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    }
+    return `${seconds}s`;
   };
 
   if (isLoading) {
@@ -356,27 +377,43 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {meeting.attendees && meeting.attendees.length > 0 ? (
+            {participants && participants.length > 0 ? (
               <div className="space-y-4">
-                {meeting.attendees.map((attendee) => (
-                  <div key={attendee.id} className="flex items-center justify-between">
+                {participants.map((participant) => (
+                  <div key={participant.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
                     <div className="flex items-center gap-3">
                       <Avatar>
-                        <AvatarImage src={attendee.avatar} alt={`${attendee.first_name} ${attendee.last_name}`} />
+                        <AvatarImage src={participant.user.avatar} alt={`${participant.user.first_name} ${participant.user.last_name}`} />
                         <AvatarFallback>
-                          {attendee.first_name?.[0]}{attendee.last_name?.[0]}
+                          {participant.user.first_name?.[0]}{participant.user.last_name?.[0]}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{attendee.first_name} {attendee.last_name}</p>
-                        <p className="text-sm text-muted-foreground">{attendee.email}</p>
+                        <p className="font-medium">{participant.user.first_name} {participant.user.last_name}</p>
+                        <p className="text-sm text-muted-foreground">{participant.user.email}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Clock className="h-3 w-3 text-primary" />
+                          <span className="text-xs text-muted-foreground">
+                            Duration: {formatParticipantDuration(participant.total_duration_seconds)}
+                          </span>
+                          {participant.first_joined_at && (
+                            <span className="text-xs text-muted-foreground">
+                              | Joined: {format(new Date(participant.first_joined_at), "p")}
+                            </span>
+                          )}
+                          {participant.last_seen_at && (
+                            <span className="text-xs text-muted-foreground">
+                              | Last seen: {format(new Date(participant.last_seen_at), "p")}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <Button 
                       variant="ghost" 
                       size="sm"
                       className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => handleRemoveAttendee(attendee.id)}
+                      onClick={() => handleRemoveAttendee(participant.user.id)}
                     >
                       <UserX className="h-4 w-4" />
                       <span className="sr-only">{t("onlineMeetings.attendees.remove")}</span>
