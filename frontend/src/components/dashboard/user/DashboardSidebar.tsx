@@ -84,7 +84,7 @@ export default function DashboardSidebar() {
     <Sidebar
       collapsible="offcanvas"
       variant="sidebar"
-      className="border-none outline-none shadow-lg min-h-screen"
+      className="border-none bg-white outline-none shadow-lg min-h-screen"
     >
       <SidebarContent className="bg-white flex flex-col h-full">
         <SidebarGroup>

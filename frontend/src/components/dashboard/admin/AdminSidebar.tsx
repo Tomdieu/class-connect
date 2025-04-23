@@ -55,9 +55,9 @@ export const AdminSidebar = () => {
     <Sidebar
       collapsible="offcanvas"
       variant="sidebar"
-      className="border-none outline-none shadow-lg min-h-screen bg-card/95 backdrop-blur"
+      className="border-none bg-white outline-none shadow-lg min-h-screen bg-card/95 backdrop-blur"
     >
-      <SidebarHeader className="flex w-full py-3 items-start justify-between border-b border-border/50">
+      <SidebarHeader className="flex bg-white w-full py-3 items-start justify-between border-b border-border/50">
         <div className="flex flex-1 w-full items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <div className="bg-primary/10 p-2 rounded-lg">
@@ -76,7 +76,7 @@ export const AdminSidebar = () => {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="bg-transparent px-2">
+      <SidebarContent className="bg-white px-2">
         {menuItems.map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel className="px-2 text-xs uppercase tracking-wider text-muted-foreground/70">

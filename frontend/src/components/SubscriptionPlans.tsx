@@ -28,7 +28,7 @@ export function SubscriptionPlans() {
       id: "basic",
       name: t("subscriptionPlans.basic.name"),
       description: t("subscriptionPlans.basic.description"),
-      price: "2 000",
+      price: "1 000",
       currency: "FCFA",
       period: "/month",
       features: [
@@ -48,7 +48,7 @@ export function SubscriptionPlans() {
       id: "standard",
       name: t("subscriptionPlans.standard.name"),
       description: t("subscriptionPlans.standard.description"),
-      price: "5 000",
+      price: "2 500",
       currency: "FCFA",
       period: "/month",
       features: [
@@ -70,7 +70,7 @@ export function SubscriptionPlans() {
       id: "premium",
       name: t("subscriptionPlans.premium.name"),
       description: t("subscriptionPlans.premium.description"),
-      price: "10 000",
+      price: "5 000",
       currency: "FCFA",
       period: "/month",
       features: [
