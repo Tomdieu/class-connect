@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 import string
 import random
+import datetime
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -49,14 +51,36 @@ class VideoConferenceSession(models.Model):
     def __str__(self):
         return self.title
 
-# class SessionParticipant(models.Model):
-#     session = models.ForeignKey(VideoConferenceSession, on_delete=models.CASCADE, related_name='participants')
-#     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='participated_session')
-#     joined_at = models.DateTimeField(null=True)
-#     left_at = models.DateTimeField(null=True)
+class SessionConnection(models.Model):
+    participant = models.ForeignKey('SessionParticipant', on_delete=models.CASCADE, related_name='connections')
+    joined_at = models.DateTimeField(auto_now_add=True)
+    left_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'Connection: {self.joined_at} - {self.left_at or "Active"}'
+
+class SessionParticipant(models.Model):
+    session = models.ForeignKey(VideoConferenceSession, on_delete=models.CASCADE, related_name='participants')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='participated_session')
+    first_joined_at = models.DateTimeField(auto_now_add=True)
+    last_seen_at = models.DateTimeField(auto_now=True)
+    total_duration = models.DurationField(default=datetime.timedelta(0))
     
-#     class Meta:
-#         unique_together = ['session', 'user_id']
+    class Meta:
+        unique_together = ['session', 'user']
         
-#     def __str__(self):
-#         return f'{self.session_id} - {self.user_id}'
+    def __str__(self):
+        return f'{self.user.username} in {self.session.title}'
+
+    def add_connection(self):
+        return self.connections.create()
+
+    def end_current_connection(self):
+        current_connection = self.connections.filter(left_at__isnull=True).first()
+        if current_connection:
+            current_connection.left_at = timezone.now()
+            current_connection.save()
+            # Update total duration
+            duration = current_connection.left_at - current_connection.joined_at
+            self.total_duration += duration
+            self.save()

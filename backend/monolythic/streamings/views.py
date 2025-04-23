@@ -1,5 +1,7 @@
-from django.shortcuts import render
-import django_filters
+from django.shortcuts import get_object_or_404
+from django.db import models
+from django.core.exceptions import ValidationError
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -9,10 +11,13 @@ from googleapiclient.discovery import build
 from datetime import datetime, timedelta
 import string
 import random
-from .models import VideoConferenceSession
-from .serializers import VideoConferenceSessionSerializer, SessionAttendeeSerializer
+from .models import VideoConferenceSession, SessionParticipant, SessionConnection
+from .serializers import (
+    VideoConferenceSessionSerializer, 
+    SessionAttendeeSerializer,
+    SessionParticipantSerializer
+)
 from .filters import VideoConferenceSessionFilter
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from drf_yasg.utils import swagger_auto_schema
@@ -26,6 +31,7 @@ class VideoConferenceSessionViewSet(ActivityLoggingMixin, viewsets.ModelViewSet)
     filterset_class = VideoConferenceSessionFilter
     filter_backends = [DjangoFilterBackend]
     permission_classes = [IsAuthenticated]
+    lookup_value_regex = '[^/]+'  # Allow any character except forward slash
 
     def generate_unique_code(self, length=10):
         """Generate a unique code for the meeting session"""
@@ -269,3 +275,100 @@ class VideoConferenceSessionViewSet(ActivityLoggingMixin, viewsets.ModelViewSet)
                 {"detail": "Session with this code does not exist."}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+
+    def get_object(self):
+        """
+        Returns the object the view is displaying.
+        Handles both UUID and code lookups.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        
+        # Get the lookup value from the URL
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs[lookup_url_kwarg]
+
+        try:
+            # Try getting object by ID first
+            obj = queryset.get(id=lookup_value)
+        except (ValueError, ValidationError, VideoConferenceSession.DoesNotExist):
+            # If that fails, try getting by code
+            obj = queryset.get(code=lookup_value)
+        
+        # May raise a PermissionDenied exception
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+class SessionParticipantViewSet(viewsets.ModelViewSet):
+    serializer_class = SessionParticipantSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Get the session using either id or code
+        session_lookup = self.kwargs['session_pk']
+        try:
+            session = VideoConferenceSession.objects.get(
+                models.Q(id=session_lookup) | models.Q(code=session_lookup)
+            )
+        except (ValueError, ValidationError):
+            session = VideoConferenceSession.objects.get(code=session_lookup)
+
+        return SessionParticipant.objects.filter(
+            session=session
+        ).select_related('user', 'session')
+
+    def create(self, request, *args, **kwargs):
+        """
+        Override create to handle existing participants gracefully
+        """
+        session_lookup = self.kwargs['session_pk']
+        try:
+            session = VideoConferenceSession.objects.get(
+                models.Q(id=session_lookup) | models.Q(code=session_lookup)
+            )
+        except (ValueError, ValidationError):
+            session = VideoConferenceSession.objects.get(code=session_lookup)
+
+        # Check if participant already exists
+        existing_participant = SessionParticipant.objects.filter(
+            session=session,
+            user=request.user
+        ).first()
+
+        if existing_participant:
+            # If participant exists, return the existing record
+            serializer = self.get_serializer(existing_participant)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # If participant doesn't exist, create new one
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        """Create a new participant entry"""
+        session_lookup = self.kwargs['session_pk']
+        try:
+            session = VideoConferenceSession.objects.get(
+                models.Q(id=session_lookup) | models.Q(code=session_lookup)
+            )
+        except (ValueError, ValidationError):
+            session = VideoConferenceSession.objects.get(code=session_lookup)
+
+        serializer.save(
+            session=session,
+            user=self.request.user
+        )
+
+    @action(detail=True, methods=['post'])
+    def join(self, request, *args, **kwargs):
+        participant = self.get_object()
+        participant.add_connection()
+        return Response({'status': 'joined'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def leave(self, request, *args, **kwargs):
+        participant = self.get_object()
+        participant.end_current_connection()
+        return Response({'status': 'left'}, status=status.HTTP_200_OK)

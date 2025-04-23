@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import VideoConferenceSession
+from .models import VideoConferenceSession, SessionParticipant
 from users.serializers import UserSerializer
 from django.contrib.auth import get_user_model
 
@@ -27,7 +27,14 @@ class SessionAttendeeSerializer(serializers.Serializer):
     )
 
 
-# class SessionParticipantSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = SessionParticipant
-#         fields = "__all__"
+class SessionParticipantSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    total_duration_seconds = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SessionParticipant
+        fields = ['id', 'session', 'user', 'first_joined_at', 'last_seen_at', 'total_duration', 'total_duration_seconds']
+        read_only_fields = ['id', 'session', 'user', 'first_joined_at', 'last_seen_at', 'total_duration']
+
+    def get_total_duration_seconds(self, obj):
+        return obj.total_duration.total_seconds()
