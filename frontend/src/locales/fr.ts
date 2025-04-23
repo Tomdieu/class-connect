@@ -1349,6 +1349,7 @@ export default {
   "onlineMeetings.details.status": "Statut",
   "onlineMeetings.details.attendees": "Participants",
   "onlineMeetings.details.join":"Joindre",
+  "onlineMeetings.details.joinNow":"Rejoindre Maintenant",
   "onlineMeetings.details.view":"Détail",
   "onlineMeetings.details.noAttendees": "Aucun participant n'a encore été ajouté",
   "onlineMeetings.details.addAttendees": "Ajouter des Participants",

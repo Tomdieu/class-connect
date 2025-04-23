@@ -1331,6 +1331,7 @@ export default {
   "onlineMeetings.details.status": "Status",
   "onlineMeetings.details.attendees": "Attendees",
   "onlineMeetings.details.join":"Join meet",
+  "onlineMeetings.details.joinNow":"Join now",
   "onlineMeetings.details.view":"Details",
   "onlineMeetings.details.noAttendees": "No attendees have been added yet",
   "onlineMeetings.details.addAttendees": "Add Attendees",
