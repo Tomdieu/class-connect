@@ -41,7 +41,7 @@ class VideoConferenceSessionViewSet(ActivityLoggingMixin, viewsets.ModelViewSet)
     def create_jitsi_meeting_link(self, code):
         """Create a Jitsi meeting link using the unique code"""
         # Use the configured Jitsi server or default to meet.jit.si
-        jitsi_server = getattr(settings, 'JITSI_SERVER', 'meet.jit.si')
+        jitsi_server = getattr(settings, 'JITSI_SERVER', 'meet.classconnect.cm')
         return f"https://{jitsi_server}/{code}"
 
     def create_google_meet_link(self, title, start_time, duration_minutes):
