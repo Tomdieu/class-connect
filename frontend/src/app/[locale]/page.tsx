@@ -20,10 +20,10 @@ import { cn } from "@/lib/utils";
 // Using online avatar images instead of importing local files
 const avatarImages = [
   "https://randomuser.me/api/portraits/women/44.jpg",
-  "https://randomuser.me/api/portraits/men/32.jpg",
-  "https://randomuser.me/api/portraits/women/68.jpg",
-  "https://randomuser.me/api/portraits/men/86.jpg",
-  "https://randomuser.me/api/portraits/women/22.jpg",
+  "https://blogs.kent.ac.uk/staff-student-news/files/2021/10/mubarak-showole-Ve7xjKImd28-unsplash.jpg",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSdlrqOXjxSQVFsN5ZlR849emo1jqMEfJ20Q&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgSs1uqeQ4Paehx3U7JNK0lgdPQp73kT5ygQ&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwcNS7kgWTd3vQkhgMmc-Jm4IuyUSkGOfNaQ&s",
 ];
 
 // Dynamic imports for animations to prevent them from blocking
@@ -767,7 +767,7 @@ function LandingPage() {
         </Suspense>
 
         {/* New Developer Section for SEO Visibility */}
-        <section className="py-16 bg-gradient-to-b from-white to-blue-50/50 relative overflow-hidden" id="developer">
+        <section className="py-16 bg-gradient-to-b from-white to-blue-50/50 relative overflow-hidden hidden" id="developer">
           <div className="absolute top-1/4 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
           
