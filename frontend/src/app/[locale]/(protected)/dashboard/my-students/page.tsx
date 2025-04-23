@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ChevronDown, X, ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { ChevronDown, X, ChevronLeft, ChevronRight, Filter, LoaderCircle } from "lucide-react";
 import { listSchoolYear, getMyStudents, createEnrollmentDeclaration, listEnrollmentDeclarations } from "@/actions/enrollments";
 import { SchoolYearType, TeacherStudentEnrollmentType, CourseDeclarationType, PaginationType, ActionStatus } from "@/types";
 import {
@@ -51,20 +51,20 @@ const Badge: React.FC<BadgeProps> = ({ text, variant }) => {
   const getVariantClasses = (): string => {
     switch (variant) {
       case "blue":
-        return "bg-blue-100 text-blue-800";
+        return "bg-primary/10 text-primary";
       case "green":
         return "bg-green-100 text-green-800";
       case "red":
         return "bg-red-100 text-red-800";
       case "cyan":
-        return "bg-cyan-100 text-cyan-800";
+        return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
 
   return (
-    <span className={`px-2 py-1 rounded-md text-sm ${getVariantClasses()}`}>
+    <span className={`px-2 py-1 rounded-md text-sm font-medium ${getVariantClasses()}`}>
       {text}
     </span>
   );
@@ -77,13 +77,15 @@ interface SwitchProps {
 
 const Switch: React.FC<SwitchProps> = ({ checked, onChange }) => (
   <button
-    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-      checked ? "bg-green-500" : "bg-gray-200"
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+      checked ? "bg-primary" : "bg-gray-200"
     }`}
     onClick={() => onChange(!checked)}
+    aria-checked={checked}
+    role="switch"
   >
     <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
         checked ? "translate-x-6" : "translate-x-1"
       }`}
     />
@@ -250,17 +252,19 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm mb-4">
+    <div className="bg-card/95 backdrop-blur rounded-lg shadow-md border border-primary/20 mb-4 overflow-hidden relative">
+      <div className="absolute top-0 right-0 w-[100px] h-[100px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
+      
       <div
-        className="flex items-center justify-between p-4 cursor-pointer"
+        className="flex items-center justify-between p-4 cursor-pointer relative z-10"
         onClick={toggleAccordion}
       >
         <div className="flex-1 flex items-center justify-between">
           <h3 className="text-lg font-medium">
             {student.offer.student.first_name} {student.offer.student.last_name}
           </h3>
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2 mt-2 select-none">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
+            <div className="flex flex-wrap gap-2 select-none">
               <Badge
                 text={student.offer.class_level.name || "N/A"}
                 variant="blue"
@@ -273,54 +277,45 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                 text={student.offer.student.class_display || "N/A"}
                 variant="cyan"
               />
-              {/* Commented out last_course_date badge
-            <Badge
-              text={lastClassText}
-              variant={
-                !student.last_course_date || diffDays > 7 ? "red" : "green"
-              }
-            />
-            */}
             </div>
-            
-          </div>
-          <button className="p-2">
+            <button className="p-2">
               <ChevronDown
-                className={`h-5 w-5 text-gray-500 transition-transform ${
+                className={`h-5 w-5 text-primary transition-transform ${
                   isOpen ? "rotate-180" : ""
                 }`}
               />
             </button>
+          </div>
         </div>
       </div>
       {isOpen && (
-        <div className="p-4 border-t">
-          <div className="flex gap-1 mb-4 border-b">
+        <div className="p-4 border-t border-primary/10 relative z-10">
+          <div className="flex gap-1 mb-4 border-b overflow-x-auto">
             <button
-              className={`px-4 py-2 rounded-t ${
+              className={`px-4 py-2 rounded-t transition-colors whitespace-nowrap ${
                 activeTab === "Cours"
-                  ? "bg-white text-blue-500 border-b-2 border-blue-500"
-                  : "text-gray-500"
+                  ? "bg-white text-primary border-b-2 border-primary"
+                  : "text-gray-500 hover:text-primary hover:bg-primary/5"
               }`}
               onClick={() => setActiveTab("Cours")}
             >
               {t("tabs.courses")}
             </button>
             <button
-              className={`px-4 py-2 rounded-t ${
+              className={`px-4 py-2 rounded-t transition-colors whitespace-nowrap ${
                 activeTab === "Suivis"
-                  ? "bg-white text-blue-500 border-b-2 border-blue-500"
-                  : "text-gray-500"
+                  ? "bg-white text-primary border-b-2 border-primary"
+                  : "text-gray-500 hover:text-primary hover:bg-primary/5"
               }`}
               onClick={() => setActiveTab("Suivis")}
             >
               {t("tabs.followUps")}
             </button>
             <button
-              className={`px-4 py-2 rounded-t ${
+              className={`px-4 py-2 rounded-t transition-colors whitespace-nowrap ${
                 activeTab === "Coordonnées"
-                  ? "bg-white text-blue-500 border-b-2 border-blue-500"
-                  : "text-gray-500"
+                  ? "bg-white text-primary border-b-2 border-primary"
+                  : "text-gray-500 hover:text-primary hover:bg-primary/5"
               }`}
               onClick={() => setActiveTab("Coordonnées")}
             >
@@ -330,87 +325,86 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
           <div>
             {activeTab === "Cours" && (
               <div>
-                <p>
-                  {t("course.hourlyRate")}: {student.offer.hourly_rate} XAF
+                <p className="text-sm text-muted-foreground">
+                  {t("course.hourlyRate")}: <span className="font-semibold text-foreground">{student.offer.hourly_rate} XAF</span>
                 </p>
-                <Credenza>
-                  <CredenzaTrigger asChild>
-                    <Button className="mt-4 px-4 py-2 bg-purple-500 text-white rounded">
-                      {t("course.declare")}
-                    </Button>
-                  </CredenzaTrigger>
-                  <CredenzaContent>
-                    <CredenzaHeader>
-                      <CredenzaTitle>{t("course.declare")}</CredenzaTitle>
-                      
-                    </CredenzaHeader>
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                          name="declaration_date"
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("form.date")}</FormLabel>
-                              <FormControl>
-                                <Input type="date" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          name="duration"
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("form.duration")}</FormLabel>
-                              <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder={t("form.selectDuration")} />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((hour) => (
-                                      <SelectItem key={hour} value={hour.toString()}>
-                                        {formatDuration(hour)}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <CredenzaFooter>
-                          <Button type="submit" disabled={isLoading}>
-                            {isLoading ? (
-                              <>
-                                <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                {t("form.submitting")}
-                              </>
-                            ) : (
-                              t("form.submit")
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Credenza>
+                    <CredenzaTrigger asChild>
+                      <Button className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded flex items-center">
+                        {t("course.declare")}
+                      </Button>
+                    </CredenzaTrigger>
+                    <CredenzaContent>
+                      <CredenzaHeader>
+                        <CredenzaTitle>{t("course.declare")}</CredenzaTitle>
+                      </CredenzaHeader>
+                      <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                          <FormField
+                            name="declaration_date"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("form.date")}</FormLabel>
+                                <FormControl>
+                                  <Input type="date" {...field} className="bg-background" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
                             )}
-                          </Button>
-                        </CredenzaFooter>
-                      </form>
-                    </Form>
-                  </CredenzaContent>
-                </Credenza>
-                <button className="mt-4 ml-2 px-4 py-2 bg-blue-500 text-white rounded">
-                  {t("course.reportEnd")}
-                </button>
-                <div className="mt-4">
+                          />
+                          <FormField
+                            name="duration"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("form.duration")}</FormLabel>
+                                <FormControl>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
+                                    <SelectTrigger className="bg-background">
+                                      <SelectValue placeholder={t("form.selectDuration")} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((hour) => (
+                                        <SelectItem key={hour} value={hour.toString()}>
+                                          {formatDuration(hour)}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <CredenzaFooter>
+                            <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-white">
+                              {isLoading ? (
+                                <>
+                                  <LoaderCircle className="animate-spin h-5 w-5 mr-2" />
+                                  {t("form.submitting")}
+                                </>
+                              ) : (
+                                t("form.submit")
+                              )}
+                            </Button>
+                          </CredenzaFooter>
+                        </form>
+                      </Form>
+                    </CredenzaContent>
+                  </Credenza>
+                  <Button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
+                    {t("course.reportEnd")}
+                  </Button>
+                </div>
+                
+                <div className="mt-6">
                   <div className="flex justify-between items-center">
                     <h4 className="font-medium">{t("course.history")}</h4>
                     <button 
                       onClick={() => setFilterOpen(!filterOpen)}
-                      className="text-blue-500 flex items-center text-sm"
+                      className="text-primary flex items-center text-sm hover:text-primary/80 transition-colors"
                     >
                       <Filter className="h-4 w-4 mr-1" />
                       {t("common.filter")}
@@ -418,7 +412,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                   </div>
                   
                   {filterOpen && (
-                    <div className="mt-2 p-4 border rounded-md bg-gray-50">
+                    <div className="mt-2 p-4 border rounded-md bg-primary/5 border-primary/20">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -429,7 +423,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                             name="startDate"
                             value={filters.startDate}
                             onChange={handleFilterChange}
-                            className="w-full p-2 border rounded-md"
+                            className="w-full p-2 border border-input rounded-md bg-background"
                           />
                         </div>
                         <div>
@@ -441,7 +435,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                             name="endDate"
                             value={filters.endDate}
                             onChange={handleFilterChange}
-                            className="w-full p-2 border rounded-md"
+                            className="w-full p-2 border border-input rounded-md bg-background"
                           />
                         </div>
                         <div>
@@ -452,43 +446,48 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                             name="status"
                             value={filters.status}
                             onChange={handleFilterChange}
-                            className="w-full p-2 border rounded-md"
+                            className="w-full p-2 border border-input rounded-md bg-background"
                           >
                             <option value="">{t("filter.allStatuses")}</option>
                             <option value="PENDING">{t("status.pending")}</option>
                             <option value="ACCEPTED">{t("status.approved")}</option>
                             <option value="REJECTED">{t("status.rejected")}</option>
                             <option value="PAID">{t("status.paid")}</option>
-
                           </select>
                         </div>
                       </div>
                       <div className="flex justify-end mt-4 space-x-2">
-                        <button
+                        <Button
                           onClick={resetFilters}
-                          className="px-3 py-1 border border-gray-300 rounded-md text-sm"
+                          variant="outline"
+                          size="sm"
+                          className="border-gray-300"
                         >
                           {t("filter.reset")}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={applyFilters}
-                          className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm"
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90"
                         >
                           {t("filter.apply")}
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   )}
                   
                   {declarationsLoading ? (
-                    <div className="mt-2 text-sm text-gray-500">Loading...</div>
+                    <div className="mt-4 flex justify-center items-center py-8 text-primary">
+                      <LoaderCircle className="animate-spin h-5 w-5 mr-2" />
+                      <span>{t("common.loading")}</span>
+                    </div>
                   ) : declarationsData?.results && declarationsData.results.length > 0 ? (
                     <>
                       <Select
                         value={selectedMonth}
                         onValueChange={setSelectedMonth}
                       >
-                        <SelectTrigger className="mt-2 w-full">
+                        <SelectTrigger className="mt-4 w-full bg-background">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -503,7 +502,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                       {selectedMonth && declarationsByMonth[selectedMonth] && (
                         <div className="mt-4 space-y-3">
                           {declarationsByMonth[selectedMonth].declarations.map(declaration => (
-                            <div key={declaration.id} className="p-3 bg-blue-50 rounded-md border border-blue-100">
+                            <div key={declaration.id} className="p-3 bg-primary/5 rounded-md border border-primary/20">
                               <div className="flex justify-between">
                                 <span className="font-medium">{formatDeclarationDate(declaration.declaration_date)}</span>
                                 <span>{formatDurationFromMinutes(declaration.duration)}</span>
@@ -517,20 +516,20 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                       )}
                       
                       {/* Pagination controls */}
-                      <div className="mt-6 flex items-center justify-between">
-                        <div className="text-sm text-gray-600">
+                      <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="text-sm text-gray-600 order-2 sm:order-1">
                           {t("pagination.showing")} {(currentPage - 1) * pageSize + 1}-
                           {Math.min(currentPage * pageSize, declarationsData.count)} {t("pagination.of")} {declarationsData.count}
                         </div>
                         
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 order-1 sm:order-2">
                           <button
                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
-                            className={`p-1 rounded-full ${
+                            className={`p-1 rounded-full transition-colors ${
                               currentPage === 1 
                                 ? 'text-gray-300 cursor-not-allowed' 
-                                : 'text-gray-700 hover:bg-gray-100'
+                                : 'text-primary hover:bg-primary/10'
                             }`}
                             aria-label="Previous page"
                           >
@@ -546,10 +545,10 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                               prev < Math.ceil(declarationsData.count / pageSize) ? prev + 1 : prev
                             )}
                             disabled={currentPage >= Math.ceil(declarationsData.count / pageSize)}
-                            className={`p-1 rounded-full ${
+                            className={`p-1 rounded-full transition-colors ${
                               currentPage >= Math.ceil(declarationsData.count / pageSize) 
                                 ? 'text-gray-300 cursor-not-allowed' 
-                                : 'text-gray-700 hover:bg-gray-100'
+                                : 'text-primary hover:bg-primary/10'
                             }`}
                             aria-label="Next page"
                           >
@@ -557,14 +556,14 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                           </button>
                         </div>
                         
-                        <div>
+                        <div className="order-3">
                           <select
                             value={pageSize}
                             onChange={(e) => {
                               setPageSize(Number(e.target.value));
                               setCurrentPage(1);
                             }}
-                            className="text-sm p-1 border rounded"
+                            className="text-sm p-1 border rounded bg-background"
                             aria-label="Items per page"
                           >
                             {[5, 10, 25, 50].map(size => (
@@ -577,7 +576,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                       </div>
                     </>
                   ) : (
-                    <div className="mt-4 p-4 bg-blue-100 rounded">
+                    <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded text-center">
                       {t("course.noDeclared")}
                     </div>
                   )}
@@ -640,8 +639,6 @@ const StudentsPage: React.FC = () => {
     enabled: !!selectedYear, // Only fetch when a year is selected
   });
 
-  console.log(allStudents);
-
   // Filter students based on selected school year and active status
   const students = allStudents.filter((student) => {
     const matchesYear = student.school_year.formatted_year === selectedYear;
@@ -653,67 +650,90 @@ const StudentsPage: React.FC = () => {
   const error = studentsError ? t("error.failedToLoadStudents") : "";
 
   return (
-    <div className="p-6 w-full container mx-auto">
-      <h1 className="text-2xl font-bold mb-6">{t("studentsPage.title")}</h1>
-
-      <div className="flex items-center justify-between mb-6">
-        <div className="w-72">
-          <Select
-            value={selectedYear}
-            onValueChange={setSelectedYear}
-            disabled={loading || schoolYears.length === 0}
-          >
-            <SelectTrigger className="w-full py-2 px-2 rounded-sm">
-              <div className="flex flex-col items-start justify-between w-full">
-                <span className="text-muted-foreground text-sm">
-                  {t("studentsPage.schoolYear")}
-                </span>
-                <span className="text-sm font-medium">
-                  {selectedYear
-                    ? selectedYear
-                    : t("studentsPage.selectSchoolYear")}
-                </span>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {schoolYears.map((year) => (
-                <SelectItem
-                  key={year.formatted_year}
-                  value={year.formatted_year}
-                >
-                  {year.formatted_year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
+      <div className="container mx-auto px-4 sm:px-6 py-8">
+        <div className="relative mb-8">
+          <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/30 rounded-bl-full z-0 opacity-20 hidden md:block"></div>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 relative z-10">{t("studentsPage.title")}</h1>
+          <p className="text-muted-foreground relative z-10">Manage your student enrollments and course declarations</p>
         </div>
 
-        <div className="flex items-center gap-4">
-          <Switch checked={showActiveOnly} onChange={setShowActiveOnly} />
-          <div>
-            <div>{t("studentsPage.activeStudentsOnly")}</div>
-            <div className="text-sm text-gray-500">
-              {t("studentsPage.uncheckToShowAll")}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+          <div className="w-full md:w-72">
+            <Select
+              value={selectedYear}
+              onValueChange={setSelectedYear}
+              disabled={loading || schoolYears.length === 0}
+            >
+              <SelectTrigger className="w-full py-2 px-2 rounded-sm bg-card/95 backdrop-blur border-primary/20 shadow-sm">
+                <div className="flex flex-col items-start justify-between w-full">
+                  <span className="text-muted-foreground text-sm">
+                    {t("studentsPage.schoolYear")}
+                  </span>
+                  <span className="text-sm font-medium">
+                    {selectedYear
+                      ? selectedYear
+                      : t("studentsPage.selectSchoolYear")}
+                  </span>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                {schoolYears.map((year) => (
+                  <SelectItem
+                    key={year.formatted_year}
+                    value={year.formatted_year}
+                  >
+                    {year.formatted_year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-4 bg-card/95 backdrop-blur p-3 rounded-lg shadow-sm border border-primary/20 w-full md:w-auto">
+            <Switch checked={showActiveOnly} onChange={setShowActiveOnly} />
+            <div>
+              <div className="font-medium">{t("studentsPage.activeStudentsOnly")}</div>
+              <div className="text-sm text-muted-foreground">
+                {t("studentsPage.uncheckToShowAll")}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {loading ? (
-        <div className="text-center py-8">{t("studentsPage.loading")}</div>
-      ) : error ? (
-        <div className="text-center text-red-500 py-8">{error}</div>
-      ) : students.length === 0 ? (
-        <div className="text-center py-8">
-          {t("studentsPage.noStudentsFound")}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {students.map((student, index) => (
-            <StudentCard key={student.id || index} student={student} />
-          ))}
-        </div>
-      )}
+        {loading ? (
+          <div className="flex justify-center items-center h-64 bg-card/95 backdrop-blur rounded-lg border border-primary/20 shadow-md">
+            <LoaderCircle className="animate-spin h-8 w-8 mr-2 text-primary" />
+            <span className="text-lg text-primary">{t("studentsPage.loading")}</span>
+          </div>
+        ) : error ? (
+          <div className="text-center text-destructive p-8 bg-card/95 backdrop-blur rounded-lg border border-destructive/20 shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            {error}
+          </div>
+        ) : students.length === 0 ? (
+          <div className="text-center p-8 bg-card/95 backdrop-blur rounded-lg border border-primary/20 shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2 text-muted-foreground">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            {t("studentsPage.noStudentsFound")}
+          </div>
+        ) : (
+          <div className="space-y-4 relative">
+            <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/20 rounded-tr-full z-0 opacity-20 hidden lg:block"></div>
+            {students.map((student, index) => (
+              <StudentCard key={student.id || index} student={student} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
