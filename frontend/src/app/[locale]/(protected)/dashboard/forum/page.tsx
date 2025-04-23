@@ -14,7 +14,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/locales/client";
 import { CreatePostRequestType, ForumNotification, ForumType, PostType } from "@/types";
-import { AlertCircle, ArrowUp, Bell, BellOff, Image as ImageIcon, Loader2, PaperclipIcon } from "lucide-react";
+import { AlertCircle, ArrowUp, Bell, BellOff, Image as ImageIcon, Loader2, LoaderCircle, MessageCircle, PaperclipIcon } from "lucide-react";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, useRef, useCallback } from "react";
 import {
@@ -130,11 +130,11 @@ export default function ForumPage() {
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-        if (!lastPage.next) return undefined;
-        const url = new URL(lastPage.next);
-        const page = url.searchParams.get("page");
-        return page ? parseInt(page, 10) : undefined;
-      },
+      if (!lastPage || !lastPage.next) return undefined;
+      const url = new URL(lastPage.next);
+      const page = url.searchParams.get("page");
+      return page ? parseInt(page, 10) : undefined;
+    },
     enabled: true,
   });
 
@@ -370,381 +370,414 @@ export default function ForumPage() {
   const unreadCount = notificationsQuery.data?.filter(n => !n.read).length || 0;
 
   return (
-    <div className="container mx-auto py-6 max-w-4xl">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">{t("forum.title")}</h1>
-        
-        {/* Notifications */}
-        <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-0" align="end">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h4 className="font-medium">{t("forum.notifications.title")}</h4>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleMarkAllRead}
-                disabled={!notificationsQuery.data?.length || markAllReadMutation.isPending}
-              >
-                {markAllReadMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  t("forum.notifications.markAllRead")
-                )}
-              </Button>
-            </div>
-            <ScrollArea className="h-[300px]">
-              {notificationsQuery.isLoading ? (
-                <div className="flex justify-center items-center h-20">
-                  <Loader2 className="h-5 w-5 animate-spin" />
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
+      <div className="py-8 px-4 sm:px-6">
+        <div className="relative mb-8">
+          <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/30 rounded-bl-full z-0 opacity-20 hidden md:block"></div>
+          <div className="flex justify-between items-center relative z-10">
+            <h1 className="text-2xl md:text-3xl font-bold text-primary">{t("forum.title")}</h1>
+            
+            {/* Notifications */}
+            <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="relative border-primary/20 hover:bg-primary/10 hover:text-primary"
+                >
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0 border-primary/20 bg-card/95 backdrop-blur" align="end">
+                <div className="flex items-center justify-between p-4 border-b border-primary/20">
+                  <h4 className="font-medium text-primary">{t("forum.notifications.title")}</h4>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleMarkAllRead}
+                    disabled={!notificationsQuery.data?.length || markAllReadMutation.isPending}
+                    className="hover:text-primary hover:bg-primary/10"
+                  >
+                    {markAllReadMutation.isPending ? (
+                      <LoaderCircle className="h-4 w-4 animate-spin" />
+                    ) : (
+                      t("forum.notifications.markAllRead")
+                    )}
+                  </Button>
                 </div>
-              ) : !notificationsQuery.data?.length ? (
-                <div className="flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
-                  <BellOff className="h-8 w-8 mb-2" />
-                  <p>{t("forum.notifications.empty")}</p>
-                </div>
-              ) : (
-                <div>
-                  {notificationsQuery.data.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
-                        !notification.read ? "bg-blue-50" : ""
-                      }`}
-                      onClick={() => handleNotificationClick(notification)}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0">
-                          <div className="h-9 w-9 rounded-full overflow-hidden">
-                            <Avatar className="h-full w-full">
-                              <AvatarImage 
-                                src={notification.sender.avatar} 
-                                alt={`${notification.sender.first_name} ${notification.sender.last_name}`}
-                              />
-                              <AvatarFallback className="bg-primary text-white">
-                                {notification.sender.first_name?.[0]}
-                                {notification.sender.last_name?.[0]}
-                              </AvatarFallback>
-                            </Avatar>
+                <ScrollArea className="h-[300px]">
+                  {notificationsQuery.isLoading ? (
+                    <div className="flex justify-center items-center h-20">
+                      <LoaderCircle className="h-5 w-5 animate-spin text-primary" />
+                    </div>
+                  ) : !notificationsQuery.data?.length ? (
+                    <div className="flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
+                      <BellOff className="h-8 w-8 mb-2" />
+                      <p>{t("forum.notifications.empty")}</p>
+                    </div>
+                  ) : (
+                    <div>
+                      {notificationsQuery.data.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className={`p-3 border-b border-primary/10 cursor-pointer transition-colors ${
+                            !notification.read ? "bg-primary/5" : "hover:bg-primary/5"
+                          }`}
+                          onClick={() => handleNotificationClick(notification)}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0">
+                              <div className="h-9 w-9 rounded-full overflow-hidden">
+                                <Avatar className="h-full w-full">
+                                  <AvatarImage 
+                                    src={notification.sender.avatar} 
+                                    alt={`${notification.sender.first_name} ${notification.sender.last_name}`}
+                                  />
+                                  <AvatarFallback className="bg-primary text-white">
+                                    {notification.sender.first_name?.[0]}
+                                    {notification.sender.last_name?.[0]}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium">
+                                {getNotificationMessage(notification)}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                              </p>
+                            </div>
+                            {!notification.read && (
+                              <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                            )}
                           </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium">
-                            {getNotificationMessage(notification)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
-                          </p>
-                        </div>
-                        {!notification.read && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-                        )}
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
-          </PopoverContent>
-        </Popover>
-      </div>
+                  )}
+                </ScrollArea>
+              </PopoverContent>
+            </Popover>
+          </div>
+          <p className="text-muted-foreground relative z-10 mt-2">
+            Connect with other students and teachers in our community forum
+          </p>
+        </div>
 
-      {/* Post creation form */}
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Forum selector */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                {t("forum.selectForum")}
-              </label>
-              <Select 
-                onValueChange={handleForumSelect} 
-                value={selectedForum}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("forum.selectForum")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {forumsQuery.data?.map((forum: ForumType) => (
-                    <SelectItem key={forum.id} value={forum.id.toString()}>
-                      {forum.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Content textarea */}
-            <Textarea
-              placeholder={t("forum.whatsOnYourMind")}
-              className="min-h-[120px]"
-              value={content}
-              onChange={handleContentChange}
-            />
-
-            {/* Attachment previews */}
-            <div className="flex gap-4 flex-wrap">
-              {imageFile && (
-                <div className="relative group">
-                  <div className="border rounded-md overflow-hidden h-24 w-24">
-                    <Image
-                      src={URL.createObjectURL(imageFile)}
-                      alt={t("forum.imagePreview")}
-                      className="object-cover h-full w-full"
-                      width={96}
-                      height={96}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center"
-                    onClick={() => setImageFile(null)}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-
-              {fileAttachment && (
-                <div className="relative group">
-                  <div className="border rounded-md p-2 h-24 w-32 flex flex-col items-center justify-center">
-                    <PaperclipIcon className="h-8 w-8 text-gray-500" />
-                    <span className="text-xs truncate max-w-full">
-                      {fileAttachment.name}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center"
-                    onClick={() => setFileAttachment(null)}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex items-center justify-between pt-2 border-t">
-              <div className="flex space-x-2">
-                <input
-                  type="file"
-                  ref={imageInputRef}
-                  onChange={handleImageUpload}
-                  accept="image/*"
-                  className="hidden"
-                />
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => imageInputRef.current?.click()}
-                  disabled={Boolean(fileAttachment) || createPostMutation.isPending}
+        {/* Post creation form */}
+        <Card className="mb-8 bg-card/95 backdrop-blur border-primary/20 shadow-md relative overflow-hidden">
+          <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/20 rounded-tr-full z-0 opacity-20"></div>
+          <CardContent className="pt-6 relative z-10">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Forum selector */}
+              <div>
+                <label className="block text-sm font-medium mb-1 text-foreground">
+                  {t("forum.selectForum")}
+                </label>
+                <Select 
+                  onValueChange={handleForumSelect} 
+                  value={selectedForum}
                 >
-                  <ImageIcon className="h-4 w-4 mr-2" />
-                  {t("forum.photo")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={Boolean(imageFile) || createPostMutation.isPending}
-                >
-                  <PaperclipIcon className="h-4 w-4 mr-2" />
-                  {t("forum.file")}
-                </Button>
+                  <SelectTrigger className="bg-background border-primary/20">
+                    <SelectValue placeholder={t("forum.selectForum")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {forumsQuery.data?.map((forum: ForumType) => (
+                      <SelectItem key={forum.id} value={forum.id.toString()}>
+                        {forum.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <Button
-                type="submit"
-                disabled={
-                  !content.trim() ||
-                  !selectedForum ||
-                  createPostMutation.isPending
-                }
-              >
-                {createPostMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {t("forum.posting")}
-                  </>
-                ) : (
-                  t("forum.post")
+
+              {/* Content textarea */}
+              <Textarea
+                placeholder={t("forum.whatsOnYourMind")}
+                className="min-h-[120px] bg-background border-primary/20 focus-visible:ring-primary/20"
+                value={content}
+                onChange={handleContentChange}
+              />
+
+              {/* Attachment previews */}
+              <div className="flex gap-4 flex-wrap">
+                {imageFile && (
+                  <div className="relative group">
+                    <div className="border border-primary/20 rounded-md overflow-hidden h-24 w-24">
+                      <Image
+                        src={URL.createObjectURL(imageFile)}
+                        alt={t("forum.imagePreview")}
+                        className="object-cover h-full w-full"
+                        width={96}
+                        height={96}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1 h-6 w-6 flex items-center justify-center shadow-sm"
+                      onClick={() => setImageFile(null)}
+                    >
+                      ×
+                    </button>
+                  </div>
                 )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
 
-      {/* Posts feed */}
-      <div className="space-y-6">
-        {feedsQuery.isLoading ? (
-          <div className="flex justify-center my-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : feedsQuery.error ? (
-          <div className="text-center my-12">
-            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h3 className="font-semibold text-lg mb-2">
-              {t("forum.somethingWentWrong")}
-            </h3>
-            <Button onClick={() => feedsQuery.refetch()}>
-              {t("common.tryAgain")}
-            </Button>
-          </div>
-        ) : feedsQuery.data?.pages[0].results.length === 0 ? (
-          <div className="text-center my-12 bg-muted/50 py-16 rounded-lg">
-            <h3 className="font-semibold text-lg mb-2">
-              {t("forum.noPostsYet")}
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              {t("forum.beTheFirstToPost")}
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* Map through all pages and their results */}
-            {feedsQuery.data?.pages.map((page, i) => (
-              <div key={i} className="space-y-6">
-                {page.results.map((post: PostType) => (
-                  <PostCard 
-                    key={post.id} 
-                    post={post} 
-                    onEdit={handleEditPost}
-                    onDelete={handleDeletePost}
-                  />
-                ))}
+                {fileAttachment && (
+                  <div className="relative group">
+                    <div className="border border-primary/20 rounded-md p-2 h-24 w-32 flex flex-col items-center justify-center bg-primary/5">
+                      <PaperclipIcon className="h-8 w-8 text-primary" />
+                      <span className="text-xs truncate max-w-full">
+                        {fileAttachment.name}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1 h-6 w-6 flex items-center justify-center shadow-sm"
+                      onClick={() => setFileAttachment(null)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
               </div>
-            ))}
 
-            {/* Load more button */}
-            {feedsQuery.hasNextPage && (
-              <div className="text-center mt-6">
+              {/* Action buttons */}
+              <div className="flex items-center justify-between pt-2 border-t border-primary/20">
+                <div className="flex flex-wrap gap-2">
+                  <input
+                    type="file"
+                    ref={imageInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => imageInputRef.current?.click()}
+                    disabled={Boolean(fileAttachment) || createPostMutation.isPending}
+                    className="border-primary/20 hover:bg-primary/10 hover:text-primary"
+                  >
+                    <ImageIcon className="h-4 w-4 mr-2" />
+                    {t("forum.photo")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={Boolean(imageFile) || createPostMutation.isPending}
+                    className="border-primary/20 hover:bg-primary/10 hover:text-primary"
+                  >
+                    <PaperclipIcon className="h-4 w-4 mr-2" />
+                    {t("forum.file")}
+                  </Button>
+                </div>
                 <Button
-                  onClick={() => feedsQuery.fetchNextPage()}
-                  disabled={feedsQuery.isFetchingNextPage}
-                  variant="outline"
+                  type="submit"
+                  disabled={
+                    !content.trim() ||
+                    !selectedForum ||
+                    createPostMutation.isPending
+                  }
+                  className="bg-primary hover:bg-primary/90"
                 >
-                  {feedsQuery.isFetchingNextPage ? (
+                  {createPostMutation.isPending ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      {t("forum.loading")}
+                      <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                      {t("forum.posting")}
                     </>
                   ) : (
-                    t("forum.loadMore")
+                    <>
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      {t("forum.post")}
+                    </>
                   )}
                 </Button>
               </div>
-            )}
-          </>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Posts feed */}
+        <div className="space-y-6 relative">
+          <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/20 rounded-tr-full z-0 opacity-20 hidden lg:block"></div>
+
+          {feedsQuery.isLoading ? (
+            <div className="flex justify-center my-12 py-10">
+              <LoaderCircle className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : feedsQuery.error ? (
+            <div className="text-center my-12 py-10 bg-card/95 backdrop-blur rounded-lg border border-destructive/20">
+              <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+              <h3 className="font-semibold text-lg mb-2">
+                {t("forum.somethingWentWrong")}
+              </h3>
+              <Button 
+                onClick={() => feedsQuery.refetch()}
+                className="bg-primary hover:bg-primary/90 mt-2"
+              >
+                {t("common.tryAgain")}
+              </Button>
+            </div>
+          ) : feedsQuery.data?.pages[0].results.length === 0 ? (
+            <div className="text-center my-12 bg-card/95 backdrop-blur py-16 rounded-lg border border-primary/20 shadow-md">
+              <div className="mx-auto mb-4 rounded-full bg-primary/10 p-3 w-16 h-16 flex items-center justify-center">
+                <MessageCircle className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 text-primary">
+                {t("forum.noPostsYet")}
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                {t("forum.beTheFirstToPost")}
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Map through all pages and their results */}
+              {feedsQuery.data?.pages.map((page, i) => (
+                <div key={i} className="space-y-6">
+                  {page.results.map((post: PostType) => (
+                    <PostCard 
+                      key={post.id} 
+                      post={post} 
+                      onEdit={handleEditPost}
+                      onDelete={handleDeletePost}
+                    />
+                  ))}
+                </div>
+              ))}
+
+              {/* Load more button */}
+              {feedsQuery.hasNextPage && (
+                <div className="text-center mt-6">
+                  <Button
+                    onClick={() => feedsQuery.fetchNextPage()}
+                    disabled={feedsQuery.isFetchingNextPage}
+                    variant="outline"
+                    className="border-primary/20 hover:bg-primary/10 hover:text-primary"
+                  >
+                    {feedsQuery.isFetchingNextPage ? (
+                      <>
+                        <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                        {t("forum.loading")}
+                      </>
+                    ) : (
+                      t("forum.loadMore")
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Edit dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="bg-card/95 backdrop-blur border-primary/20">
+            <DialogHeader>
+              <DialogTitle className="text-primary">{t("forum.editPost")}</DialogTitle>
+              <DialogDescription>
+                {t("forum.editPostDescription")}
+              </DialogDescription>
+            </DialogHeader>
+            <Textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="min-h-[150px] mt-2 bg-background border-primary/20"
+            />
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditDialogOpen(false)}
+                className="border-primary/20 hover:bg-primary/10"
+              >
+                {t("common.cancel")}
+              </Button>
+              <Button 
+                onClick={handleEditSubmit}
+                disabled={updatePostMutation.isPending || !editContent.trim()}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {updatePostMutation.isPending ? (
+                  <>
+                    <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                    {t("forum.updating")}
+                  </>
+                ) : (
+                  t("forum.saveChanges")
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete confirmation dialog */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent className="bg-card/95 backdrop-blur border-primary/20">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-primary">{t("forum.deletePost")}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("forum.deletePostWarning")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="border-primary/20 hover:bg-primary/10">
+                {t("common.cancel")}
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleDeleteConfirm}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {deletePostMutation.isPending ? (
+                  <>
+                    <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                    {t("forum.deleting")}
+                  </>
+                ) : (
+                  t("common.delete")
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Scroll to top button */}
+        {showScrollTop && (
+          <Button
+            onClick={scrollToTop}
+            className="fixed bottom-8 right-8 z-50 rounded-full shadow-lg size-12 p-0 bg-primary hover:bg-primary/90"
+            aria-label={t("forum.scrollToTop")}
+          >
+            <ArrowUp className="h-5 w-5" />
+          </Button>
         )}
+
+        <style jsx global>{`
+          .highlight-post {
+            animation: highlight 2s ease-in-out;
+          }
+          
+          @keyframes highlight {
+            0% { background-color: rgba(var(--primary-rgb), 0.1); }
+            50% { background-color: rgba(var(--primary-rgb), 0.2); }
+            100% { background-color: transparent; }
+          }
+        `}</style>
       </div>
-
-      {/* Edit dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("forum.editPost")}</DialogTitle>
-            <DialogDescription>
-              {t("forum.editPostDescription")}
-            </DialogDescription>
-          </DialogHeader>
-          <Textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            className="min-h-[150px] mt-2"
-          />
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsEditDialogOpen(false)}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button 
-              onClick={handleEditSubmit}
-              disabled={updatePostMutation.isPending || !editContent.trim()}
-            >
-              {updatePostMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {t("forum.updating")}
-                </>
-              ) : (
-                t("forum.saveChanges")
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete confirmation dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("forum.deletePost")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("forum.deletePostWarning")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deletePostMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {t("forum.deleting")}
-                </>
-              ) : (
-                t("common.delete")
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Scroll to top button */}
-      {showScrollTop && (
-        <Button
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 rounded-full shadow-lg size-12 p-0"
-          aria-label={t("forum.scrollToTop")}
-        >
-          <ArrowUp className="h-5 w-5" />
-        </Button>
-      )}
-
-      <style jsx global>{`
-        .highlight-post {
-          animation: highlight 2s ease-in-out;
-        }
-        
-        @keyframes highlight {
-          0% { background-color: rgba(59, 130, 246, 0.1); }
-          50% { background-color: rgba(59, 130, 246, 0.2); }
-          100% { background-color: transparent; }
-        }
-      `}</style>
     </div>
   );
 }
