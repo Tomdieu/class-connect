@@ -23,7 +23,7 @@ import {
   VideoResourceType
 } from '@/types';
 import {EDUCATION_LEVELS,SECTIONS} from "@/constants"
-import { ChevronRight, ArrowLeft, FileText, Video, ScrollText, BookOpen } from 'lucide-react';
+import { ChevronRight, ArrowLeft, FileText, Video, ScrollText, BookOpen, LoaderCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useResourceNavigationStore } from '@/store/resource-navigation-store';
 
@@ -132,7 +132,7 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
   const getResourceIcon = (resourceType: string) => {
     switch (resourceType) {
       case 'PDFResource':
-        return <FileText className="h-5 w-5 text-red-500" />;
+        return <FileText className="h-5 w-5 text-primary" />;
       case 'VideoResource':
         return <Video className="h-5 w-5 text-blue-500" />;
       case 'ExerciseResource':
@@ -140,7 +140,7 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
       case 'RevisionResource':
         return <BookOpen className="h-5 w-5 text-purple-500" />;
       default:
-        return <FileText className="h-5 w-5 text-gray-400" />;
+        return <FileText className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
@@ -263,30 +263,30 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
     if (currentLevel === 'classes') return null;
     
     return (
-      <div className="flex items-center mb-6 text-sm">
+      <div className="flex flex-wrap items-center mb-6 text-sm bg-card/95 backdrop-blur p-3 rounded-lg border border-primary/20 shadow-sm">
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={navigateBack}
-          className="mr-2"
+          className="mr-2 hover:bg-primary/10 hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back
         </Button>
         
-        <div className="flex items-center">
+        <div className="flex flex-wrap items-center">
           {currentLevel !== 'classes' && (
             <>
-              <span className="text-gray-500 cursor-pointer" onClick={() => setCurrentLevel('classes')}>
+              <span className="text-muted-foreground cursor-pointer hover:text-primary" onClick={() => setCurrentLevel('classes')}>
                 Classes
               </span>
-              <ChevronRight className="h-4 w-4 mx-1 text-gray-400" />
+              <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground" />
             </>
           )}
           
           {currentLevel !== 'classes' && currentClass && (
             <>
-              <span className="text-gray-500 cursor-pointer" onClick={() => {
+              <span className="text-muted-foreground cursor-pointer hover:text-primary" onClick={() => {
                 setCurrentLevel('subjects');
                 setCurrentSubject(null);
                 setCurrentChapter(null);
@@ -294,37 +294,37 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
               }}>
                 {currentClass.name}
               </span>
-              {currentLevel !== 'subjects' && <ChevronRight className="h-4 w-4 mx-1 text-gray-400" />}
+              {currentLevel !== 'subjects' && <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground" />}
             </>
           )}
           
           {currentLevel !== 'classes' && currentLevel !== 'subjects' && currentSubject && (
             <>
-              <span className="text-gray-500 cursor-pointer" onClick={() => {
+              <span className="text-muted-foreground cursor-pointer hover:text-primary" onClick={() => {
                 setCurrentLevel('chapters');
                 setCurrentChapter(null);
                 setCurrentTopic(null);
               }}>
                 {currentSubject.name}
               </span>
-              {currentLevel !== 'chapters' && <ChevronRight className="h-4 w-4 mx-1 text-gray-400" />}
+              {currentLevel !== 'chapters' && <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground" />}
             </>
           )}
           
           {currentLevel !== 'classes' && currentLevel !== 'subjects' && currentLevel !== 'chapters' && currentChapter && (
             <>
-              <span className="text-gray-500 cursor-pointer" onClick={() => {
+              <span className="text-muted-foreground cursor-pointer hover:text-primary" onClick={() => {
                 setCurrentLevel('topics');
                 setCurrentTopic(null);
               }}>
                 {currentChapter.title}
               </span>
-              {currentLevel !== 'topics' && <ChevronRight className="h-4 w-4 mx-1 text-gray-400" />}
+              {currentLevel !== 'topics' && <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground" />}
             </>
           )}
           
           {currentLevel === 'resources' && currentTopic && (
-            <span className="font-medium">{currentTopic.title}</span>
+            <span className="font-medium text-primary">{currentTopic.title}</span>
           )}
         </div>
       </div>
@@ -339,9 +339,13 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
         onValueChange={(value) => setActiveTab(value as Section)} 
         className="w-full"
       >
-        <TabsList className="grid grid-cols-2 mb-4">
+        <TabsList className="grid grid-cols-2 mb-4 bg-card/95 backdrop-blur border border-primary/20">
           {SECTIONS.map(section => (
-            <TabsTrigger key={section} value={section}>
+            <TabsTrigger 
+              key={section} 
+              value={section}
+              className="data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
               {section}
             </TabsTrigger>
           ))}
@@ -356,31 +360,30 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
                 if (levelClasses.length === 0) return null;
                 
                 return (
-                  <div key={level}>
-                    <h2 className="text-xl font-semibold mb-3">{level}</h2>
+                  <div key={level} className="relative">
+                    <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/20 rounded-tr-full z-0 opacity-20 hidden lg:block"></div>
+                    <h2 className="text-xl font-semibold mb-3 text-primary">{level}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {levelClasses.map(classItem => (
                         <Card 
                           key={classItem.id} 
-                          className="hover:shadow-md transition-shadow cursor-pointer"
+                          className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden"
                           onClick={() => handleClassClick(classItem)}
                         >
+                          <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
                           <CardHeader className="pb-2">
-                            <CardTitle>{classItem.name}</CardTitle>
+                            <CardTitle className="text-primary">{classItem.name}</CardTitle>
                             <CardDescription>
                               {classItem.speciality && `Speciality: ${classItem.speciality}`}
                             </CardDescription>
                           </CardHeader>
                           <CardContent>
-                            <p className="text-sm text-gray-500 mb-4">
+                            <p className="text-sm text-muted-foreground">
                               {classItem.description || 'No description available'}
-                            </p>
-                            <p className="text-sm font-medium">
-                              Students: {classItem.student_count}
                             </p>
                           </CardContent>
                           <CardFooter>
-                            <Button variant="default" className="w-full">
+                            <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                               View Subjects
                             </Button>
                           </CardFooter>
@@ -401,7 +404,7 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
   const renderSubjects = () => {
     return (
       <div>
-        <h2 className="text-xl font-semibold mb-4">
+        <h2 className="text-xl font-semibold mb-4 text-primary">
           Subjects in {currentClass?.name}
         </h2>
         
@@ -409,19 +412,20 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
           {subjects.map(subject => (
             <Card 
               key={subject.id} 
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden"
               onClick={() => handleSubjectClick(subject)}
             >
+              <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
               <CardHeader>
-                <CardTitle>{subject.name}</CardTitle>
+                <CardTitle className="text-primary">{subject.name}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-muted-foreground">
                   {subject.description || 'No description available'}
                 </p>
               </CardContent>
               <CardFooter>
-                <Button variant="default" className="w-full">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                   View Chapters
                 </Button>
               </CardFooter>
@@ -431,30 +435,31 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
         
         {resources.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Class Resources</h2>
+            <h2 className="text-xl font-semibold mb-4 text-primary">Class Resources</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {resources.map(resource => (
                 <Card 
                   key={resource.id}
-                  className="hover:shadow-md transition-shadow cursor-pointer"
+                  className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden"
                   onClick={() => handleViewResource(resource)}
                 >
+                  <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       {getResourceIcon(resource.resource_type)}
-                      <CardTitle>{resource.title}</CardTitle>
+                      <CardTitle className="text-primary">{resource.title}</CardTitle>
                     </div>
                     <CardDescription>
                       {resource.resource_type?.replace('Resource', '')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-muted-foreground">
                       {resource.description || 'No description available'}
                     </p>
                   </CardContent>
                   <CardFooter>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10">
                       {resource.resource_type === 'VideoResource' ? 'Watch Video' : 'View Resource'}
                     </Button>
                   </CardFooter>
@@ -466,28 +471,29 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
         
         {videoResources.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Class Videos</h2>
+            <h2 className="text-xl font-semibold mb-4 text-primary">Class Videos</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {videoResources.map(video => (
                 <Card 
                   key={video.id}
-                  className="hover:shadow-md transition-shadow cursor-pointer"
+                  className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden"
                   onClick={() => handleViewResource(video)}
                 >
+                  <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       <Video className="h-5 w-5 text-blue-500" />
-                      <CardTitle>{video.title}</CardTitle>
+                      <CardTitle className="text-primary">{video.title}</CardTitle>
                     </div>
                     <CardDescription>Video</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-muted-foreground">
                       {video.description || 'No description available'}
                     </p>
                   </CardContent>
                   <CardFooter>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10">
                       Watch Video
                     </Button>
                   </CardFooter>
@@ -504,7 +510,7 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
   const renderChapters = () => {
     return (
       <div>
-        <h2 className="text-xl font-semibold mb-4">
+        <h2 className="text-xl font-semibold mb-4 text-primary">
           Chapters in {currentSubject?.name}
         </h2>
         
@@ -512,19 +518,20 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
           {chapters.map(chapter => (
             <Card 
               key={chapter.id} 
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden"
               onClick={() => handleChapterClick(chapter)}
             >
+              <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
               <CardHeader>
-                <CardTitle>{chapter.title}</CardTitle>
+                <CardTitle className="text-primary">{chapter.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-muted-foreground">
                   {chapter.description || 'No description available'}
                 </p>
               </CardContent>
               <CardFooter>
-                <Button variant="default" className="w-full">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                   View Topics
                 </Button>
               </CardFooter>
@@ -539,7 +546,7 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
   const renderTopics = () => {
     return (
       <div>
-        <h2 className="text-xl font-semibold mb-4">
+        <h2 className="text-xl font-semibold mb-4 text-primary">
           Topics in {currentChapter?.title}
         </h2>
         
@@ -547,19 +554,20 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
           {topics.map(topic => (
             <Card 
               key={topic.id} 
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden"
               onClick={() => handleTopicClick(topic)}
             >
+              <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
               <CardHeader>
-                <CardTitle>{topic.title}</CardTitle>
+                <CardTitle className="text-primary">{topic.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-muted-foreground">
                   {topic.description || 'No description available'}
                 </p>
               </CardContent>
               <CardFooter>
-                <Button variant="default" className="w-full">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                   View Resources
                 </Button>
               </CardFooter>
@@ -574,7 +582,7 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
   const renderResources = () => {
     return (
       <div>
-        <h2 className="text-xl font-semibold mb-4">
+        <h2 className="text-xl font-semibold mb-4 text-primary">
           Resources for {currentTopic?.title}
         </h2>
         
@@ -582,25 +590,26 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
           {resources.map(resource => (
             <Card 
               key={resource.id}
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden"
               onClick={() => handleViewResource(resource)}
             >
+              <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
               <CardHeader>
                 <div className="flex items-center gap-2">
                   {getResourceIcon(resource.resource_type)}
-                  <CardTitle>{resource.title}</CardTitle>
+                  <CardTitle className="text-primary">{resource.title}</CardTitle>
                 </div>
                 <CardDescription>
                   {resource.resource_type.replace('Resource', '')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-muted-foreground">
                   {resource.description || 'No description available'}
                 </p>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10">
                   {resource.resource_type === 'VideoResource' ? 'Watch Video' : 'View Resource'}
                 </Button>
               </CardFooter>
@@ -608,8 +617,12 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
           ))}
           
           {resources.length === 0 && (
-            <div className="col-span-3 text-center py-8 text-gray-500">
-              No resources found for this topic
+            <div className="col-span-3 text-center py-8 bg-card/95 backdrop-blur rounded-lg border border-primary/20 p-8">
+              <div className="mx-auto mb-4 rounded-full bg-primary/10 p-3 w-16 h-16 flex items-center justify-center">
+                <FileText className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-medium mb-2 text-primary">No Resources Found</h3>
+              <p className="text-muted-foreground">No resources are available for this topic</p>
             </div>
           )}
         </div>
@@ -620,7 +633,12 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
   // Render the appropriate UI based on current navigation level
   const renderContent = () => {
     if (isLoading) {
-      return <div className="flex justify-center py-8">Loading resources...</div>;
+      return (
+        <div className="flex justify-center items-center h-64 bg-card/95 backdrop-blur rounded-lg border border-primary/20 shadow-md">
+          <LoaderCircle className="animate-spin h-8 w-8 mr-2 text-primary" />
+          <span className="text-lg text-primary">Loading resources...</span>
+        </div>
+      );
     }
 
     switch (currentLevel) {
@@ -640,7 +658,8 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ initialClasses }) => 
   };
 
   return (
-    <div>
+    <div className="relative">
+      <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/20 rounded-tr-full z-0 opacity-20 hidden lg:block"></div>
       {renderBreadcrumbs()}
       {renderContent()}
     </div>
