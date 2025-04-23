@@ -1,5 +1,5 @@
 "use client";
-import { Users, BookOpen, BarChart3, Settings, CreditCard, Rss, Bell, GraduationCap } from "lucide-react";
+import { Users, BookOpen, BarChart3, Settings, CreditCard, Rss, Bell, GraduationCap, X, Video } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,6 +11,8 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
   useSidebar,
+  SidebarHeader,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import { getPathAfterLanguage } from "@/lib/utils";
@@ -19,7 +21,7 @@ import { useI18n } from "@/locales/client";
 
 export const AdminSidebar = () => {
   const pathname = usePathname();
-  const { openMobile } = useSidebar();
+  const { openMobile, toggleSidebar } = useSidebar();
   const t = useI18n();
 
   const menuItems = [
@@ -31,6 +33,7 @@ export const AdminSidebar = () => {
         { title: t("adminSidebar.items.courseOfferings"), icon: GraduationCap, url: "/admin/course-offerings" },
         { title: t("adminSidebar.items.payments"), icon: CreditCard, url: "/admin/payments" },
         { title: t("adminSidebar.items.forum"), icon: Rss, url: "/admin/forum" },
+        { title: t("adminSidebar.items.onlineMeetings"), icon: Video, url: "/admin/online-meetings" },
       ],
     },
     {
@@ -46,41 +49,76 @@ export const AdminSidebar = () => {
     },
   ];
 
-  const correctPath = getPathAfterLanguage(pathname);
+  const correctPath = getPathAfterLanguage(pathname!);
 
   return (
-    <Sidebar>
-      <SidebarContent className="bg-white z-in">
-        <div className="font-bold text-xl p-5 pb-0 flex items-center justify-between">
-          <Link href="/admin">
-            <span>{t("adminSidebar.title")}</span>
-          </Link>
-          {openMobile && <SidebarTrigger />}
+    <Sidebar
+      collapsible="offcanvas"
+      variant="sidebar"
+      className="border-none outline-none shadow-lg min-h-screen bg-card/95 backdrop-blur"
+    >
+      <SidebarHeader className="flex w-full py-3 items-start justify-between border-b border-border/50">
+        <div className="flex flex-1 w-full items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary/10 p-2 rounded-lg">
+              <Settings className="h-6 w-6 text-primary" />
+            </div>
+            <span className="font-bold text-lg bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              {t("adminSidebar.title")}
+            </span>
+          </div>
+          <div
+            onClick={toggleSidebar}
+            className="cursor-pointer md:hidden hover:bg-primary/10 p-2 rounded-full transition-colors"
+          >
+            <X className="text-gray-500 size-5" />
+          </div>
         </div>
+      </SidebarHeader>
+
+      <SidebarContent className="bg-transparent px-2">
         {menuItems.map((group) => (
           <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-2 text-xs uppercase tracking-wider text-muted-foreground/70">
+              {group.label}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => (
                   <SidebarMenuItem
-                    key={item.title}
-                    className={`hover:text-primary/80 hover:bg-primary/5 ${
-                      correctPath.startsWith(item.url) ? "text-primary bg-primary/5 font-semibold" : ""
+                    key={item.url}
+                    className={`rounded-lg mb-1 transition-all duration-200 ${
+                      correctPath.startsWith(item.url)
+                        ? "bg-primary text-primary-foreground font-medium shadow-md"
+                        : "hover:bg-primary/10 text-foreground/70 hover:text-primary"
                     }`}
                   >
-                    <SidebarMenuButton asChild>
-                      <a href={item.url}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={correctPath.startsWith(item.url)}
+                      tooltip={item.title}
+                      className="p-2"
+                    >
+                      <Link href={item.url} className="flex items-center gap-3">
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
+            <SidebarSeparator className="my-0 opacity-50" />
           </SidebarGroup>
         ))}
+
+        <div className="mt-auto w-full pt-4 border-t border-border/50">
+          <div className="px-4 py-3">
+            <p className="text-xs text-center text-muted-foreground/70">
+              Copyright © 2024 ClassConnect
+            </p>
+          </div>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
