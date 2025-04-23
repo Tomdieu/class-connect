@@ -303,6 +303,8 @@ class SessionParticipantViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return VideoConferenceSession.objects.none()
         # Get the session using either id or code
         session_lookup = self.kwargs['session_pk']
         try:
