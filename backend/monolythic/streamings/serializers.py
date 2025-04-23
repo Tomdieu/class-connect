@@ -22,7 +22,7 @@ class VideoConferenceSessionSerializer(serializers.ModelSerializer):
 
 class SessionAttendeeSerializer(serializers.Serializer):
     user_ids = serializers.ListField(
-        child=serializers.IntegerField(),
+        child=serializers.CharField(),
         help_text="List of user IDs to add/remove as attendees"
     )
 
