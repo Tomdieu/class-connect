@@ -32,7 +32,7 @@ except FileNotFoundError:
 SECRET_KEY = "django-insecure-)%^x%9(v84+=#1vc3wgh=^uq7d6gtcyw-tl%x5k+8cj1nt6wdm"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG", default=False)
 
 ALLOWED_HOSTS = ["*"]
 
