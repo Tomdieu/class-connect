@@ -23,8 +23,8 @@ export default auth((req) => {
     // Get the current locale
     const locale = pathname.startsWith('/en') ? '/en' : '/fr';
     
-    // Create the redirect URL with callbackUrl
-    const url = new URL(locale, req.url);
+    // Create the redirect URL pointing to the login page
+    const url = new URL(`${locale}/auth/login`, req.nextUrl.origin);
     // Remove the locale prefix from pathname for the callback
     const callbackPath = pathname.replace(/^\/(?:en|fr)/, '');
     // Add the full path (with locale) as callbackUrl

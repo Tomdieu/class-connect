@@ -530,6 +530,7 @@ export default {
   "adminSidebar.items.settings": "Settings",
   "adminSidebar.items.courseOfferings": "Course Offerings",
   "adminSidebar.items.forum": "Forum",
+  "adminSidebar.items.onlineMeetings": "Online Meetings",
   "class.modal.title.add": "Add Class",
   "class.modal.title.edit": "Edit Class",
   "class.modal.subtitle.add": "Fill in the information to add a class",

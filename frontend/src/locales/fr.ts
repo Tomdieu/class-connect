@@ -510,6 +510,7 @@ export default {
   "adminSidebar.items.notifications": "Notifications",
   "adminSidebar.items.settings": "Paramètres",
   "adminSidebar.items.courseOfferings": "Offres de Cours",
+  "adminSidebar.items.onlineMeetings": "Réunions en Ligne",
   "resources.title": "Ressources d'Apprentissage",
   "resources.empty": "Aucune ressource disponible",
   "resources.loading": "Chargement des ressources...",
