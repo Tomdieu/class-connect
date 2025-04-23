@@ -710,6 +710,21 @@ export declare interface OnlineCourseCreateType{
   calendar_event_id?:string;
 }
 
+export declare interface OnlineCourseParticipantType{
+  id:number;
+  session:number;
+  user:UserType,
+  first_joined_at:string;
+  last_seen_at:string;
+  total_duration:number;
+  total_duration_seconds:number;
+}
+
+export declare interface OnlineCourseParticipantCreateType{
+  session:number;
+  user:UserType,
+}
+
 export declare interface Attendees{
   user_ids:number[]
 }
