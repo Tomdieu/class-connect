@@ -111,7 +111,7 @@ export function SubscriptionPlans() {
   }, [plansMockData]);
 
   return (
-    <section className="relative py-20 md:py-32 overflow-hidden" id="pricing">
+    <section className="relative py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden" id="pricing">
       {/* Enhanced Background Elements with interactive particles */}
       <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/80 z-0"></div>
       
@@ -154,22 +154,22 @@ export function SubscriptionPlans() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="text-center max-w-3xl mx-auto mb-16"
+          className="text-center max-w-3xl mx-auto mb-10 sm:mb-16"
         >
-          <span className="text-primary font-semibold tracking-wider uppercase mb-3 inline-block">
+          <span className="text-primary font-semibold tracking-wider uppercase mb-2 sm:mb-3 inline-block">
             {t("pricing")}
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-5 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-5 tracking-tight">
             {t("subscriptionPlans.title")}
           </h2>
-          <div className="w-24 h-1.5 bg-primary mx-auto rounded-full mb-6"></div>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <div className="w-16 sm:w-24 h-1.5 bg-primary mx-auto rounded-full mb-4 sm:mb-6"></div>
+          <p className="text-base sm:text-lg text-gray-600 leading-relaxed px-4">
             {t("subscriptionPlans.subtitle")}
           </p>
         </motion.div>
 
-        {/* Enhanced plan cards with interactive elements */}
-        <div className="grid md:grid-cols-3 gap-x-8 gap-y-12 max-w-7xl mx-auto">
+        {/* Improved flexbox layout with better large screen handling */}
+        <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
           {plansMockData.map((plan, index) => (
             <motion.div
               key={plan.id || `plan-${index}`}
@@ -177,13 +177,17 @@ export function SubscriptionPlans() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.7, delay: index * 0.15 }}
-              className={`relative ${plan.popular ? 'md:-mt-6 z-10' : ''}`}
+              className={`relative flex-grow flex-shrink-0 
+                w-full 
+                sm:w-[min(calc(50%-1rem),400px)] 
+                lg:w-[min(calc(33.333%-1.5rem),350px)] 
+                ${plan.popular ? 'order-first sm:order-none lg:-mt-6 lg:z-10' : ''}`}
             >
               <motion.div 
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 className={`relative rounded-2xl shadow-xl overflow-hidden h-full border border-gray-100 bg-white ${
-                  plan.popular ? 'ring-2 ring-primary md:scale-105' : ''
+                  plan.popular ? 'ring-2 ring-primary lg:scale-105' : ''
                 }`}
               >
                 {/* Popular Badge */}
@@ -191,7 +195,7 @@ export function SubscriptionPlans() {
                   <div className="absolute -top-5 -right-5">
                     <div className="relative">
                       <div className="absolute -inset-3 bg-primary/20 rounded-full blur-xl opacity-70"></div>
-                      <div className="relative bg-gradient-to-r from-primary to-primary-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                      <div className="relative bg-gradient-to-r from-primary to-primary-600 text-white text-xs font-bold px-3 sm:px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
                         <Sparkle className="h-3.5 w-3.5 inline-block mr-1 text-yellow-200" />
                         {t("most popular")}
                       </div>
@@ -200,52 +204,52 @@ export function SubscriptionPlans() {
                 )}
 
                 {/* Header with gradient */}
-                <div className={`${plan.headerClass} bg-green-500 text-white p-8 relative overflow-hidden`}>
+                <div className={`${plan.headerClass} bg-green-500 text-white p-6 sm:p-8 relative overflow-hidden`}>
                   {/* Abstract shape for visual interest */}
                   <div className="absolute -right-16 -bottom-16 w-48 h-48 bg-white/10 rounded-full"></div>
                   <div className="absolute top-0 left-0 w-full h-1 bg-white/20"></div>
                   
                   {/* Plan title and icon */}
-                  <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-start justify-between mb-4 sm:mb-6">
                     <div>
-                      <h3 className="text-2xl md:text-3xl font-bold mb-1">{plan.name}</h3>
-                      <p className="opacity-80 font-medium">{plan.description}</p>
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1">{plan.name}</h3>
+                      <p className="opacity-80 font-medium text-sm sm:text-base">{plan.description}</p>
                     </div>
-                    <div className="bg-white/20 rounded-full p-3 backdrop-blur-sm">
+                    <div className="bg-white/20 rounded-full p-2 sm:p-3 backdrop-blur-sm">
                       {plan.icon}
                     </div>
                   </div>
 
                   {/* Price block with enhanced typography */}
                   <div className="mb-2">
-                    <div className="flex items-baseline">
-                      <span className="text-4xl md:text-5xl font-extrabold tracking-tight">
+                    <div className="flex items-baseline flex-wrap">
+                      <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
                         {planPrices[plan.id] ?? plan.price}
                       </span>
                       <div className="ml-2">
-                        <span className="text-xl font-semibold">{plan.currency}</span>
-                        <span className="opacity-70 text-sm ml-1">{plan.period}</span>
+                        <span className="text-lg sm:text-xl font-semibold">{plan.currency}</span>
+                        <span className="opacity-70 text-xs sm:text-sm ml-1">{plan.period}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Features with improved visuals */}
-                <div className="p-8">
-                  <h4 className="text-sm uppercase tracking-wider text-gray-500 mb-4 font-medium">
+                <div className="p-6 sm:p-8">
+                  <h4 className="text-xs sm:text-sm uppercase tracking-wider text-gray-500 mb-4 font-medium">
                     {t("features.title")}
                   </h4>
-                  <ul className="space-y-4">
+                  <ul className="space-y-3 sm:space-y-4">
                     {Array.isArray(plan.features) && plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
-                        <div className={`flex-shrink-0 ${
+                        <div className={`flex-shrink-0 mt-0.5 ${
                           plan.highlightFeatures?.includes(featureIndex) 
                             ? `text-${plan.variant === 'basic' ? 'blue' : plan.variant === 'standard' ? 'primary' : 'amber'}-500` 
                             : 'text-gray-400'
                         }`}>
-                          <Check className="h-5 w-5 mr-3" />
+                          <Check className="h-4 sm:h-5 w-4 sm:w-5 mr-2 sm:mr-3" />
                         </div>
-                        <span className={`text-gray-700 ${
+                        <span className={`text-sm sm:text-base text-gray-700 ${
                           plan.highlightFeatures?.includes(featureIndex) ? 'font-medium' : ''
                         }`}>
                           {feature}
@@ -255,14 +259,14 @@ export function SubscriptionPlans() {
                   </ul>
                   
                   {/* CTA Button */}
-                  <div className="mt-8 pt-6 border-t border-gray-100">
+                  <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
                     <Link href={getUrl(`/subscribe/${plan.id}`)}>
                       <motion.div
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}
                       >
                         <Button 
-                          className={`w-full ${plan.buttonClass} text-white py-6 rounded-xl transition-all duration-300 font-semibold text-base`}
+                          className={`w-full ${plan.buttonClass} text-white py-4 sm:py-6 rounded-xl transition-all duration-300 font-semibold text-sm sm:text-base`}
                         >
                           {t("subscriptionPlans.choose")}
                           <ChevronRight className="h-4 w-4 ml-2 opacity-70" />
@@ -275,7 +279,7 @@ export function SubscriptionPlans() {
                 {/* Best Value badge - inside the card */}
                 {plan.bestValue && (
                   <div className="absolute top-3 left-0 w-full">
-                    <div className="-mt-3 mx-auto w-fit bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                    <div className="-mt-3 mx-auto w-fit bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold px-3 sm:px-4 py-1.5 rounded-full shadow-lg">
                       <Crown className="h-3.5 w-3.5 inline-block mr-1" />
                       BEST VALUE
                     </div>
@@ -285,7 +289,6 @@ export function SubscriptionPlans() {
             </motion.div>
           ))}
         </div>
-
       </div>
     </section>
   );
