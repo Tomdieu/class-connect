@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, MessageSquare, Video, X } from "lucide-react";
+import { Bell, BookOpen, MessageSquare, Video, X } from "lucide-react";
 import { TiHome } from "react-icons/ti";
 import { FaCalendarCheck, FaTasks } from "react-icons/fa";
 import { FaEuroSign } from "react-icons/fa";
@@ -24,7 +24,7 @@ import Link from "next/link";
 export default function DashboardSidebar() {
   const { toggleSidebar } = useSidebar();
   const pathname = usePathname();
-  const correctPath = getPathAfterLanguage(pathname);
+  const correctPath = getPathAfterLanguage(pathname!);
   const t = useI18n();
 
   const items = [
@@ -73,6 +73,11 @@ export default function DashboardSidebar() {
       url: "/dashboard/message",
       icon: IoChatbubbles,
     },
+    {
+      title:t("dashboardSidebar.notifications"),
+      url: "/dashboard/notifications",
+      icon: Bell,
+    }
   ];
 
   return (
@@ -105,35 +110,33 @@ export default function DashboardSidebar() {
           </div>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
-              {items.map((item) => (
-                <SidebarMenuItem
-                  key={item.title}
-                  className={`
-                    rounded-xl transition-all duration-200 
-                    ${
-                      correctPath === item.url
+              {items.map((item) => {
+                // Determine active state: for '/dashboard', check exact match; for others, use startsWith.
+                const isActive =
+                  item.url === "/dashboard"
+                    ? correctPath === "/dashboard"
+                    : correctPath.startsWith(item.url);
+                return (
+                  <SidebarMenuItem
+                    key={item.title}
+                    className={`
+                      rounded-xl transition-all duration-200 
+                      ${isActive
                         ? "bg-primary rounded-sm text-white shadow-md shadow-default/25 hover:bg-primary/90"
-                        : "hover:bg-gray-100/80 text-gray-600 hover:text-gray-900"
-                    }
-                  `}
-                >
-                  <SidebarMenuButton asChild>
-                    <a
-                      href={item.url}
-                      className="flex items-center gap-3 px-4 py-3"
-                    >
-                      <item.icon
-                        className={`size-5 ${
-                          correctPath === item.url
-                            ? "text-white"
-                            : "text-gray-500"
-                        }`}
-                      />
-                      <span className="font-medium">{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                        : "hover:bg-gray-100/80 text-gray-600 hover:text-gray-900"}
+                    `}
+                  >
+                    <SidebarMenuButton asChild>
+                      <a href={item.url} className="flex items-center gap-3 px-4 py-3">
+                        <item.icon
+                          className={`size-5 ${isActive ? "text-white" : "text-gray-500"}`}
+                        />
+                        <span className="font-medium">{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
