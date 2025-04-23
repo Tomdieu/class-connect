@@ -35,7 +35,7 @@ export function StudentSidebar() {
   const { toggleSidebar } = useSidebar();
 
   // Use getPathAfterLanguage like AdminSidebar does
-  const correctPath = getPathAfterLanguage(pathname);
+  const correctPath = getPathAfterLanguage(pathname!);
 
   const menuItems = [
     {
