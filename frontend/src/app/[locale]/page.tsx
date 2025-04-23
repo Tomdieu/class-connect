@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 // Using online avatar images instead of importing local files
 const avatarImages = [
-  "https://randomuser.me/api/portraits/women/44.jpg",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTW380aXH0KB3zSyiv9RSDacdztHUiBWWjv0g&s",
   "https://blogs.kent.ac.uk/staff-student-news/files/2021/10/mubarak-showole-Ve7xjKImd28-unsplash.jpg",
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSdlrqOXjxSQVFsN5ZlR849emo1jqMEfJ20Q&s",
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgSs1uqeQ4Paehx3U7JNK0lgdPQp73kT5ygQ&s",
