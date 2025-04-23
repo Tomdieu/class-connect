@@ -1,8 +1,9 @@
 """
 URL configuration for backend project.
 """
+
 from django.contrib import admin
-from django.urls import path,include,re_path
+from django.urls import path, include, re_path
 
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
@@ -21,27 +22,38 @@ schema_view = get_schema_view(
     permission_classes=(permissions.IsAdminUser,),
 )
 
+admin.site.site_header = "Classconnect Backend"
+admin.site.site_title = "Classconnect Backend"
+admin.site.index_title = "Classconnect Administration"
+admin.empty_value_display = "**Empty**"
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-     path('api/', include([
-        path('', include('users.urls')),
-        path('',include('courses.urls')),
-        path('',include('payments.urls')),
-        path('',include('notifications.urls')),
-        path('',include('streamings.urls')),
-        path('',include('forum.urls')),
-        
-        
-        # Updated OAuth2 configuration with explicit namespace and application name
-        re_path(r'^auth/', include(('drf_social_oauth2.urls', 'drf_social_oauth2'), namespace='drf')),
-        
-        path(
-        "docs/",
-        schema_view.with_ui("swagger", cache_timeout=0),
-        name="schema-swagger-ui",
+    path("admin/", admin.site.urls),
+    path(
+        "api/",
+        include(
+            [
+                path("", include("users.urls")),
+                path("", include("courses.urls")),
+                path("", include("payments.urls")),
+                path("", include("notifications.urls")),
+                path("", include("streamings.urls")),
+                path("", include("forum.urls")),
+                # Updated OAuth2 configuration with explicit namespace and application name
+                re_path(
+                    r"^auth/",
+                    include(
+                        ("drf_social_oauth2.urls", "drf_social_oauth2"), namespace="drf"
+                    ),
+                ),
+                path(
+                    "docs/",
+                    schema_view.with_ui("swagger", cache_timeout=0),
+                    name="schema-swagger-ui",
+                ),
+            ]
+        ),
     ),
-    ])),
     path(
         "swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"
     ),
