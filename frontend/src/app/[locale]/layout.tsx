@@ -224,7 +224,7 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
 
-  // Locale-specific structured data
+  // Enhance structured data with more developer information
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
@@ -233,6 +233,7 @@ export default async function RootLayout({
     logo: "https://www.classconnect.cm/logo.png",
     sameAs: [
       "https://www.linkedin.com/in/tomdieuivan",
+      "https://github.com/Tomdieu",
       "https://twitter.com/classconnect",
     ],
     description:
@@ -242,14 +243,28 @@ export default async function RootLayout({
     address: {
       "@type": "PostalAddress",
       addressCountry: "CM",
-      addressRegion: "Littoral", // Add if applicable
-      addressLocality: "Douala", // Add if applicable
+      addressRegion: "Littoral",
+      addressLocality: "Douala",
     },
-    foundingDate: "2025", // Add actual founding date
+    foundingDate: "2025",
     founder: {
       "@type": "Person",
       name: "Tomdieu Ivan",
-      sameAs: "https://www.linkedin.com/in/tomdieuivan",
+      jobTitle: "Full Stack Developer",
+      sameAs: [
+        "https://www.linkedin.com/in/tomdieuivan",
+        "https://github.com/Tomdieu"
+      ],
+      knowsAbout: ["Web Development", "E-Learning", "Educational Technology"],
+      email: "ivan.tomdieu@gmail.com"
+    },
+    creator: {
+      "@type": "Person",
+      name: "Tomdieu Ivan",
+      sameAs: [
+        "https://www.linkedin.com/in/tomdieuivan",
+        "https://github.com/Tomdieu"
+      ],
     },
     areaServed: {
       "@type": "Country",
@@ -269,7 +284,7 @@ export default async function RootLayout({
     offers: {
       "@type": "Offer",
       category: "Online Education",
-      availabilityStarts: new Date().toString(), // Add actual date
+      availabilityStarts: new Date().toString(),
       educationalProgramMode: "online",
       educationalUse: "Online Learning Platform",
     },
@@ -277,7 +292,7 @@ export default async function RootLayout({
       "@type": "ContactPoint",
       contactType: "customer support",
       availableLanguage: ["French", "English"],
-      email: "support@classconnect.cm", // Add actual contact email
+      email: "support@classconnect.cm",
     },
   };
 
@@ -311,6 +326,13 @@ export default async function RootLayout({
           hrefLang="x-default"
           href="https://www.classconnect.cm"
         />
+        
+        {/* Enhanced meta tags for developer attribution */}
+        <meta name="author" content="Tomdieu Ivan" />
+        <meta name="developer" content="Tomdieu Ivan" />
+        <meta name="creator" content="Tomdieu Ivan" />
+        <meta name="copyright" content="ClassConnect - Developed by Tomdieu Ivan" />
+        
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}

@@ -11,7 +11,7 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Users, Clock, Award, LucideBook, Play, Star, MessageCircle, Sparkle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Users, Clock, Award, LucideBook, Play, Star, MessageCircle, Sparkle, Code, Linkedin, Github, Mail } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import Loading from "./loading";
 import Link from "next/link";
@@ -367,7 +367,7 @@ function LandingPage() {
   const t = useI18n();
   const locale = useCurrentLocale();
 
-  // Create localized JSON-LD data using translations
+  // Create enhanced localized JSON-LD data using translations and including developer info
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -376,6 +376,25 @@ function LandingPage() {
         ? "ClassConnect - Plateforme d'Apprentissage en Ligne"
         : "ClassConnect - Online Learning Platform",
     description: t("hero.subtitle"),
+    author: {
+      "@type": "Person",
+      name: "Tomdieu Ivan",
+      url: "https://github.com/Tomdieu",
+      sameAs: [
+        "https://www.linkedin.com/in/tomdieuivan/",
+        "https://github.com/Tomdieu"
+      ]
+    },
+    creator: {
+      "@type": "Person",
+      name: "Tomdieu Ivan",
+      jobTitle: "Full Stack Developer",
+      url: "https://github.com/Tomdieu",
+      sameAs: [
+        "https://www.linkedin.com/in/tomdieuivan/",
+        "https://github.com/Tomdieu"
+      ]
+    },
     offers: {
       "@type": "AggregateOffer",
       offers: [
@@ -400,24 +419,34 @@ function LandingPage() {
       ],
     },
     inLanguage: locale === "fr" ? "fr" : "en",
+    mainEntity: {
+      "@type": "SoftwareApplication",
+      name: "ClassConnect",
+      applicationCategory: "EducationalApplication",
+      operatingSystem: "Web",
+      author: {
+        "@type": "Person",
+        name: "Tomdieu Ivan"
+      }
+    }
   };
 
-  // Create localized meta tags
+  // Create localized meta tags with enhanced SEO for developer name
   const pageTitle =
     locale === "fr"
-      ? "ClassConnect | Plateforme E-learning N°1 au Cameroun"
-      : "ClassConnect | #1 E-learning Platform in Cameroon";
+      ? "ClassConnect | Plateforme E-learning N°1 au Cameroun | Développée par Tomdieu Ivan"
+      : "ClassConnect | #1 E-learning Platform in Cameroon | Developed by Tomdieu Ivan";
 
   const pageDescription =
     locale === "fr"
-      ? "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés."
-      : "Discover ClassConnect, the innovative e-learning platform in Cameroon. Learn at your own pace with personalized courses.";
+      ? "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun développée par Tomdieu Ivan. Apprenez à votre rythme avec des cours personnalisés."
+      : "Discover ClassConnect, the innovative e-learning platform in Cameroon developed by Tomdieu Ivan. Learn at your own pace with personalized courses.";
 
-  // Enhanced keywords for better SEO
+  // Enhanced keywords for better SEO including developer name
   const keywords =
     locale === "fr"
-      ? "e-learning, éducation en ligne, cours en ligne, Cameroun, apprentissage en ligne, plateforme éducative, cours personnalisés, enseignement à distance, école virtuelle, lycée en ligne, université en ligne, tutorat, développement professionnel, compétences numériques, enseignement interactif, formation continue, soutien scolaire, préparation aux examens, apprentissage mobile, éducation en Afrique, plateforme éducative Cameroun, cours en ligne certifiés, apprentissage numérique Afrique, préparation baccalauréat en ligne, enseignement secondaire virtuel, ressources pédagogiques digitales, formation professionnelle en ligne, système éducatif camerounais, cours de remise à niveau, pédagogie interactive, enseignement supérieur à distance, exercices corrigés en ligne, suivi académique personnalisé, technologie éducative innovante, apprentissage adaptatif, préparation concours Cameroun, tutorat en ligne francophone, éducation inclusive numérique, méthodologie d'apprentissage, réussite scolaire garantie"
-      : "e-learning, online education, online courses, Cameroon, online learning, educational platform, personalized courses, distance learning, virtual school, online high school, online university, tutoring, professional development, digital skills, interactive teaching, continuing education, academic support, exam preparation, mobile learning, education in Africa, online learning Cameroon, virtual classroom Africa, Cameroon education technology, affordable e-learning Africa, interactive online courses, certified digital courses, STEM education online, GCE A-Level courses, flexible learning schedules, academic support Cameroon, career-focused courses, mobile-friendly learning, Cameroon curriculum alignment, expert-led webinars, 24/7 course access, educational subscription service, digital skills Cameroon, professional certification prep, adaptive learning technology, Cameroon student success stories";
+      ? "e-learning, éducation en ligne, cours en ligne, Cameroun, apprentissage en ligne, plateforme éducative, cours personnalisés, enseignement à distance, école virtuelle, lycée en ligne, université en ligne, tutorat, développement professionnel, compétences numériques, enseignement interactif, formation continue, soutien scolaire, préparation aux examens, apprentissage mobile, éducation en Afrique, plateforme éducative Cameroun, cours en ligne certifiés, apprentissage numérique Afrique, Tomdieu Ivan, développeur Tomdieu Ivan, ClassConnect Tomdieu, Ivan Tomdieu, Cameroun développeur"
+      : "e-learning, online education, online courses, Cameroon, online learning, educational platform, personalized courses, distance learning, virtual school, online high school, online university, tutoring, professional development, digital skills, interactive teaching, continuing education, academic support, exam preparation, mobile learning, education in Africa, online learning Cameroon, virtual classroom Africa, Cameroon education technology, Tomdieu Ivan, developer Tomdieu Ivan, ClassConnect Tomdieu, Ivan Tomdieu, Cameroon developer";
 
   // Implement requestIdleCallback for non-critical operations
   useEffect(() => {
@@ -458,7 +487,15 @@ function LandingPage() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
-        <meta name="author" content="ClassConnect" />
+        <meta name="author" content="Tomdieu Ivan" />
+        
+        {/* Additional meta tags for developer attribution */}
+        <meta name="developer" content="Tomdieu Ivan" />
+        <meta name="creator" content="Tomdieu Ivan" />
+        <meta name="copyright" content="ClassConnect - Tomdieu Ivan" />
+        <meta name="application-developer" content="Tomdieu Ivan" />
+        <meta name="owner" content="Tomdieu Ivan" />
+        
         <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
       </Helmet>
 
@@ -538,109 +575,6 @@ function LandingPage() {
                   : "Engage with other students and teachers for collaborative learning"}
                 delay={0.4}
               />
-            </div>
-          </div>
-        </section>
-
-        {/* Animated Learning Process Section */}
-        <section className="py-24 bg-gradient-to-b from-white to-blue-50/70 relative overflow-hidden">
-          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-blue-50/70 to-transparent"></div>
-          <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/5 rounded-full"></div>
-          <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-indigo-500/5 rounded-full"></div>
-          
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="text-center mb-20"
-            >
-              <span className="text-primary font-semibold tracking-wider uppercase mb-2 block">
-                {locale === "fr" ? "NOTRE APPROCHE" : "OUR APPROACH"}
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-5 tracking-tight">
-                {locale === "fr" ? "Comment Nous Enseignons" : "How We Teach"}
-              </h2>
-              <div className="w-24 h-1.5 bg-primary mx-auto rounded-full mb-5"></div>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                {locale === "fr"
-                  ? "Notre méthode pédagogique combine technologie et expertise humaine pour des résultats exceptionnels"
-                  : "Our teaching method combines technology and human expertise for exceptional results"}
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
-              <div className="lg:col-span-1 order-2 lg:order-1">
-                <RevealOnScroll direction="left">
-                  <div className="space-y-8">
-                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-indigo-100/50 relative overflow-hidden group hover:shadow-xl transition-all duration-300">
-                      <div className="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-primary-600 to-primary"></div>
-                      <div className="absolute -right-16 -top-16 w-32 h-32 bg-primary/5 rounded-full transition-all duration-500 group-hover:scale-150"></div>
-                      
-                      <h3 className="text-xl font-bold mb-3 pl-4 relative">
-                        <span className="absolute left-0 top-2 h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">1</span>
-                        <span>{locale === "fr" ? "Évaluation Initiale" : "Initial Assessment"}</span>
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {locale === "fr" 
-                          ? "Nous identifions votre niveau et vos besoins d'apprentissage spécifiques"
-                          : "We identify your level and specific learning needs"}
-                      </p>
-                    </div>
-                    
-                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-sky-100/50 relative overflow-hidden group hover:shadow-xl transition-all duration-300">
-                      <div className="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-sky-600 to-sky-500"></div>
-                      <div className="absolute -right-16 -top-16 w-32 h-32 bg-sky-500/5 rounded-full transition-all duration-500 group-hover:scale-150"></div>
-                      
-                      <h3 className="text-xl font-bold mb-3 pl-4 relative">
-                        <span className="absolute left-0 top-2 h-5 w-5 rounded-full bg-sky-500/20 flex items-center justify-center text-sm font-bold text-sky-600">2</span>
-                        <span>{locale === "fr" ? "Parcours Personnalisé" : "Personalized Path"}</span>
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {locale === "fr" 
-                          ? "Nous créons un parcours d'apprentissage adapté à vos objectifs"
-                          : "We create a learning path tailored to your goals"}
-                      </p>
-                    </div>
-                    
-                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-amber-100/50 relative overflow-hidden group hover:shadow-xl transition-all duration-300">
-                      <div className="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-amber-600 to-amber-500"></div>
-                      <div className="absolute -right-16 -top-16 w-32 h-32 bg-amber-500/5 rounded-full transition-all duration-500 group-hover:scale-150"></div>
-                      
-                      <h3 className="text-xl font-bold mb-3 pl-4 relative">
-                        <span className="absolute left-0 top-2 h-5 w-5 rounded-full bg-amber-500/20 flex items-center justify-center text-sm font-bold text-amber-600">3</span>
-                        <span>{locale === "fr" ? "Suivi Continu" : "Continuous Monitoring"}</span>
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {locale === "fr" 
-                          ? "Nous suivons vos progrès et adaptons votre apprentissage en conséquence"
-                          : "We track your progress and adapt your learning accordingly"}
-                      </p>
-                    </div>
-                  </div>
-                </RevealOnScroll>
-              </div>
-              
-              <div className="lg:col-span-2 order-1 lg:order-2 flex justify-center mb-10 lg:mb-0">
-                <RevealOnScroll direction="right">
-                  <motion.div
-                    whileHover={{ y: -15 }}
-                    transition={{ type: "spring", stiffness: 100 }}
-                    className="relative w-full max-w-xl"
-                  >
-                    <div className="absolute -top-6 -left-6 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
-                    <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-                    
-                    <div className="relative bg-white rounded-2xl shadow-2xl border border-indigo-100/30 overflow-hidden p-6">
-                      <OptimizedLottie 
-                        loader={teachingAnimationLoader} 
-                        className="w-[400px] h-[400px] mx-auto"
-                      />
-                    </div>
-                  </motion.div>
-                </RevealOnScroll>
-              </div>
             </div>
           </div>
         </section>
@@ -832,6 +766,101 @@ function LandingPage() {
           <SubscriptionPlans />
         </Suspense>
 
+        {/* New Developer Section for SEO Visibility */}
+        <section className="py-16 bg-gradient-to-b from-white to-blue-50/50 relative overflow-hidden" id="developer">
+          <div className="absolute top-1/4 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
+          
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <span className="text-primary font-semibold tracking-wider uppercase mb-2 block">
+                {locale === "fr" ? "DÉVELOPPEUR" : "DEVELOPER"}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5 tracking-tight">
+                {locale === "fr" ? "Développé par Tomdieu Ivan" : "Developed by Tomdieu Ivan"}
+              </h2>
+              <div className="w-24 h-1.5 bg-primary mx-auto rounded-full mb-5"></div>
+            </motion.div>
+
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-primary/20 shadow-xl"
+              >
+                <Image 
+                  src="https://avatars.githubusercontent.com/u/77198289?v=4" 
+                  alt="Tomdieu Ivan" 
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="max-w-lg"
+              >
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Tomdieu Ivan</h3>
+                <p className="text-primary font-semibold mb-4">Full Stack Developer</p>
+                <p className="text-gray-600 mb-6">
+                  {locale === "fr" 
+                    ? "Développeur passionné spécialisé dans la création de solutions éducatives innovantes. ClassConnect est le fruit de mon expertise en développement web et de ma vision pour l'avenir de l'éducation en ligne au Cameroun."
+                    : "Passionate developer specialized in creating innovative educational solutions. ClassConnect is the result of my web development expertise and my vision for the future of online education in Cameroon."
+                  }
+                </p>
+                
+                <div className="flex gap-4">
+                  <Link 
+                    href="https://github.com/Tomdieu" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    aria-label="GitHub Profile" 
+                    className="p-3 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                  >
+                    <Github className="h-5 w-5" />
+                  </Link>
+                  <Link 
+                    href="https://www.linkedin.com/in/tomdieuivan/"
+                    target="_blank" 
+                    rel="noreferrer"
+                    aria-label="LinkedIn Profile"
+                    className="p-3 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors" 
+                  >
+                    <Linkedin className="h-5 w-5" />
+                  </Link>
+                  <Link 
+                    href="mailto:ivan.tomdieu@gmail.com"
+                    aria-label="Contact Email"
+                    className="p-3 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                  >
+                    <Mail className="h-5 w-5" />
+                  </Link>
+                </div>
+              </motion.div>
+            </div>
+            
+            <div className="flex justify-center mt-10">
+              <Link href="/about">
+                <Button variant="outline" className="gap-2">
+                  {locale === "fr" ? "En savoir plus" : "Learn more"}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+        
         {/* Enhanced Final CTA Section with modern particle effects */}
         <section className="py-24 bg-gradient-to-br from-primary-600 bg-primary to-primary relative overflow-hidden">
           {/* Animated particles background */}
