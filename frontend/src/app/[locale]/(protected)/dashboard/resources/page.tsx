@@ -7,13 +7,18 @@ async function ResourcesPage() {
   const classes = await listClasses({});
   
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6">Learning Resources</h1>
-      <p className="text-gray-600 mb-6">
-        Browse through educational resources by selecting a class, subject, chapter, and topic.
-      </p>
-      
-      <ResourceBrowser initialClasses={classes} />
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
+      <div className="container mx-auto px-4 sm:px-6 py-8">
+        <div className="relative mb-8">
+          <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/30 rounded-bl-full z-0 opacity-20 hidden md:block"></div>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 relative z-10 text-primary">Learning Resources</h1>
+          <p className="text-muted-foreground relative z-10">
+            Browse through educational resources by selecting a class, subject, chapter, and topic.
+          </p>
+        </div>
+        
+        <ResourceBrowser initialClasses={classes} />
+      </div>
     </div>
   );
 }
