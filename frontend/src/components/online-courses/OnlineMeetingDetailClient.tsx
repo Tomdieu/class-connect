@@ -36,6 +36,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { UserType } from "@/types";
+import { useCurrentLocale } from "@/locales/client";
+import { motion } from "framer-motion";
 
 interface OnlineMeetingDetailClientProps {
   meetingId: string;
@@ -44,6 +46,7 @@ interface OnlineMeetingDetailClientProps {
 export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDetailClientProps) {
   const t = useI18n();
   const router = useRouter();
+  const locale = useCurrentLocale()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,8 +89,12 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
   };
 
   const handleCopyLink = () => {
-    if (meeting?.meeting_link) {
-      navigator.clipboard.writeText(meeting.meeting_link);
+    if (meeting?.code) {
+      // Construct the full meeting URL
+      const baseUrl = window.location.origin;
+      const meetingUrl = `${baseUrl}/${locale}/meet/${meeting.code}`;
+
+      navigator.clipboard.writeText(meetingUrl);
       toast.success(t("onlineMeetings.details.copied"));
     }
   };
@@ -125,7 +132,7 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background px-4 py-6 md:px-6 md:py-8">
         <Skeleton className="h-12 w-1/3" />
         <Skeleton className="h-6 w-1/4" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -133,23 +140,25 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
           <Skeleton className="h-40" />
         </div>
         <Skeleton className="h-60" />
-      </div>
+      </motion.div>
     );
   }
 
   if (error || !meeting) {
     return (
-      <Card className="w-full">
-        <CardContent className="py-10">
-          <div className="text-center">
-            <p className="text-destructive mb-4">Error loading meeting details</p>
-            <div className="flex justify-center gap-4">
-              <Button onClick={() => refetch()}>Retry</Button>
-              <Button variant="outline" onClick={() => router.back()}>Go Back</Button>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background px-4 py-6 md:px-6 md:py-8">
+        <Card className="w-full">
+          <CardContent className="py-10">
+            <div className="text-center">
+              <p className="text-destructive mb-4">Error loading meeting details</p>
+              <div className="flex justify-center gap-4">
+                <Button onClick={() => refetch()}>Retry</Button>
+                <Button variant="outline" onClick={() => router.back()}>Go Back</Button>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
     );
   }
 
@@ -171,20 +180,20 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
   const isPast = new Date(meeting.start_time) < new Date();
 
   return (
-    <>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="min-h-screen w-full">
+      {/* Header Section */}
       <div className="mb-6">
         <Button 
           variant="ghost" 
-          className="flex items-center gap-2 mb-6"
+          className="flex items-center gap-2 mb-6" 
           onClick={() => router.push("/dashboard/online-meetings")}
         >
           <ArrowLeft className="h-4 w-4" />
           {t("common.back")}
         </Button>
-        
-        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-3">
+            <h2 className="text-2xl text-primary font-bold flex items-center gap-3">
               <VideoIcon className="h-6 w-6 text-primary" />
               {meeting.title}
               <div className="ml-2">{getStatusBadge()}</div>
@@ -193,7 +202,6 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
               {t("onlineMeetings.details.createdBy")}: {meeting.instructor.first_name} {meeting.instructor.last_name}
             </p>
           </div>
-          
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
@@ -203,8 +211,7 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
               <Trash2 className="h-4 w-4" />
               {t("onlineMeetings.details.deleteMeeting")}
             </Button>
-            
-            {meeting.meeting_link && !isPast && (
+            {meeting.meeting_link && new Date(meeting.start_time) > new Date() && (
               <>
                 <Button
                   variant="outline"
@@ -214,7 +221,6 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
                   <Copy className="h-4 w-4" />
                   {t("onlineMeetings.details.copy")}
                 </Button>
-                
                 <Button
                   asChild
                   variant="default"
@@ -228,11 +234,13 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
               </>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
+
+      {/* Details Cards Section */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Start Time Card */}
+        <Card className="bg-card/95 backdrop-blur border border-primary/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {t("onlineMeetings.details.startTime")}
@@ -249,8 +257,9 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
             </div>
           </CardContent>
         </Card>
-        
-        <Card>
+
+        {/* Duration Card */}
+        <Card className="bg-card/95 backdrop-blur border border-primary/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {t("onlineMeetings.details.duration")}
@@ -260,11 +269,13 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
             <p className="text-2xl font-semibold">{meeting.duration_minutes} {t("onlineMeetings.duration.minutes")}</p>
           </CardContent>
         </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
+
+        {/* Attendees Summary Card */}
+        <Card className="bg-card/95 backdrop-blur border border-primary/20 shadow-md">
+          <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
               {t("onlineMeetings.details.attendees")}
+              {/* Attendees Modal Trigger */}
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm" className="flex items-center gap-1">
@@ -272,14 +283,13 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
                     {t("onlineMeetings.details.addAttendees")}
                   </Button>
                 </SheetTrigger>
-                <SheetContent>
+                <SheetContent className="w-full sm:max-w-md">
                   <SheetHeader>
                     <SheetTitle>{t("onlineMeetings.details.addAttendees")}</SheetTitle>
                     <SheetDescription>
                       {t("onlineMeetings.attendees.searchPlaceholder")}
                     </SheetDescription>
                   </SheetHeader>
-                  
                   <div className="py-4">
                     <Input
                       placeholder={t("onlineMeetings.attendees.searchPlaceholder")}
@@ -287,16 +297,12 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="mb-4"
                     />
-                    
                     <div className="space-y-2 max-h-[400px] overflow-y-auto">
                       {filteredUsers.length > 0 ? (
                         filteredUsers.map((user) => (
                           <div 
-                            key={user.id} 
-                            className={`
-                              flex items-center justify-between p-2 rounded-md 
-                              ${selectedUsers.includes(user.id) ? 'bg-primary/10' : 'hover:bg-muted/50'}
-                            `}
+                            key={user.id}
+                            className={`flex items-center justify-between p-2 rounded-md ${selectedUsers.includes(user.id) ? 'bg-primary/10' : 'hover:bg-muted/50'}`}
                             onClick={() => toggleUserSelection(user.id)}
                           >
                             <div className="flex items-center gap-2">
@@ -311,13 +317,8 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
                                 <p className="text-xs text-muted-foreground">{user.email}</p>
                               </div>
                             </div>
-                            <Button 
-                              variant={selectedUsers.includes(user.id) ? "default" : "outline"} 
-                              size="sm"
-                            >
-                              {selectedUsers.includes(user.id) 
-                                ? t("onlineMeetings.attendees.added") 
-                                : t("onlineMeetings.attendees.add")}
+                            <Button variant={selectedUsers.includes(user.id) ? "default" : "outline"} size="sm">
+                              {selectedUsers.includes(user.id) ? t("onlineMeetings.attendees.added") : t("onlineMeetings.attendees.add")}
                             </Button>
                           </div>
                         ))
@@ -328,15 +329,10 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
                       )}
                     </div>
                   </div>
-                  
                   <SheetFooter>
                     <SheetClose asChild>
-                      <Button
-                        onClick={handleAddAttendees}
-                        disabled={selectedUsers.length === 0}
-                      >
-                        {t("onlineMeetings.attendees.add")} 
-                        {selectedUsers.length > 0 && ` (${selectedUsers.length})`}
+                      <Button onClick={handleAddAttendees} disabled={selectedUsers.length === 0}>
+                        {t("onlineMeetings.attendees.add")} {selectedUsers.length > 0 && ` (${selectedUsers.length})`}
                       </Button>
                     </SheetClose>
                   </SheetFooter>
@@ -348,63 +344,70 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
             <p className="text-2xl font-semibold">{meeting.attendees?.length || 0}</p>
           </CardContent>
         </Card>
-      </div>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            {t("onlineMeetings.details.attendees")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {meeting.attendees && meeting.attendees.length > 0 ? (
-            <div className="space-y-4">
-              {meeting.attendees.map((attendee) => (
-                <div key={attendee.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src={attendee.avatar} alt={`${attendee.first_name} ${attendee.last_name}`} />
-                      <AvatarFallback>
-                        {attendee.first_name?.[0]}{attendee.last_name?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{attendee.first_name} {attendee.last_name}</p>
-                      <p className="text-sm text-muted-foreground">{attendee.email}</p>
-                    </div>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => handleRemoveAttendee(attendee.id)}
-                  >
-                    <UserX className="h-4 w-4" />
-                    <span className="sr-only">{t("onlineMeetings.attendees.remove")}</span>
-                  </Button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>{t("onlineMeetings.details.noAttendees")}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      
-      {meeting.description && (
-        <Card className="mt-6">
+      </motion.div>
+
+      {/* Attendees List Section */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.4 }}>
+        <Card className="bg-card/95 backdrop-blur border border-primary/20">
           <CardHeader>
-            <CardTitle>Description</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              {t("onlineMeetings.details.attendees")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="whitespace-pre-line">{meeting.description}</p>
+            {meeting.attendees && meeting.attendees.length > 0 ? (
+              <div className="space-y-4">
+                {meeting.attendees.map((attendee) => (
+                  <div key={attendee.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarImage src={attendee.avatar} alt={`${attendee.first_name} ${attendee.last_name}`} />
+                        <AvatarFallback>
+                          {attendee.first_name?.[0]}{attendee.last_name?.[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{attendee.first_name} {attendee.last_name}</p>
+                        <p className="text-sm text-muted-foreground">{attendee.email}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => handleRemoveAttendee(attendee.id)}
+                    >
+                      <UserX className="h-4 w-4" />
+                      <span className="sr-only">{t("onlineMeetings.attendees.remove")}</span>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>{t("onlineMeetings.details.noAttendees")}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
+      </motion.div>
+
+      {/* Description Card */}
+      {meeting.description && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.6 }} className="mt-6">
+          <Card className="bg-card/95 backdrop-blur border border-primary/20">
+            <CardHeader>
+              <CardTitle>Description</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="whitespace-pre-line">{meeting.description}</p>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -428,6 +431,6 @@ export default function OnlineMeetingDetailClient({ meetingId }: OnlineMeetingDe
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </motion.div>
   );
 }
