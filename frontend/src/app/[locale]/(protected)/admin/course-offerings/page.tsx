@@ -112,8 +112,7 @@ export default function CourseOfferingPage() {
           {t("courseOfferings.noOfferings")}
         </h3>
         <p className="text-gray-600">
-          {t("courseOfferings.emptyStateDescription", 
-            "Create your first course offering to start connecting with students. Set your schedule, rates, and preferences.")}
+          {t("courseOfferings.emptyStateDescription")}
         </p>
       </div>
 
@@ -163,8 +162,7 @@ export default function CourseOfferingPage() {
           </Link>
         </Button>
         <p className="text-sm text-gray-500">
-          {t("courseOfferings.getStartedGuide", 
-            "Need help getting started? Check out our guide on creating effective course offerings.")}
+          {t("courseOfferings.getStartedGuide"  )}
         </p>
       </div>
     </motion.div>
