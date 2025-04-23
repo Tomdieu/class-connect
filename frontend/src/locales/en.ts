@@ -336,6 +336,7 @@ export default {
   "dashboardSidebar.contactUs": "Contact Us",
   "dashboardSidebar.myCourseOfferings": "My Course Offerings",
   "dashboardSidebar.onlineMeetings": "Online Meetings",
+  "dashboardSidebar.notifications": "Notifications",
   "dashboardPage.welcome": "Welcome to your dashboard",
   "dashboardPage.overview": "Overview",
   "dashboardPage.recentActivities": "Recent Activities",
@@ -726,6 +727,7 @@ export default {
   "availability.errors.loadFailed": "Failed to load availability data",
   "availability.errors.updateFailed": "Failed to update availability",
   "availability.errors.updateSlotFailed": "Failed to update time slot",
+  "availability.subtitle":"",
 
   // Course Offerings translations
   "courseOfferings.title": "My Course Offerings",
@@ -1328,6 +1330,8 @@ export default {
   "onlineMeetings.details.duration": "Duration",
   "onlineMeetings.details.status": "Status",
   "onlineMeetings.details.attendees": "Attendees",
+  "onlineMeetings.details.join":"Join meet",
+  "onlineMeetings.details.view":"Details",
   "onlineMeetings.details.noAttendees": "No attendees have been added yet",
   "onlineMeetings.details.addAttendees": "Add Attendees",
   "onlineMeetings.details.meetingLink": "Meeting Link",

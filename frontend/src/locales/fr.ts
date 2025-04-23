@@ -306,6 +306,7 @@ export default {
   "dashboardSidebar.contactUs": "Nous Contacter",
   "dashboardSidebar.myCourseOfferings": "Mes offres de cours",
   "dashboardSidebar.onlineMeetings": "Réunions en Ligne",
+  "dashboardSidebar.notifications":"Notifications",
   "dashboardPage.welcome": "Bienvenue sur votre tableau de bord",
   "dashboardPage.overview": "Vue d'ensemble",
   "dashboardPage.recentActivities": "Activités Récentes",
@@ -729,6 +730,7 @@ export default {
     "Échec de la mise à jour de la disponibilité",
   "availability.errors.updateSlotFailed":
     "Échec de la mise à jour du créneau horaire",
+    "availability.subtitle":"",
 
   // Course Offerings translations
   "courseOfferings.title": "Mes Offres de Cours",
@@ -1346,6 +1348,8 @@ export default {
   "onlineMeetings.details.duration": "Durée",
   "onlineMeetings.details.status": "Statut",
   "onlineMeetings.details.attendees": "Participants",
+  "onlineMeetings.details.join":"Joindre",
+  "onlineMeetings.details.view":"Détail",
   "onlineMeetings.details.noAttendees": "Aucun participant n'a encore été ajouté",
   "onlineMeetings.details.addAttendees": "Ajouter des Participants",
   "onlineMeetings.details.meetingLink": "Lien de la Réunion",
