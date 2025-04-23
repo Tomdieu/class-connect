@@ -76,7 +76,8 @@ export default function SubscriptionsPage() {
   if (isLoading) {
     return (
       <motion.div 
-        className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
+        className="bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
+        style={{ position: "relative", zIndex: 1 }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -95,7 +96,8 @@ export default function SubscriptionsPage() {
   if (error) {
     return (
       <motion.div 
-        className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
+        className="bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
+        style={{ position: "relative", zIndex: 1 }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -106,10 +108,10 @@ export default function SubscriptionsPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
-            <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full z-0 opacity-10"></div>
+            <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full opacity-20"></div>
+            <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full opacity-10"></div>
             
-            <div className="flex items-center mb-4 relative z-10 w-full">
+            <div className="flex items-center mb-4 relative w-full">
               <div className="bg-primary/10 p-3 rounded-full mr-4">
                 <Receipt className="h-7 w-7 text-primary" />
               </div>
@@ -142,7 +144,8 @@ export default function SubscriptionsPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
+      style={{ position: "relative", zIndex: 1 }}
+      className="w-full bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
     >
       <div className="max-w-[2400px] mx-auto">
         <motion.div 
@@ -151,10 +154,10 @@ export default function SubscriptionsPage() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
-          <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full z-0 opacity-10"></div>
+          <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full opacity-20" style={{ zIndex: 0 }}></div>
+          <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full opacity-10" style={{ zIndex: 0 }}></div>
           
-          <div className="flex items-center mb-4 relative z-10 w-full">
+          <div className="flex items-center mb-4 relative w-full">
             <div className="bg-primary/10 p-3 rounded-full mr-4">
               <Receipt className="h-7 w-7 text-primary" />
             </div>

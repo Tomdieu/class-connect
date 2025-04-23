@@ -148,7 +148,7 @@ function StudentProfilePage() {
         <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
         <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full z-0 opacity-10"></div>
         
-        <div className="flex items-center mb-4 relative z-10 w-full">
+        <div className="flex items-center mb-4 relative w-full">
           <div className="bg-primary/10 p-3 rounded-full mr-4">
             <User className="h-7 w-7 text-primary" />
           </div>
