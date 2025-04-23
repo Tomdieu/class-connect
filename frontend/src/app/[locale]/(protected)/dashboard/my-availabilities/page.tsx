@@ -5,19 +5,21 @@ import { DayOfWeek, TimeSlot } from '@/types';
 import { format } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '@/locales/client';
+import { LoaderCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-const Switch = ({ checked, onChange }) => (
+const Switch = ({ checked, onChange, disabled = false }) => (
   <button
-    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-      checked ? 'bg-green-500' : 'bg-gray-200'
-    }`}
-    onClick={() => onChange(!checked)}
-    disabled={onChange === undefined}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+      checked ? 'bg-primary' : 'bg-gray-200'
+    } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+    onClick={() => !disabled && onChange && onChange(!checked)}
+    disabled={disabled || onChange === undefined}
     aria-checked={checked}
     role="switch"
   >
     <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
         checked ? 'translate-x-6' : 'translate-x-1'
       }`}
     />
@@ -29,25 +31,25 @@ const Checkbox = ({ checked, onChange, disabled = false }) => (
     type="checkbox"
     checked={checked}
     onChange={() => onChange && onChange(!checked)}
-    className="h-5 w-5 rounded border-gray-300 cursor-pointer"
+    className={`h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary/20 cursor-pointer ${disabled ? 'opacity-50' : ''}`}
     disabled={disabled}
   />
 );
 
 // Skeleton loaders
 const TableSkeleton = () => (
-  <div className="overflow-x-auto shadow rounded-lg animate-pulse">
-    <div className="min-w-full bg-white rounded-lg">
-      <div className="bg-gray-200 h-12 w-full mb-1 rounded"></div>
+  <div className="overflow-x-auto shadow-md rounded-lg animate-pulse">
+    <div className="min-w-full bg-card/95 backdrop-blur rounded-lg">
+      <div className="bg-primary/10 h-12 w-full mb-1 rounded"></div>
       {Array(8).fill(0).map((_, i) => (
-        <div key={i} className="bg-gray-100 h-10 w-full mb-1 rounded"></div>
+        <div key={i} className="bg-primary/5 h-10 w-full mb-1 rounded"></div>
       ))}
     </div>
   </div>
 );
 
 const TextSkeleton = ({ className = "" }) => (
-  <div className={`h-4 bg-gray-200 rounded animate-pulse ${className}`}></div>
+  <div className={`h-4 bg-primary/10 rounded animate-pulse ${className}`}></div>
 );
 
 const AvailabilityPage = () => {
@@ -190,110 +192,140 @@ const AvailabilityPage = () => {
   const isUpdating = updateAvailabilityMutation.isPending || updateTimeSlotMutation.isPending;
 
   return (
-    <div className="p-4 md:p-6 container mx-auto">
-      <h1 className="text-xl md:text-2xl font-bold mb-4">{t('availability.title')}</h1>
-      
-      {error && (
-        <div className="p-4 mb-4 bg-red-100 text-red-700 rounded-md">
-          <p>{t('availability.error')}: {error}</p>
-          <button 
-            onClick={() => setError(null)} 
-            className="underline mt-2"
-          >
-            {t('availability.close')}
-          </button>
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
+      <div className="container mx-auto px-4 sm:px-6 py-8">
+        <div className="relative mb-8">
+          <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/30 rounded-bl-full z-0 opacity-20 hidden md:block"></div>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 relative z-10 text-primary">{t('availability.title')}</h1>
+          <p className="text-muted-foreground relative z-10">{t('availability.subtitle') || 'Manage your teaching availability schedule'}</p>
         </div>
-      )}
-      
-      <div className="mb-8">
-        {isLoading ? (
-          <>
-            <TextSkeleton className="w-3/4 mb-2" />
-            <TextSkeleton className="w-2/4 mb-4" />
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-              <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className="text-gray-600 mb-4">
-              {t('availability.lastUpdated', { date: getLastUpdatedDate() })}. 
-              {t('availability.regularUpdate')}
-            </p>
-            
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-              <div className="flex items-center gap-2">
-                <Switch 
-                  checked={draftIsAvailable}
-                  onChange={isUpdating ? undefined : handleSwitchToggle}
-                />
-                <span>{t('availability.iAmAvailable')}</span>
-              </div>
-              
-              <button 
-                className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors ${
-                  isUpdating ? 'opacity-70 cursor-not-allowed' : 
-                  !hasChanges ? 'opacity-50' : ''
-                }`}
-                onClick={handleUpdateAvailability}
-                disabled={isUpdating || !hasChanges}
-              >
-                {isUpdating ? t('availability.updating') : t('availability.update')}
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-
-      <section className="mb-8">
-        <h2 className="text-lg md:text-xl font-semibold mb-4">{t('availability.dailyAvailabilities')}</h2>
         
-        {isLoading ? (
-          <TableSkeleton />
-        ) : !draftIsAvailable ? (
-          <div className="bg-gray-50 p-6 text-center rounded-lg border border-gray-200">
-            <p className="text-gray-600">
-              {t('availability.notVisibleWarning')}
+        {error && (
+          <div className="p-4 mb-6 bg-destructive/15 text-destructive rounded-lg border border-destructive/30">
+            <p className="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              {t('availability.error')}: {error}
             </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto shadow rounded-lg">
-            <table className="min-w-full border-collapse bg-white">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="border p-2 w-24 md:w-32 sticky left-0 bg-gray-50 z-10">{t('availability.timeSlot')}</th>
-                  {days.map(day => (
-                    <th key={day} className="border p-2 text-center">
-                      <span className="hidden md:inline">{`${day}.`}</span>
-                      <span className="md:hidden">{day}</span>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {timeSlots.map(timeSlot => (
-                  <tr key={timeSlot} className="hover:bg-gray-50">
-                    <td className="border p-2 font-medium text-center sticky left-0 bg-white z-10">{timeSlot}</td>
-                    {days.map(day => {
-                      const slot = findSlot(day, timeSlot);
-                      return (
-                        <td key={day} className="border p-2 text-center">
-                          <Checkbox
-                            checked={slot?.is_available || false}
-                            onChange={() => handleCheckboxChange(timeSlot, day)}
-                            disabled={isUpdating}
-                          />
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <button 
+              onClick={() => setError(null)} 
+              className="text-destructive/80 hover:text-destructive underline text-sm mt-2 flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+              {t('availability.close')}
+            </button>
           </div>
         )}
-      </section>
+        
+        <div className="mb-8 bg-card/95 backdrop-blur rounded-lg border border-primary/20 p-6 relative shadow-md">
+          <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/20 rounded-tr-full z-0 opacity-20 hidden lg:block"></div>
+          
+          {isLoading ? (
+            <div className="relative z-10">
+              <TextSkeleton className="w-3/4 mb-2" />
+              <TextSkeleton className="w-2/4 mb-4" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+                <div className="h-6 w-32 bg-primary/10 rounded animate-pulse"></div>
+                <div className="h-10 w-32 bg-primary/10 rounded animate-pulse"></div>
+              </div>
+            </div>
+          ) : (
+            <div className="relative z-10">
+              <p className="text-muted-foreground mb-4">
+                {t('availability.lastUpdated', { date: getLastUpdatedDate() })}. 
+                {t('availability.regularUpdate')}
+              </p>
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+                <div className="flex items-center gap-2">
+                  <Switch 
+                    checked={draftIsAvailable}
+                    onChange={isUpdating ? undefined : handleSwitchToggle}
+                    disabled={isUpdating}
+                  />
+                  <span className="font-medium">{t('availability.iAmAvailable')}</span>
+                </div>
+                
+                <Button 
+                  onClick={handleUpdateAvailability}
+                  disabled={isUpdating || !hasChanges}
+                  className={`bg-primary hover:bg-primary/90 text-white transition-colors ${
+                    !hasChanges && !isUpdating ? 'opacity-50' : ''
+                  }`}
+                >
+                  {isUpdating ? (
+                    <>
+                      <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                      {t('availability.updating')}
+                    </>
+                  ) : t('availability.update')}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-primary">{t('availability.dailyAvailabilities')}</h2>
+          
+          {isLoading ? (
+            <TableSkeleton />
+          ) : !draftIsAvailable ? (
+            <div className="bg-card/95 backdrop-blur p-6 text-center rounded-lg border border-primary/20 shadow-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2 text-muted-foreground">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <p className="text-muted-foreground">
+                {t('availability.notVisibleWarning')}
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto shadow-md rounded-lg border border-primary/20">
+              <table className="min-w-full border-collapse bg-card/95 backdrop-blur">
+                <thead className="bg-primary/10">
+                  <tr>
+                    <th className="border border-primary/20 p-2 w-24 md:w-32 sticky left-0 bg-primary/10 z-10">{t('availability.timeSlot')}</th>
+                    {days.map(day => (
+                      <th key={day} className="border border-primary/20 p-2 text-center">
+                        <span className="hidden md:inline">{`${day}.`}</span>
+                        <span className="md:hidden">{day}</span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {timeSlots.map((timeSlot, index) => (
+                    <tr key={timeSlot} className={`hover:bg-primary/5 ${index % 2 === 0 ? 'bg-white/50' : 'bg-white/80'}`}>
+                      <td className="border border-primary/20 p-2 font-medium text-center sticky left-0 bg-white/80 z-10">{timeSlot}</td>
+                      {days.map(day => {
+                        const slot = findSlot(day, timeSlot);
+                        return (
+                          <td key={day} className="border border-primary/20 p-2 text-center">
+                            <Checkbox
+                              checked={slot?.is_available || false}
+                              onChange={() => handleCheckboxChange(timeSlot, day)}
+                              disabled={isUpdating}
+                            />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 };
