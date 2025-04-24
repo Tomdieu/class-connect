@@ -9,18 +9,30 @@ import { useMemo, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getSubscriptionPlanByIdorSlug } from "@/actions/payments";
 
+// Define type for particle properties in this component
+interface SubscriptionParticleProps {
+  id: number;
+  width: number;
+  height: number;
+  x: string;
+  y: string;
+  duration: number;
+  delay: number;
+}
+
 export function SubscriptionPlans() {
   const t = useI18n();
+  const { data: session } = useSession();
+  // State for storing particle properties, initialized client-side
+  const [subscriptionParticles, setSubscriptionParticles] = useState<SubscriptionParticleProps[] | null>(null);
 
-  const {data:session} = useSession()
-
-  const getUrl = (path:string) =>{
-    if(session?.user){
-      return path
-    }else{
-      return `/auth/register?callbackUrl=${path}`
+  const getUrl = (path: string) => {
+    if (session?.user) {
+      return path;
+    } else {
+      return `/auth/register?callbackUrl=${path}`;
     }
-  }
+  };
 
   // Mock data for when API data isn't available
   const plansMockData = useMemo(() => [
@@ -108,40 +120,53 @@ export function SubscriptionPlans() {
       }
     }
     fetchPrices();
+
+    // Generate particle properties only on the client-side after mount
+    const generatedParticles = Array.from({ length: 20 }).map((_, i) => ({
+      id: i,
+      width: Math.random() * 10 + 5,
+      height: Math.random() * 10 + 5,
+      x: `${Math.random() * 100 - 50}%`,
+      y: `${Math.random() * 100}%`,
+      duration: Math.random() * 10 + 20,
+      delay: Math.random() * 20,
+    }));
+    setSubscriptionParticles(generatedParticles);
   }, [plansMockData]);
 
   return (
     <section className="relative py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden" id="pricing">
       {/* Enhanced Background Elements with interactive particles */}
       <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/80 z-0"></div>
-      
+
       {/* Decorative circles */}
       <div className="absolute -top-40 left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
       <div className="absolute top-1/3 right-5 w-72 h-72 bg-amber-500/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
-      
+
       {/* Animated particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="particles-container">
-          {[...Array(20)].map((_, i) => (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="particles-container relative w-full h-full">
+          {subscriptionParticles && subscriptionParticles.map((p) => (
             <motion.div
-              key={i}
+              key={p.id}
               className="absolute rounded-full bg-primary/20"
               style={{
-                width: Math.random() * 10 + 5,
-                height: Math.random() * 10 + 5,
-                x: Math.random() * 100 - 50 + "%",
-                y: Math.random() * 100 + "%",
+                width: p.width,
+                height: p.height,
+                left: p.x,
+                top: p.y,
               }}
+              initial={{ opacity: 0 }}
               animate={{
-                y: [null, "-100%"],
+                y: ["0%", "-100vh"],
                 opacity: [0, 0.5, 0],
               }}
               transition={{
-                duration: Math.random() * 10 + 20,
+                duration: p.duration,
                 repeat: Infinity,
                 ease: "linear",
-                delay: Math.random() * 20,
+                delay: p.delay,
               }}
             />
           ))}
@@ -149,7 +174,7 @@ export function SubscriptionPlans() {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -183,12 +208,11 @@ export function SubscriptionPlans() {
                 lg:w-[min(calc(33.333%-1.5rem),350px)] 
                 ${plan.popular ? 'order-first sm:order-none lg:-mt-6 lg:z-10' : ''}`}
             >
-              <motion.div 
+              <motion.div
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className={`relative rounded-2xl shadow-xl overflow-hidden h-full border border-gray-100 bg-white ${
-                  plan.popular ? 'ring-2 ring-primary lg:scale-105' : ''
-                }`}
+                className={`relative rounded-2xl shadow-xl overflow-hidden h-full border border-gray-100 bg-white ${plan.popular ? 'ring-2 ring-primary lg:scale-105' : ''
+                  }`}
               >
                 {/* Popular Badge */}
                 {plan.popular && (
@@ -208,7 +232,7 @@ export function SubscriptionPlans() {
                   {/* Abstract shape for visual interest */}
                   <div className="absolute -right-16 -bottom-16 w-48 h-48 bg-white/10 rounded-full"></div>
                   <div className="absolute top-0 left-0 w-full h-1 bg-white/20"></div>
-                  
+
                   {/* Plan title and icon */}
                   <div className="flex items-start justify-between mb-4 sm:mb-6">
                     <div>
@@ -242,22 +266,20 @@ export function SubscriptionPlans() {
                   <ul className="space-y-3 sm:space-y-4">
                     {Array.isArray(plan.features) && plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
-                        <div className={`flex-shrink-0 mt-0.5 ${
-                          plan.highlightFeatures?.includes(featureIndex) 
-                            ? `text-${plan.variant === 'basic' ? 'blue' : plan.variant === 'standard' ? 'primary' : 'amber'}-500` 
+                        <div className={`flex-shrink-0 mt-0.5 ${plan.highlightFeatures?.includes(featureIndex)
+                            ? `text-${plan.variant === 'basic' ? 'blue' : plan.variant === 'standard' ? 'primary' : 'amber'}-500`
                             : 'text-gray-400'
-                        }`}>
+                          }`}>
                           <Check className="h-4 sm:h-5 w-4 sm:w-5 mr-2 sm:mr-3" />
                         </div>
-                        <span className={`text-sm sm:text-base text-gray-700 ${
-                          plan.highlightFeatures?.includes(featureIndex) ? 'font-medium' : ''
-                        }`}>
+                        <span className={`text-sm sm:text-base text-gray-700 ${plan.highlightFeatures?.includes(featureIndex) ? 'font-medium' : ''
+                          }`}>
                           {feature}
                         </span>
                       </li>
                     ))}
                   </ul>
-                  
+
                   {/* CTA Button */}
                   <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
                     <Link href={getUrl(`/subscribe/${plan.id}`)}>
@@ -265,7 +287,7 @@ export function SubscriptionPlans() {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <Button 
+                        <Button
                           className={`w-full ${plan.buttonClass} text-white py-4 sm:py-6 rounded-xl transition-all duration-300 font-semibold text-sm sm:text-base`}
                         >
                           {t("subscriptionPlans.choose")}
