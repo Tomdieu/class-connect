@@ -509,7 +509,7 @@ function LandingPage() {
     { name: "theme-color", content: "#ffffff" },
     { name: "msapplication-TileColor", content: "#ffffff" },
     { name: "google-site-verification", content: "google1a036d19159746c1" },
-    { name: "fb:app_id", content: "your-fb-app-id" },
+    // { name: "fb:app_id", content: "your-fb-app-id" },
     { name: "og:site_name", content: "ClassConnect" },
     { name: "og:image", content: "https://www.classconnect.cm/og-image.jpg" },
     { name: "og:image:width", content: "1200" },
@@ -518,7 +518,7 @@ function LandingPage() {
   ];
 
   return (
-    <div className="relative flex-1 w-full h-full flex flex-col min-h-screen">
+    <div className="relative flex-1 w-full h-full flex flex-col">
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
@@ -551,7 +551,10 @@ function LandingPage() {
         <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
       </Helmet>
 
-      <Header className="bg-white/95 backdrop-blur-md border-b border-gray-100 px-5 sticky top-0 z-50" />
+      <Header className="fixed top-0 left-0 right-0 shadow-md bg-white/95 backdrop-blur-md border-b border-gray-100 px-5 z-[99999999]" />
+
+      {/* Add a spacer to push content below the fixed header */}
+      <div className="h-20 mt-10 md:mt-0 md:h-20"></div> {/* Adjust this height to match your header height */}
 
       <main className="flex-1">
         <Suspense fallback={<Loading />}>
