@@ -508,7 +508,7 @@ function LandingPage() {
     { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
     { name: "theme-color", content: "#ffffff" },
     { name: "msapplication-TileColor", content: "#ffffff" },
-    { name: "google-site-verification", content: "your-verification-code-here" },
+    { name: "google-site-verification", content: "google1a036d19159746c1" },
     { name: "fb:app_id", content: "your-fb-app-id" },
     { name: "og:site_name", content: "ClassConnect" },
     { name: "og:image", content: "https://www.classconnect.cm/og-image.jpg" },
