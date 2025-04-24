@@ -25,7 +25,7 @@ function AboutPage() {
     title: "Full Stack Developer",
     description: "Passionate about creating innovative web solutions",
     location: "Cameroon",
-    image: "/images/developer.jpg",
+    image: "https://avatars.githubusercontent.com/u/77198289?v=4",
     social: [
       { icon: <Github className="h-5 w-5" />, url: "https://github.com/Tomdieu", name: "GitHub" },
       { icon: <Linkedin className="h-5 w-5" />, url: "https://www.linkedin.com/in/tomdieuivan/", name: "LinkedIn" },
@@ -61,6 +61,9 @@ function AboutPage() {
   const pageTitle = t('about.pageTitle');
   const pageDescription = t('about.pageDescription');
   const pageUrl = `${baseUrl}/about`;
+
+  // Enhanced Keywords for Developer SEO
+  const keywords = `ClassConnect, Tomdieu Ivan, Ivan Tomdieu, Tomdieu Ivan developer, Full Stack Developer Cameroon, ClassConnect developer, E-learning Platform Cameroon, Online Education, About ClassConnect, ${t('about.title')}, ${t('about.subtitle')}, ${developer.name}, ${developer.title}`;
   
   // JSON-LD structured data for about page
   const jsonLdData = {
@@ -85,6 +88,9 @@ function AboutPage() {
         "name": developer.name,
         "jobTitle": developer.title,
         "description": developer.description,
+        "image": developer.image,
+        "url": "https://github.com/Tomdieu",
+        "sameAs": developer.social.map(s => s.url),
         "address": {
           "@type": "PostalAddress",
           "addressCountry": developer.location
@@ -118,24 +124,24 @@ function AboutPage() {
   return (
     <div className="min-h-screen pb-16">
       <Helmet>
-        <title>{pageTitle} | ClassConnect</title>
+        <title>{pageTitle} | ClassConnect - Developed by Tomdieu Ivan</title>
         <meta name="description" content={pageDescription} />
-        <meta name='keywords' content='ClassConnect, Tomdieu Ivan, Tomdieu, Full Stack Developer, E-learning Platform, Online Education, Cameroon,'/>
+        <meta name='keywords' content={keywords}/>
         <link rel="canonical" href={pageUrl} />
         <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
         
         {/* SEO: Open Graph tags for social sharing */}
-        <meta property="og:title" content={pageTitle} />
+        <meta property="og:title" content={`${pageTitle} | Developed by Tomdieu Ivan`} />
         <meta property="og:description" content={pageDescription} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={pageUrl} />
-        <meta property="og:image" content={`https://www.classconnect.cm/logo.png`} /> 
+        <meta property="og:image" content={developer.image} /> 
 
         {/* SEO: Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:title" content={`${pageTitle} | Developed by Tomdieu Ivan`} />
         <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content={`https://www.classconnect.cm/logo.png`} />
+        <meta name="twitter:image" content={developer.image} />
         
         {/* Additional metadata for better SEO */}
         <meta name="author" content="Tomdieu Ivan" />
@@ -158,17 +164,6 @@ function AboutPage() {
             </p>
           </motion.div>
         </div>
-        
-        {/* Wave separator */}
-        {/* <div className="absolute bottom-0 left-0 right-0 z-10">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="w-full">
-            <path 
-              fill="hsl(var(--background))" 
-              fillOpacity="1" 
-              d="M0,96L60,112C120,128,240,160,360,149.3C480,139,600,85,720,80C840,75,960,117,1080,122.7C1200,128,1320,96,1380,80L1440,64L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z">
-            </path>
-          </svg>
-        </div> */}
       </section>
 
       {/* Main Content */}
@@ -190,7 +185,9 @@ function AboutPage() {
             >
               <motion.div variants={fadeIn}>
                 <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('about.whatIs.title')}</h2>
-                <p className="text-muted-foreground mb-4">{t('about.whatIs.desc1')}</p>
+                <p className="text-muted-foreground mb-4">
+                  {t('about.whatIs.desc1')} {locale === 'fr' ? 'Développée par' : 'Developed by'} {developer.name}, ClassConnect {locale === 'fr' ? 'est conçue pour...' : 'is designed to...'}
+                </p>
                 <p className="text-muted-foreground">{t('about.whatIs.desc2')}</p>
               </motion.div>
               
@@ -466,7 +463,7 @@ function AboutPage() {
                   <CardHeader>
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                        <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
+                        <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
                       </svg>
                     </div>
                     <CardTitle>{t('about.features.support.title')}</CardTitle>
@@ -503,27 +500,25 @@ function AboutPage() {
             >
               <motion.div variants={fadeIn} className="md:col-span-1">
                 <Card className="overflow-hidden border-primary/20">
-                  <div className="relative h-48 flex items-center justify-center">
-                    {/* Replace with actual developer image */}
-                    {/* <Code className="h-20 w-20 text-primary/50" /> */}
+                  <div className="relative h-48 flex items-center justify-center bg-gray-100">
                     <Image 
-                      src="https://avatars.githubusercontent.com/u/77198289?v=4"
-                      alt={developer.name}
-                      width={200}
-                      height={200}
-                      className="object-center"
+                      src={developer.image}
+                      alt={`${developer.name} - ${developer.title} - Developer of ClassConnect`}
+                      width={150}
+                      height={150}
+                      className="object-cover rounded-full border-4 border-white shadow-md"
                     />
                   </div>
-                  <CardContent className="pt-6">
-                    <h3 className="text-2xl font-bold mb-2">{developer.name}</h3>
-                    <p className="text-primary font-medium mb-4">{developer.title}</p>
+                  <CardContent className="pt-6 text-center">
+                    <h3 className="text-2xl font-bold mb-1">{developer.name}</h3>
+                    <p className="text-primary font-medium mb-3">{developer.title}</p>
                     
-                    <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                    <div className="flex items-center justify-center gap-2 text-muted-foreground mb-4">
                       <MapPin className="h-4 w-4" />
                       <span>{developer.location}</span>
                     </div>
                     
-                    <div className="flex gap-3 mt-4">
+                    <div className="flex gap-3 justify-center mt-4">
                       {developer.social.map((item, index) => (
                         <Link 
                           key={index}
@@ -544,10 +539,10 @@ function AboutPage() {
               <motion.div variants={fadeIn} className="md:col-span-2">
                 <Card className="h-full border-primary/20">
                   <CardHeader>
-                    <CardTitle>{t('about.developer.aboutTitle')}</CardTitle>
+                    <CardTitle>{t('about.developer.aboutTitle')} - {developer.name}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <p>{t('about.developer.bio')}</p>
+                    <p>{t('about.developer.bio')} {locale === 'fr' ? 'En tant que développeur principal de ClassConnect...' : 'As the lead developer of ClassConnect...'}</p>
                     
                     <div>
                       <h4 className="font-medium mb-3">{t('about.developer.skills')}</h4>
@@ -561,7 +556,6 @@ function AboutPage() {
                         <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
                           {t('about.developer.skillsList.2')}
                         </span>
-                        {/* Add more skills as needed */}
                       </div>
                     </div>
                     
