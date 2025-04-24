@@ -363,9 +363,22 @@ const CountUpNumber: React.FC<CountUpNumberProps> = ({ value, suffix = "", durat
   return <span ref={ref}>{inView ? count : 0}{suffix}</span>;
 };
 
+// New type for particle properties
+interface ParticleProps {
+  id: number;
+  width: number;
+  height: number;
+  left: string;
+  top: string;
+  duration: number;
+  delay: number;
+}
+
 function LandingPage() {
   const t = useI18n();
   const locale = useCurrentLocale();
+  // State for storing particle properties, initialized client-side
+  const [particles, setParticles] = useState<ParticleProps[] | null>(null);
 
   // Create enhanced localized JSON-LD data using translations and including developer info
   const jsonLdData = {
@@ -442,29 +455,67 @@ function LandingPage() {
       ? "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun développée par Tomdieu Ivan. Apprenez à votre rythme avec des cours personnalisés."
       : "Discover ClassConnect, the innovative e-learning platform in Cameroon developed by Tomdieu Ivan. Learn at your own pace with personalized courses.";
 
-  // Enhanced keywords for better SEO including developer name
+  // Enhanced keywords for better SEO including developer name and more search terms
   const keywords =
-    locale === "fr"
-      ? "e-learning, éducation en ligne, cours en ligne, Cameroun, apprentissage en ligne, plateforme éducative, cours personnalisés, enseignement à distance, école virtuelle, lycée en ligne, université en ligne, tutorat, développement professionnel, compétences numériques, enseignement interactif, formation continue, soutien scolaire, préparation aux examens, apprentissage mobile, éducation en Afrique, plateforme éducative Cameroun, cours en ligne certifiés, apprentissage numérique Afrique, Tomdieu Ivan, développeur Tomdieu Ivan, ClassConnect Tomdieu, Ivan Tomdieu, Cameroun développeur"
-      : "e-learning, online education, online courses, Cameroon, online learning, educational platform, personalized courses, distance learning, virtual school, online high school, online university, tutoring, professional development, digital skills, interactive teaching, continuing education, academic support, exam preparation, mobile learning, education in Africa, online learning Cameroon, virtual classroom Africa, Cameroon education technology, Tomdieu Ivan, developer Tomdieu Ivan, ClassConnect Tomdieu, Ivan Tomdieu, Cameroon developer";
+      "e-learning, éducation en ligne, cours en ligne, Cameroun, apprentissage en ligne, plateforme éducative, cours personnalisés, enseignement à distance, école virtuelle, lycée en ligne, université en ligne, tutorat, développement professionnel, compétences numériques, enseignement interactif, formation continue, soutien scolaire, préparation aux examens, apprentissage mobile, éducation en Afrique, plateforme éducative Cameroun, cours en ligne certifiés, apprentissage numérique Afrique, Tomdieu Ivan, développeur Tomdieu Ivan, ClassConnect Tomdieu, Ivan Tomdieu, Cameroun développeur, " +
+      "e-learning, online education, online courses, Cameroon, online learning, educational platform, personalized courses, distance learning, virtual school, online high school, online university, tutoring, professional development, digital skills, interactive teaching, continuing education, academic support, exam preparation, mobile learning, education in Africa, online learning Cameroon, virtual classroom Africa, Cameroon education technology, Tomdieu Ivan, developer Tomdieu Ivan, ClassConnect Tomdieu, Ivan Tomdieu, Cameroon developer, " +
+      // Add more specific and broader keywords
+      "cours de mathématiques en ligne, cours de physique en ligne, cours de chimie en ligne, cours de biologie en ligne, cours de français en ligne, cours d'anglais en ligne, cours d'informatique en ligne, programmation web, développement web Cameroun, " +
+      "formation professionnelle Cameroun, certification en ligne, MOOC Cameroun, SPOC Cameroun, éducation numérique Cameroun, technologie éducative, EdTech Cameroun, " +
+      "soutien scolaire primaire, soutien scolaire collège, soutien scolaire lycée, préparation baccalauréat Cameroun, préparation GCE Cameroon, " +
+      "apprentissage adaptatif, microlearning, gamification éducation, classe virtuelle interactive, plateforme LMS Cameroun, " +
+      "meilleure plateforme e-learning Cameroun, cours en ligne abordables, éducation de qualité Cameroun, transformation digitale éducation, " +
+      "online math courses, online physics courses, online chemistry courses, online biology courses, online French courses, online English courses, online computer science courses, web programming, web development Cameroon, " +
+      "vocational training Cameroon, online certification, MOOC Cameroon, SPOC Cameroon, digital education Cameroon, educational technology, EdTech Cameroon, " +
+      "primary school tutoring, middle school tutoring, high school tutoring, baccalaureate preparation Cameroon, GCE preparation Cameroon, " +
+      "adaptive learning, microlearning, education gamification, interactive virtual classroom, LMS platform Cameroon, " +
+      "best e-learning platform Cameroon, affordable online courses, quality education Cameroon, digital transformation education, " +
+      "remote learning solutions, homeschooling support, adult learning online, career change courses, upskilling platform, lifelong learning opportunities, digital literacy Cameroon, tech skills training";
 
   // Implement requestIdleCallback for non-critical operations
   useEffect(() => {
     const idleCallback = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
-    
     const handle = idleCallback(() => {
       // Preload animations during idle time but with low priority
       const link = document.createElement('link');
       link.rel = 'prefetch';
       link.as = 'fetch';
-      document.head.appendChild(link);
+      // Check if document.head exists (client-side)
+      if (document.head) {
+        document.head.appendChild(link);
+      }
     });
-    
+
+    // Generate particle properties only on the client-side after mount
+    const generatedParticles = Array.from({ length: 20 }).map((_, i) => ({
+      id: i,
+      width: Math.round(Math.random() * 8 + 4),
+      height: Math.round(Math.random() * 8 + 4),
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      duration: Math.random() * 3 + 3,
+      delay: Math.random() * 5,
+    }));
+    setParticles(generatedParticles);
+
     return () => {
       const cancelIdle = window.cancelIdleCallback || clearTimeout;
       cancelIdle(handle);
     };
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on the client after mount
+
+  const additionalMetaTags = [
+    { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+    { name: "theme-color", content: "#ffffff" },
+    { name: "msapplication-TileColor", content: "#ffffff" },
+    { name: "google-site-verification", content: "your-verification-code-here" },
+    { name: "fb:app_id", content: "your-fb-app-id" },
+    { name: "og:site_name", content: "ClassConnect" },
+    { name: "og:image", content: "https://www.classconnect.cm/og-image.jpg" },
+    { name: "og:image:width", content: "1200" },
+    { name: "og:image:height", content: "630" },
+    { name: "twitter:image", content: "https://www.classconnect.cm/twitter-image.jpg" },
+  ];
 
   return (
     <div className="relative flex-1 w-full h-full flex flex-col min-h-screen">
@@ -475,18 +526,16 @@ function LandingPage() {
         <link rel="canonical" href={`https://www.classconnect.cm/${locale}`} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta
-          property="og:url"
-          content={`https://www.classconnect.cm/${locale}`}
-        />
+        <meta property="og:url" content={`https://www.classconnect.cm/${locale}`} />
         <meta property="og:type" content="website" />
-        <meta
-          property="og:locale"
-          content={locale === "fr" ? "fr_FR" : "en_US"}
-        />
+        <meta property="og:locale" content={locale === "fr" ? "fr_FR" : "en_US"} />
+        <meta property="og:image" content="https://www.classconnect.cm/og-image.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content="https://www.classconnect.cm/twitter-image.jpg" />
         <meta name="author" content="Tomdieu Ivan" />
         
         {/* Additional meta tags for developer attribution */}
@@ -495,7 +544,10 @@ function LandingPage() {
         <meta name="copyright" content="ClassConnect - Tomdieu Ivan" />
         <meta name="application-developer" content="Tomdieu Ivan" />
         <meta name="owner" content="Tomdieu Ivan" />
-        
+        {/* New additional SEO meta tags */}
+        {additionalMetaTags.map((tag, index) => (
+          <meta key={index} name={tag.name} content={tag.content} />
+        ))}
         <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
       </Helmet>
 
@@ -534,7 +586,6 @@ function LandingPage() {
                   : "Our innovative platform combines technology and pedagogy to deliver an exceptional learning experience"}
               </p>
             </motion.div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <FeatureCard
                 icon={<Users className="h-7 w-7" />}
@@ -545,7 +596,6 @@ function LandingPage() {
                   : "Content tailored to your level and goals for optimal progress"}
                 delay={0.1}
               />
-              
               <FeatureCard
                 icon={<Play className="h-7 w-7" />}
                 color="bg-gradient-to-r from-sky-500 to-blue-600"
@@ -555,7 +605,6 @@ function LandingPage() {
                   : "Videos, quizzes and practical exercises that make learning engaging"}
                 delay={0.2}
               />
-              
               <FeatureCard
                 icon={<Star className="h-7 w-7" />}
                 color="bg-gradient-to-r from-amber-500 to-orange-600"
@@ -565,7 +614,6 @@ function LandingPage() {
                   : "Experienced teachers dedicated to your academic success"}
                 delay={0.3}
               />
-              
               <FeatureCard
                 icon={<MessageCircle className="h-7 w-7" />}
                 color="bg-gradient-to-r from-emerald-500 to-green-600"
@@ -601,7 +649,6 @@ function LandingPage() {
               </h2>
               <div className="w-24 h-1.5 bg-primary mx-auto rounded-full mb-5"></div>
             </motion.div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
               <Suspense fallback={<StatCardSkeleton />}>
                 <StatCard
@@ -612,7 +659,6 @@ function LandingPage() {
                   gradient="bg-gradient-to-br from-primary to-primary-600"
                 />
               </Suspense>
-              
               <Suspense fallback={<StatCardSkeleton />}>
                 <StatCard
                   icon={<LucideBook className="h-8 w-8" />}
@@ -622,7 +668,6 @@ function LandingPage() {
                   gradient="bg-gradient-to-br from-sky-500 to-blue-600"
                 />
               </Suspense>
-              
               <Suspense fallback={<StatCardSkeleton />}>
                 <StatCard
                   icon={<CheckCircle2 className="h-8 w-8" />}
@@ -634,7 +679,6 @@ function LandingPage() {
                   gradient="bg-gradient-to-br from-amber-500 to-orange-600"
                 />
               </Suspense>
-              
               <Suspense fallback={<StatCardSkeleton />}>
                 <StatCard
                   icon={<Clock className="h-8 w-8" />}
@@ -667,9 +711,7 @@ function LandingPage() {
                 {locale === "fr" ? "TÉMOIGNAGES" : "TESTIMONIALS"}
               </span>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-5 tracking-tight">
-                {locale === "fr"
-                  ? "Ce Que Disent Nos Étudiants"
-                  : "What Our Students Say"}
+                {locale === "fr" ? "Ce Que Disent Nos Étudiants" : "What Our Students Say"}
               </h2>
               <div className="w-24 h-1.5 bg-primary mx-auto rounded-full mb-5"></div>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -678,7 +720,6 @@ function LandingPage() {
                   : "Discover how ClassConnect transforms our students' learning experience"}
               </p>
             </motion.div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Suspense fallback={<TestimonialSkeleton />}>
                 <TestimonialCard
@@ -787,7 +828,6 @@ function LandingPage() {
               </h2>
               <div className="w-24 h-1.5 bg-primary mx-auto rounded-full mb-5"></div>
             </motion.div>
-
             <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
@@ -819,7 +859,6 @@ function LandingPage() {
                     : "Passionate developer specialized in creating innovative educational solutions. ClassConnect is the result of my web development expertise and my vision for the future of online education in Cameroon."
                   }
                 </p>
-                
                 <div className="flex gap-4">
                   <Link 
                     href="https://github.com/Tomdieu" 
@@ -835,7 +874,7 @@ function LandingPage() {
                     target="_blank" 
                     rel="noreferrer"
                     aria-label="LinkedIn Profile"
-                    className="p-3 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors" 
+                    className="p-3 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                   >
                     <Linkedin className="h-5 w-5" />
                   </Link>
@@ -849,7 +888,6 @@ function LandingPage() {
                 </div>
               </motion.div>
             </div>
-            
             <div className="flex justify-center mt-10">
               <Link href="/about">
                 <Button variant="outline" className="gap-2">
@@ -866,27 +904,26 @@ function LandingPage() {
           {/* Animated particles background */}
           <div className="absolute inset-0">
             <div className="absolute inset-0 bg-[url('/patterns/grid.svg')] bg-center opacity-10"></div>
-            
-            {/* Animated floating particles */}
-            {Array.from({ length: 20 }).map((_, i) => (
+            {/* Animated floating particles - Render only when particles state is ready */}
+            {particles && particles.map((p) => (
               <motion.div
-                key={i}
+                key={p.id}
                 className="absolute rounded-full bg-white/20"
                 style={{
-                  width: Math.round(Math.random() * 8 + 4),
-                  height: Math.round(Math.random() * 8 + 4),
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
+                  width: p.width,
+                  height: p.height,
+                  left: p.left,
+                  top: p.top,
                 }}
                 animate={{
                   y: [0, -15, 0],
                   opacity: [0.3, 0.8, 0.3],
                 }}
                 transition={{
-                  duration: Math.random() * 3 + 3,
+                  duration: p.duration,
                   repeat: Infinity,
                   ease: "easeInOut",
-                  delay: Math.random() * 5,
+                  delay: p.delay,
                 }}
               />
             ))}
@@ -907,7 +944,6 @@ function LandingPage() {
               >
                 {locale === "fr" ? "COMMENCEZ MAINTENANT" : "START NOW"}
               </motion.span>
-              
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -931,7 +967,6 @@ function LandingPage() {
                   ? "Rejoignez des milliers d'étudiants qui ont déjà révolutionné leur apprentissage avec ClassConnect. Votre succès commence maintenant."
                   : "Join thousands of students who have already revolutionized their learning with ClassConnect. Your success starts now."}
               </motion.p>
-              
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -941,7 +976,7 @@ function LandingPage() {
               >
                 {/* Enhanced glow effect */}
                 <motion.div
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.2, 1],
                     opacity: [0.5, 0.8, 0.5],
                   }}
@@ -952,7 +987,6 @@ function LandingPage() {
                   }}
                   className="absolute -inset-5 rounded-full bg-white/30 blur-xl"
                 ></motion.div>
-                
                 <Link href="/auth/register">
                   <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
@@ -985,13 +1019,12 @@ function LandingPage() {
                     ? "Rejoignez plus de 5,000 étudiants satisfaits"
                     : "Join over 5,000 satisfied students"}
                 </p>
-                
                 <div className="flex -space-x-2 overflow-hidden">
                   {avatarImages.map((avatar, index) => (
                     <Image 
                       key={index}
-                      src={avatar} 
-                      alt="Student Avatar" 
+                      src={avatar}
+                      alt="Student Avatar"
                       width={32}
                       height={32}
                       className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
@@ -1001,7 +1034,6 @@ function LandingPage() {
                     +99
                   </span>
                 </div>
-                
                 <div className="flex items-center gap-1 text-white/90">
                   <div className="flex">
                     {[1, 2, 3, 4, 5].map(star => (
