@@ -229,12 +229,19 @@ export default async function RootLayout({
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     name: "ClassConnect",
+    alternateName: "ClassConnect E-learning Platform",
     url: "https://www.classconnect.cm",
-    logo: "https://www.classconnect.cm/logo.png",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://www.classconnect.cm/logo.png",
+      width: "180",
+      height: "180"
+    },
     sameAs: [
       "https://www.linkedin.com/in/tomdieuivan",
       "https://github.com/Tomdieu",
       "https://twitter.com/classconnect",
+      "https://www.facebook.com/classconnect"
     ],
     description:
       locale === "en"
@@ -245,12 +252,20 @@ export default async function RootLayout({
       addressCountry: "CM",
       addressRegion: "Littoral",
       addressLocality: "Douala",
+      postalCode: "00237"
     },
-    foundingDate: "2025",
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: "4.0511",
+      longitude: "9.7679"
+    },
+    foundingDate: "2025-01-01",
+    openingHours: "Mo-Fr 08:00-18:00",
+    email: "contact@classconnect.cm",
     founder: {
       "@type": "Person",
       name: "Tomdieu Ivan",
-      jobTitle: "Full Stack Developer",
+      jobTitle: "Full Stack Developer & Founder",
       sameAs: [
         "https://www.linkedin.com/in/tomdieuivan",
         "https://github.com/Tomdieu"
@@ -258,42 +273,69 @@ export default async function RootLayout({
       knowsAbout: ["Web Development", "E-Learning", "Educational Technology"],
       email: "ivan.tomdieu@gmail.com"
     },
-    creator: {
-      "@type": "Person",
-      name: "Tomdieu Ivan",
-      sameAs: [
-        "https://www.linkedin.com/in/tomdieuivan",
-        "https://github.com/Tomdieu"
-      ],
-    },
+    alumni: [
+      {
+        "@type": "Person",
+        name: "Tomdieu Ivan",
+        jobTitle: "Full Stack Developer"
+      }
+    ],
     areaServed: {
       "@type": "Country",
-      name: "Cameroon",
+      name: "Cameroon"
     },
     teaches: [
       "High School Education",
       "Middle School Education",
       "University Level Education",
+      "Computer Science",
+      "Mathematics",
+      "Physics"
     ],
     educationalLevel: [
       "Middle School",
       "High School",
       "University",
+      "Professional Development"
     ],
     availableLanguage: ["French", "English"],
-    offers: {
-      "@type": "Offer",
-      category: "Online Education",
-      availabilityStarts: new Date().toString(),
-      educationalProgramMode: "online",
-      educationalUse: "Online Learning Platform",
+    hasCredential: {
+      "@type": "EducationalOccupationalCredential",
+      name: "ClassConnect Certificate",
+      credentialCategory: "Certificate"
     },
-    contactPoint: {
-      "@type": "ContactPoint",
-      contactType: "customer support",
-      availableLanguage: ["French", "English"],
-      email: "support@classconnect.cm",
+    keywords: "e-learning, online education, Cameroon, digital learning, courses, education, ClassConnect",
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        availableLanguage: ["French", "English"],
+        email: "support@classconnect.cm"
+      },
+      {
+        "@type": "ContactPoint",
+        contactType: "technical support",
+        availableLanguage: ["French", "English"],
+        email: "tech@classconnect.cm"
+      }
+    ],
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://www.classconnect.cm/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
     },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://www.classconnect.cm/${locale}`
+    },
+    parentOrganization: {
+      "@type": "Organization",
+      name: "ClassConnect Education Group",
+      sameAs: "https://www.classconnect.cm"
+    }
   };
 
   return (
