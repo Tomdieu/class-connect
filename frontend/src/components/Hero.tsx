@@ -283,7 +283,7 @@ export default function Hero() {
 
         {/* Features Section */}
         <Dialog open={openFeatures} onOpenChange={setOpenFeatures}>
-          <DialogContent className="max-w-full w-full max-h-screen h-screen flex flex-col overflow-y-auto p-10">
+          <DialogContent className="max-w-full w-full max-h-screen h-screen flex flex-col overflow-y-auto p-10 z-[99999999999999999999999]">
             <div className="container mx-auto">
 
             <Features />
