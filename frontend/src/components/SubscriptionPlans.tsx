@@ -76,7 +76,7 @@ export function SubscriptionPlans() {
       gradient: "from-primary-500 to-primary-600",
       bgClass: "bg-green-500",
       buttonClass: "bg-primary hover:bg-primary/90",
-      headerClass: "bg-gradient-to-r from-primary-500 to-primary-600",
+      headerClass: "",
     },
     {
       id: "premium",
