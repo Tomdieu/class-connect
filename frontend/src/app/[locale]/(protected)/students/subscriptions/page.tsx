@@ -71,7 +71,7 @@ export default function SubscriptionsPage() {
   };
 
   // Check if user has any subscriptions (current or past)
-  const hasSubscriptions = subscriptions?.results.length > 0;
+  const hasSubscriptions = (subscriptions?.results?.length ?? 0) > 0;
 
   if (isLoading) {
     return (
