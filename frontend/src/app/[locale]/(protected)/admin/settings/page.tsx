@@ -47,7 +47,7 @@ const SettingsPage = () => {
         </div>
       </Card>
 
-      <Card className="p-6">
+      {/* <Card className="p-6">
         <h3 className="text-lg font-medium mb-4">Paramètres de Paiement</h3>
         <div className="space-y-4">
           <div className="space-y-2">
@@ -62,7 +62,7 @@ const SettingsPage = () => {
             {loading ? "Sauvegarde..." : "Sauvegarder"}
           </Button>
         </div>
-      </Card>
+      </Card> */}
     </div>
   );
 };

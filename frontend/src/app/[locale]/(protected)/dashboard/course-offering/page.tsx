@@ -62,12 +62,12 @@ export default function CourseOfferingPage() {
               <h1 className="text-2xl md:text-3xl font-bold mb-2 text-primary">{t("courseOfferings.title")}</h1>
               <p className="text-muted-foreground">{t("courseOfferings.description")}</p>
             </div>
-            <Button asChild className="bg-primary hover:bg-primary/90 text-white">
+            {/* <Button asChild className="bg-primary hover:bg-primary/90 text-white">
               <Link href="/dashboard/course-offering/create">
                 <Plus className="mr-2 h-4 w-4" />
                 {t("courseOfferings.add")}
               </Link>
-            </Button>
+            </Button> */}
           </div>
         </div>
 
