@@ -99,10 +99,10 @@ export const AdminSidebar = () => {
                       tooltip={item.title}
                       className="p-2"
                     >
-                      <Link href={item.url} className="flex items-center gap-3">
+                      <a href={item.url} className="flex items-center gap-3">
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
-                      </Link>
+                      </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
