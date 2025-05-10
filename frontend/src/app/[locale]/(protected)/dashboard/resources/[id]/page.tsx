@@ -12,6 +12,7 @@ import PDFDisplay from '@/components/PDFDisplay';
 import VideoReader from '@/components/VideoReader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import ScreenshotProtectionProvider from '@/providers/ScreenshotProtectionProvider';
 
 export default function ResourceDetailPage() {
   const params = useParams();
@@ -26,7 +27,7 @@ export default function ResourceDetailPage() {
   // Get resource icon based on type
   const getResourceIcon = () => {
     if (!resource) return <File className="h-8 w-8 text-gray-400" />;
-    
+
     switch (resource.resource_type) {
       case 'PDFResource':
         return <FileText className="h-8 w-8 text-red-500" />;
@@ -74,7 +75,7 @@ export default function ResourceDetailPage() {
             <div className="bg-gray-50 p-4 rounded-md mb-6">
               <p>{exerciseResource.instructions}</p>
             </div>
-            
+
             {exerciseResource.exercise_url && (
               <div className="flex space-x-4">
                 <Button asChild variant="outline">
@@ -82,7 +83,7 @@ export default function ResourceDetailPage() {
                     View Exercise
                   </a>
                 </Button>
-                
+
                 {exerciseResource.solution_url && (
                   <Button asChild variant="outline">
                     <a href={exerciseResource.solution_url} target="_blank" rel="noopener noreferrer">
@@ -101,7 +102,7 @@ export default function ResourceDetailPage() {
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4">Revision Notes</h3>
             <div className="bg-gray-50 p-4 rounded-md">
-              <div 
+              <div
                 className="prose max-w-none"
                 dangerouslySetInnerHTML={{ __html: revisionResource.content }}
               />
@@ -157,7 +158,7 @@ export default function ResourceDetailPage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to Resources
       </Button>
-      
+
       <div className="flex items-center gap-4 mb-6">
         {getResourceIcon()}
         <div>
@@ -169,18 +170,20 @@ export default function ResourceDetailPage() {
           )}
         </div>
       </div>
-      
+
       {resource.description && (
         <div className="mb-6 bg-gray-50 p-4 rounded-md">
           <p className="text-muted-foreground">{resource.description}</p>
         </div>
       )}
-      
-      <Card>
-        <CardContent className="p-0">
-          {renderResourceViewer()}
-        </CardContent>
-      </Card>
+      <ScreenshotProtectionProvider>
+
+        <Card>
+          <CardContent className="p-0">
+            {renderResourceViewer()}
+          </CardContent>
+        </Card>
+      </ScreenshotProtectionProvider>
     </div>
   );
 }
