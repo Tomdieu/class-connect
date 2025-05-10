@@ -41,7 +41,7 @@ class CourseCategorySerializer(serializers.ModelSerializer):
 
 
 class ClassSerializer(serializers.ModelSerializer):
-    definition_display = serializers.StringRelatedField(source='definition', read_only=True)
+    definition_display = serializers.SerializerMethodField()
     student_count = serializers.SerializerMethodField()
     
     class Meta:
@@ -58,6 +58,9 @@ class ClassSerializer(serializers.ModelSerializer):
         ]
         ref_name = 'ClassBasic'
 
+    def get_definition_display(self, obj):
+        return str(obj)  # Use the Class.__str__ method
+        
     def get_student_count(self, obj):
         from .models import UserClass
         school_year = self.context.get("school_year")
@@ -535,7 +538,7 @@ class ClassDetailSerializer(serializers.ModelSerializer):
     """
     Detailed serializer for Class model that includes the complete hierarchy
     """
-    definition_display = serializers.StringRelatedField(source='definition', read_only=True)
+    definition_display = serializers.SerializerMethodField()
     definition = serializers.SerializerMethodField()
     student_count = serializers.SerializerMethodField()
     
@@ -552,6 +555,9 @@ class ClassDetailSerializer(serializers.ModelSerializer):
             'student_count'
         ]
         ref_name = 'ClassDetail'
+
+    def get_definition_display(self, obj):
+        return str(obj)  # Use the Class.__str__ method
 
     def get_student_count(self, obj):
         from .models import UserClass
