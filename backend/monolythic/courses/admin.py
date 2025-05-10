@@ -5,7 +5,8 @@ from .models import (
     AbstractResource, VideoResource,
     RevisionResource, PDFResource, ExerciseResource,
     UserProgress, CourseCategory, UserAvailability, DailyTimeSlot,
-    CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,UserClass
+    CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration, UserClass,
+    Section, EducationLevel, Speciality, LevelClassDefinition
     # Question, QuestionOption, QuizAttempt, QuestionResponse
 )
 
@@ -24,9 +25,10 @@ class UserClassAdmin(admin.ModelAdmin):
 
 @admin.register(Class)
 class ClassAdmin(admin.ModelAdmin):
-    list_display = ('name', 'level', 'created_at')
-    list_filter = ('level',)
-    search_fields = ('name',)
+    list_display = ('__str__', 'definition', 'variant', 'created_at')
+    list_filter = ('definition__education_level', 'definition__speciality')
+    search_fields = ('variant', 'description')
+    date_hierarchy = 'created_at'
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
@@ -153,3 +155,25 @@ class CourseDeclarationAdmin(admin.ModelAdmin):
     list_display = ('teacher_student_enrollment', 'status', 'declaration_date', 'updated_at')
     search_fields = ('teacher_student_enrollment__teacher__email', 'teacher_student_enrollment__offer__student__email')
     list_filter = ('status', 'declaration_date')
+
+@admin.register(Section)
+class SectionAdmin(admin.ModelAdmin):
+    list_display = ('code', 'label')
+    search_fields = ('code', 'label')
+
+@admin.register(EducationLevel)
+class EducationLevelAdmin(admin.ModelAdmin):
+    list_display = ('code', 'label', 'section')
+    list_filter = ('section',)
+    search_fields = ('code', 'label')
+
+@admin.register(Speciality)
+class SpecialityAdmin(admin.ModelAdmin):
+    list_display = ('code', 'label')
+    search_fields = ('code', 'label')
+
+@admin.register(LevelClassDefinition)
+class LevelClassDefinitionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'education_level', 'speciality')
+    list_filter = ('education_level', 'speciality')
+    search_fields = ('name',)
