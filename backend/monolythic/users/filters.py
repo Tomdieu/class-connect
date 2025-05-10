@@ -16,10 +16,7 @@ class UserFilter(django_filters.FilterSet):
     last_name = django_filters.CharFilter(lookup_expr='icontains')
     name = filters.CharFilter(method='filter_by_name')
     phone_number = django_filters.CharFilter(lookup_expr='icontains')
-    education_level = django_filters.ChoiceFilter(choices=User.EDUCATION_LEVELS)
-    lycee_class = django_filters.CharFilter(lookup_expr='icontains')
-    university_level = django_filters.CharFilter(lookup_expr='icontains')
-    university_year = django_filters.CharFilter(lookup_expr='icontains')
+    user_type = django_filters.ChoiceFilter(choices=User.USER_TYPES)
     enterprise_name = django_filters.CharFilter(lookup_expr='icontains')
     platform_usage_reason = django_filters.CharFilter(lookup_expr='icontains')
     is_active = django_filters.BooleanFilter()
@@ -45,27 +42,25 @@ class UserFilter(django_filters.FilterSet):
         # Debug the incoming value
         logger.debug(f"is_student filter received value: {value}, type: {type(value)}")
         
-        student_education_levels = ['COLLEGE', 'LYCEE', 'UNIVERSITY']
-        
         # Handle boolean parameter
         is_student = self._parse_boolean(value)
         logger.debug(f"is_student parsed to: {is_student}")
         
         if is_student:
-            # If True, return only users who have education_level in student levels
+            # If True, return only users who are students
             # Exclude staff and superusers
             result = queryset.filter(
-                education_level__in=student_education_levels, 
+                user_type='STUDENT', 
                 is_staff=False, 
                 is_superuser=False
             )
             logger.debug(f"is_student filter returned {result.count()} records")
             return result
         else:
-            # If False, return only users who don't have education_level in student levels
+            # If False, return only users who are not students
             # Or are staff/superusers
             result = queryset.filter(
-                Q(~Q(education_level__in=student_education_levels)) | 
+                Q(~Q(user_type='STUDENT')) | 
                 Q(is_staff=True) | 
                 Q(is_superuser=True)
             )
@@ -84,7 +79,7 @@ class UserFilter(django_filters.FilterSet):
             # If True, return only professionals
             # Exclude staff and superusers
             result = queryset.filter(
-                education_level='PROFESSIONAL',
+                user_type='PROFESSIONAL',
                 is_staff=False,
                 is_superuser=False
             )
@@ -94,7 +89,7 @@ class UserFilter(django_filters.FilterSet):
             # If False, return only non-professionals
             # Or are staff/superusers
             result = queryset.filter(
-                Q(~Q(education_level='PROFESSIONAL')) | 
+                Q(~Q(user_type='PROFESSIONAL')) | 
                 Q(is_staff=True) | 
                 Q(is_superuser=True)
             )
@@ -110,13 +105,19 @@ class UserFilter(django_filters.FilterSet):
         logger.debug(f"is_admin parsed to: {is_admin}")
         
         if is_admin:
-            # If True, return users who are staff OR superusers
-            result = queryset.filter(Q(is_staff=True) | Q(is_superuser=True))
+            # If True, return users who are ADMIN user_type OR staff OR superusers
+            result = queryset.filter(
+                Q(user_type='ADMIN') | Q(is_staff=True) | Q(is_superuser=True)
+            )
             logger.debug(f"is_admin filter returned {result.count()} records")
             return result
         else:
-            # If False, return users who are neither staff NOR superusers
-            result = queryset.filter(is_staff=False, is_superuser=False)
+            # If False, return users who are not ADMIN user_type AND not staff AND not superusers
+            result = queryset.filter(
+                ~Q(user_type='ADMIN'), 
+                is_staff=False, 
+                is_superuser=False
+            )
             logger.debug(f"is_admin filter returned {result.count()} records")
             return result
     
@@ -225,9 +226,8 @@ class UserFilter(django_filters.FilterSet):
     class Meta:
         model = User
         fields = [
-            'email', 'first_name', 'last_name', 'name', 'phone_number', 'education_level', 
-            'lycee_class', 'university_level', 'university_year', 'enterprise_name', 
-            'platform_usage_reason', 'is_active', 'date_joined', 'is_student',
-            'is_professional', 'is_admin', 'has_subscription', 'subscription_expiring',
-            'subscription_expired', 'subscription_plan'
+            'email', 'first_name', 'last_name', 'name', 'phone_number', 'user_type',
+            'enterprise_name', 'platform_usage_reason', 'is_active', 'date_joined', 
+            'is_student', 'is_professional', 'is_admin', 'has_subscription', 
+            'subscription_expiring', 'subscription_expired', 'subscription_plan'
         ]
