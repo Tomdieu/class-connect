@@ -7,26 +7,22 @@ export default function ScreenshotProtectionProvider({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    // ⛔ Prevent right-click
-    const disableRightClick = (event: MouseEvent) => {
-      event.preventDefault();
-      console.warn("Right-click is disabled.");
+    // Dynamically load NoPrint.js
+    const script = document.createElement("script");
+    script.src = "https://pdfanticopy.com/noprint.js";
+    script.type = "text/javascript";
+    script.onload = () => {
+      // Configure NoPrint.js variables
+      (window as any).noPrint = true;
+      (window as any).noCopy = true;
+      (window as any).noScreenshot = true;
+      (window as any).autoBlur = true;
     };
-    document.addEventListener("contextmenu", disableRightClick);
-
-    // 🖥️ Prevent text selection & copying
-    const preventCopy = (event: Event) => {
-      event.preventDefault();
-      console.warn("Copying is disabled.");
-    };
-    document.addEventListener("selectstart", preventCopy);
-    document.addEventListener("copy", preventCopy);
+    document.body.appendChild(script);
 
     // Cleanup on unmount
     return () => {
-      document.removeEventListener("contextmenu", disableRightClick);
-      document.removeEventListener("selectstart", preventCopy);
-      document.removeEventListener("copy", preventCopy);
+      document.body.removeChild(script);
     };
   }, []);
 
