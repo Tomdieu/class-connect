@@ -382,7 +382,7 @@ export default async function RootLayout({
         {/* <GoogleAnalytics measurementId="G-H8NMLWT2HV" /> */}
       </head>
       <body
-        className={`antialiased overflow-y-auto flex flex-col ${Inter.variable} font-inter h-screen w-full`}
+        className={`antialiased overflow-y-auto flex flex-col ${Inter.variable} font-inter h-screen w-full scroll-smooth`}
         suppressHydrationWarning
       >
         <ThemeProvider
