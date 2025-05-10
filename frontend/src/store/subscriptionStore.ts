@@ -1,42 +1,46 @@
 import { create } from 'zustand';
 import { getCurrentPlan } from '@/actions/payments';
-import { SubscriptionDetail } from '@/types';
 
 interface SubscriptionState {
+  hasActiveSubscription: boolean | null;
+  currentPlan: any | null;
   isLoading: boolean;
-  hasActiveSubscription: boolean;
-  subscription: SubscriptionDetail | null;
+  error: Error | null;
+  initialized: boolean; // Add initialization tracking
   fetchSubscription: () => Promise<void>;
+  setInitialized: () => void; // Add method to mark as initialized
 }
 
-export const useSubscriptionStore = create<SubscriptionState>((set) => {
-  const fetchSubscription = async () => {
+export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
+  hasActiveSubscription: null,
+  currentPlan: null,
+  isLoading: true,
+  error: null,
+  initialized: false, // Track if the store has been initialized
+  
+  fetchSubscription: async () => {
+    // If already initialized, don't fetch again on initial render
+    if (!get().initialized) return;
+    
+    set({ isLoading: true });
     try {
-      const data = await getCurrentPlan();
-      set({
-        subscription: data.subscription || null,
-        hasActiveSubscription: data.has_active_subscription,
+      const plan = await getCurrentPlan();
+      set({ 
+        hasActiveSubscription: !!plan, 
+        currentPlan: plan, 
         isLoading: false,
+        error: null
       });
     } catch (error) {
-      console.error("Failed to fetch subscription", error);
-      set({ hasActiveSubscription: false, subscription: null, isLoading: false });
+      set({ 
+        error: error as Error, 
+        isLoading: false,
+        hasActiveSubscription: false, 
+        currentPlan: null
+      });
     }
-  };
-
-  // Fetch the initial subscription data
-  fetchSubscription();
-
-  // Set up polling only in the browser and add cleanup
-  if (typeof window !== "undefined") {
-    const interval = setInterval(fetchSubscription, 30000);
-    window.addEventListener("beforeunload", () => clearInterval(interval));
-  }
-
-  return {
-    isLoading: true,
-    hasActiveSubscription: false,
-    subscription: null,
-    fetchSubscription,
-  };
-});
+  },
+  
+  // Method to mark store as initialized
+  setInitialized: () => set({ initialized: true }),
+}));
