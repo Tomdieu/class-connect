@@ -15,16 +15,22 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 function StudentHomePage() {
   const router = useRouter();
-  const { isLoading, hasActiveSubscription } = useSubscriptionStore();
-
+  const { isLoading, hasActiveSubscription, fetchSubscription, setInitialized } = useSubscriptionStore();
+  const t = useI18n();
+  
+  // Initialize subscription store and fetch data after mount
+  useEffect(() => {
+    setInitialized();
+    fetchSubscription();
+  }, [fetchSubscription, setInitialized]);
+  
+  // Redirect logic
   useEffect(() => {
     if (!isLoading && hasActiveSubscription === false) {
       router.push('/students/subscriptions');
     }
   }, [isLoading, hasActiveSubscription, router]);
 
-  const t = useI18n();
-  
   const { data: myClasses, isLoading: classesLoading, error } = useQuery({
     queryKey: ['myClasses'],
     queryFn: () => getMyClass(),
@@ -87,7 +93,6 @@ function StudentHomePage() {
   return (
     <div 
       className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background" 
-      style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}
     >
       <div className="w-full p-4 sm:p-6">
         <div className="animate-fadeIn">
@@ -120,7 +125,7 @@ function StudentHomePage() {
                       className="flex items-center justify-between p-3 border rounded-lg hover:bg-primary/10 transition-colors group"
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
-                      <span>{classItem.class_level.name}</span>
+                      <span>{classItem.class_level.definition_display}</span>
                       <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                     </Link>
                   ))}
