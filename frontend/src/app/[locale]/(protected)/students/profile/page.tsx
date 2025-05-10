@@ -18,7 +18,7 @@ import { getAccountInfor } from "@/actions/accounts";
 import AvatarUploadForm from "@/components/forms/AvatarUploadForm";
 import { motion } from "framer-motion";
 
-// Add animation variants
+// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -57,43 +57,20 @@ function StudentProfilePage() {
   // Show loading state while session is loading
   if (isLoading) {
     return (
-      <motion.div 
-        className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
-        <div className="max-w-[2400px] mx-auto">
-          <Skeleton className="h-12 w-2/3 mb-2" />
-          <Skeleton className="h-4 w-1/2 mb-8" />
-          <div className="mt-6 bg-card/95 backdrop-blur border border-primary/20 rounded-lg p-6">
-            <Skeleton className="h-10 w-80 mb-6" />
-            <div className="space-y-6">
-              <div>
-                <Skeleton className="h-6 w-48 mb-2" />
-                <Skeleton className="h-4 w-96 mb-4" />
-              </div>
-              <Skeleton className="h-1 w-full mb-6" />
-
-              <div className="space-y-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
-                  </div>
-                ))}
-                <Skeleton className="h-10 w-32 mt-4" />
-              </div>
-            </div>
-          </div>
+      <div className="container max-w-5xl mx-auto py-8 px-4">
+        <Skeleton className="h-12 w-2/3 mb-2" />
+        <Skeleton className="h-4 w-1/2 mb-8" />
+        <div className="space-y-6">
+          <Skeleton className="h-[400px] rounded-xl" />
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   // Handle error state
   if (userError) {
     return (
-      <div className="container mx-auto py-6">
+      <div className="container max-w-5xl mx-auto py-8 px-4">
         <DashboardHeader
           title={t("student.profile.title")}
           description={t("student.profile.description")}
@@ -120,97 +97,101 @@ function StudentProfilePage() {
 
   return (
     <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="container max-w-5xl mx-auto py-8 px-4"
     >
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-        className="w-full max-w-[2400px] mx-auto mb-6"
-      >
-        <Button variant="outline" size="sm" asChild className="hover:bg-primary/10 transition-all">
+      <motion.div variants={sectionVariants} className="mb-8">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          asChild 
+          className="rounded-full hover:bg-primary/10 transition-all mb-4"
+        >
           <Link href="/students">
             <ChevronLeft className="h-4 w-4 mr-1" />
-            {t('common.back')} {t('common.dashboard')}
+            {t('common.back')}
           </Link>
         </Button>
-      </motion.div>
 
-      <motion.div 
-        className="relative flex flex-col items-center justify-between mb-10 pb-4 border-b border-primary/10 max-w-[2400px] mx-auto"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-      >
-        <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
-        <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full z-0 opacity-10"></div>
-        
-        <div className="flex items-center mb-4 relative w-full">
-          <div className="bg-primary/10 p-3 rounded-full mr-4">
-            <User className="h-7 w-7 text-primary" />
-          </div>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
               {t("student.profile.title")}
             </h1>
-            <p className="text-sm text-gray-600">{t("student.profile.description")}</p>
+            <p className="text-muted-foreground mt-1">{t("student.profile.description")}</p>
           </div>
+          
+          {userInfo && (
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="hidden md:block mt-4 md:mt-0"
+            >
+              <AvatarUploadForm user={userInfo} />
+            </motion.div>
+          )}
         </div>
       </motion.div>
 
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="space-y-8 max-w-[2400px] mx-auto"
+      <motion.div 
+        variants={sectionVariants} 
+        className="bg-card/80 backdrop-blur-sm border border-primary/10 shadow-xl rounded-2xl overflow-hidden"
       >
-        <motion.div variants={sectionVariants} className="bg-card/95 backdrop-blur shadow-lg border border-primary/20 rounded-lg p-6">
-          <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="mb-6 grid w-full md:w-[400px] grid-cols-2 bg-primary/10">
-              <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+        <Tabs defaultValue="profile" className="w-full">
+          <div className="px-6 pt-6 border-b border-primary/10 pb-4">
+            <TabsList className="grid w-full max-w-md grid-cols-2 bg-muted/50">
+              <TabsTrigger 
+                value="profile" 
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-3"
+              >
                 <User className="h-4 w-4 mr-2" />
                 {t("student.profile.personalTab")}
               </TabsTrigger>
-              <TabsTrigger value="password" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger 
+                value="password" 
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-3"
+              >
                 <Lock className="h-4 w-4 mr-2" />
                 {t("student.profile.passwordTab")}
               </TabsTrigger>
             </TabsList>
+          </div>
 
-            <TabsContent value="profile" className="mt-4 space-y-6">
-              <div>
-                <h3 className="text-lg font-medium">{t("student.profile.personalInfo")}</h3>
-                <p className="text-sm text-muted-foreground">{t("student.profile.personalInfoDesc")}</p>
-              </div>
-              <Separator className="border-primary/10" />
-              
+          <TabsContent value="profile" className="p-6 space-y-8 focus:outline-none">
+            <div>
+              <h3 className="text-xl font-semibold text-foreground">{t("student.profile.personalInfo")}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{t("student.profile.personalInfoDesc")}</p>
+            </div>
+            <Separator className="bg-primary/10" />
+            
+            <div className="md:hidden mb-8">
               {userInfo && (
-                <div className="mb-8">
-                  <h4 className="text-md font-medium mb-2">{t("student.profile.profilePicture")}</h4>
+                <div>
+                  <h4 className="text-md font-medium mb-3">{t("student.profile.profilePicture")}</h4>
                   <AvatarUploadForm user={userInfo} />
                 </div>
               )}
-              
-              <div className="">
-                <ProfileForm user={userInfo!} />
-              </div>
-            </TabsContent>
+            </div>
+            
+            <div className="bg-muted/30 p-6 rounded-xl border border-muted/50 shadow-sm">
+              <ProfileForm user={userInfo!} />
+            </div>
+          </TabsContent>
 
-            <TabsContent value="password" className="mt-4 space-y-6">
-              <div>
-                <h3 className="text-lg font-medium">{t("student.profile.changePassword")}</h3>
-                <p className="text-sm text-muted-foreground">{t("student.profile.changePasswordDesc")}</p>
-              </div>
-              <Separator className="border-primary/10" />
-              <div className="">
-                {userInfo && <PasswordChangeForm userId={userInfo?.id} />}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </motion.div>
+          <TabsContent value="password" className="p-6 space-y-8 focus:outline-none">
+            <div>
+              <h3 className="text-xl font-semibold text-foreground">{t("student.profile.changePassword")}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{t("student.profile.changePasswordDesc")}</p>
+            </div>
+            <Separator className="bg-primary/10" />
+            <div className="bg-muted/30 p-6 rounded-xl border border-muted/50 shadow-sm">
+              {userInfo && <PasswordChangeForm userId={userInfo?.id} />}
+            </div>
+          </TabsContent>
+        </Tabs>
       </motion.div>
     </motion.div>
   );
