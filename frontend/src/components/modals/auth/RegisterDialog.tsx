@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { InputPhone } from "@/components/ui/input-phone";
 import {
   Select,
   SelectContent,
@@ -624,11 +625,112 @@ function RegisterDialog() {
                             {t("registerDialog.dateOfBirthLabel")}
                           </FormLabel>
                           <FormControl>
-                            <Input
-                              type="date"
-                              className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
-                              {...field}
-                            />
+                            <div className="space-y-3">
+                              {/* Custom date picker with separate scrollable inputs */}
+                              <div className="grid grid-cols-3 gap-2">
+                                {/* Day select */}
+                                <Select
+                                  onValueChange={(day) => {
+                                    const currentDate = field.value ? new Date(field.value) : new Date();
+                                    const newDate = new Date(
+                                      currentDate.getFullYear(),
+                                      currentDate.getMonth(),
+                                      parseInt(day)
+                                    );
+                                    field.onChange(newDate.toISOString().split('T')[0]);
+                                  }}
+                                  value={field.value ? new Date(field.value).getDate().toString() : ""}
+                                >
+                                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20">
+                                    <SelectValue placeholder="Day" />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-60">
+                                    {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                                      <SelectItem key={day} value={day.toString()}>
+                                        {day}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                
+                                {/* Month select */}
+                                <Select
+                                  onValueChange={(month) => {
+                                    const currentDate = field.value ? new Date(field.value) : new Date();
+                                    const newDate = new Date(
+                                      currentDate.getFullYear(),
+                                      parseInt(month) - 1,
+                                      currentDate.getDate()
+                                    );
+                                    field.onChange(newDate.toISOString().split('T')[0]);
+                                  }}
+                                  value={field.value ? (new Date(field.value).getMonth() + 1).toString() : ""}
+                                >
+                                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20">
+                                    <SelectValue placeholder="Month" />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-60">
+                                    {[
+                                      "January", "February", "March", "April",
+                                      "May", "June", "July", "August",
+                                      "September", "October", "November", "December"
+                                    ].map((month, index) => (
+                                      <SelectItem key={month} value={(index + 1).toString()}>
+                                        {month}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                
+                                {/* Year select - with years appropriate for 80s and 90s birth years */}
+                                <Select
+                                  onValueChange={(year) => {
+                                    const currentDate = field.value ? new Date(field.value) : new Date();
+                                    const newDate = new Date(
+                                      parseInt(year),
+                                      currentDate.getMonth(),
+                                      currentDate.getDate()
+                                    );
+                                    field.onChange(newDate.toISOString().split('T')[0]);
+                                  }}
+                                  value={field.value ? new Date(field.value).getFullYear().toString() : ""}
+                                >
+                                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20">
+                                    <SelectValue placeholder="Year" />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-60">
+                                    {/* Years from 1980 to 2012 (for users 13+ years old) */}
+                                    {Array.from({ length: 33 }, (_, i) => 2012 - i).map((year) => (
+                                      <SelectItem 
+                                        key={year} 
+                                        value={year.toString()}
+                                        className={year >= 1980 && year <= 1999 ? "font-medium" : ""}
+                                      >
+                                        {year}
+                                        {year >= 1980 && year <= 1999 ? " 🔍" : ""}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              
+                              {/* Traditional date input as fallback */}
+                              <div className="flex items-center gap-2">
+                                <div className="h-px flex-1 bg-gray-200"></div>
+                                <span className="text-xs text-gray-500">{t("common.or")}</span>
+                                <div className="h-px flex-1 bg-gray-200"></div>
+                              </div>
+                              
+                              <Input
+                                type="date"
+                                className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                                {...field}
+                              />
+                              
+                              <p className="text-xs text-muted-foreground">
+                                {t("registerDialog.dateOfBirthHelper") || "You can choose using the selectors above or type the date directly"}
+                              </p>
+                            </div>
                           </FormControl>
                           <FormMessage className="text-red-500" />
                         </FormItem>
@@ -699,7 +801,8 @@ function RegisterDialog() {
                             {t("registerDialog.phoneNumberLabel")}
                           </FormLabel>
                           <FormControl>
-                            <Input
+                            <InputPhone
+                              defaultCountry="CM"
                               placeholder={t("registerDialog.phoneNumberLabel")}
                               className="h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
                               {...field}
