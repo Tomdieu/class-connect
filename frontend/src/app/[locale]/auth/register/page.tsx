@@ -128,7 +128,7 @@ export default function RegisterPage() {
     message: t('registerDialog.errors.passwordsMustMatch'),
     path: ['confirm_password'],
   }).refine(data => {
-    // Validate age is at least 13
+    // Validate age is at least 10
     const today = new Date();
     const birthDate = new Date(data.date_of_birth);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -136,7 +136,7 @@ export default function RegisterPage() {
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    return age >= 13;
+    return age >= 10;
   }, {
     message: t('registerDialog.errors.dateMinAge'),
     path: ['date_of_birth'],
@@ -532,11 +532,6 @@ export default function RegisterPage() {
                   onClick={() => handleClassSelection(classDetail)}
                 >
                   <span>{classDetail.definition_display}</span>
-                  {classDetail.student_count > 0 && (
-                    <Badge variant="outline" className="ml-2">
-                      {classDetail.student_count} {t("common.students")}
-                    </Badge>
-                  )}
                 </Button>
               ))}
             </div>
@@ -824,30 +819,58 @@ export default function RegisterPage() {
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
+                            <div className="flex items-center justify-between px-4 py-2">
+                              {/* Year Dropdown */}
+                              <Select
+                                value={birthYear}
+                                onValueChange={(value) => setBirthYear(value)}
+                              >
+                                <SelectTrigger className="w-24">
+                                  <SelectValue placeholder="Year" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {years.map((year) => (
+                                    <SelectItem key={year} value={year}>
+                                      {year}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+
+                              {/* Month Dropdown */}
+                              <Select
+                                value={birthMonth}
+                                onValueChange={(value) => setBirthMonth(value)}
+                              >
+                                <SelectTrigger className="w-24">
+                                  <SelectValue placeholder="Month" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {months.map((month) => (
+                                    <SelectItem key={month.value} value={month.value}>
+                                      {month.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Calendar Component */}
                             <CalendarComponent
                               mode="single"
                               selected={field.value}
                               onSelect={(date) => {
                                 field.onChange(date);
-                                // Update separate day/month/year states if needed, though direct form update is sufficient
                                 if (date) {
                                   setBirthYear(date.getFullYear().toString());
                                   setBirthMonth((date.getMonth() + 1).toString().padStart(2, '0'));
                                   setBirthDay(date.getDate().toString().padStart(2, '0'));
                                 }
                               }}
-                              disabled={(date) => {
-                                // Disable future dates & dates more than 100 years ago
-                                const today = new Date();
-                                const maxDate = new Date();
-                                const minDate = new Date();
-
-                                // Must be at least 13 years old
-                                maxDate.setFullYear(today.getFullYear() - 13);
-                                // Max 100 years old
-                                minDate.setFullYear(today.getFullYear() - 100);
-
-                                return date > maxDate || date < minDate;
+                              month={new Date(parseInt(birthYear), parseInt(birthMonth) - 1)}
+                              onMonthChange={(month) => {
+                                setBirthYear(month.getFullYear().toString());
+                                setBirthMonth((month.getMonth() + 1).toString().padStart(2, '0'));
                               }}
                               initialFocus
                             />
