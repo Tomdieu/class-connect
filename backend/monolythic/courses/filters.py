@@ -3,7 +3,8 @@ from .models import (
     Class, Subject, Chapter, Topic, AbstractResource,
     VideoResource, RevisionResource,
     PDFResource, ExerciseResource, UserProgress, CourseCategory, User,
-    CourseOffering,CourseOfferingAction,CourseDeclaration,TeacherStudentEnrollment, UserClass, SchoolYear
+    CourseOffering, CourseOfferingAction, CourseDeclaration, TeacherStudentEnrollment, UserClass, SchoolYear,
+    Section, EducationLevel, Speciality, LevelClassDefinition
 )
 
 class CourseCategoryFilter(django_filters.FilterSet):
@@ -14,26 +15,62 @@ class CourseCategoryFilter(django_filters.FilterSet):
         fields = ['name', 'parent']
 
 class ClassFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(lookup_expr='icontains')
-    level = django_filters.ChoiceFilter(choices=Class.EDUCATION_LEVELS)
+    variant = django_filters.CharFilter(lookup_expr='icontains')
+    description = django_filters.CharFilter(lookup_expr='icontains')
+    definition = django_filters.NumberFilter(field_name='definition__id')
+    education_level = django_filters.NumberFilter(field_name='definition__education_level__id')
+    section = django_filters.NumberFilter(field_name='definition__education_level__section__id')
+    speciality = django_filters.NumberFilter(field_name='definition__speciality__id')
     created_at = django_filters.DateTimeFromToRangeFilter()
-    speciality = django_filters.CharFilter(method='filter_speciality')
-    
-    def filter_speciality(self, queryset, name, value):
-        return queryset.filter(speciality__icontains=value)
     
     class Meta:
         model = Class
-        fields = ['name', 'level']
+        fields = ['variant', 'description', 'definition', 'education_level', 'section', 'speciality']
+
+class SectionFilter(django_filters.FilterSet):
+    code = django_filters.CharFilter(lookup_expr='exact')
+    label = django_filters.CharFilter(lookup_expr='icontains')
+    
+    class Meta:
+        model = Section
+        fields = ['code', 'label']
+
+class EducationLevelFilter(django_filters.FilterSet):
+    code = django_filters.CharFilter(lookup_expr='exact')
+    label = django_filters.CharFilter(lookup_expr='icontains')
+    section = django_filters.NumberFilter(field_name='section__id')
+    
+    class Meta:
+        model = EducationLevel
+        fields = ['code', 'label', 'section']
+
+class SpecialityFilter(django_filters.FilterSet):
+    code = django_filters.CharFilter(lookup_expr='exact')
+    label = django_filters.CharFilter(lookup_expr='icontains')
+    
+    class Meta:
+        model = Speciality
+        fields = ['code', 'label']
+
+class LevelClassDefinitionFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(lookup_expr='icontains')
+    education_level = django_filters.NumberFilter(field_name='education_level__id')
+    section = django_filters.NumberFilter(field_name='education_level__section__id')
+    speciality = django_filters.NumberFilter(field_name='speciality__id')
+    
+    class Meta:
+        model = LevelClassDefinition
+        fields = ['name', 'education_level', 'speciality']
 
 class SubjectFilter(django_filters.FilterSet):
-    class_name = django_filters.CharFilter(field_name='class_level__name', lookup_expr='iexact')
     name = django_filters.CharFilter(lookup_expr='icontains')
     class_id = django_filters.NumberFilter(field_name='class_level__id')
+    education_level = django_filters.NumberFilter(field_name='class_level__definition__education_level__id')
+    section = django_filters.NumberFilter(field_name='class_level__definition__education_level__section__id')
 
     class Meta:
         model = Subject
-        fields = ['name', 'class_level', 'class_id', 'class_name']
+        fields = ['name', 'class_level', 'class_id', 'education_level', 'section']
 
 class ChapterFilter(django_filters.FilterSet):
     title = django_filters.CharFilter(lookup_expr='icontains')
@@ -88,13 +125,15 @@ class UserProgressFilter(django_filters.FilterSet):
 class CourseOfferingFilter(django_filters.FilterSet):
     subject = django_filters.ModelChoiceFilter(queryset=Subject.objects.all())
     class_level = django_filters.ModelChoiceFilter(queryset=Class.objects.all())
+    education_level = django_filters.NumberFilter(field_name='class_level__definition__education_level__id')
+    section = django_filters.NumberFilter(field_name='class_level__definition__education_level__section__id')
     start_date = django_filters.DateFromToRangeFilter()
     hourly_rate = django_filters.RangeFilter()
     is_available = django_filters.BooleanFilter()
 
     class Meta:
         model = CourseOffering
-        fields = ['subject', 'class_level', 'is_available', 'student']
+        fields = ['subject', 'class_level', 'is_available', 'student', 'education_level', 'section']
 
 class CourseOfferingActionFilter(django_filters.FilterSet):
     action = django_filters.ChoiceFilter(choices=CourseOfferingAction.ACTIONS)
@@ -144,12 +183,14 @@ class CourseDeclarationFilter(django_filters.FilterSet):
         fields = ['status', 'declaration_date_from', 'declaration_date_to', 'user_id']
 
 class UserClassFilter(django_filters.FilterSet):
-    class_level = django_filters.NumberFilter(field_name='class_level')
+    class_level = django_filters.NumberFilter(field_name='class_level__id')
     school_year = django_filters.CharFilter(method='filter_by_school_year')
+    education_level = django_filters.NumberFilter(field_name='class_level__definition__education_level__id')
+    section = django_filters.NumberFilter(field_name='class_level__definition__education_level__section__id')
     
     class Meta:
         model = UserClass
-        fields = ['class_level', 'school_year', 'user']
+        fields = ['class_level', 'school_year', 'user', 'education_level', 'section']
     
     def filter_by_school_year(self, queryset, name, value):
         try:
