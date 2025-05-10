@@ -12,7 +12,6 @@ class PermissionSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     subscription_status = serializers.ReadOnlyField()
-    class_level = serializers.SerializerMethodField()
     class_display = serializers.SerializerMethodField()
     is_superuser = serializers.BooleanField(read_only=True)
     is_staff = serializers.BooleanField(read_only=True)
@@ -21,16 +20,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'email', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 
-            'education_level', 'college_class', 'lycee_class', 'lycee_speciality',
-            'university_level', 'university_year', 'enterprise_name', 
-            'platform_usage_reason', 'email_verified', 'avatar', 'language', 
-            'town', 'quarter', 'subscription_status', 'class_level', 'class_display',
-            'is_active', 'created_at', 'updated_at', 'date_joined','last_login',
+            'user_type', 'class_enrolled',
+            'enterprise_name', 'platform_usage_reason', 'email_verified', 'avatar', 'language', 
+            'town', 'quarter', 'subscription_status', 'class_display',
+            'is_active', 'created_at', 'updated_at', 'date_joined', 'last_login',
             'is_superuser', 'is_staff'
         ]
-        
-    def get_class_level(self, obj):
-        return obj.get_class_level()
     
     def get_class_display(self, obj):
         return obj.get_class_display()
@@ -39,33 +34,23 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     is_superuser = serializers.BooleanField(required=False, default=False)
     is_staff = serializers.BooleanField(required=False, default=False)
-    education_level = serializers.CharField(required=False, allow_blank=True)
+    user_type = serializers.CharField(required=False)
 
     class Meta:
         model = User
         fields = [
             'email', 'password', 'first_name', 'last_name', 'phone_number', 
-            'date_of_birth', 'education_level', 'college_class', 'lycee_class',
-            'lycee_speciality', 'university_level', 'university_year',
+            'date_of_birth', 'user_type', 'class_enrolled',
             'enterprise_name', 'platform_usage_reason', 'avatar', 'language',
             'town', 'quarter', 'is_superuser', 'is_staff'
         ]
 
     def validate(self, data):
-        # For admin/staff, ensure education_level is at least an empty string
-        if data.get('is_superuser', False) or data.get('is_staff', False):
-            # Set to empty string if not provided or if null
-            if 'education_level' not in data or data['education_level'] is None:
-                data['education_level'] = ''
-        else:
-            # For regular users, education_level is required
-            if not data.get('education_level'):
-                raise serializers.ValidationError({'education_level': 'This field is required for non-admin users.'})
-        
+        # Let the model's save method determine the user_type automatically 
+        # based on the provided fields
         return data
 
     def create(self, validated_data):
-        # At this point education_level should always be a string (possibly empty)
         user = User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
@@ -73,12 +58,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             last_name=validated_data.get('last_name', ''),
             phone_number=validated_data.get('phone_number', ''),
             date_of_birth=validated_data.get('date_of_birth', None),
-            education_level=validated_data.get('education_level', ''),
-            college_class=validated_data.get('college_class', None),
-            lycee_class=validated_data.get('lycee_class', None),
-            lycee_speciality=validated_data.get('lycee_speciality', None),
-            university_level=validated_data.get('university_level', None),
-            university_year=validated_data.get('university_year', None),
+            user_type=validated_data.get('user_type', 'STUDENT'),  # Default to STUDENT
+            class_enrolled=validated_data.get('class_enrolled', None),
             enterprise_name=validated_data.get('enterprise_name', ''),
             platform_usage_reason=validated_data.get('platform_usage_reason', ''),
             avatar=validated_data.get('avatar', None),
