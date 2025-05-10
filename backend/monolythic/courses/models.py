@@ -10,6 +10,106 @@ from django.utils.text import slugify
 from django.utils.timezone import now
 
 User = get_user_model()
+
+class Section(models.Model):
+    FRANCOPHONE = 'FR'
+    ANGLOPHONE = 'EN'
+    TYPE_CHOICES = [
+        (FRANCOPHONE, 'Francophone'),
+        (ANGLOPHONE, 'Anglophone'),
+    ]
+    code = models.CharField(max_length=2, choices=TYPE_CHOICES, unique=True)
+    label = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.label
+
+class EducationLevel(models.Model):
+    COLLEGE = 'COLLEGE'
+    LYCEE = 'LYCEE'
+    UNIVERSITY = 'UNIVERSITY'
+    PROFESSIONAL = 'PROFESSIONAL'
+    LEVEL_CHOICES = [
+        (COLLEGE, 'College'),
+        (LYCEE, 'Lycée'),
+        (UNIVERSITY, 'Université'),
+        (PROFESSIONAL, 'Professionnel'),
+    ]
+    code = models.CharField(max_length=20, choices=LEVEL_CHOICES)  # Remove unique=True
+    label = models.CharField(max_length=100)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='education_levels')
+    
+    class Meta:
+        unique_together = ('code', 'section')  # Make code unique per section
+    
+    def __str__(self):
+        return f"{self.label} ({self.section.code})"
+
+class Speciality(models.Model):
+    SCIENTIFIQUE = 'scientifique'
+    LITTERAIRE = 'litteraire'
+    TYPE_CHOICES = [
+        (SCIENTIFIQUE, 'Scientifique'),
+        (LITTERAIRE, 'Littéraire'),
+    ]
+    code = models.CharField(max_length=20, choices=TYPE_CHOICES, unique=True)
+    label = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.label
+    
+    class Meta:
+        verbose_name_plural = "Specialities"
+
+class LevelClassDefinition(models.Model):
+    """
+    Defines the standard classes available for a given education level,
+    optionally tied to a speciality (e.g. 2nde scientifique).
+    """
+    education_level = models.ForeignKey(EducationLevel, on_delete=models.CASCADE, related_name='class_definitions')
+    name = models.CharField(max_length=50)
+    speciality = models.ForeignKey(
+        Speciality,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='class_definitions'
+    )
+    
+    class Meta:
+        unique_together = ('education_level', 'name', 'speciality')
+        
+    def __str__(self):
+        parts = [self.name]
+        if self.speciality:
+            parts.append(self.speciality.code)
+        return " ".join(parts)
+
+class Class(models.Model):
+    """
+    Actual offered class instance/variant, tied to a LevelClassDefinition.
+    e.g. '2nde C', 'L1-A'.
+    """
+    definition = models.ForeignKey(
+        LevelClassDefinition, 
+        on_delete=models.CASCADE, 
+        related_name='instances',
+        null=True,  # Allow null temporarily for migration
+        blank=True  # Allow blank temporarily
+    )
+    variant = models.CharField(max_length=50, blank=True, help_text="Optional variant label, e.g. 'A', 'C', 'A4'.")
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name_plural = "Classes"
+        
+    def __str__(self):
+        if self.variant:
+            return f"{self.definition.name} {self.variant}"
+        return self.definition.name
+
 class CourseCategory(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -17,50 +117,6 @@ class CourseCategory(models.Model):
     
     def __str__(self):
         return self.name
-
-class Class(models.Model):
-
-    COLLEGE = 'COLLEGE'
-    LYCEE = 'LYCEE'
-    UNIVERSITY = 'UNIVERSITY'
-    PROFESSIONAL = 'PROFESSIONAL'
-
-    EDUCATION_LEVELS = [
-        (COLLEGE,"College"),
-        (LYCEE, 'Lycée'),
-        (UNIVERSITY, 'Université'),
-        (PROFESSIONAL, 'Professionnel'),
-    ]
-
-    FRANCOPHONE = 'FRANCOPHONE'
-    ANGLOPHONE = 'ANGLOPHONE'
-
-    SECTIONS = [
-        (FRANCOPHONE,'Francophone'),
-        (ANGLOPHONE,'Anglophone')
-    ]
-    
-    SCIENTIFIQUE = 'scientifique'
-    LITTERAIRE = 'litteraire'
-    
-    SPECIALITES = [
-        (SCIENTIFIQUE, 'Scientifique'),
-        (LITTERAIRE, 'Litteraire')
-    ]
-    
-    name = models.CharField(max_length=100)
-    level = models.CharField(max_length=20, choices=EDUCATION_LEVELS)
-    section = models.CharField(max_length=20,choices=SECTIONS,default=FRANCOPHONE)
-    speciality = models.CharField(max_length=20,choices=SPECIALITES,blank=True,null=True)
-    description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name_plural = "Classes"
-
-    def __str__(self):
-        return f"{self.name} - {self.get_level_display()}"
 
 class SchoolYear(models.Model):
     start_year = models.PositiveIntegerField()
@@ -194,139 +250,6 @@ class VideoResource(AbstractResource):
     def get_video_url(self):
         return self.get_signed_url('video_file')
 
-
-# class QuizResource(AbstractResource):
-#    duration_minutes = models.PositiveIntegerField()
-#    passing_score = models.PositiveIntegerField(default=60)
-#    show_correct_answers = models.BooleanField(default=True)
-#    shuffle_questions = models.BooleanField(default=False)
-
-#    def get_user_attempts(self, user):
-#        return self.attempts.filter(user=user).count()
-
-#    def can_user_attempt(self, user):
-#        attempts = self.get_user_attempts(user)
-#        return attempts < self.attempts_allowed
-
-#    def get_user_best_score(self, user):
-#        return self.attempts.filter(
-#            user=user, 
-#            is_completed=True
-#        ).aggregate(best_score=models.Max('score'))['best_score']
-       
-# class Question(models.Model):
-#    QUESTION_TYPES = [
-#        ('MULTIPLE_CHOICE', 'Multiple Choice'),
-#        ('SINGLE_CHOICE', 'Single Choice'),
-#        ('TRUE_FALSE', 'True/False'),
-#        ('SHORT_ANSWER', 'Short Answer'),
-#    ]
-
-#    quiz = models.ForeignKey(QuizResource, on_delete=models.CASCADE, related_name='questions') 
-#    text = models.TextField()
-#    image = models.ImageField(upload_to='quiz_questions/', blank=True, null=True)
-#    type = models.CharField(max_length=20, choices=QUESTION_TYPES)
-#    points = models.PositiveIntegerField(default=1)
-#    order = models.PositiveIntegerField(default=0)
-#    explanation = models.TextField(blank=True)
-#    explanation_image = models.ImageField(upload_to='quiz_explanations/', blank=True, null=True)
-#    created_at = models.DateTimeField(auto_now_add=True)
-#    updated_at = models.DateTimeField(auto_now=True)
-
-#    class Meta:
-#        ordering = ['order']
-
-#    def __str__(self):
-#        return f"Question {self.order}: {self.text[:50]}..."
-   
-# class QuestionOption(models.Model):
-#    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
-#    text = models.CharField(max_length=255)
-#    image = models.ImageField(upload_to='quiz_options/', blank=True, null=True)
-#    is_correct = models.BooleanField(default=False)
-#    order = models.PositiveIntegerField(default=0)
-#    created_at = models.DateTimeField(auto_now_add=True)
-#    updated_at = models.DateTimeField(auto_now=True)
-
-#    class Meta:
-#        ordering = ['order']
-
-#    def __str__(self):
-#        return f"Option for {self.question}: {self.text[:30]}.."
-   
-# class QuizAttempt(models.Model):
-#    quiz = models.ForeignKey(QuizResource, on_delete=models.CASCADE, related_name='attempts')
-#    user = models.ForeignKey(User, on_delete=models.CASCADE)
-#    score = models.DecimalField(max_digits=5, decimal_places=2)
-#    started_at = models.DateTimeField(auto_now_add=True)
-#    completed_at = models.DateTimeField(null=True, blank=True)
-#    is_completed = models.BooleanField(default=False)
-
-#    def __str__(self):
-#        return f"Attempt by {self.user} on {self.quiz.title}"
-
-#    @property
-#    def duration(self):
-#        if self.completed_at:
-#            return self.completed_at - self.started_at
-#        return None
-
-#    def finish_attempt(self):
-#        self.completed_at = timezone.now()
-#        self.is_completed = True
-#        self.calculate_score()
-#        self.save()
-
-#    def calculate_score(self):
-#        total_points = self.quiz.questions.aggregate(total=models.Sum('points'))['total']
-#        earned_points = self.responses.filter(is_correct=True).aggregate(
-#            earned=models.Sum('points_earned'))['earned'] or 0
-#        self.score = (earned_points / total_points * 100) if total_points > 0 else 0
-#        self.save()
-
-# class QuestionResponse(models.Model):
-#    attempt = models.ForeignKey(QuizAttempt, on_delete=models.CASCADE, related_name='responses')
-#    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-#    selected_options = models.ManyToManyField(QuestionOption, blank=True)
-#    text_response = models.TextField(blank=True)
-#    is_correct = models.BooleanField(default=False)
-#    points_earned = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-#    created_at = models.DateTimeField(auto_now_add=True)
-#    updated_at = models.DateTimeField(auto_now=True)
-
-#    def calculate_score(self):
-#        if self.question.type in ['MULTIPLE_CHOICE', 'SINGLE_CHOICE']:
-#            correct_options = set(self.question.options.filter(is_correct=True))
-#            selected_options = set(self.selected_options.all())
-           
-#            if self.question.type == 'SINGLE_CHOICE':
-#                self.is_correct = len(selected_options) == 1 and selected_options.issubset(correct_options)
-#                self.points_earned = self.question.points if self.is_correct else 0
-#            else:
-#                correct_selections = len(selected_options.intersection(correct_options))
-#                incorrect_selections = len(selected_options - correct_options)
-#                total_correct = len(correct_options)
-               
-#                if incorrect_selections == 0:
-#                    self.points_earned = (correct_selections / total_correct) * self.question.points
-#                    self.is_correct = correct_selections == total_correct
-#                else:
-#                    self.points_earned = 0
-#                    self.is_correct = False
-                   
-#        elif self.question.type == 'TRUE_FALSE':
-#            self.is_correct = self.selected_options.filter(is_correct=True).exists()
-#            self.points_earned = self.question.points if self.is_correct else 0
-           
-#        elif self.question.type == 'SHORT_ANSWER':
-#            correct_answer = self.question.options.filter(is_correct=True).first()
-#            if correct_answer and self.text_response.lower().strip() == correct_answer.text.lower().strip():
-#                self.is_correct = True
-#                self.points_earned = self.question.points
-           
-#        self.save()
-
-       
 class RevisionResource(AbstractResource):
     content = models.TextField()
 
@@ -564,44 +487,5 @@ class UserProgress(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.topic} - {self.resource}"
-    
-    
-
-# class Course(models.Model):
-#     COURSE_LEVELS = [
-#         ('COLLEGE', 'Collège'),
-#         ('LYCEE', 'Lycée'),
-#         ('UNIVERSITY', 'Université'),
-#         ('PROFESSIONAL', 'Professionnel'),
-#     ]
-    
-#     title = models.CharField(max_length=200)
-#     description = models.TextField()
-#     level = models.CharField(max_length=20, choices=COURSE_LEVELS)
-#     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE)
-#     instructor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses')
-#     minimum_subscription_plan_id = models.IntegerField()  # Reference to Subscription service
-#     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='courses', null=True)
-#     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name='courses', null=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-    
-#     def __str__(self):
-#         return self.title
-
-# class CourseResource(models.Model):
-    
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='resources')
-#     title = models.CharField(max_length=200)
-#     file = models.FileField(upload_to='course_resources/')
-#     description = models.TextField(blank=True)
-#     order = models.PositiveIntegerField(default=0)
-    
-#     @property
-#     def resource_type(self):
-#         return self.file.url.split('.')[-1]
-    
-#     def __str__(self):
-#         return self.title
 
 
