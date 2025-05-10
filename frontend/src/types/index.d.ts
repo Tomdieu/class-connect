@@ -3,7 +3,8 @@ export declare const EDUCATION_LEVELS: readonly [
   "COLLEGE",
   "LYCEE",
   "UNIVERSITY",
-  "PROFESSIONAL"
+  "PROFESSIONAL",
+  "ADMIN"
 ];
 export declare const LYCEE_CLASSES: readonly ["2nde", "1ere", "terminale"];
 export declare const LYCEE_SPECIALITIES: readonly ["scientifique", "litteraire"];
@@ -13,63 +14,149 @@ export declare const MASTER_YEARS: readonly ["M1", "M2"];
 export declare const SECTIONS: readonly ["FRANCOPHONE", "ANGLOPHONE"];
 export declare const COLLEGE_CLASSES: readonly ["6eme", "5eme", "4eme", "3eme"];
 
-export type EducationLevel = (typeof EDUCATION_LEVELS)[number];
+// export type EducationLevel = (typeof EDUCATION_LEVELS)[number];
 export type LyceeClass = (typeof LYCEE_CLASSES)[number];
 export type LyceeSpecialities = (typeof LYCEE_SPECIALITIES)[number];
 export type UniversityLevel = (typeof UNIVERSITY_LEVELS)[number];
 export type LicenceYear = (typeof LICENCE_YEARS)[number];
 export type MasterYear = (typeof MASTER_YEARS)[number];
-export type Section = (typeof SECTIONS)[number];
+// export type Section = (typeof SECTIONS)[number];
 export type CollegeClass = (typeof COLLEGE_CLASSES)[number];
 
 export declare const LANGUAGE_CHOICES: readonly ["en", "fr"];
 export type LanguageChoice = (typeof LANGUAGE_CHOICES)[number];
 
-export declare interface UserCreateType {
+
+// Type definitions for section options
+export type SectionType = 'FR' | 'EN';
+
+// Type definitions for education levels
+export type EducationLevelType = 'COLLEGE' | 'LYCEE' | 'UNIVERSITY' | 'PROFESSIONAL';
+
+// Type definitions for specialities
+export type SpecialityType = 'scientifique' | 'litteraire';
+
+// Section model interface
+export interface Section {
+  id?: number;
+  code: SectionType;
+  label: string;
+}
+
+// Education Level model interface
+export interface EducationLevel {
+  id?: number;
+  code: EducationLevelType;
+  label: string;
+  section: number; // Foreign key to Section
+}
+
+// Speciality model interface
+export interface Speciality {
+  id?: number;
+  code: SpecialityType;
+  label: string;
+}
+
+// Level Class Definition model interface
+export interface LevelClassDefinition {
+  id?: number;
+  education_level: number; // Foreign key to EducationLevel
+  name: string;
+  speciality: number | null; // Optional foreign key to Speciality
+}
+
+export interface ClassCreateSerializer {
+  variant:string;
+  description:string;
+}
+
+// Level Class Definition Create model interface
+export interface LevelClassDefinitionCreate {
+  id?: number;
+  education_level: number; // Foreign key to EducationLevel
+  name: string;
+  speciality: number | null; // Optional foreign key to Speciality
+  initial_class:ClassCreateSerializer[];
+}
+
+
+// Class model interface
+export interface ClassType {
+  id?: number;
+  definition: number | null; // Foreign key to LevelClassDefinition
+  variant: string;
+  readonly definition_display: string;
+  description: string;
+  created_at: string; // ISO date string from API
+  updated_at: string; // ISO date string from API
+}
+
+// User creation interface
+export interface UserCreateType {
   first_name: string;
   last_name: string;
   phone_number: string;
   date_of_birth: string;
-  education_level: EducationLevel;
   email: string;
   town: string;
   quarter: string;
   password: string;
-  // Optional fields based on education level
-  college_class?: CollegeClass;
-  lycee_class?: LyceeClass;
-  lycee_speciality?: LyceeSpecialities;
-  university_level?: UniversityLevel;
-  university_year?: string;
+  user_type:"STUDENT" | "PROFESSIONAL" | "ADMIN";
+  class_enrolled?: number | null; // Reference to Class model ID
+  // Optional fields based on if user is a professional
   enterprise_name?: string;
   platform_usage_reason?: string;
+  
   is_staff?: boolean;
   is_superuser?: boolean;
 }
 
+// export declare interface UserCreateType {
+//   first_name: string;
+//   last_name: string;
+//   phone_number: string;
+//   date_of_birth: string;
+//   education_level: EducationLevel;
+//   email: string;
+//   town: string;
+//   quarter: string;
+//   password: string;
+//   // Optional fields based on education level
+//   college_class?: CollegeClass;
+//   lycee_class?: LyceeClass;
+//   lycee_speciality?: LyceeSpecialities;
+//   university_level?: UniversityLevel;
+//   university_year?: string;
+//   enterprise_name?: string;
+//   platform_usage_reason?: string;
+//   is_staff?: boolean;
+//   is_superuser?: boolean;
+// }
+
+// Subscription status interfaces
 export declare interface HasSub { active: boolean; plan: string; expires_at: string }
 export declare interface NoSub { active: boolean }
-export declare interface UserType {
-  id: string;
+
+// User interface
+export interface UserType {
+  id: string; // UUID
   email: string;
   first_name: string;
   last_name: string;
   phone_number: string;
   date_of_birth: string | null;
-  education_level: EducationLevel;
-  class_level: number | null;
-  lycee_class: LyceeClass | null;
-  lycee_speciality: LyceeSpecialities | null;
+  education_level: EducationLevel | null;
+  class_enrolled: number | null; // Reference to Class model ID
+  lycee_speciality: LyceeSpeciality | null;
   university_level: UniversityLevel | null;
-  university_year: string | null;
   enterprise_name: string | null;
   platform_usage_reason: string | null;
   email_verified: boolean;
-  profile_picture: string | null;
+  avatar: string | null;
   language: LanguageChoice;
   town: string | null;
   quarter: string | null;
-  avatar: string;
   is_staff: boolean;
   is_superuser: boolean;
   is_active: boolean;
@@ -77,12 +164,45 @@ export declare interface UserType {
   created_at: string;
   updated_at: string;
   date_joined: string;
-  college_class: CollegeClass | null;
-  subscription_status:
-    | HasSub
-    | NoSub
+  subscription_status: HasSub | NoSub;
   class_display: string;
+  profile_picture: string | null;
 }
+
+// export declare interface UserType {
+//   id: string;
+//   email: string;
+//   first_name: string;
+//   last_name: string;
+//   phone_number: string | null;
+//   date_of_birth: string | null;
+//   education_level: EducationLevel;
+//   class_level: number | null;
+//   lycee_class: LyceeClass | null;
+//   lycee_speciality: LyceeSpecialities | null;
+//   university_level: UniversityLevel | null;
+//   university_year: string | null;
+//   enterprise_name: string | null;
+//   platform_usage_reason: string | null;
+//   email_verified: boolean;
+//   profile_picture: string | null;
+//   language: LanguageChoice;
+//   town: string | null;
+//   quarter: string | null;
+//   avatar: string;
+//   is_staff: boolean;
+//   is_superuser: boolean;
+//   is_active: boolean;
+//   last_login: string | null;
+//   created_at: string;
+//   updated_at: string;
+//   date_joined: string;
+//   college_class: CollegeClass | null;
+//   subscription_status:
+//     | HasSub
+//     | NoSub
+//   class_display: string;
+// }
 
 export declare interface UserActiveToken {
   user: UserType;
@@ -143,55 +263,43 @@ export declare interface CourseCategoryCreateType {
   parent?: number;
 }
 
-export declare interface ClassType {
+// ClassDetail interface (representing a single class with student count)
+export interface ClassDetail {
   id: number;
-  name: string;
-  level: EducationLevel;
-  section: Section;
-  speciality?: LyceeSpecialities;
-  description: string | null;
+  definition: number;
+  definition_display: string;
+  variant: string;
+  description: string;
   created_at: string;
   updated_at: string;
-  student_count:number;
+  student_count: number;
 }
 
-// College structure
-interface CollegeStructure {
-  classes: ClassType[];
+// Updated interfaces for the new API response format
+export interface EducationLevelGroup {
+  classes?: ClassDetail[];
+  [specialityOrLevel: string]: ClassDetail[] | undefined;
 }
 
-// Lycee structure
-interface LyceeStructure {
-  scientifique: ClassType[];
-  litteraire: ClassType[];
+export interface EducationLevelDetail {
+  id: number;
+  code: string;
+  label: string;
+  groups: EducationLevelGroup;
 }
 
-// University structure
-interface UniversityStructure {
-  licence: ClassType[];
-  master: ClassType[];
-  doctorat: ClassType[];
+export interface SectionDetail {
+  id: number;
+  code: string;
+  label: string;
+  levels: {
+    [levelKey: string]: EducationLevelDetail;
+  };
 }
 
-// Section structure combining all levels
-interface SectionStructure {
-  COLLEGE: CollegeStructure;
-  LYCEE: LyceeStructure;
-  UNIVERSITY: UniversityStructure;
-}
-
-// Root type
-interface SchoolStructure {
-  FRANCOPHONE: SectionStructure;
-  ANGLOPHONE: SectionStructure;
-}
-
-export declare interface ClassCreateType {
-  name: string;
-  level: EducationLevel;
-  section: Section;
-  description?: string;
-  speciality?: LyceeSpecialities;
+// Updated ClassStructure to match the new API response format
+export interface ClassStructure {
+  [languageCode: string]: SectionDetail;
 }
 
 export declare interface SubjectType {
