@@ -72,7 +72,7 @@ export const getformatedClasses = async () => {
     console.log("Fetching formatted classes...");
     const res = await api.get(`/api/classes/formatted_classes/`);
     
-    console.log("Formatted classes API response:", res.status);
+    console.log("Formatted classes API response:", res.data); // Log the response data
     const data = await res.data;
     return data as ClassStructure;
   } catch (error: unknown) {
