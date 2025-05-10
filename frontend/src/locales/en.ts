@@ -1766,5 +1766,10 @@ class: {
 "register.alreadyHaveAccount": "Already have an account?",
 "register.loginInstead": "Login instead",
 "register.backToLogin": "Back to Login",
+"registerDialog.enterprisePlaceholder": "Enter your enterprise name",
+"common.reload": "Reload",
+"registerDialog.noClassesAvailable": "No classes available for this level",
+"common.retry": "Retry",
+"common.errorOccurred": "An error occurred",
 
 } as const;

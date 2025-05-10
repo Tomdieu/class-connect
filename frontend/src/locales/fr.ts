@@ -1736,4 +1736,8 @@ export default {
 "register.alreadyHaveAccount": "Vous avez déjà un compte ?",
 "register.loginInstead": "Se connecter",
 "register.backToLogin": "Retour à la connexion",
+"common.reload": "Recharger",
+"registerDialog.noClassesAvailable": "Aucune classe disponible pour l'année scolaire sélectionnée",
+"common.retry": "Réessayer",
+"common.errorOccurred": "Une erreur s'est produite",
 } as const;
