@@ -23,6 +23,10 @@ from .models import (
     SchoolYear,
     UserClass,
     # Question, QuestionOption, QuizAttempt, QuestionResponse
+    Section,
+    EducationLevel,
+    Speciality,
+    LevelClassDefinition,
 )
 from users.serializers import UserSerializer
 from django.contrib.auth import get_user_model
@@ -37,13 +41,25 @@ class CourseCategorySerializer(serializers.ModelSerializer):
 
 
 class ClassSerializer(serializers.ModelSerializer):
+    definition_display = serializers.StringRelatedField(source='definition', read_only=True)
     student_count = serializers.SerializerMethodField()
-
+    
     class Meta:
         model = Class
-        fields = "__all__"
+        fields = [
+            'id', 
+            'definition', 
+            'definition_display', 
+            'variant', 
+            'description', 
+            'created_at', 
+            'updated_at',
+            'student_count'
+        ]
+        ref_name = 'ClassBasic'
 
     def get_student_count(self, obj):
+        from .models import UserClass
         school_year = self.context.get("school_year")
         queryset = UserClass.objects.filter(class_level=obj)
         if school_year:
@@ -54,12 +70,6 @@ class ClassSerializer(serializers.ModelSerializer):
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = "__all__"
-
-
-class ChapterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Chapter
         fields = "__all__"
 
 
@@ -437,3 +447,217 @@ class UserClassSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+class SectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Section
+        fields = ['id', 'code', 'label']
+
+
+class EducationLevelSerializer(serializers.ModelSerializer):
+    section_display = serializers.StringRelatedField(source='section', read_only=True)
+    
+    class Meta:
+        model = EducationLevel
+        fields = ['id', 'code', 'label', 'section', 'section_display']
+
+
+class SpecialitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Speciality
+        fields = ['id', 'code', 'label']
+
+
+class ClassBasicSerializer(serializers.ModelSerializer):
+    """Simplified Class serializer for nested use"""
+    class Meta:
+        model = Class
+        fields = ['variant', 'description']
+        ref_name = 'ClassNested'
+
+
+class ClassCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Class
+        fields = ['variant', 'description']
+
+
+class LevelClassDefinitionSerializer(serializers.ModelSerializer):
+    education_level_display = serializers.StringRelatedField(source='education_level', read_only=True)
+    speciality_display = serializers.StringRelatedField(source='speciality', read_only=True)
+    initial_class = ClassCreateSerializer(write_only=True, required=False, many=True)  # Changed to many=True
+    
+    class Meta:
+        model = LevelClassDefinition
+        fields = [
+            'id', 
+            'education_level', 
+            'education_level_display', 
+            'name', 
+            'speciality', 
+            'speciality_display', 
+            'initial_class'
+        ]
+    
+    def create(self, validated_data):
+        initial_classes_data = validated_data.pop('initial_class', None)
+        # Create the level class definition first
+        level_class_def = LevelClassDefinition.objects.create(**validated_data)
+        
+        # If class data was provided, create class instances linked to this definition
+        if initial_classes_data:
+            for class_data in initial_classes_data:
+                Class.objects.create(definition=level_class_def, **class_data)
+                
+        return level_class_def
+    
+    def update(self, instance, validated_data):
+        classes_data = validated_data.pop('classes', [])
+        
+        # Update the LevelClassDefinition fields
+        instance.education_level = validated_data.get('education_level', instance.education_level)
+        instance.name = validated_data.get('name', instance.name)
+        instance.speciality = validated_data.get('speciality', instance.speciality)
+        instance.save()
+        
+        # Create associated Class instances if provided
+        for class_data in classes_data:
+            Class.objects.create(
+                definition=instance,
+                **class_data
+            )
+        
+        return instance
+
+
+class ClassDetailSerializer(serializers.ModelSerializer):
+    """
+    Detailed serializer for Class model that includes the complete hierarchy
+    """
+    definition_display = serializers.StringRelatedField(source='definition', read_only=True)
+    definition = serializers.SerializerMethodField()
+    student_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Class
+        fields = [
+            'id', 
+            'variant', 
+            'description', 
+            'created_at', 
+            'updated_at',
+            'definition_display',
+            'definition',
+            'student_count'
+        ]
+        ref_name = 'ClassDetail'
+
+    def get_student_count(self, obj):
+        from .models import UserClass
+        school_year = self.context.get("school_year")
+        queryset = UserClass.objects.filter(class_level=obj)
+        if school_year:
+            queryset = queryset.filter(school_year=school_year)
+        return queryset.count()
+        
+    def get_definition(self, obj):
+        if not obj.definition:
+            return None
+            
+        definition = obj.definition
+        education_level = definition.education_level
+        section = education_level.section if education_level else None
+        
+        # Build the complete hierarchical structure
+        result = {
+            'id': definition.id,
+            'name': definition.name,
+            'education_level': {
+                'id': education_level.id,
+                'code': education_level.code,
+                'label': education_level.label,
+                'section': {
+                    'id': section.id,
+                    'code': section.code,
+                    'label': section.label
+                } if section else None
+            } if education_level else None
+        }
+        
+        # Add speciality if it exists
+        if definition.speciality:
+            result['speciality'] = {
+                'id': definition.speciality.id,
+                'code': definition.speciality.code,
+                'label': definition.speciality.label
+            }
+        else:
+            result['speciality'] = None
+            
+        return result
+
+
+class SectionDetailSerializer(serializers.ModelSerializer):
+    """
+    Detailed serializer that provides the complete education hierarchy:
+    Section -> Education Levels -> Level Class Definitions -> Classes
+    """
+    education_levels = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Section
+        fields = ['id', 'code', 'label', 'education_levels']
+        ref_name = 'SectionHierarchy'  # Explicit ref_name for Swagger
+    
+    def get_education_levels(self, obj):
+        # Get all education levels for this section with prefetched relationships
+        education_levels = EducationLevel.objects.filter(section=obj).prefetch_related(
+            'class_definitions__speciality',
+            'class_definitions__instances'  # 'instances' is the related_name from Class -> LevelClassDefinition
+        )
+        
+        result = []
+        for level in education_levels:
+            level_data = {
+                'id': level.id,
+                'code': level.code,
+                'label': level.label,
+                'class_definitions': []
+            }
+            
+            # Get all class definitions for this education level
+            for definition in level.class_definitions.all():
+                # Create speciality data directly - will be an empty object if no speciality
+                speciality_data = {}
+                if definition.speciality:
+                    speciality_data = {
+                        'id': definition.speciality.id,
+                        'code': definition.speciality.code,
+                        'label': definition.speciality.label
+                    }
+                
+                def_data = {
+                    'id': definition.id,
+                    'name': definition.name,
+                    'speciality': speciality_data,
+                    'classes': []
+                }
+                
+                # Get all classes for this definition
+                for cls in definition.instances.all():
+                    cls_data = {
+                        'id': cls.id,
+                        'variant': cls.variant,
+                        'description': cls.description,
+                        'full_name': str(cls),  # Uses the __str__ representation
+                        'created_at': cls.created_at,
+                        'updated_at': cls.updated_at
+                    }
+                    def_data['classes'].append(cls_data)
+                
+                level_data['class_definitions'].append(def_data)
+            
+            result.append(level_data)
+        
+        return result
