@@ -51,13 +51,13 @@ function MyCourses() {
   const router = useRouter();
   const { isLoading, hasActiveSubscription } = useSubscriptionStore();
 
-  useEffect(() => {
-    // If subscription info is loaded and there is no active subscription,
-    // redirect the user to subscriptions page.
-    if (!isLoading && hasActiveSubscription === false) {
-      router.push('/students/subscriptions');
-    }
-  }, [isLoading, hasActiveSubscription, router]);
+  // useEffect(() => {
+  //   // If subscription info is loaded and there is no active subscription,
+  //   // redirect the user to subscriptions page.
+  //   if (!isLoading && hasActiveSubscription === false) {
+  //     router.push('/students/subscriptions');
+  //   }
+  // }, [isLoading, hasActiveSubscription, router]);
 
   const t = useI18n();
   const [selectedClass, setSelectedClass] = useState<string>("");
@@ -164,7 +164,7 @@ function MyCourses() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
       className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
-      style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}
+      // style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}
     >
       <motion.div 
         initial={{ opacity: 0 }}
@@ -221,8 +221,8 @@ function MyCourses() {
             <SelectContent>
               {uniqueClasses && uniqueClasses.length > 0 ? (
                 uniqueClasses.map((classItem) => (
-                  <SelectItem key={classItem.id} value={classItem.id.toString()}>
-                    {classItem.class_level.name} - {classItem.school_year.formatted_year}
+                  <SelectItem key={classItem.class_level.id} value={classItem.class_level?.id?.toString()!}>
+                    {classItem.class_level.definition_display} - {classItem.school_year.formatted_year}
                   </SelectItem>
                 ))
               ) : (
