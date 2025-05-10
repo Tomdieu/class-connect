@@ -34,70 +34,11 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    EDUCATION_LEVELS = [
-        ("COLLEGE", "Collège"),
-        ("LYCEE", "Lycée"),
-        ("UNIVERSITY", "Université"),
-        ("PROFESSIONAL", "Professionnel"),
+    USER_TYPES = [
         ("ADMIN", "Administrator"),
+        ("STUDENT", "Student"),
+        ("PROFESSIONAL", "Professional"),
     ]
-
-    COLLEGE_CLASSES = [
-        ("6eme", "6ème"),
-        ("5eme", "5ème"),
-        ("4eme", "4ème"),
-        ("3eme", "3ème"),
-    ]
-
-    LYCEE_CLASSES = [
-        ("2nde", "2nde"),
-        ("1ere", "1ère"),
-        ("terminale", "Terminale"),
-    ]
-
-    LYCEE_SPECIALITIES = [
-        ("scientifique", "scientifique"),
-        ("litteraire", "litteraire")
-    ]
-
-    UNIVERSITY_LEVELS = [
-        ("licence", "Licence"),
-        ("master", "Master"),
-        ("doctorat", "Doctorat"),
-    ]
-
-    LICENCE_YEARS = [
-        ("L1", "L1"),
-        ("L2", "L2"),
-        ("L3", "L3"),
-    ]
-
-    MASTER_YEARS = [
-        ("M1", "M1"),
-        ("M2", "M2"),
-    ]
-    
-    CLASS_LEVELS = {
-        # College classes (6eme = 1, 5eme = 2, etc.)
-        "6eme": 1,
-        "5eme": 2,
-        "4eme": 3,
-        "3eme": 4,
-        # Lycee classes (2nde = 5, 1ere = 6, etc.)
-        "2nde": 5,
-        "1ere": 6,
-        "terminale": 7,
-        # University levels
-        # Licence
-        "L1": 8,
-        "L2": 9,
-        "L3": 10,
-        # Master
-        "M1": 11,
-        "M2": 12,
-        # Doctorat
-        "doctorat": 13,
-    }
 
     LANGUAGE_CHOICES = [
         ("en", "English"),
@@ -110,37 +51,26 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_("last name"), max_length=150)
     phone_number = PhoneNumberField(unique=True, region="CM")
     date_of_birth = models.DateField(null=True, blank=True)
-    education_level = models.CharField(
+    
+    # Replace education_level with user_type
+    user_type = models.CharField(
         max_length=20, 
-        choices=EDUCATION_LEVELS,
-        blank=True,  # Allow empty in forms/validation
-        null=True,
+        choices=USER_TYPES,
+        default="STUDENT",
     )
 
-    # Education level specific fields
-    college_class = models.CharField(
-        max_length=20, 
-        choices=COLLEGE_CLASSES,
-        null=True, 
-        blank=True,
-        help_text=_("Class for college students")
-    )
-    lycee_class = models.CharField(
-        max_length=20, 
-        choices=LYCEE_CLASSES,
-        null=True, 
-        blank=True,
-        help_text=_("Class for lycee students")
-    )
-    lycee_speciality = models.CharField(max_length=255,choices=LYCEE_SPECIALITIES, null=True, blank=True)
-    university_level = models.CharField(
-        max_length=20, choices=UNIVERSITY_LEVELS, null=True, blank=True
-    )
-    university_year = models.CharField(
-        max_length=2, choices=LICENCE_YEARS + MASTER_YEARS, null=True, blank=True
-    )
+    # Professional-specific fields
     enterprise_name = models.CharField(max_length=255, null=True, blank=True)
     platform_usage_reason = models.TextField(null=True, blank=True)
+
+    # Student-specific field
+    class_enrolled = models.ForeignKey(
+        'courses.Class',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='students'
+    )
 
     email_verified = models.BooleanField(default=False)
     avatar = models.ImageField(
@@ -183,205 +113,53 @@ class User(AbstractBaseUser, PermissionsMixin):
     def clean(self):
         from django.core.exceptions import ValidationError
 
-        # For superusers and staff, set a special admin education level
-        # This satisfies the database constraint while maintaining the distinction
+        # For superusers and staff, automatically set as ADMIN
         if self.is_superuser or self.is_staff:
-            self.education_level = "ADMIN"
-            # Clear all education specific fields for admins
-            self.college_class = None
-            self.lycee_class = None
-            self.lycee_speciality = None
-            self.university_level = None
-            self.university_year = None
+            self.user_type = "ADMIN"
             self.enterprise_name = None
             self.platform_usage_reason = None
+            self.class_enrolled = None
             return
 
-        # Validate education level for regular users
-        if not self.education_level:
-            raise ValidationError(_("Education level is required for regular users"))
-
-        # Validate education level specific fields
-        if self.education_level == "COLLEGE":
-            if not self.college_class:
-                raise ValidationError(_("College class is required for college students"))
-            self.lycee_class = None
-            self.lycee_speciality = None
-            self.university_level = None
-            self.university_year = None
+        # For students, class_enrolled should be provided
+        if self.user_type == "STUDENT":
+            if not self.class_enrolled:
+                raise ValidationError(_("Class must be provided for students"))
             self.enterprise_name = None
             self.platform_usage_reason = None
             
-        if self.education_level == "LYCEE":
-            if not self.lycee_class:
-                raise ValidationError(_("Lycee class is required for lycee students"))
-            if not self.lycee_speciality:
-                raise ValidationError(_("Speciality is required for lycee students"))
-            self.college_class = None
-            self.university_level = None
-            self.university_year = None
-            self.enterprise_name = None
-            self.platform_usage_reason = None
-
-        elif self.education_level == "UNIVERSITY":
-            if not self.university_level:
-                raise ValidationError(_("University level is required for university students"))
-            if self.university_level in ["licence", "master"] and not self.university_year:
-                raise ValidationError(_("University year is required for licence and master students"))
-            self.college_class = None
-            self.lycee_class = None
-            self.lycee_speciality = None
-            self.enterprise_name = None
-            self.platform_usage_reason = None
-
-        elif self.education_level == "PROFESSIONAL":
+        # For professionals, enterprise name and platform usage reason are required
+        elif self.user_type == "PROFESSIONAL":
             if not self.enterprise_name or not self.platform_usage_reason:
                 raise ValidationError(_("Enterprise name and platform usage reason are required for professionals"))
-            self.college_class = None
-            self.lycee_class = None
-            self.lycee_speciality = None
-            self.university_level = None
-            self.university_year = None
+            self.class_enrolled = None
+            
+        # Fall back to STUDENT if user_type is invalid
+        elif self.user_type not in dict(self.USER_TYPES):
+            self.user_type = "STUDENT"
 
-    def get_class_level(self):
-        """
-        Returns the numeric level of the user's class.
-        College: 1-4 (6eme-3eme)
-        Lycee: 5-7 (2nde-terminale)
-        University: 8-13 (L1-Doctorat)
-        Returns None if user has no class or is not in college/lycee/university
-        """
-        if self.education_level == "COLLEGE" and self.college_class:
-            return self.CLASS_LEVELS.get(self.college_class)
-        elif self.education_level == "LYCEE" and self.lycee_class:
-            return self.CLASS_LEVELS.get(self.lycee_class)
-        elif self.education_level == "UNIVERSITY":
-            if self.university_level == "doctorat":
-                return self.CLASS_LEVELS.get("doctorat")
-            elif self.university_year:
-                return self.CLASS_LEVELS.get(self.university_year)
-        return None
-    
-    def can_access_class_level(self, target_level: int):
-        """
-        Determines if the user can access content for a specific class level
-        based on their subscription and current level.
-
-        Premium users can access all previous levels.
-        Standard users can access their current level and 2 previous levels.
-        Basic users can only access their current level.
-        """
-        current_level = self.get_class_level()
-        if not current_level:
-            return False
-
-        # Get user's subscription (implement this based on your subscription model)
-        subscription = self.get_active_subscription()
-        if not subscription:
-            return False
-
-        if subscription.plan == "premium":
-            # Premium users can access all previous levels
-            return target_level <= current_level
-        elif subscription.plan == "standard":
-            # Standard users can access their level and 2 previous levels
-            return current_level - 2 <= target_level <= current_level
-        else:  # Basic plan
-            # Basic users can only access their current level
-            return target_level == current_level
-    
-    def get_accessible_levels(self):
-        """
-        Returns a list of class levels the user can access based on their
-        subscription and current level.
-        """
-        current_level = self.get_class_level()
-        if not current_level:
-            return []
-
-        subscription = self.get_active_subscription()
-        if not subscription:
-            return []
-
-        if subscription.plan == "premium":
-            # All levels up to current level
-            return list(range(1, current_level + 1))
-        elif subscription.plan == "standard":
-            # Current level and 2 previous levels
-            start_level = max(1, current_level - 2)
-            return list(range(start_level, current_level + 1))
-        else:  # Basic plan
-            # Only current level
-            return [current_level]
-    
-    @property
-    def subscription_status(self):
-        """Returns the current subscription status of the user"""
-        active_sub = self.get_active_subscription()
-        if active_sub:
-            return {
-                'active': True,
-                'plan': active_sub.plan.name,
-                'expires': active_sub.end_date
-            }
-        return {'active': False}
-
-    def get_active_subscription(self):
-        """
-        Returns the user's active subscription.
-        """
-        try:
-            return self.subscriptions.select_related('plan').get(
-                end_date__gt=timezone.now()
-            )
-        except:
-            return None
-
-    def has_active_subscription(self):
-        """Check if user has any active subscription"""
-        return self.get_active_subscription() is not None
-
-    def get_subscription_plan(self):
-        """Returns the current subscription plan name or None"""
-        subscription = self.get_active_subscription()
-        return subscription.plan.name if subscription else None
-
-    def can_access_content(self, content_level=None):
-        """
-        Determines if user can access specific content based on subscription level
-        and education level
-        """
-        subscription = self.get_active_subscription()
-        if not subscription:
-            return False
-
-        if not content_level:
-            return True
-
-        return self.can_access_class_level(content_level)
-    
     def get_class_display(self):
         """
-        Returns a formatted string of the user's education level and class
+        Returns a formatted string of the user's class if applicable
         """
-        if not self.education_level:
-            return "No education level set"
-
-        if self.education_level == "COLLEGE":
-            class_name = dict(self.COLLEGE_CLASSES).get(self.college_class, "")
-            return f"{dict(self.EDUCATION_LEVELS)[self.education_level]} - {class_name}"
-        elif self.education_level == "LYCEE":
-            class_name = dict(self.LYCEE_CLASSES).get(self.lycee_class, "")
-            return f"{dict(self.EDUCATION_LEVELS)[self.education_level]} - {class_name}"
-            
-        if self.education_level == "UNIVERSITY":
-            level = dict(self.UNIVERSITY_LEVELS).get(self.university_level, "")
-            year = self.university_year or ""
-            return f"{level} {year}".strip()
-        
-        return dict(self.EDUCATION_LEVELS)[self.education_level]
+        if self.user_type == "STUDENT" and self.class_enrolled:
+            return f"{str(self.class_enrolled)}"
+        elif self.user_type == "PROFESSIONAL":
+            return f"Professional - {self.enterprise_name}"
+        elif self.user_type == "ADMIN":
+            return "Administrator"
+        return "No class assigned"
 
     def save(self, *args, **kwargs):
+        # Auto-determine user_type based on provided fields if not explicitly set
+        if not self.pk:  # Only for new users
+            if self.is_superuser or self.is_staff:
+                self.user_type = "ADMIN"
+            elif self.enterprise_name and self.platform_usage_reason:
+                self.user_type = "PROFESSIONAL"
+            elif self.class_enrolled:
+                self.user_type = "STUDENT"
+        
         self.clean()
         super().save(*args, **kwargs)
 
