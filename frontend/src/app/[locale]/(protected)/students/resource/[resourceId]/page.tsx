@@ -21,9 +21,9 @@ import { useSubscriptionStore } from '@/store/subscriptionStore';
 
 export default function ResourceView() {
   const t = useI18n();
-  const params = useParams();
+  const params = useParams<{resourceId:string}>();
   const router = useRouter();
-  const resourceId = params.resourceId as string;
+  const resourceId = params?.resourceId as string;
   const [isProgressTracking, setIsProgressTracking] = useState<boolean>(false);
   const { isLoading, hasActiveSubscription } = useSubscriptionStore();
 
