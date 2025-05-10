@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { 
-  ClassType,
-  SubjectType,
-  ChapterType,
-  TopicType,
-  AbstractResourceType,
-  VideoResourceType,
-  Section
+  ClassDetail, 
+  Section, 
+  SubjectType, 
+  ChapterType, 
+  TopicType, 
+  AbstractResourceType, 
+  VideoResourceType 
 } from '@/types';
 
 type NavigationLevel = 'classes' | 'subjects' | 'chapters' | 'topics' | 'resources';
@@ -15,7 +15,7 @@ type NavigationLevel = 'classes' | 'subjects' | 'chapters' | 'topics' | 'resourc
 interface ResourceNavigationState {
   // Navigation state
   currentLevel: NavigationLevel;
-  currentClass: ClassType | null;
+  currentClass: ClassDetail | null;
   currentSubject: SubjectType | null;
   currentChapter: ChapterType | null;
   currentTopic: TopicType | null;
@@ -30,7 +30,7 @@ interface ResourceNavigationState {
   
   // Actions
   setCurrentLevel: (level: NavigationLevel) => void;
-  setCurrentClass: (classItem: ClassType | null) => void;
+  setCurrentClass: (classData: ClassDetail | null) => void;
   setCurrentSubject: (subject: SubjectType | null) => void;
   setCurrentChapter: (chapter: ChapterType | null) => void;
   setCurrentTopic: (topic: TopicType | null) => void;
@@ -43,7 +43,7 @@ interface ResourceNavigationState {
   setVideoResources: (videoResources: VideoResourceType[]) => void;
   
   // Reset state
-  resetState: () => void;
+  reset: () => void;
 }
 
 export const useResourceNavigationStore = create<ResourceNavigationState>()(
@@ -65,7 +65,7 @@ export const useResourceNavigationStore = create<ResourceNavigationState>()(
       
       // Actions
       setCurrentLevel: (level) => set({ currentLevel: level }),
-      setCurrentClass: (classItem) => set({ currentClass: classItem }),
+      setCurrentClass: (classData) => set({ currentClass: classData }),
       setCurrentSubject: (subject) => set({ currentSubject: subject }),
       setCurrentChapter: (chapter) => set({ currentChapter: chapter }),
       setCurrentTopic: (topic) => set({ currentTopic: topic }),
@@ -78,7 +78,7 @@ export const useResourceNavigationStore = create<ResourceNavigationState>()(
       setVideoResources: (videoResources) => set({ videoResources }),
       
       // Reset the entire state
-      resetState: () => set({
+      reset: () => set({
         currentLevel: 'classes',
         currentClass: null,
         currentSubject: null,
@@ -92,7 +92,7 @@ export const useResourceNavigationStore = create<ResourceNavigationState>()(
       }),
     }),
     {
-      name: 'resource-navigation-storage', // unique name for localStorage
+      name: 'resource-navigation', // unique name for localStorage
     }
   )
 );
