@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework_nested import routers
+from rest_framework.routers import DefaultRouter
 from .views import (
     CourseCategoryViewSet, ClassViewSet, SchoolYearViewSet, SubjectViewSet,
     ChapterViewSet, TopicViewSet, ResourceViewSet, DirectResourceViewSet,
@@ -13,11 +14,13 @@ from .views import (
     # QuizResourceViewSet, QuestionViewSet, QuestionOptionViewSet,
     # QuizAttemptViewSet, QuestionResponseViewSet,
     VideoResourceViewSet, RevisionResourceViewSet, PDFResourceViewSet, ExerciseResourceViewSet,
-    UserClassViewSet
+    UserClassViewSet,
+    SectionViewSet, EducationLevelViewSet, SpecialityViewSet,
+    LevelClassDefinitionViewSet, SectionHierarchyViewSet
 )
 
 # Create main router
-router = routers.DefaultRouter()
+router = DefaultRouter()
 router.register(r'categories', CourseCategoryViewSet)
 router.register(r'classes', ClassViewSet)
 router.register(r'user-progress', UserProgressViewSet)
@@ -28,6 +31,11 @@ router.register(r'enrollments', TeacherStudentEnrollmentViewSet)
 router.register(r'user-classes', UserClassViewSet)  # Add the new viewset
 router.register(r'resources', DirectResourceViewSet)  # Add direct resource access
 router.register(r'course-declarations', CourseDeclarationDirectViewSet)  # Add the new route
+router.register(r'sections', SectionViewSet)
+router.register(r'education-levels', EducationLevelViewSet)
+router.register(r'specialities', SpecialityViewSet)
+router.register(r'class-definitions', LevelClassDefinitionViewSet)
+router.register(r'section-hierarchy', SectionHierarchyViewSet, basename='section-hierarchy')
 
 # Create nested routers
 class_router = routers.NestedDefaultRouter(router, r'classes', lookup='class')
