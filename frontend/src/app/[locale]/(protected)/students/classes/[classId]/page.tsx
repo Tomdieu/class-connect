@@ -15,8 +15,8 @@ import { useQuery } from '@tanstack/react-query';
 
 function ClassSubjectsPage() {
   const t = useI18n();
-  const params = useParams();
-  const classId = parseInt(params.classId as string);
+  const params = useParams<{classId:string}>();
+  const classId = parseInt(params?.classId as string);
   
   // Add error check for invalid classId
   if (!classId || isNaN(classId)) {
@@ -40,13 +40,16 @@ function ClassSubjectsPage() {
   
   const { data: subjects, isLoading: subjectsLoading, error: subjectsError } = useQuery({
     queryKey: ['classSubjects', classId],
-    queryFn: () => getClassSubject({ params: { class_id: classId } }),
+    enabled: !!classInfo, // Only fetch subjects if classInfo is available
+    queryFn: () => getClassSubject({ params: { class_id: classInfo?.class_level.id! } }),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     refetchOnWindowFocus: false, // Prevent refetch on window focus
   });
   
   const isLoading = classLoading || subjectsLoading;
   const error = classError || subjectsError;
+
+  console.log({error, classInfo, subjects});
   
   if (isLoading) {
     return (
@@ -103,8 +106,8 @@ function ClassSubjectsPage() {
       </Button>
 
       <DashboardHeader
-        title={classInfo.class_level.name}
-        description={t('student.subject.exploreFor', { name: classInfo.class_level.name })}
+        title={classInfo.class_level.definition_display}
+        description={t('student.subject.exploreFor', { name: classInfo.class_level.definition_display })}
         icon={<BookOpen className="h-6 w-6" />}
       />
 
