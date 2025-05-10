@@ -1,8 +1,8 @@
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import (
@@ -10,7 +10,8 @@ from .models import (
     AbstractResource, UserProgress,UserAvailability,DailyTimeSlot,
     CourseOffering, CourseOfferingAction, TeacherStudentEnrollment, CourseDeclaration,
     # QuizResource, Question, QuestionOption, QuizAttempt, QuestionResponse,
-    VideoResource, RevisionResource, PDFResource, ExerciseResource, UserClass
+    VideoResource, RevisionResource, PDFResource, ExerciseResource, UserClass,
+    Section, EducationLevel, Speciality, LevelClassDefinition
 )
 from .serializers import (
     CourseCategorySerializer, ClassSerializer, PaymentProofSerializer, SchoolYearSerializer, SubjectSerializer,
@@ -20,6 +21,8 @@ from .serializers import (
     TeacherStudentEnrollmentSerializer, CourseDeclarationSerializer,DailyTimeSlotSerializer,DailyTimeSlotUpdateSerializer,
     VideoResourceSerializer, RevisionResourceSerializer, PDFResourceSerializer, ExerciseResourceSerializer,
     EnhancedTeacherEnrollmentSerializer, UserClassSerializer,
+    SectionSerializer, EducationLevelSerializer, SpecialitySerializer, LevelClassDefinitionSerializer,
+    SectionDetailSerializer
 )
 from .pagination import CustomPagination
 from .filters import (
@@ -32,6 +35,54 @@ from django.utils.decorators import method_decorator
 # from django.views.decorators.cache import cache_page
 from rest_framework import serializers
 from utils.mixins import ActivityLoggingMixin
+
+class SectionViewSet(viewsets.ModelViewSet):
+    queryset = Section.objects.all()
+    serializer_class = SectionSerializer
+    permission_classes = [AllowAny]
+
+class SectionHierarchyViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset that provides the complete education hierarchy from Section down to Class.
+    This allows the frontend to fetch all selection options in a single request.
+    """
+    queryset = Section.objects.all().prefetch_related(
+        'education_levels', 
+        'education_levels__class_definitions',
+        'education_levels__class_definitions__speciality',
+        'education_levels__class_definitions__instances'
+    )
+    serializer_class = SectionDetailSerializer
+    permission_classes = [AllowAny]
+
+class EducationLevelViewSet(viewsets.ModelViewSet):
+    queryset = EducationLevel.objects.all()
+    serializer_class = EducationLevelSerializer
+    filterset_fields = ['section', 'code']
+    permission_classes = [AllowAny]
+    
+class SpecialityViewSet(viewsets.ModelViewSet):
+    queryset = Speciality.objects.all()
+    serializer_class = SpecialitySerializer
+    permission_classes = [AllowAny]
+    
+class LevelClassDefinitionViewSet(viewsets.ModelViewSet):
+    queryset = LevelClassDefinition.objects.all()
+    serializer_class = LevelClassDefinitionSerializer
+    filterset_fields = ['education_level', 'speciality']
+    permission_classes = [AllowAny]
+    
+class ClassViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing classes.
+    """
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+    filterset_fields = ['definition__education_level', 'definition__speciality']
+    permission_classes = [AllowAny]
+
+    class Meta:
+        ref_name = 'ClassViewSet'
 
 class CourseCategoryViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     """
@@ -242,43 +293,93 @@ class ClassViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
             )
         }
     )
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def formatted_classes(self, request):
-        classes = self.get_queryset().exclude(level='PROFESSIONAL')
+        """
+        Get classes organized by section and education level.
+        This endpoint has been updated to work with the new Class model structure
+        and includes education level IDs for frontend use.
+        """
+        # Get all classes, excluding any with a professional education level if needed
+        queryset = self.get_queryset()
+        # Try to filter out professional classes if they exist
+        try:
+            professional_levels = EducationLevel.objects.filter(code__contains='PROFESSIONAL')
+            if professional_levels.exists():
+                queryset = queryset.exclude(definition__education_level__in=professional_levels)
+        except Exception as e:
+            # If filtering fails, just use all classes
+            pass
+        
         formatted_data = {}
-
-        # Use the same context as the viewset to ensure student_count is included
         context = self.get_serializer_context()
 
-        for class_obj in classes:
-            section = class_obj.section
-            level = class_obj.level
+        for class_obj in queryset:
+            # Extract the section and level from the class's definition
+            if not hasattr(class_obj, 'definition') or not class_obj.definition:
+                continue
+                
+            definition = class_obj.definition
+            if not hasattr(definition, 'education_level') or not definition.education_level:
+                continue
+                
+            education_level = definition.education_level
+            if not hasattr(education_level, 'section') or not education_level.section:
+                continue
+                
+            section = education_level.section
+            section_code = section.code
+            level_code = education_level.code
 
-            if section not in formatted_data:
-                formatted_data[section] = {}
+            # Initialize the section in the formatted data if it doesn't exist
+            if section_code not in formatted_data:
+                formatted_data[section_code] = {
+                    'id': section.id,
+                    'code': section.code,
+                    'label': section.label,
+                    'levels': {}
+                }
 
-            if level not in formatted_data[section]:
-                formatted_data[section][level] = {}
+            # Initialize the education level in the section if it doesn't exist
+            if level_code not in formatted_data[section_code]['levels']:
+                formatted_data[section_code]['levels'][level_code] = {
+                    'id': education_level.id,  # Include the education level ID
+                    'code': education_level.code,
+                    'label': education_level.label,
+                    'groups': {}  # Store class groupings (by speciality, university level, or generic classes)
+                }
 
-            if level == 'LYCEE':
-                speciality = class_obj.speciality or 'NO_SPECIALITY'
-                if speciality not in formatted_data[section][level]:
-                    formatted_data[section][level][speciality] = []
-                formatted_data[section][level][speciality].append(
-                    self.serializer_class(class_obj, context=context).data
+            # Handle different education levels
+            if 'LYCEE' in level_code:
+                # For lycee level, organize by speciality
+                speciality = definition.speciality
+                speciality_code = speciality.code if speciality else 'NO_SPECIALITY'
+                
+                if speciality_code not in formatted_data[section_code]['levels'][level_code]['groups']:
+                    formatted_data[section_code]['levels'][level_code]['groups'][speciality_code] = []
+                    
+                formatted_data[section_code]['levels'][level_code]['groups'][speciality_code].append(
+                    ClassSerializer(class_obj, context=context).data
                 )
-            elif level == 'UNIVERSITY':
+                
+            elif 'UNIVERSITY' in level_code:
+                # For university level, organize by description (e.g., licence, master)
                 univ_level = class_obj.description or 'OTHER'
-                if univ_level not in formatted_data[section][level]:
-                    formatted_data[section][level][univ_level] = []
-                formatted_data[section][level][univ_level].append(
-                    self.serializer_class(class_obj, context=context).data
+                
+                if univ_level not in formatted_data[section_code]['levels'][level_code]['groups']:
+                    formatted_data[section_code]['levels'][level_code]['groups'][univ_level] = []
+                    
+                formatted_data[section_code]['levels'][level_code]['groups'][univ_level].append(
+                    ClassSerializer(class_obj, context=context).data
                 )
+                
             else:
-                if 'classes' not in formatted_data[section][level]:
-                    formatted_data[section][level]['classes'] = []
-                formatted_data[section][level]['classes'].append(
-                    self.serializer_class(class_obj, context=context).data
+                # For other levels (college), organize under 'classes'
+                if 'classes' not in formatted_data[section_code]['levels'][level_code]['groups']:
+                    formatted_data[section_code]['levels'][level_code]['groups']['classes'] = []
+                    
+                formatted_data[section_code]['levels'][level_code]['groups']['classes'].append(
+                    ClassSerializer(class_obj, context=context).data
                 )
 
         return Response(formatted_data)
@@ -634,7 +735,7 @@ class UserAvailabilityViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         # Determine user type based on the user's role
-        user_type = 'TEACHER' if self.request.user.education_level == "PROFESSIONAL" else 'STUDENT'
+        user_type = 'TEACHER' if self.request.user.user_type == "PROFESSIONAL" else 'STUDENT'
         serializer.save(user=self.request.user, user_type=user_type)
     
     def list(self, request, *args, **kwargs):
@@ -1155,7 +1256,7 @@ class CourseDeclarationDirectViewSet(ActivityLoggingMixin, viewsets.ModelViewSet
             return queryset
             
         # Otherwise, users can only see their own declarations
-        if user.education_level == 'PROFESSIONAL':
+        if user.user_type == 'PROFESSIONAL':
             return queryset.filter(teacher_student_enrollment__teacher=user)
         else:
             # Students can see declarations made for them
@@ -1535,7 +1636,7 @@ class UserClassViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
         user = request.user
         
         # Check if user is not a professional (thus a student)
-        if user.education_level != 'PROFESSIONAL':
+        if user.user_type != 'PROFESSIONAL':
             # Get the current user class for the current school year
             user_class = UserClass.objects.filter(
                 user=user,
