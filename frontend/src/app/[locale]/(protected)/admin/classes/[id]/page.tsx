@@ -76,6 +76,7 @@ import {
 } from "@/components/ui/popover";
 import { CheckIcon,ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { deleteClass } from "@/actions/sections";
 
 // Animation variants
 const containerVariants = {
@@ -127,6 +128,7 @@ function ClassDetail() {
   const [subjectToDelete, setSubjectToDelete] = useState<SubjectType | null>(null);
   const queryClient = useQueryClient();
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [isDeleteClassModalOpen, setIsDeleteClassModalOpen] = useState(false);
 
   const [isStudentPopoverOpen,setIsStudentPopoverOpen]=useState(false)
   
@@ -195,6 +197,19 @@ function ClassDetail() {
     onError: (error) => {
       toast.error(t("subject.delete.error"), {
         description: error.message,
+      });
+    },
+  });
+
+  const deleteClassMutation = useMutation({
+    mutationFn: deleteClass,
+    onSuccess: () => {
+      toast.success(t("class.delete.success") || "Class deleted successfully");
+      router.push('/admin/classes');
+    },
+    onError: (error) => {
+      toast.error(t("class.delete.error") || "Failed to delete class", {
+        description: error instanceof Error ? error.message : "Unknown error occurred",
       });
     },
   });
@@ -277,6 +292,17 @@ function ClassDetail() {
     return selectedYear ? selectedYear.formatted_year : currentSchoolYear;
   };
 
+  const handleDeleteClass = () => {
+    setIsDeleteClassModalOpen(true);
+  };
+
+  const handleConfirmDeleteClass = () => {
+    if(id){
+
+      deleteClassMutation.mutate(id);
+    }
+  };
+
   const router = useRouter();
 
   if (isLoading) {
@@ -344,7 +370,7 @@ function ClassDetail() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{data?.name}</BreadcrumbPage>
+                <BreadcrumbPage>{data?.definition_display}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -359,26 +385,54 @@ function ClassDetail() {
           <div className="flex items-center justify-between">
             <motion.div 
               className="flex items-center gap-2"
-              whileHover={{ scale: 1.01 }}
-              transition={{ type: "spring", stiffness: 400 }}
+              // whileHover={{ scale: 1.01 }}
+              // transition={{ type: "spring", stiffness: 400 }}
             >
               <Book className="size-6 text-primary" />
-              <h1 className="text-2xl font-semibold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                {t("class.detail.title")}
-              </h1>
+              <div>
+                <h1 className="text-2xl font-semibold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                  {data?.definition_display} {data?.variant ? `(${data.variant})` : ''}
+                </h1>
+                {data?.description && (
+                  <p className="text-muted-foreground text-sm">{data.description}</p>
+                )}
+              </div>
             </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button 
-                onClick={() => data && data.id && onAdd(data.id)}
-                className="bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
+            <div className="flex items-center gap-3">
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <Plus className="size-4 mr-2" />
-                {t("class.detail.addButton")}
-              </Button>
-            </motion.div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="outline"
+                        className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                        onClick={handleDeleteClass}
+                      >
+                        <Trash2 className="size-4 mr-1" />
+                        {t("class.detail.deleteClass") || "Delete Class"}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t("class.detail.deleteClassTooltip") || "Delete this class permanently"}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button 
+                  onClick={() => data && data.id && onAdd(data.id)}
+                  className="bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
+                >
+                  <Plus className="size-4 mr-2" />
+                  {t("class.detail.addButton")}
+                </Button>
+              </motion.div>
+            </div>
           </div>
 
           <Tabs 
@@ -393,7 +447,6 @@ function ClassDetail() {
             </TabsList>
 
             <AnimatePresence mode="wait">
-              {/* Add key prop to each TabsContent to fix the React key error */}
               <TabsContent key="subjects-tab" value="subjects">
                 {subjectQuery.isLoading ? (
                   <motion.div 
@@ -422,7 +475,6 @@ function ClassDetail() {
                           passHref
                           className="block h-full"
                           onClick={(e) => {
-                            // Only navigate if the click is directly on the Link or Card (not on buttons)
                             if ((e.target as HTMLElement).closest('button')) {
                               e.preventDefault();
                             }
@@ -441,7 +493,6 @@ function ClassDetail() {
                               )}
                             </CardHeader>
                             <CardContent>
-                              {/* Subject content can be added here */}
                             </CardContent>
                             <CardFooter className="justify-between">
                               <TooltipProvider>
@@ -566,7 +617,6 @@ function ClassDetail() {
                         </CardTitle>
                         
                         <div className="flex items-center gap-4">
-                          {/* School Year Selector */}
                           <div className="flex items-center gap-2">
                             <span className="text-sm text-muted-foreground">{t("class.detail.schoolYear")}:</span>
                             {schoolYearsQuery.isLoading ? (
@@ -595,7 +645,6 @@ function ClassDetail() {
                             )}
                           </div>
                           
-                          {/* Add Student Button */}
                           <Button 
                             onClick={() => setIsAddStudentOpen(true)}
                             size="sm"
@@ -715,7 +764,6 @@ function ClassDetail() {
         </motion.div>
       </motion.div>
 
-      {/* Add Student Dialog */}
       <Credenza open={isAddStudentOpen} onOpenChange={setIsAddStudentOpen}>
         <CredenzaContent className="sm:max-w-xl">
           <CredenzaHeader>
@@ -782,7 +830,6 @@ function ClassDetail() {
                                   value={`${student.first_name} ${student.last_name} ${student.email}`}
                                   onSelect={() => {
                                     form.setValue("user_id", student.id);
-                                    // Close just the popover, not the entire dialog
                                     setIsStudentPopoverOpen(false);
                                   }}
                                 >
@@ -829,6 +876,15 @@ function ClassDetail() {
           </Form>
         </CredenzaContent>
       </Credenza>
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteClassModalOpen}
+        onClose={() => setIsDeleteClassModalOpen(false)}
+        onConfirm={handleConfirmDeleteClass}
+        title={t("class.delete.title") || "Delete Class"}
+        description={t("class.delete.description") || "Are you sure you want to delete this class? This action cannot be undone and will remove all associated subjects, chapters, and resources."}
+        isLoading={deleteClassMutation.isPending}
+      />
 
       <DeleteConfirmationModal
         isOpen={!!subjectToDelete}
