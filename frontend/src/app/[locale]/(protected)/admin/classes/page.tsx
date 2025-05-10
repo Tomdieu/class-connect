@@ -1,6 +1,6 @@
 "use client";
 import { getformatedClasses } from "@/actions/courses";
-import { SchoolStructure, Section } from "@/types";
+import { ClassDetail, ClassStructure, SectionDetail } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, Loader, Plus, Book, GraduationCap, School, Users, BookOpen, BarChart3 } from "lucide-react";
 import { useI18n } from "@/locales/client";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/collapsible";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ClassCreationDialog } from "@/components/dialogs/ClassCreationDialog";
 
 // Animation variants
 const containerVariants = {
@@ -61,13 +62,17 @@ const cardVariants = {
 };
 
 function CoursesPages() {
-  const { data, isError, isLoading, error } = useQuery({
+  const { data, isError, isLoading, error, refetch } = useQuery<ClassStructure>({
     queryKey: ["formatted-classes"],
     queryFn: () => getformatedClasses(),
   });
   const t = useI18n();
   const { onAdd } = useClassStore();
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const [classCreationDialogOpen, setClassCreationDialogOpen] = useState(false);
+  const [selectedEducationLevel, setSelectedEducationLevel] = useState<{id: number, type: string}>({id: 0, type: ''});
+
+  console.log("Class Structure Data:", data);
 
   if (isLoading) {
     return (
@@ -113,6 +118,27 @@ function CoursesPages() {
     );
   }
 
+  if (!data) {
+    return (
+      <motion.div 
+        className="w-full flex justify-center items-center h-screen"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div 
+          className="bg-amber-100 border border-amber-400 text-amber-700 px-5 py-4 rounded-lg shadow-md max-w-md w-full"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 100 }}
+        >
+          <strong className="font-bold">{t("warning")}: </strong>
+          <span className="block mt-1">{t("class.noClassesFound")}</span>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
   const toggleSection = (sectionId: string) => {
     setOpenSections(prev => ({
       ...prev,
@@ -120,59 +146,136 @@ function CoursesPages() {
     }));
   };
 
-  const renderClassCard = (c: any, section: Section) => (
-    <Link href={`/admin/classes/${c.id}/`} className="block h-full">
-      <motion.div
-        variants={cardVariants}
-        whileHover="hover"
-        className="p-5 h-[160px] rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-200 flex flex-col justify-between relative overflow-hidden"
-      >
-        {/* Status indicator */}
-        <div className={`absolute top-0 right-0 w-[80px] h-[80px] rounded-bl-full z-0 opacity-20 
-          ${c.status === 'active' ? 'bg-emerald-500' : 
-            c.status === 'draft' ? 'bg-amber-500' : 'bg-gray-500'}`}>
-        </div>
-        
-        {/* Status badge */}
-        <div className="absolute top-3 right-3 z-10">
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full
-            ${c.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 
-              c.status === 'draft' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'}`}>
-            {c.status === 'active' ? t('class.status.active') : 
-              c.status === 'draft' ? t('class.status.draft') : t('class.status.archived')}
-          </span>
-        </div>
-        
-        <div>
-          <h4 className="text-xl font-semibold mb-2 text-gray-800">{c.name}</h4>
-          <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-            {c.description && <>{c.description || t("class.noDescription")}</>}
-          </p>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
-            {t(`sections.${section}`)}
-          </span>
-          <span className="text-xs text-gray-500 flex items-center">
-            <Users size={12} className="mr-1" />
-            {c.student_count} {c.student_count === 1 ? t("class.student") : t("class.students")}
-          </span>
-        </div>
-      </motion.div>
-    </Link>
-  );
+  const handleAddClassClick = (educationLevelId: number, educationType: string) => {
+    setSelectedEducationLevel({id: educationLevelId, type: educationType});
+    setClassCreationDialogOpen(true);
+  };
 
-  const renderLevelSection = (title: string, classes: any[], section: Section, sectionId: string, icon?: React.ReactNode) => {
-    const isOpen = openSections[sectionId];
+  const handleClassCreationSuccess = () => {
+    refetch();
+  };
+
+  const renderClassCard = (classItem: ClassDetail, sectionName: string) => {
+    const hasStudents = classItem.student_count > 0;
     
-    if (classes.length === 0) {
-      // Empty state
+    return (
+      <Link href={`/admin/classes/${classItem.id}/`} className="block h-full">
+        <motion.div
+          variants={cardVariants}
+          whileHover="hover"
+          className="p-5 h-[160px] rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-200 flex flex-col justify-between relative overflow-hidden"
+        >
+          <div>
+            <h4 className="text-xl font-semibold mb-2 text-gray-800">
+              {classItem.definition_display} {classItem.variant && `(${classItem.variant})`}
+            </h4>
+            <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+              {classItem.description || t("class.noDescription")}
+            </p>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
+              {t(`sections.${sectionName.split('_')[0]}`)}
+            </span>
+            <span className="text-xs text-gray-500 flex items-center">
+              <Users size={12} className="mr-1" />
+              {classItem.student_count} {classItem.student_count === 1 ? t("class.student") : t("class.students")}
+            </span>
+          </div>
+        </motion.div>
+      </Link>
+    );
+  };
+
+  const getEducationType = (sectionKey: string): string => {
+    if (sectionKey.includes('_COLLEGE')) return 'COLLEGE';
+    if (sectionKey.includes('_LYCEE')) return 'LYCEE';
+    if (sectionKey.includes('_UNIVERSITY')) return 'UNIVERSITY';
+    return 'OTHER';
+  };
+
+  const getSectionIcon = (educationType: string) => {
+    switch (educationType) {
+      case 'COLLEGE':
+        return <School size={20} />;
+      case 'LYCEE':
+        return <Book size={20} />;
+      case 'UNIVERSITY':
+        return <GraduationCap size={20} />;
+      default:
+        return <BookOpen size={20} />;
+    }
+  };
+
+  const renderClassGroup = (title: string, classes: ClassDetail[], sectionId: string, icon?: React.ReactNode, sectionName: string, educationLevelId: number) => {
+    const isOpen = openSections[sectionId];
+    const sectionParts = sectionName.split('_');
+    const educationType = sectionParts[1]; // COLLEGE, LYCEE, UNIVERSITY
+    
+    if (!classes || classes.length === 0) {
       return (
+        <div className="space-y-2">
+          <Collapsible
+            key={sectionId}
+            open={openSections[sectionId]}
+            onOpenChange={() => toggleSection(sectionId)}
+            className="w-full"
+          >
+            <CollapsibleTrigger className="flex items-center w-full gap-2 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 transition-colors shadow-sm">
+              <motion.div
+                animate={{ rotate: openSections[sectionId] ? 90 : 0 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                <ChevronRight className="h-5 w-5 text-primary/70" />
+              </motion.div>
+              {icon && <div className="text-primary">{icon}</div>}
+              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              <span className="text-sm text-primary/70 ml-2 bg-primary/10 px-2 py-0.5 rounded-full">
+                0 {t("class.plural")}
+              </span>
+            </CollapsibleTrigger>
+            
+            <AnimatePresence>
+              {isOpen && (
+                <CollapsibleContent>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="p-8 flex flex-col items-center justify-center text-center rounded-lg border border-dashed border-primary/30 bg-primary/5 mt-3"
+                  >
+                    <div className="bg-primary/10 p-3 rounded-full mb-3">
+                      <BookOpen className="h-8 w-8 text-primary" />
+                    </div>
+                    <h4 className="text-lg font-medium text-gray-800 mb-2">{t('class.empty.title')}</h4>
+                    <p className="text-sm text-gray-600 mb-4 max-w-md">{t('class.empty.description')}</p>
+                    <Button 
+                      onClick={() => handleAddClassClick(educationLevelId, educationType)} 
+                      className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
+                    >
+                      <Plus size={18} />
+                      {t("class.actions.add")}
+                    </Button>
+                  </motion.div>
+                </CollapsibleContent>
+              )}
+            </AnimatePresence>
+          </Collapsible>
+        </div>
+      );
+    }
+    
+    const totalStudents = classes.reduce((sum, c) => sum + c.student_count, 0);
+    const activeClasses = classes.filter(c => c.student_count > 0).length;
+    
+    return (
+      <div className="space-y-2" key={sectionId}>
         <Collapsible
           key={sectionId}
           open={openSections[sectionId]}
           onOpenChange={() => toggleSection(sectionId)}
-          className="space-y-2"
+          className="w-full"
         >
           <CollapsibleTrigger className="flex items-center w-full gap-2 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 transition-colors shadow-sm">
             <motion.div
@@ -182,179 +285,129 @@ function CoursesPages() {
               <ChevronRight className="h-5 w-5 text-primary/70" />
             </motion.div>
             {icon && <div className="text-primary">{icon}</div>}
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-            <span className="text-sm text-primary/70 ml-2 bg-primary/10 px-2 py-0.5 rounded-full">
-              0 {t("class.plural")}
+            <h3 className="text-sm sm:text-lg truncate font-semibold text-gray-900">{title}</h3>
+            <span className="hidden sm:flex text-sm  text-primary/70 ml-2 bg-primary/10 px-2 py-0.5 rounded-full">
+              {classes.length} {classes.length === 1 ? t("class.singular") : t("class.plural")}
             </span>
+            
+            <div className="ml-auto flex text-xs">
+              <span className="flex items-center truncate bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                <span className="w-2 h-2 bg-emerald-500 rounded-full mr-1.5"></span>
+                {activeClasses} {t('class.status.active')}
+              </span>
+            </div>
           </CollapsibleTrigger>
           
           <AnimatePresence>
             {isOpen && (
               <CollapsibleContent>
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="p-8 flex flex-col items-center justify-center text-center rounded-lg border border-dashed border-primary/30 bg-primary/5 mt-3"
-                >
-                  <div className="bg-primary/10 p-3 rounded-full mb-3">
-                    <BookOpen className="h-8 w-8 text-primary" />
-                  </div>
-                  <h4 className="text-lg font-medium text-gray-800 mb-2">{t('class.empty.title')}</h4>
-                  <p className="text-sm text-gray-600 mb-4 max-w-md">{t('class.empty.description')}</p>
-                  <Button 
-                    onClick={onAdd} 
-                    className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
+                <div className="pt-4 pb-2 sm:px-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex justify-between items-center"
                   >
-                    <Plus size={18} />
-                    {t("class.actions.add")}
-                  </Button>
+                    <h4 className="text-sm font-medium text-muted-foreground">{t('class.metrics.overview')}</h4>
+                    <Button 
+                      size="sm" 
+                      className="bg-primary hover:bg-primary/90 text-white rounded-full shadow-sm hover:shadow-md transition-all"
+                      onClick={() => handleAddClassClick(educationLevelId, educationType)}
+                    >
+                      <Plus size={16} className="mr-1" />
+                      {t("class.actions.addToLevel")}
+                    </Button>
+                  </motion.div>
+                </div>
+                
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1 mb-5 sm:pl-6 sm:pr-6"
+                >
+                  <div className="flex items-center bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                    <div className="bg-primary/10 p-2 rounded-full mr-3">
+                      <Users size={18} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">{t('class.metrics.students')}</p>
+                      <p className="text-xl font-semibold">{totalStudents}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                    <div className="bg-emerald-100 p-2 rounded-full mr-3">
+                      <BookOpen size={18} className="text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">{t('class.metrics.classes')}</p>
+                      <p className="text-xl font-semibold">{classes.length}</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial="hidden"
+                  animate="show"
+                  variants={containerVariants}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 pt-2 sm:pl-6 sm:pr-6"
+                >
+                  {classes.map(c => (
+                    <motion.div key={c.id} variants={cardVariants} className="h-full">
+                      {renderClassCard(c, sectionName)}
+                    </motion.div>
+                  ))}
                 </motion.div>
               </CollapsibleContent>
             )}
           </AnimatePresence>
         </Collapsible>
-      );
-    }
-    
-    // Calculate metrics for the section
-    const totalStudents = classes.reduce((sum, c) => sum + c.student_count, 0);
-    const avgCompletionRate = Math.round(classes.reduce((sum, c) => sum + (c.completion_rate || 0), 0) / classes.length);
-    const activeClasses = classes.filter(c => c.status === 'active').length;
-    
-    return (
-      <Collapsible
-        key={sectionId}
-        open={openSections[sectionId]}
-        onOpenChange={() => toggleSection(sectionId)}
-        className="space-y-2"
-      >
-        <CollapsibleTrigger className="flex items-center w-full gap-2 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 transition-colors shadow-sm">
-          <motion.div
-            animate={{ rotate: openSections[sectionId] ? 90 : 0 }}
-            transition={{ type: "spring", stiffness: 200 }}
-          >
-            <ChevronRight className="h-5 w-5 text-primary/70" />
-          </motion.div>
-          {icon && <div className="text-primary">{icon}</div>}
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          <span className="text-sm text-primary/70 ml-2 bg-primary/10 px-2 py-0.5 rounded-full">
-            {classes.length} {classes.length === 1 ? t("class.singular") : t("class.plural")}
-          </span>
-          
-          <div className="ml-auto flex gap-4 text-xs">
-            {/* <span className="flex items-center bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full mr-1.5"></span>
-              {activeClasses} {t('class.status.active')}
-            </span> */}
-            
-            {/* <span className="flex items-center bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
-              <span className="w-2 h-2 bg-amber-500 rounded-full mr-1.5"></span>
-              {classes.length - activeClasses} {classes.length - activeClasses > 0 ? t('class.status.nonActive') : ''}
-            </span> */}
-          </div>
-        </CollapsibleTrigger>
-        
-        <AnimatePresence>
-          {isOpen && (
-            <CollapsibleContent>
-              {/* Quick-view metrics */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 mb-5 pl-6 pr-6"
-              >
-                <div className="flex items-center bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                  <div className="bg-primary/10 p-2 rounded-full mr-3">
-                    <Users size={18} className="text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">{t('class.metrics.students')}</p>
-                    <p className="text-xl font-semibold">{totalStudents}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                  <div className="bg-emerald-100 p-2 rounded-full mr-3">
-                    <BookOpen size={18} className="text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">{t('class.metrics.classes')}</p>
-                    <p className="text-xl font-semibold">{classes.length}</p>
-                  </div>
-                </div>
-                
-                {/* <div className="flex items-center bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                  <div className="bg-amber-100 p-2 rounded-full mr-3">
-                    <BarChart3 size={18} className="text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">{t('class.metrics.completion')}</p>
-                    <p className="text-xl font-semibold">{avgCompletionRate || 0}%</p>
-                  </div>
-                </div> */}
-              </motion.div>
-
-              <motion.div
-                initial="hidden"
-                animate="show"
-                variants={containerVariants}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 pt-2 pl-6 pr-6"
-              >
-                {classes.map(c => (
-                  <motion.div key={c.id} variants={cardVariants} className="h-full">
-                    {renderClassCard(c, section)}
-                  </motion.div>
-                ))}
-              </motion.div>
-            </CollapsibleContent>
-          )}
-        </AnimatePresence>
-      </Collapsible>
+      </div>
     );
   };
 
-  const renderSectionContent = (structure: SchoolStructure, section: Section) => {
-    return (
-      <div className="space-y-6">
-        {/* College Section */}
-        {renderLevelSection(
-          `${t("educationLevels.college")}`,
-          structure[section].COLLEGE.classes,
-          section,
-          `${section}-college`,
-          <School size={20} />
-        )}
-
-        {/* Lycee Sections */}
-        {Object.entries(structure[section].LYCEE).map(([speciality, classes]) => (
-          <React.Fragment key={`${section}-lycee-${speciality}`}>
-            {renderLevelSection(
-              `${t("educationLevels.lycee")} - ${speciality}`,
-              classes,
-              section,
-              `${section}-lycee-${speciality}`,
-              <Book size={20} />
-            )}
-          </React.Fragment>
-        ))}
-
-        {/* University Sections */}
-        {Object.entries(structure[section].UNIVERSITY).map(([level, classes]) => (
-          <React.Fragment key={`${section}-university-${level}`}>
-            {renderLevelSection(
-              `${t("educationLevels.university")} - ${level}`,
-              classes,
-              section,
-              `${section}-university-${level}`,
-              <GraduationCap size={20} />
-            )}
-          </React.Fragment>
-        ))}
-      </div>
-    );
+  const renderSectionContent = (languageCode: string, sectionDetail: SectionDetail) => {
+    return Object.entries(sectionDetail.levels).map(([levelKey, levelDetail]) => {
+      const educationType = getEducationType(levelKey);
+      const sectionIcon = getSectionIcon(educationType);
+      const sectionId = `${languageCode}-${levelKey}`;
+      
+      if (levelKey.includes('_COLLEGE') && levelDetail.groups.classes) {
+        const educationName = t(`educationLevels.${educationType.toLowerCase()}`);
+        return renderClassGroup(
+          educationName, 
+          levelDetail.groups.classes, 
+          sectionId, 
+          sectionIcon, 
+          levelKey,
+          levelDetail.id // Pass the actual education level ID
+        );
+      } else {
+        // For LYCEE and UNIVERSITY sections
+        return Object.entries(levelDetail.groups).map(([groupKey, classes]) => {
+          if (groupKey === 'classes') return null;
+          
+          let displayName;
+          if (levelKey.includes('_LYCEE')) {
+            displayName = `${t("educationLevels.lycee")} - ${groupKey}`;
+          } else if (levelKey.includes('_UNIVERSITY')) {
+            displayName = groupKey;
+          } else {
+            displayName = groupKey;
+          }
+          
+          return renderClassGroup(
+            displayName,
+            classes as ClassDetail[],
+            `${sectionId}-${groupKey}`,
+            sectionIcon,
+            levelKey,
+            levelDetail.id // Pass the actual education level ID
+          );
+        });
+      }
+    });
   };
 
   return (
@@ -385,14 +438,14 @@ function CoursesPages() {
           </div>
         </div>
         
-        <Button 
+        {/* <Button 
           onClick={onAdd}
           className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow rounded-lg px-6 py-6 relative z-10"
           size="lg"
         >
           <Plus size={20} />
           {t("class.actions.add")}
-        </Button>
+        </Button> */}
       </motion.div>
 
       <motion.div 
@@ -401,9 +454,9 @@ function CoursesPages() {
         animate="show"
         className="space-y-10 max-w-[2400px] mx-auto"
       >
-        {Object.entries(data).map(([section, sectionData]) => (
+        {data && Object.entries(data).map(([languageCode, sectionDetail]) => (
           <motion.div 
-            key={section} 
+            key={languageCode} 
             variants={sectionVariants}
             className="bg-white/90 backdrop-blur-sm rounded-xl px-4 py-6 shadow-md hover:shadow-lg transition-shadow duration-300 border border-primary/10 relative overflow-hidden"
           >
@@ -411,7 +464,7 @@ function CoursesPages() {
             
             <h2 className="text-2xl font-semibold mb-6 text-gray-800 border-b pb-3 relative z-10 flex items-center">
               <span className="bg-primary/10 p-2 rounded-full mr-3">
-                {section === 'ANGLOPHONE' ? (
+                {languageCode === 'EN' ? (
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M2 5h20" /><path d="M2 10h20" /><path d="M2 15h20" /><path d="M2 20h20" />
                   </svg>
@@ -421,12 +474,23 @@ function CoursesPages() {
                   </svg>
                 )}
               </span>
-              {t(`sections.${section}`)}
+              {sectionDetail.label}
             </h2>
-            {renderSectionContent(data, section as Section)}
+
+            <div className="space-y-6">
+              {renderSectionContent(languageCode, sectionDetail)}
+            </div>
           </motion.div>
         ))}
       </motion.div>
+
+      <ClassCreationDialog 
+        isOpen={classCreationDialogOpen}
+        onClose={() => setClassCreationDialogOpen(false)}
+        educationLevelId={selectedEducationLevel.id}
+        educationType={selectedEducationLevel.type}
+        onSuccess={handleClassCreationSuccess}
+      />
     </motion.div>
   );
 }
