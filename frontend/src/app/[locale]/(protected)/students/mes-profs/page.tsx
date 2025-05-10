@@ -38,15 +38,14 @@ const fadeInVariants = {
   }
 };
 
-function MyTeachersPage() {
+function MesProfsPage() {
   const router = useRouter();
-  const { isLoading, hasActiveSubscription } = useSubscriptionStore();
+  const { isLoading, hasActiveSubscription, fetchSubscription, setInitialized } = useSubscriptionStore();
 
   useEffect(() => {
-    if (!isLoading && hasActiveSubscription === false) {
-      router.push('/students/subscriptions');
-    }
-  }, [isLoading, hasActiveSubscription, router]);
+    setInitialized();
+    fetchSubscription();
+  }, [fetchSubscription, setInitialized]);
 
   const t = useI18n();
   
@@ -91,7 +90,6 @@ function MyTeachersPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
       className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
-      style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}
     >
       <motion.div 
         initial={{ opacity: 0 }}
@@ -214,4 +212,4 @@ function MyTeachersPage() {
   );
 }
 
-export default MyTeachersPage;
+export default MesProfsPage;
