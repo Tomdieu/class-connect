@@ -242,6 +242,7 @@ export default {
   "registerDialog.licenceYearLabel": "Bachelor Year",
   "registerDialog.masterYearLabel": "Master Year",
   "registerDialog.enterpriseNameLabel": "Enterprise Name",
+  "registerDialog.enterpriseName": "Enterprise Name",
   "registerDialog.platformUsageReasonLabel": "Reason for Using Platform",
   "registerDialog.lyceeSpecialityLabel": "Speciality",
   "registerDialog.lyceeSpecialities": {
@@ -428,6 +429,9 @@ export default {
   "subject.form.submit.edit": "Update",
   "class.detail.title": "Subjects",
   "class.detail.addButton": "Add Subject",
+  "class.detail.deleteClass": "Delete Class",
+  "class.detail.deleteClassTooltip":
+    "Delete this class and all its associated subjects and students",
   "class.detail.subjectsTab": "Subjects",
   "class.detail.studentsTab": "Students",
   "class.detail.studentsCount": "Students",
@@ -463,6 +467,7 @@ export default {
   "class.detail.studentAddFailed": "Failed to add student",
   "class.detail.selectSchoolYearFirst": "Please select a school year first",
   "class.detail.invalidSchoolYear": "Invalid school year selected",
+  "class.metrics.overview": "Overview",
   "chapter.title": "Chapter",
   "chapter.topics": "Topics",
   "chapter.add": "Add Chapter",
@@ -503,6 +508,7 @@ export default {
   "common.delete": "Delete",
   "common.back": "Back",
   "common.error": "Error",
+  "common.remove": "Remove",
   "resources.title": "Learning Resources",
   "resources.empty": "No resources available",
   "resources.loading": "Loading resources...",
@@ -1686,4 +1692,48 @@ export default {
 "student.myVideos.selectClassDesc": "Please select a class to view available videos",
 "student.myVideos.noVideosAvailableTitle": "No Videos Available",
 "student.myVideos.noVideosAvailableDesc": "There are no videos available for this class yet.",
+
+class: {
+  create: {
+    title: "Create New Class",
+    descriptionCollege: "Create a new class for college level education",
+    descriptionLycee: "Create a new class for lycée level education",
+    descriptionUniversity: "Create a new class for university level education",
+    descriptionProfessional: "Create a new class for professional level education",
+    name: "Class Name",
+    nameDescription: "The name of the class (e.g., 6ème, 2nde, Licence)",
+    speciality: "Speciality",
+    selectSpeciality: "Select a speciality",
+    variant: "Variant",
+    variantDescription: "Optional variant (e.g., A, C, L1)",
+    description: "Description",
+    descriptionPlaceholder: "Optional description for this class",
+    variants: "Class Variants",
+    addVariant: "Add Variant",
+    variantNumber: "Variant {number}",
+    successMessage: "Class created successfully",
+    errorMessage: "Failed to create class. Please try again."
+  },
+  
+  actions: {
+    addToLevel: "Add Class",
+  },
+},
+"common.creating": "Creating...",
+"common.create": "Create",
+
+// Add any missing registration translations
+"register.title": "Register",
+"register.description": "Create your account to start your learning journey",
+"registerDialog.successToast": "Registration Successful",
+"registerDialog.successToastDescription": "Your account has been successfully created. You can now log in.",
+
+
+"registerDialog.selectLevel": "Select a level",
+"registerDialog.selectClassType": "Select a class type",
+"registerDialog.selectClass": "Select a class",
+"registerDialog.generalClasses": "General classes",
+"registerDialog.platformUsageReason": "Reason for using the platform",
+"registerDialog.reasonPlaceholder": "Explain why you want to use the platform"
+
 } as const;
