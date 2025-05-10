@@ -8,6 +8,7 @@ import {
   ChapterType,
   ClassCreateType,
   ClassType,
+  ClassStructure,
   ExerciseResourceCreateType,
   ExerciseResourceType,
   PDFResourceCreateType,
@@ -68,22 +69,23 @@ export const listClasses = async ({
 
 export const getformatedClasses = async () => {
   try {
-    const session = await auth();
-    if (!session?.user) throw Error("Unauthorize user!");
-    const res = await api.get(`/api/classes/formatted_classes/`, {
-      headers: {
-        Authorization: `Bearer ${session?.user.accessToken}`,
-        "Content-Type": "application/json",
-      },
-    });
+    console.log("Fetching formatted classes...");
+    const res = await api.get(`/api/classes/formatted_classes/`);
+    
+    console.log("Formatted classes API response:", res.status);
     const data = await res.data;
-    return data as SchoolStructure;
+    return data as ClassStructure;
   } catch (error: unknown) {
+    console.error("Error fetching formatted classes:", error);
     const axiosError = error as AxiosError;
     if (axiosError.response?.data) {
-      throw JSON.stringify(axiosError.response.data);
+      console.error("API error response:", axiosError.response.data);
+      throw JSON.stringify({ 
+        message: "Failed to fetch class information", 
+        details: axiosError.response.data 
+      });
     }
-    throw JSON.stringify({ message: "An unexpected error occurred" });
+    throw JSON.stringify({ message: "An unexpected error occurred while fetching classes" });
   }
 };
 
