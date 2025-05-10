@@ -118,7 +118,7 @@ export function StudentSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem 
                   key={item.href} 
-                  className={`rounded-lg mb-1 transition-all duration-200 ${
+                  className={`rounded-md mb-1 transition-all duration-200 ${
                     (correctPath === item.href || 
                      (item.href !== "/students" && correctPath.startsWith(item.href))) 
                       ? "bg-primary text-primary-foreground font-medium shadow-md" 
@@ -154,7 +154,7 @@ export function StudentSidebar() {
               {accountItems.map((item) => (
                 <SidebarMenuItem 
                   key={item.href}
-                  className={`rounded-lg mb-1 transition-all duration-200 ${
+                  className={`rounded-md mb-1 transition-all duration-200 ${
                     correctPath.startsWith(item.href) 
                       ? "bg-primary text-primary-foreground font-medium shadow-md" 
                       : "hover:bg-primary/10 text-foreground/70 hover:text-primary"
