@@ -40,11 +40,11 @@ function BrowseClassesPage() {
   const router = useRouter();
   const { isLoading, hasActiveSubscription } = useSubscriptionStore();
 
-  useEffect(() => {
-    if (!isLoading && hasActiveSubscription === false) {
-      router.push('/students/subscriptions');
-    }
-  }, [isLoading, hasActiveSubscription, router]);
+  // useEffect(() => {
+  //   if (!isLoading && hasActiveSubscription === false) {
+  //     router.push('/students/subscriptions');
+  //   }
+  // }, [isLoading, hasActiveSubscription, router]);
 
   const t = useI18n();
   
@@ -121,18 +121,25 @@ function BrowseClassesPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
       className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
-      style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}
+      // style={{ filter: (!isLoading && hasActiveSubscription === false) ? "blur(10px)" : "none" }}
     >
       <motion.div 
-        className="relative flex flex-col items-center justify-between mb-10 pb-4 border-b border-primary/10 max-w-[2400px] mx-auto"
+        className="relative flex flex-col gap-2 items-center justify-between mb-10 pb-4 border-b border-primary/10 max-w-[2400px] mx-auto"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
-        <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full z-0 opacity-10"></div>
-        
-        <div className="flex items-center mb-4 relative z-10 w-full">
+        {/* <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
+        <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full z-0 opacity-10"></div> */}
+        <div className="mr-auto">
+            <Button variant="ghost" size="sm" asChild className="hover:bg-primary/10 transition-all">
+              <Link href="/students">
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                {t('common.back')} {t('common.dashboard')}
+              </Link>
+            </Button>
+          </div>
+        <div className="flex items-center mb-4 relativew-full w-full">
           <div className="bg-primary/10 p-3 rounded-full mr-4">
             <BookOpen className="h-7 w-7 text-primary" />
           </div>
@@ -142,14 +149,7 @@ function BrowseClassesPage() {
             </h1>
             <p className="text-sm text-gray-600">{t('student.classes.description')}</p>
           </div>
-          <div className="ml-auto">
-            <Button variant="outline" size="sm" asChild className="hover:bg-primary/10 transition-all">
-              <Link href="/students">
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                {t('common.back')} {t('common.dashboard')}
-              </Link>
-            </Button>
-          </div>
+          
         </div>
       </motion.div>
 
@@ -174,13 +174,13 @@ function BrowseClassesPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <GraduationCap className="h-5 w-5 mr-2 text-primary" />
-                      {classItem.class_level.name}
+                      {classItem.class_level.definition_display}
                     </CardTitle>
                     <CardDescription>
                       School Year: {classItem.school_year.formatted_year}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="relative z-10">
+                  <CardContent className="relative">
                     <p className="text-muted-foreground mb-4">
                       {t('student.classes.enrolledInfo')}
                     </p>
