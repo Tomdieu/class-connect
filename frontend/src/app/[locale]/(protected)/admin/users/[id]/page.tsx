@@ -9,6 +9,7 @@ import {
   updateEnrollmentDeclarationPaid,
 } from "@/actions/enrollments";
 import { listTransactions } from "@/actions/payments";
+import { getCourseDeclarationsOfTeacher } from "@/actions/course-declarations";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,7 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useI18n } from "@/locales/client";
-import { UserType, ActionStatus, CourseDeclarationType } from "@/types";
+import { UserType, ActionStatus, CourseDeclarationType, ActivityLogType } from "@/types";
 import {
   ArrowLeft,
   CalendarIcon,
@@ -46,9 +47,11 @@ import {
   CreditCard,
   Receipt,
   FileCheck,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getUserRole } from "@/lib/utils";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -78,8 +81,6 @@ import {
   CredenzaTitle,
   CredenzaTrigger,
 } from "@/components/ui/credenza";
-// Removed Dialog import as it wasn't used after removing animations
-// import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -94,11 +95,22 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-// Removed framer-motion imports
-
-// Removed animation variants
-
-// Removed custom animated components
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  getPaginationRowModel,
+  ColumnDef,
+} from "@tanstack/react-table";
 
 // Zod schema for the payment form
 const paymentFormSchema = z.object({
@@ -117,6 +129,50 @@ export default function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [selectedDeclaration, setSelectedDeclaration] = useState<CourseDeclarationType | null>(null);
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [confirmStatus, setConfirmStatus] = useState<{
+    show: boolean;
+    enrollmentId: number | null;
+    declarationId: number | null;
+    newStatus: Omit<ActionStatus, "CANCELLED"> | null;
+  }>({
+    show: false,
+    enrollmentId: null,
+    declarationId: null,
+    newStatus: null,
+  });
+
+  // Initialize form for payment form
+  const form = useForm<PaymentFormValues>({
+    resolver: zodResolver(paymentFormSchema),
+    defaultValues: {
+      payment_comment: "",
+    },
+  });
+
+  // Function to get available status options based on current status
+  const getStatusOptions = (currentStatus: ActionStatus) => {
+    switch (currentStatus) {
+      case "PENDING":
+        return [
+          { value: "PENDING", label: "Pending" },
+          { value: "ACCEPTED", label: "Accept" },
+          { value: "REJECTED", label: "Reject" },
+        ];
+      case "ACCEPTED":
+        return [{ value: "ACCEPTED", label: "Accepted" }];
+      case "REJECTED":
+        return [{ value: "REJECTED", label: "Rejected" }];
+      default:
+        return [
+          { value: "PENDING", label: "Pending" },
+          { value: "ACCEPTED", label: "Accept" },
+          { value: "REJECTED", label: "Reject" },
+        ];
+    }
+  };
 
   // Query for fetching user details
   const {
@@ -152,14 +208,10 @@ export default function UserDetailPage() {
     queryKey: ["userEnrollments", id],
     queryFn: () => listEnrollments({ student_id: id }),
     staleTime: 1000 * 60 * 2, // 2 minutes
-    enabled:
-      !!id &&
-      user?.education_level !== "PROFESSIONAL" &&
-      !user?.is_staff &&
-      !user?.is_superuser,
+    enabled: !!id && user && getUserRole(user) === "student",
   });
 
-  // Query for fetching teacher enrollments (only for professionals)
+  // Query for fetching teacher enrollments (only for teachers)
   const {
     data: teacherEnrollments,
     isLoading: teacherEnrollmentsLoading,
@@ -168,7 +220,19 @@ export default function UserDetailPage() {
     queryKey: ["teacherEnrollments", id],
     queryFn: () => listEnrollments({ teacher_id: id }),
     staleTime: 1000 * 60 * 2, // 2 minutes
-    enabled: !!id && user?.education_level === "PROFESSIONAL",
+    enabled: !!id && user && getUserRole(user) === "teacher",
+  });
+
+  // Query for fetching teacher declarations (only for teachers)
+  const {
+    data: teacherDeclarations,
+    isLoading: teacherDeclarationsLoading,
+    isError: teacherDeclarationsError,
+  } = useQuery({
+    queryKey: ["teacherDeclarations", id],
+    queryFn: () => getCourseDeclarationsOfTeacher({ user_id: id }),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    enabled: !!id && user && getUserRole(user) === "teacher",
   });
 
   // Query for fetching user transactions
@@ -255,11 +319,8 @@ export default function UserDetailPage() {
     }
   };
 
-  const isStudent =
-    user?.education_level !== "PROFESSIONAL" &&
-    !user?.is_staff &&
-    !user?.is_superuser;
-  const isProfessional = user?.education_level === "PROFESSIONAL";
+  const isStudent = user && getUserRole(user) === "student";
+  const isTeacher = user && getUserRole(user) === "teacher";
 
   const handleStatusChange = (
     enrollmentId: number,
@@ -272,6 +333,177 @@ export default function UserDetailPage() {
       status: newStatus,
     });
   };
+
+  // Function to handle confirmation of status change in dialog
+  const handleConfirmStatusChange = () => {
+    if (
+      confirmStatus.enrollmentId &&
+      confirmStatus.declarationId &&
+      confirmStatus.newStatus
+    ) {
+      updateDeclarationStatusMutation.mutate({
+        enrollmentId: confirmStatus.enrollmentId,
+        declarationId: confirmStatus.declarationId,
+        status: confirmStatus.newStatus,
+      });
+      setConfirmStatus({
+        show: false,
+        enrollmentId: null,
+        declarationId: null,
+        newStatus: null,
+      });
+    }
+  };
+
+  // Form submission handler for payment form
+  function onSubmit(data: PaymentFormValues) {
+    if (!selectedDeclaration) return;
+
+    // Check if a file is selected
+    if (!data.proof_of_payment) {
+      toast.error("Please select a proof of payment file");
+      return;
+    }
+
+    markAsPaidMutation.mutate({
+      enrollmentId: selectedDeclaration.teacher_student_enrollment.id,
+      declarationId: selectedDeclaration.id,
+      data: {
+        proof_of_payment: data.proof_of_payment,
+        payment_comment: data.payment_comment,
+      },
+    });
+
+    // Reset form will be done after successful mutation
+  }
+
+  // Define columns for the Activities table
+  const activityColumns: ColumnDef<ActivityLogType>[] = [
+    {
+      accessorKey: "timestamp",
+      header: "Date & Time",
+      cell: ({ row }) => formatDate(row.original.timestamp),
+    },
+    {
+      accessorKey: "action",
+      header: "Action",
+    },
+    {
+      accessorKey: "request_method",
+      header: "Method",
+    },
+    {
+      accessorKey: "request_path",
+      header: "Path",
+      cell: ({ row }) => (
+        <div className="max-w-[200px] truncate">{row.original.request_path}</div>
+      ),
+    },
+    {
+      accessorKey: "ip_address",
+      header: "IP Address",
+    },
+    {
+      id: "details",
+      header: "Details",
+      cell: ({ row }) => {
+        const activity = row.original;
+        return (
+          activity.extra_data && Object.keys(activity.extra_data).length > 0 && (
+            <details className="cursor-pointer">
+              <summary className="text-sm text-primary">View details</summary>
+              <div className="mt-2 pl-2 border-l-2 border-muted text-xs space-y-1">
+                {Object.entries(activity.extra_data).map(([key, value]) => (
+                  <div key={key} className="flex gap-2">
+                    <span className="text-muted-foreground">{key}:</span>
+                    <span>{String(value)}</span>
+                  </div>
+                ))}
+              </div>
+            </details>
+          )
+        );
+      },
+    },
+  ];
+
+  // Define columns for the Declarations table
+  const declarationColumns: ColumnDef<CourseDeclarationType>[] = [
+    {
+      accessorKey: "declaration_date",
+      header: "Date",
+      cell: ({ row }) => formatDate(row.original.declaration_date),
+    },
+    {
+      accessorKey: "duration",
+      header: "Duration (hours)",
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <Badge
+          variant={
+            row.original.status === "ACCEPTED"
+              ? "default"
+              : row.original.status === "REJECTED"
+              ? "destructive"
+              : "secondary"
+          }
+        >
+          {row.original.status}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "teacher_student_enrollment",
+      header: "Course",
+      cell: ({ row }) => {
+        const enrollment = row.original.teacher_student_enrollment;
+        return (
+          <div>
+            <div className="font-medium">{enrollment?.offer?.subject?.name || "N/A"}</div>
+            <div className="text-xs text-muted-foreground">{enrollment?.offer?.class_level?.definition_display || "N/A"}</div>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "payment_status",
+      header: "Payment",
+      cell: ({ row }) => (
+        <Badge variant={row.original.proof_of_payment ? "default" : "outline"}>
+          {row.original.proof_of_payment ? "Paid" : "Unpaid"}
+        </Badge>
+      ),
+    },
+  ];
+
+  // Set up table for activities with pagination (30 items per page)
+  const activitiesTable = useReactTable({
+    data: activities || [],
+    columns: activityColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 30,
+      },
+    },
+  });
+
+  // Set up table for declarations with pagination
+  const declarationsTable = useReactTable({
+    data: teacherDeclarations || [],
+    columns: declarationColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
+  });
 
   if (isLoading) {
     return (
@@ -308,13 +540,6 @@ export default function UserDetailPage() {
     if (user.is_superuser) return "Admin";
     if (user.is_staff) return "Staff";
     return "User";
-  };
-
-  const getUserRole = (user: UserType) => {
-    if (user.is_superuser) return "Administrator";
-    if (user.is_staff) return "Staff Member";
-    if (user.education_level === "PROFESSIONAL") return "Teacher";
-    return "Student";
   };
 
   return (
@@ -372,7 +597,6 @@ export default function UserDetailPage() {
                   {t("users.table.actions.delete")}
                 </Button>
               </AlertDialogTrigger>
-              {/* Removed motion.div wrapper */}
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
@@ -407,18 +631,20 @@ export default function UserDetailPage() {
 
         <div>
           <Tabs defaultValue="overview" className="w-full space-y-9">
-            <TabsList className="grid w-full md:w-auto grid-cols-2 sm:grid-cols-3 md:grid-cols-4 mb-4">
+            <TabsList className="grid w-full md:w-auto grid-cols-2 sm:grid-cols-3 md:grid-cols-5 mb-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              {(isStudent || isProfessional) && (
+              {(isStudent || isTeacher) && (
                 <TabsTrigger value="courses">Courses</TabsTrigger>
+              )}
+              {isTeacher && (
+                <TabsTrigger value="declarations">Declarations</TabsTrigger>
               )}
               <TabsTrigger value="payments">Payments</TabsTrigger>
               <TabsTrigger value="activities">Activities</TabsTrigger>
             </TabsList>
 
-            {/* Removed AnimatePresence */}
             <TabsContent
-              key="overview" // Key might not be necessary without AnimatePresence, but harmless
+              key="overview"
               value="overview"
               className="space-y-6"
             >
@@ -493,38 +719,57 @@ export default function UserDetailPage() {
 
                       <Separator />
 
-                      <div className="space-y-4">
-                        <div className="flex items-start gap-2">
-                          <School className="h-5 w-5 text-muted-foreground mt-1" />
-                          <div>
-                            <h3 className="font-medium">
-                              Education Information
-                            </h3>
-                            {user.education_level ? (
+                      {isTeacher && (
+                        <div className="space-y-4">
+                          <div className="flex items-start gap-2">
+                            <School className="h-5 w-5 text-muted-foreground mt-1" />
+                            <div>
+                              <h3 className="font-medium">
+                                Professional Information
+                              </h3>
                               <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                  <p className="text-sm text-muted-foreground">
-                                    Education Level
-                                  </p>
-                                  <p>{user.education_level}</p>
-                                </div>
-                                {user.class_level && (
+                                {user.enterprise_name && (
                                   <div className="space-y-1">
                                     <p className="text-sm text-muted-foreground">
-                                      Class
+                                      Enterprise
                                     </p>
-                                    <p>{user.class_display}</p>
+                                    <p>{user.enterprise_name}</p>
+                                  </div>
+                                )}
+                                {user.platform_usage_reason && (
+                                  <div className="space-y-1">
+                                    <p className="text-sm text-muted-foreground">
+                                      Reason for Using Platform
+                                    </p>
+                                    <p>{user.platform_usage_reason}</p>
                                   </div>
                                 )}
                               </div>
-                            ) : (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                No education information provided
-                              </p>
-                            )}
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
+
+                      {isStudent && user.class_enrolled && (
+                        <div className="space-y-4">
+                          <div className="flex items-start gap-2">
+                            <School className="h-5 w-5 text-muted-foreground mt-1" />
+                            <div>
+                              <h3 className="font-medium">
+                                Education Information
+                              </h3>
+                              <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                  <p className="text-sm text-muted-foreground">
+                                    Class
+                                  </p>
+                                  <p>{user.class_display}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
@@ -552,7 +797,7 @@ export default function UserDetailPage() {
                           <p className="text-sm text-muted-foreground">
                             Role
                           </p>
-                          <p className="font-medium">{getUserRole(user)}</p>
+                          <p className="font-medium capitalize">{getUserRole(user)}</p>
                         </div>
 
                         <div className="space-y-1">
@@ -596,7 +841,7 @@ export default function UserDetailPage() {
 
             {isStudent && (
               <TabsContent
-                key="courses-student" // Key might not be necessary without AnimatePresence, but harmless
+                key="courses-student"
                 value="courses"
               >
                 <Card>
@@ -640,9 +885,9 @@ export default function UserDetailPage() {
               </TabsContent>
             )}
 
-            {isProfessional && (
+            {isTeacher && (
               <TabsContent
-                key="courses-professional" // Key might not be necessary without AnimatePresence, but harmless
+                key="courses-professional"
                 value="courses"
               >
                 <Card>
@@ -686,8 +931,206 @@ export default function UserDetailPage() {
               </TabsContent>
             )}
 
+            {isTeacher && (
+              <TabsContent
+                key="declarations"
+                value="declarations"
+              >
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Teacher Declarations</CardTitle>
+                    <CardDescription>
+                      All course declarations submitted by this teacher
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {teacherDeclarationsLoading ? (
+                      <div className="flex justify-center items-center py-6">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary mr-2" />
+                        <p>Loading declarations...</p>
+                      </div>
+                    ) : teacherDeclarationsError ? (
+                      <div className="flex flex-col items-center justify-center py-6">
+                        <p className="text-destructive text-center">
+                          Failed to load declarations
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() =>
+                            queryClient.invalidateQueries({
+                              queryKey: ["teacherDeclarations", id],
+                            })
+                          }
+                        >
+                          Retry
+                        </Button>
+                      </div>
+                    ) : teacherDeclarations && teacherDeclarations.length > 0 ? (
+                      <div>
+                        <div className="rounded-md border">
+                          <Table>
+                            <TableHeader>
+                              {declarationsTable.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                  {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                      {header.isPlaceholder
+                                        ? null
+                                        : flexRender(
+                                            header.column.columnDef.header,
+                                            header.getContext()
+                                          )}
+                                    </TableHead>
+                                  ))}
+                                  <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                              ))}
+                            </TableHeader>
+                            <TableBody>
+                              {declarationsTable.getRowModel().rows?.length ? (
+                                declarationsTable.getRowModel().rows.map((row) => {
+                                  const declaration = row.original;
+                                  const enrollmentId = declaration.teacher_student_enrollment.id;
+                                  const declarationId = declaration.id;
+                                  
+                                  return (
+                                    <TableRow
+                                      key={row.id}
+                                      data-state={row.getIsSelected() && "selected"}
+                                    >
+                                      {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                      ))}
+                                      <TableCell className="text-right flex justify-end items-center space-x-2">
+                                        {declaration.status !== "REJECTED" && !declaration.proof_of_payment && (
+                                          <Select
+                                            value={declaration.status}
+                                            onValueChange={(value) => {
+                                              const newStatus = value as Omit<
+                                                ActionStatus,
+                                                "CANCELLED"
+                                              >;
+                                              if (newStatus !== declaration.status) {
+                                                setConfirmStatus({
+                                                  show: true,
+                                                  enrollmentId,
+                                                  declarationId,
+                                                  newStatus,
+                                                });
+                                              }
+                                            }}
+                                          >
+                                            <SelectTrigger className="w-[140px]">
+                                              <SelectValue placeholder="Update status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              {getStatusOptions(declaration.status).map(
+                                                (option) => (
+                                                  <SelectItem
+                                                    key={option.value}
+                                                    value={option.value}
+                                                  >
+                                                    {option.label}
+                                                  </SelectItem>
+                                                )
+                                              )}
+                                            </SelectContent>
+                                          </Select>
+                                        )}
+                                        
+                                        {declaration.proof_of_payment && (
+                                          <Badge variant="outline" className="mr-2">
+                                            Status Locked (Paid)
+                                          </Badge>
+                                        )}
+                                        
+                                        {declaration.status === "ACCEPTED" &&
+                                          !declaration.proof_of_payment && (
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              className="flex items-center gap-1"
+                                              onClick={() => {
+                                                setSelectedDeclaration(declaration);
+                                                setShowPaymentForm(true);
+                                              }}
+                                            >
+                                              <CreditCard className="h-4 w-4" />
+                                              <span className="sr-only md:not-sr-only md:inline-block">
+                                                Mark as Paid
+                                              </span>
+                                            </Button>
+                                          )}
+
+                                        {declaration.proof_of_payment && (
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="flex items-center gap-1"
+                                            onClick={() => {
+                                              setSelectedDeclaration(declaration);
+                                              setShowPaymentDetails(true);
+                                            }}
+                                          >
+                                            <Receipt className="h-4 w-4" />
+                                            <span className="sr-only md:not-sr-only md:inline-block">
+                                              View Payment
+                                            </span>
+                                          </Button>
+                                        )}
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })
+                              ) : (
+                                <TableRow>
+                                  <TableCell colSpan={declarationColumns.length + 1} className="h-24 text-center">
+                                    No declarations found
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </TableBody>
+                          </Table>
+                        </div>
+                        <div className="flex items-center justify-end space-x-2 py-4">
+                          <div className="text-sm text-muted-foreground">
+                            Page {declarationsTable.getState().pagination.pageIndex + 1} of{" "}
+                            {declarationsTable.getPageCount()}
+                          </div>
+                          <Pagination>
+                            <PaginationContent>
+                              <PaginationItem>
+                                <PaginationPrevious
+                                  onClick={() => declarationsTable.previousPage()}
+                                  disabled={!declarationsTable.getCanPreviousPage()}
+                                />
+                              </PaginationItem>
+                              <PaginationItem>
+                                <PaginationNext
+                                  onClick={() => declarationsTable.nextPage()}
+                                  disabled={!declarationsTable.getCanNextPage()}
+                                />
+                              </PaginationItem>
+                            </PaginationContent>
+                          </Pagination>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-center py-6">
+                        No declarations found for this teacher
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+
             <TabsContent
-              key="payments" // Key might not be necessary without AnimatePresence, but harmless
+              key="payments"
               value="payments"
             >
               <Card>
@@ -772,12 +1215,12 @@ export default function UserDetailPage() {
             </TabsContent>
 
             <TabsContent
-              key="activities" // Key might not be necessary without AnimatePresence, but harmless
+              key="activities"
               value="activities"
             >
               <Card>
                 <CardHeader>
-                  <CardTitle>Recent Activities</CardTitle>
+                  <CardTitle>User Activities</CardTitle>
                   <CardDescription>
                     User's activities on the platform
                   </CardDescription>
@@ -797,65 +1240,99 @@ export default function UserDetailPage() {
                         variant="outline"
                         size="sm"
                         className="mt-2"
-                        onClick={() => refetch()}
+                        onClick={() => 
+                          queryClient.invalidateQueries({
+                            queryKey: ["userActivities", id],
+                          })
+                        }
                       >
                         Retry
                       </Button>
                     </div>
                   ) : activities && activities.length > 0 ? (
-                    <div className="space-y-6">
-                      {activities.map((activity) => (
-                        <div
-                          key={activity.id}
-                          className="border rounded-lg p-4 space-y-2"
-                        >
-                          <div className="flex justify-between">
-                            <p className="font-medium">{activity.action}</p>
-                            <time className="text-muted-foreground text-sm">
-                              {formatDate(activity.timestamp)}
-                            </time>
-                          </div>
-                          <div className="text-sm space-y-1">
-                            <div className="flex gap-2">
-                              <span className="text-muted-foreground">
-                                Path:
-                              </span>
-                              <span>
-                                {activity.request_method}{" "}
-                                {activity.request_path}
-                              </span>
-                            </div>
-                            {activity.ip_address && (
-                              <div className="flex gap-2">
-                                <span className="text-muted-foreground">
-                                  IP:
-                                </span>
-                                <span>{activity.ip_address}</span>
-                              </div>
+                    <div>
+                      <div className="rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            {activitiesTable.getHeaderGroups().map((headerGroup) => (
+                              <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                  <TableHead key={header.id}>
+                                    {header.isPlaceholder
+                                      ? null
+                                      : flexRender(
+                                          header.column.columnDef.header,
+                                          header.getContext()
+                                        )}
+                                  </TableHead>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableHeader>
+                          <TableBody>
+                            {activitiesTable.getRowModel().rows?.length ? (
+                              activitiesTable.getRowModel().rows.map((row) => (
+                                <TableRow
+                                  key={row.id}
+                                  data-state={row.getIsSelected() && "selected"}
+                                >
+                                  {row.getVisibleCells().map((cell) => (
+                                    <TableCell key={cell.id}>
+                                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </TableCell>
+                                  ))}
+                                </TableRow>
+                              ))
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={activityColumns.length} className="h-24 text-center">
+                                  No activities found
+                                </TableCell>
+                              </TableRow>
                             )}
-                            {activity.extra_data &&
-                              Object.keys(activity.extra_data).length > 0 && (
-                                <details className="mt-2">
-                                  <summary className="text-sm cursor-pointer text-primary">
-                                    Additional details
-                                  </summary>
-                                  <div className="mt-2 pl-2 border-l-2 border-muted text-xs space-y-1">
-                                    {Object.entries(activity.extra_data).map(
-                                      ([key, value]) => (
-                                        <div key={key} className="flex gap-2">
-                                          <span className="text-muted-foreground">
-                                            {key}:
-                                          </span>
-                                          <span>{String(value)}</span>
-                                        </div>
-                                      )
-                                    )}
-                                  </div>
-                                </details>
-                              )}
-                          </div>
+                          </TableBody>
+                        </Table>
+                      </div>
+                      <div className="flex items-center justify-end space-x-2 py-4">
+                        <div className="text-sm text-muted-foreground">
+                          Page {activitiesTable.getState().pagination.pageIndex + 1} of{" "}
+                          {activitiesTable.getPageCount()}
                         </div>
-                      ))}
+                        <Pagination>
+                          <PaginationContent>
+                            <PaginationItem>
+                              <PaginationPrevious
+                                onClick={() => activitiesTable.previousPage()}
+                                disabled={!activitiesTable.getCanPreviousPage()}
+                              />
+                            </PaginationItem>
+                            {Array.from({ length: Math.min(5, activitiesTable.getPageCount()) }).map((_, i) => {
+                              const pageIndex = i;
+                              return (
+                                <PaginationItem key={pageIndex}>
+                                  <PaginationLink
+                                    isActive={pageIndex === activitiesTable.getState().pagination.pageIndex}
+                                    onClick={() => activitiesTable.setPageIndex(pageIndex)}
+                                  >
+                                    {pageIndex + 1}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              );
+                            })}
+                            {activitiesTable.getPageCount() > 5 && (
+                              <PaginationItem>
+                                <PaginationEllipsis />
+                              </PaginationItem>
+                            )}
+                            <PaginationItem>
+                              <PaginationNext
+                                onClick={() => activitiesTable.nextPage()}
+                                disabled={!activitiesTable.getCanNextPage()}
+                              />
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+                      </div>
                     </div>
                   ) : (
                     <p className="text-muted-foreground text-center py-6">
@@ -865,10 +1342,215 @@ export default function UserDetailPage() {
                 </CardContent>
               </Card>
             </TabsContent>
-            {/* Removed AnimatePresence */}
           </Tabs>
         </div>
       </div>
+
+      {/* Status change confirmation dialog */}
+      <AlertDialog
+        open={confirmStatus.show}
+        onOpenChange={(open) => {
+          if (!open) {
+            setConfirmStatus({ ...confirmStatus, show: false });
+          } else if (!confirmStatus.show) {
+            setConfirmStatus({ ...confirmStatus, show: true });
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Status Change</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to change the declaration status to{" "}
+              {confirmStatus.newStatus}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() =>
+                setConfirmStatus({ ...confirmStatus, show: false })
+              }
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmStatusChange}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Payment Form Dialog */}
+      <Credenza open={showPaymentForm} onOpenChange={setShowPaymentForm}>
+        <CredenzaContent className="max-w-md">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col gap-2"
+            >
+              <CredenzaHeader>
+                <CredenzaTitle>
+                  Mark Declaration as Paid
+                </CredenzaTitle>
+                <CredenzaDescription>
+                  Upload payment proof and add comments
+                  for this declaration.
+                </CredenzaDescription>
+              </CredenzaHeader>
+              <CredenzaBody className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="proof_of_payment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Proof of Payment
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) {
+                              field.onChange(
+                                e.target.files[0]
+                              );
+                            }
+                          }}
+                          ref={field.ref}
+                          disabled={field.disabled}
+                          name={field.name}
+                          onBlur={field.onBlur}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="payment_comment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Payment Comment
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Add details about this payment"
+                          {...field}
+                          rows={3}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CredenzaBody>
+              <CredenzaFooter>
+                <CredenzaClose asChild>
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => {
+                      form.reset();
+                      setShowPaymentForm(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </CredenzaClose>
+                <Button
+                  type="submit"
+                  disabled={
+                    markAsPaidMutation.isPending
+                  }
+                >
+                  {markAsPaidMutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Save Payment
+                </Button>
+              </CredenzaFooter>
+            </form>
+          </Form>
+        </CredenzaContent>
+      </Credenza>
+
+      {/* Payment Details Dialog */}
+      <Credenza open={showPaymentDetails} onOpenChange={setShowPaymentDetails}>
+        <CredenzaContent>
+          <div>
+            <CredenzaHeader>
+              <CredenzaTitle>Payment Details</CredenzaTitle>
+              <CredenzaDescription>
+                Payment information for declaration on{" "}
+                {selectedDeclaration &&
+                  formatDate(selectedDeclaration.declaration_date)}
+              </CredenzaDescription>
+            </CredenzaHeader>
+
+            {selectedDeclaration && (
+              <CredenzaBody className="space-y-4 py-4">
+                {selectedDeclaration.proof_of_payment ? (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-sm">
+                        Payment Proof:
+                      </span>
+                      <a
+                        href={selectedDeclaration.proof_of_payment}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-primary hover:underline"
+                      >
+                        <FileCheck className="h-4 w-4 mr-1" />
+                        View Document
+                      </a>
+                    </div>
+
+                    <div>
+                      <span className="font-medium text-sm">Payment Date:</span>
+                      <p>
+                        {selectedDeclaration.payment_date
+                          ? formatDate(selectedDeclaration.payment_date)
+                          : "Not recorded"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <span className="font-medium text-sm">
+                        Payment Comment:
+                      </span>
+                      <p className="mt-1 p-3 bg-muted rounded-md text-sm">
+                        {selectedDeclaration.payment_comment ||
+                          "No comments provided"}
+                      </p>
+                    </div>
+
+                    {selectedDeclaration.paid_by && (
+                      <div>
+                        <span className="font-medium text-sm">Paid By:</span>
+                        <p>
+                          {selectedDeclaration.paid_by.first_name}{" "}
+                          {selectedDeclaration.paid_by.last_name}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center p-6">
+                    <p className="text-muted-foreground">
+                      No payment information available
+                    </p>
+                  </div>
+                )}
+              </CredenzaBody>
+            )}
+          </div>
+        </CredenzaContent>
+      </Credenza>
     </>
   );
 }
@@ -1063,7 +1745,6 @@ function EnrollmentWithDeclarations({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {/* Removed AnimatePresence */}
               {declarations.results.map(
                 (declaration: CourseDeclarationType, index: number) => (
                   <TableRow key={declaration.id}>
@@ -1094,7 +1775,7 @@ function EnrollmentWithDeclarations({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right space-x-2 flex items-center">
-                      {declaration.status !== "REJECTED" && (
+                      {declaration.status !== "REJECTED" && !declaration.proof_of_payment && (
                         <Select
                           value={declaration.status}
                           onValueChange={(value) => {
@@ -1129,6 +1810,12 @@ function EnrollmentWithDeclarations({
                             )}
                           </SelectContent>
                         </Select>
+                      )}
+
+                      {declaration.proof_of_payment && (
+                        <Badge variant="outline" className="mr-2">
+                          Status Locked (Paid)
+                        </Badge>
                       )}
 
                       <div className="inline-flex items-center mt-2 space-x-2">
@@ -1274,7 +1961,6 @@ function EnrollmentWithDeclarations({
                   </TableRow>
                 )
               )}
-              {/* Removed AnimatePresence */}
             </TableBody>
           </Table>
         </div>
@@ -1320,7 +2006,6 @@ function EnrollmentWithDeclarations({
 
       {/* Payment Details Dialog without animations */}
       <Credenza open={showPaymentDetails} onOpenChange={setShowPaymentDetails}>
-        {/* Keep asChild if needed by Credenza structure, replace motion.div with plain div */}
         <CredenzaContent>
           <div>
             <CredenzaHeader>
