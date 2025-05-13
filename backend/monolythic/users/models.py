@@ -163,6 +163,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.clean()
         super().save(*args, **kwargs)
 
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
 
 class UserPasswordResetToken(models.Model):
     user = models.ForeignKey(User, related_name="reset_token", on_delete=models.CASCADE)
