@@ -1575,55 +1575,55 @@ class UserClassViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
         self.log_activity(request, "Deleted user class", {"user_class_id": kwargs.get("pk")})
         return super().destroy(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        method='get',
-        manual_parameters=[
-            openapi.Parameter('school_year', openapi.IN_QUERY, 
-                             description="School year in format YYYY-YYYY", 
-                             type=openapi.TYPE_STRING, required=False),
-        ],
-        responses={200: UserClassSerializer(many=True)},
-        operation_description="Get all students for a specific class level for the given school year"
-    )
-    @action(detail=False, methods=['get'], url_path='students-by-class')
-    def students_by_class(self, request):
-        """Get all students enrolled in a specific class level for a given school year."""
-        class_level_id = request.query_params.get('class_level')
-        school_year_param = request.query_params.get('school_year')
+    # @swagger_auto_schema(
+    #     method='get',
+    #     manual_parameters=[
+    #         openapi.Parameter('school_year', openapi.IN_QUERY, 
+    #                          description="School year in format YYYY-YYYY", 
+    #                          type=openapi.TYPE_STRING, required=False),
+    #     ],
+    #     responses={200: UserClassSerializer(many=True)},
+    #     operation_description="Get all students for a specific class level for the given school year"
+    # )
+    # @action(detail=False, methods=['get'], url_path='students-by-class')
+    # def students_by_class(self, request):
+    #     """Get all students enrolled in a specific class level for a given school year."""
+    #     class_level_id = request.query_params.get('class_level')
+    #     school_year_param = request.query_params.get('school_year')
         
-        if not class_level_id:
-            return Response(
-                {"error": "class_level parameter is required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    #     if not class_level_id:
+    #         return Response(
+    #             {"error": "class_level parameter is required"}, 
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
         
-        queryset = UserClass.objects.filter(class_level_id=class_level_id)
+    #     queryset = UserClass.objects.filter(class_level_id=class_level_id)
         
-        if school_year_param:
-            try:
-                start_year, end_year = school_year_param.split('-')
-                school_year_obj = SchoolYear.objects.filter(
-                    start_year=start_year,
-                    end_year=end_year
-                ).first()
-                if school_year_obj:
-                    queryset = queryset.filter(school_year=school_year_obj)
-            except (ValueError, SchoolYear.DoesNotExist):
-                return Response(
-                    {"error": "Invalid school_year format. Use YYYY-YYYY"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        else:
-            # Default to current school year
-            queryset = queryset.filter(school_year=SchoolYear.current_year())
+    #     if school_year_param:
+    #         try:
+    #             start_year, end_year = school_year_param.split('-')
+    #             school_year_obj = SchoolYear.objects.filter(
+    #                 start_year=start_year,
+    #                 end_year=end_year
+    #             ).first()
+    #             if school_year_obj:
+    #                 queryset = queryset.filter(school_year=school_year_obj)
+    #         except (ValueError, SchoolYear.DoesNotExist):
+    #             return Response(
+    #                 {"error": "Invalid school_year format. Use YYYY-YYYY"}, 
+    #                 status=status.HTTP_400_BAD_REQUEST
+    #             )
+    #     else:
+    #         # Default to current school year
+    #         queryset = queryset.filter(school_year=SchoolYear.current_year())
         
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
         
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    #     serializer = self.get_serializer(queryset, many=True)
+    #     return Response(serializer.data)
     
     @swagger_auto_schema(   
         method='get',
