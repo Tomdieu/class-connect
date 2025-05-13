@@ -60,3 +60,45 @@ export const getCourseDeclarationsOfTeacher = async (
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
+
+export const updateCourseDeclarationStatus = async (
+  declarationId: number,
+  newStatus: "PENDING"|"ACCEPTED"|"REJECTED"
+) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorized user!");
+
+    // First check if the declaration has been paid
+    const response = await api.get(`/api/course-declarations/${declarationId}/`, {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+      }
+    });
+    
+    const declaration = response.data as CourseDeclarationType;
+    
+    // If the declaration has a proof of payment, don't allow status changes
+    if (declaration.proof_of_payment) {
+      throw Error("Cannot modify status of a paid declaration");
+    }
+    
+    // If not paid, proceed with the status update
+    const updateResponse = await api.patch(`/api/course-declarations/${declarationId}/`, 
+      { status: newStatus },
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        }
+      }
+    );
+    
+    return updateResponse.data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
