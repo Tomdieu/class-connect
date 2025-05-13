@@ -143,7 +143,7 @@ export const getClassSubject = async ({
         Authorization: `Bearer ${session.user.accessToken}`,
         "Content-Type": "application/json",
       },
-      params:params
+      params: params
     });
     return response.data as SubjectType[];
   } catch (error: unknown) {
@@ -167,7 +167,7 @@ export async function getStudentsByClass(classId: string, schoolYearId?: number)
       const formattedSchoolYear = `${schoolYearId}-${endYear}`;
       params = { school_year: formattedSchoolYear };
     }
-    
+
     const res = await api.get(`/api/classes/${classId}/students/`, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
@@ -186,3 +186,27 @@ export async function getStudentsByClass(classId: string, schoolYearId?: number)
 }
 
 // endregion User Classes
+
+
+export const getStudentsByClassId = async (params?: { class_level?: string | number, school_year?: string | number, page?: number }) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw new Error("Unauthorized");
+
+    const res = await api.get(`/api/user-classes/students-by-class/`, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+      params: params
+    });
+
+    return res.data as UserClassType[];
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+
+  }
+}
