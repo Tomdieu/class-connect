@@ -118,9 +118,9 @@ export default function RegisterPage() {
     confirm_password: z.string().min(1, t('registerDialog.errors.confirmPasswordRequired')),
     // Class selection
     class_enrolled: accountType === "STUDENT" ? z.number({
-        required_error: t('registerDialog.errors.classRequired'),
-        invalid_type_error: t('registerDialog.errors.classRequired')
-      }).int().positive() : z.number().optional(), // Make required for student, optional for professional
+      required_error: t('registerDialog.errors.classRequired'),
+      invalid_type_error: t('registerDialog.errors.classRequired')
+    }).int().positive() : z.number().optional(), // Make required for student, optional for professional
     // Professional fields
     enterprise_name: accountType === "PROFESSIONAL" ? z.string().min(1, t('registerDialog.errors.enterpriseRequired')) : z.string().optional(),
     platform_usage_reason: accountType === "PROFESSIONAL" ? z.string().min(10, t('registerDialog.errors.reasonRequired')) : z.string().optional(),
@@ -147,6 +147,50 @@ export default function RegisterPage() {
 
   // Base URL with locale
   const baseUrl = `https://www.classconnect.cm/${locale}`;
+
+  // JSON-LD structured data for registration page - localized
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: t('register.title'),
+    description: t('register.description'),
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: locale === "fr" ? "Accueil" : "Home",
+          item: `https://www.classconnect.cm/${locale}`,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: t('register.title'),
+          item: `${baseUrl}/auth/register`,
+        },
+      ],
+    },
+    mainEntity: {
+      "@type": "RegisterAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${baseUrl}/auth/register`,
+        actionPlatform: [
+          "https://schema.org/DesktopWebPlatform",
+          "https://schema.org/MobileWebPlatform",
+        ],
+      },
+      potentialAction: {
+        "@type": "CreateAction",
+        name: t('registerDialog.createAccount'),
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${baseUrl}/auth/register`,
+        },
+      },
+    },
+  };
 
   // Initialize form with default values
   const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -175,13 +219,13 @@ export default function RegisterPage() {
       errors: form.formState.errors,
       values: form.getValues(),
     });
-    
+
     // Show all validation errors in toast for visibility
     if (Object.keys(form.formState.errors).length > 0) {
       const errorMessages = Object.entries(form.formState.errors)
         .map(([field, error]) => `${field}: ${error.message}`)
         .join('\n');
-        
+
       toast.error("Validation errors:", {
         description: errorMessages,
         duration: 5000
@@ -276,7 +320,7 @@ export default function RegisterPage() {
       platform_usage_reason: accountType === "PROFESSIONAL" ? form.getValues().platform_usage_reason : "",
     }, {
       keepValues: true,
-      resolver: zodResolver(newSchema),
+      // resolver: zodResolver(newSchema),
     });
 
     // Also reset conditional field validations
@@ -307,14 +351,14 @@ export default function RegisterPage() {
           if (parsedError.message) {
             errorMessage = parsedError.message;
           } else if (parsedError.error) { // Check for common error key too
-             errorMessage = parsedError.error;
+            errorMessage = parsedError.error;
           }
         } catch (e) {
           // Ignore parsing errors, use default message
           console.error("Failed to parse error message string:", e);
         }
       } else if (error instanceof Error) {
-         errorMessage = error.message;
+        errorMessage = error.message;
       }
 
       toast.error(t("registerDialog.errorToast"), {
@@ -328,16 +372,16 @@ export default function RegisterPage() {
     try {
       console.log("Form submission started with values:", values);
       debugFormState();
-      
+
       // Check for student account type with missing class
       if (accountType === "STUDENT" && values.class_enrolled === undefined) {
         console.error("Class enrolled is undefined for student account type");
         toast.error(t("registerDialog.errors.classRequired"), {
           description: t("registerDialog.errors.pleaseSelectClass")
         });
-        form.setError("class_enrolled", { 
-          type: "manual", 
-          message: t("registerDialog.errors.classRequired") 
+        form.setError("class_enrolled", {
+          type: "manual",
+          message: t("registerDialog.errors.classRequired")
         });
         return;
       }
@@ -368,9 +412,9 @@ export default function RegisterPage() {
     } catch (error) {
       console.error("Submission error:", error);
       toast.error(t("common.error"), {
-        description: typeof error === 'string' ? error : 
-          error instanceof Error ? error.message : 
-          t("registerDialog.errorToast")
+        description: typeof error === 'string' ? error :
+          error instanceof Error ? error.message :
+            t("registerDialog.errorToast")
       });
     }
   }
@@ -379,7 +423,7 @@ export default function RegisterPage() {
   const handleClassSelection = (classDetail: ClassDetail) => {
     setSelectedClass(classDetail);
     // Update form value and trigger validation
-    form.setValue("class_enrolled", classDetail.id, { 
+    form.setValue("class_enrolled", classDetail.id, {
       shouldValidate: true,
       shouldDirty: true,
       shouldTouch: true
@@ -472,21 +516,21 @@ export default function RegisterPage() {
             <FormLabel>{t("registerDialog.selectLevel")}</FormLabel>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1">
               {Object.entries(classesData[selectedSection].levels).map(([levelKey, level]) => (
-                  <Button
-                    key={levelKey}
-                    type="button"
-                    variant={selectedEducationLevel === levelKey ? "default" : "outline"}
-                    className="justify-start text-left"
-                    onClick={() => {
-                      setSelectedEducationLevel(levelKey);
-                      setSelectedLevelClass(null); // Reset downstream
-                      setSelectedClass(null); // Reset downstream
-                      form.setValue("class_enrolled", undefined); // Reset form value
-                    }}
-                  >
-                    {level.label}
-                  </Button>
-                ))}
+                <Button
+                  key={levelKey}
+                  type="button"
+                  variant={selectedEducationLevel === levelKey ? "default" : "outline"}
+                  className="justify-start text-left"
+                  onClick={() => {
+                    setSelectedEducationLevel(levelKey);
+                    setSelectedLevelClass(null); // Reset downstream
+                    setSelectedClass(null); // Reset downstream
+                    form.setValue("class_enrolled", undefined); // Reset form value
+                  }}
+                >
+                  {level.label}
+                </Button>
+              ))}
             </div>
           </div>
         )}
@@ -537,17 +581,17 @@ export default function RegisterPage() {
             </div>
             {/* Explicitly show class_enrolled message if it exists */}
             <FormField
-                control={form.control}
-                name="class_enrolled"
-                render={({ field }) => (
-                    <FormItem>
-                        {/* Hidden FormControl as the UI is handled by buttons above */}
-                        <FormControl className="hidden">
-                            <Input type="hidden" {...field} value={field.value ?? ''} />
-                        </FormControl>
-                        <FormMessage className="mt-2" />
-                    </FormItem>
-                )}
+              control={form.control}
+              name="class_enrolled"
+              render={({ field }) => (
+                <FormItem>
+                  {/* Hidden FormControl as the UI is handled by buttons above */}
+                  <FormControl className="hidden">
+                    <Input type="hidden" {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage className="mt-2" />
+                </FormItem>
+              )}
             />
           </div>
         )}
@@ -609,6 +653,8 @@ export default function RegisterPage() {
         <meta property="og:title" content={`${t('register.title')} | ClassConnect`} />
         <meta property="og:description" content={t('register.description')} />
         <meta property="og:url" content={`${baseUrl}/auth/register`} />
+        <link rel="canonical" href={`${baseUrl}/auth/register`} />
+        <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
       </Helmet>
 
       <div className="container max-w-5xl mx-auto py-8 px-4">
@@ -629,7 +675,7 @@ export default function RegisterPage() {
         </div>
 
         <Card className="w-full max-w-4xl mx-auto border border-primary/10 bg-card/90 backdrop-blur shadow-xl">
-          <ShineBorder  shineColor={"blue"}/>
+          <ShineBorder shineColor={"blue"} />
           <CardHeader className="pb-4">
             <CardTitle className="text-xl font-semibold">{t('register.formTitle')}</CardTitle>
             <CardDescription>{t('register.formDescription')}</CardDescription>
@@ -637,11 +683,11 @@ export default function RegisterPage() {
 
           <CardContent className="pb-2">
             <Form {...form}>
-              <form 
+              <form
                 onSubmit={(e) => {
                   console.log("Form submit event triggered");
                   form.handleSubmit(onSubmit)(e);
-                }} 
+                }}
                 className="space-y-6"
               >
                 {/* Account Type Selection */}
@@ -974,7 +1020,7 @@ export default function RegisterPage() {
                       </>
                     )}
                   </Button>
-                  
+
                   {/* Add this development helper button in non-production environments */}
                   {process.env.NODE_ENV !== 'production' && (
                     <div className="mt-4">
