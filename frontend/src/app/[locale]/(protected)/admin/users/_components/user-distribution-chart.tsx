@@ -41,7 +41,7 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
 const UserDistributionChart = () => {
   const t = useI18n();
   const searchParams = useSearchParams();
-  const currentUserType = searchParams.get("type") || "all";
+  const currentUserType = searchParams?.get("type") || "all";
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["user-stats"],

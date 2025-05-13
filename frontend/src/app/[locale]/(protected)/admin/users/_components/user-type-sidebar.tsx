@@ -19,7 +19,7 @@ const UserTypeSidebar = () => {
   const t = useI18n();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const currentUserType = searchParams.get("type") || "all";
+  const currentUserType = searchParams?.get("type") || "all";
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["user-stats"],
