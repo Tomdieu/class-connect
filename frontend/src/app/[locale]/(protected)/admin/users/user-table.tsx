@@ -15,18 +15,18 @@ function UserTable() {
   const t = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const page = searchParams.get("page") || "1";
-  const userType = searchParams.get("type") || "all";
-  const subscriptionStatus = searchParams.get("subscription") || "all";
-  const subscriptionPlan = searchParams.get("subscription_plan") || "";
+  const page = searchParams?.get("page") || "1";
+  const userType = searchParams?.get("type") || "all";
+  const subscriptionStatus = searchParams?.get("subscription") || "all";
+  const subscriptionPlan = searchParams?.get("subscription_plan") || "";
   
   // Education level filters
-  const educationLevel = searchParams.get("education_level") || "";
-  const collegeClass = searchParams.get("college_class") || "";
-  const lyceeClass = searchParams.get("lycee_class") || "";
-  const lyceeSpeciality = searchParams.get("lycee_speciality") || "";
-  const universityLevel = searchParams.get("university_level") || "";
-  const universityYear = searchParams.get("university_year") || "";
+  const educationLevel = searchParams?.get("education_level") || "";
+  const collegeClass = searchParams?.get("college_class") || "";
+  const lyceeClass = searchParams?.get("lycee_class") || "";
+  const lyceeSpeciality = searchParams?.get("lycee_speciality") || "";
+  const universityLevel = searchParams?.get("university_level") || "";
+  const universityYear = searchParams?.get("university_year") || "";
   
   const { data, isLoading, isError } = useQuery({
     queryKey: [
