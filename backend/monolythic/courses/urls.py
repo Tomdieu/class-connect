@@ -10,9 +10,7 @@ from .views import (
     CourseOfferingActionViewSet,
     TeacherStudentEnrollmentViewSet,
     CourseDeclarationViewSet,
-    CourseDeclarationDirectViewSet,  # Add the new viewset import
-    # QuizResourceViewSet, QuestionViewSet, QuestionOptionViewSet,
-    # QuizAttemptViewSet, QuestionResponseViewSet,
+    CourseDeclarationDirectViewSet,
     VideoResourceViewSet, RevisionResourceViewSet, PDFResourceViewSet, ExerciseResourceViewSet,
     UserClassViewSet,
     SectionViewSet, EducationLevelViewSet, SpecialityViewSet,
