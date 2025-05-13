@@ -167,6 +167,7 @@ export interface UserType {
   subscription_status: HasSub | NoSub;
   class_display: string;
   profile_picture: string | null;
+  user_type:"ADMIN"|"STUDENT"|"PROFESSIONAL"
 }
 
 // export declare interface UserType {
