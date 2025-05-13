@@ -1740,4 +1740,143 @@ export default {
 "registerDialog.noClassesAvailable": "Aucune classe disponible pour l'année scolaire sélectionnée",
 "common.retry": "Réessayer",
 "common.errorOccurred": "Une erreur s'est produite",
+courseOfferings: {
+  title: "Offres de Cours",
+  description: "Parcourir les offres de cours disponibles",
+  subject: "Matière",
+  class: "Classe",
+  hourlyRate: "Tarif Horaire",
+  status: "Statut",
+  actions: {
+    create: "Postuler pour ce cours",
+    loading: "Chargement des actions...",
+    error: "Échec du chargement des actions",
+    noActions: "Aucune action pour l'instant",
+    cancel: "Annuler",
+    status: {
+      pending: "En attente",
+      accepted: "Accepté",
+      rejected: "Refusé",
+      cancelled: "Annulé"
+    },
+    success: {
+      created: "Candidature soumise avec succès",
+      updated: "Candidature mise à jour avec succès"
+    }
+  },
+  add: "Ajouter une nouvelle offre",
+  loading: "Chargement des offres...",
+  error: "Échec du chargement des offres",
+  retry: "Réessayer",
+  noOfferings: "Aucune offre trouvée",
+  available: "Disponible",
+  unavailable: "Indisponible",
+  view: "Voir",
+  detail: {
+    loading: "Chargement des détails du cours...",
+    notFound: "Offre de cours introuvable",
+    retry: "Réessayer",
+    actions: {
+      back: "Retour aux offres"
+    },
+    overview: "Aperçu",
+    courseDetails: "Détails du Cours",
+    startDate: "Date de Début",
+    location: "Lieu",
+    durationFrequency: "Durée et Fréquence",
+    duration: "Durée",
+    hours: "heures",
+    frequency: "Fréquence",
+    timesPerWeek: "fois par semaine",
+    student: "Informations sur l'Étudiant",
+    information: "Informations sur le Cours",
+    created: "Créé le",
+    updated: "Dernière mise à jour",
+    view: "Voir le Profil",
+    noStudents: "Aucun étudiant assigné pour l'instant"
+  },
+  confirm: {
+    cancel: "Annuler",
+    cancelDescription: "Êtes-vous sûr de vouloir annuler cette candidature ? Cette action ne peut pas être annulée.",
+    confirm: "Oui, annuler"
+  },
+  create: {
+    title: "Créer une Offre de Cours",
+    description: "Créer une nouvelle offre de cours pour les étudiants",
+    back: "Retour aux offres de cours",
+    offeringDetails: "Détails de l'Offre de Cours",
+    offeringDetailsDescription: "Fournir des détails sur l'offre de cours",
+    classLevel: "Niveau de Classe",
+    selectClass: "Sélectionner un niveau de classe",
+    searchClass: "Rechercher des classes...",
+    noClassFound: "Aucune classe trouvée",
+    classLevelDescription: "Le niveau de classe pour cette offre de cours",
+    subject: "Matière",
+    selectSubject: "Sélectionner une matière",
+    searchSubject: "Rechercher des matières...",
+    noSubjectFound: "Aucune matière trouvée",
+    subjectDescription: "La matière pour cette offre de cours",
+    student: "Étudiant",
+    selectStudent: "Sélectionner un étudiant",
+    studentNotFound: "Étudiant non trouvé",
+    searchStudent: "Rechercher des étudiants...",
+    noStudentFound: "Aucun étudiant trouvé",
+    studentDescription: "L'étudiant qui suivra ce cours",
+    studentAvailability: "Disponibilité de l'Étudiant",
+    startDate: "Date de Début",
+    pickDate: "Choisir une date",
+    startDateDescription: "Quand le cours commencera",
+    duration: "Durée (par séance)",
+    hour: "heure",
+    hours: "heures",
+    durationDescription: "Combien de temps durera chaque séance",
+    frequency: "Fréquence Hebdomadaire",
+    frequencyDescription: "Combien de fois par semaine le cours aura lieu",
+    hourlyRate: "Tarif Horaire (XAF)",
+    hourlyRateDescription: "Le coût par heure pour ce cours",
+    cancel: "Annuler",
+    submit: "Créer l'Offre",
+    schoolYear: "Année Scolaire",
+    noActiveSchoolYear: "Aucune année scolaire active trouvée",
+    active: "Active"
+  },
+  edit: {
+    title: "Modifier l'Offre de Cours",
+    description: "Modifier les détails de cette offre de cours",
+    back: "Retour",
+    offeringDetails: "Détails de l'Offre de Cours",
+    offeringDetailsDescription: "Mettre à jour les détails de cette offre de cours",
+    availability: "Disponibilité",
+    availabilityDescription: "Rendre cette offre de cours disponible aux enseignants",
+    studentAvailability: "Disponibilité de l'Étudiant",
+    submit: "Mettre à Jour l'Offre",
+    success: "Offre de cours mise à jour avec succès",
+    error: "Échec de la mise à jour de l'offre de cours",
+    notFound: "Offre de cours introuvable"
+  }
+},
+availability: {
+  studentAvailability: "Disponibilité de l'Étudiant",
+  scheduleDescription: "Les créneaux horaires disponibles de l'étudiant",
+  timeSlot: "Créneau Horaire",
+  studentNotVisibleWarning: "Les informations de disponibilité de l'étudiant ne sont pas accessibles",
+  studentNotAvailable: "L'étudiant n'a pas défini sa disponibilité",
+  notAvailableDescription: "L'étudiant doit définir son emploi du temps de disponibilité avant que vous puissiez le voir",
+  legend: {
+    available: "Disponible",
+    unavailable: "Indisponible"
+  },
+  slotUpdated: "Créneau de disponibilité mis à jour avec succès",
+  errors: {
+    fetchFailed: "Échec de récupération des informations de disponibilité",
+    updateSlotFailed: "Échec de mise à jour du créneau de disponibilité"
+  },
+  statusAvailable: "L'étudiant est disponible",
+  statusUnavailable: "L'étudiant n'est pas disponible",
+  lastUpdated: "Dernière mise à jour : {date}",
+  noDataAvailable: "Aucune donnée de disponibilité disponible"
+},
+class: {
+  noClassesFound: "Aucune classe trouvée"
+}
 } as const;
