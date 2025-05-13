@@ -6,9 +6,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const getFullName = (user:UserType) => {
-  if(user.first_name !== "" && user.last_name!==""){
-      return user.first_name + " "+ user.last_name
+export const getFullName = (user: UserType) => {
+  if (user.first_name !== "" && user.last_name !== "") {
+    return user.first_name + " " + user.last_name
   }
   return user.first_name + user.last_name
 }
@@ -28,14 +28,14 @@ export function formatCurrency(amount: number | string) {
 
 export function formatDate(dateString: string | null | undefined): string {
   if (!dateString) return "N/A";
-  
+
   try {
     const date = new Date(dateString);
     // Check if date is valid
     if (isNaN(date.getTime())) {
       return "Invalid date";
     }
-    
+
     return new Intl.DateTimeFormat('default', {
       dateStyle: 'medium',
       timeStyle: 'short',
@@ -68,14 +68,10 @@ export function getInitials(name: string): string {
  */
 export function formatClassName(classItem: ClassType): string {
   if (!classItem) return '';
-  
-  let formattedName = classItem.name;
-  
-  // Add speciality if it exists (primarily for lycee classes)
-  if (classItem.speciality) {
-    formattedName += ` (${classItem.speciality})`;
-  }
-  
+
+  let formattedName = classItem.definition_display;
+
+
   return formattedName;
 }
 
@@ -98,13 +94,13 @@ export interface GroupedClasses {
 
 export function groupClassesByHierarchy(classes: ClassType[]): GroupedClasses {
   if (!classes || !Array.isArray(classes)) return {};
-  
+
   const grouped: GroupedClasses = {};
-  
+
   classes.forEach(classItem => {
     // Get section key
     const sectionKey = classItem.section || 'UNKNOWN';
-    
+
     // Initialize section if not exists
     if (!grouped[sectionKey]) {
       grouped[sectionKey] = {
@@ -112,10 +108,10 @@ export function groupClassesByHierarchy(classes: ClassType[]): GroupedClasses {
         levels: {}
       };
     }
-    
+
     // Get level key
     const levelKey = classItem.level || 'UNKNOWN';
-    
+
     // Initialize level if not exists
     if (!grouped[sectionKey].levels[levelKey]) {
       grouped[sectionKey].levels[levelKey] = {
@@ -123,11 +119,11 @@ export function groupClassesByHierarchy(classes: ClassType[]): GroupedClasses {
         classes: []
       };
     }
-    
+
     // Add class to appropriate group
     grouped[sectionKey].levels[levelKey].classes.push(classItem);
   });
-  
+
   return grouped;
 }
 
@@ -138,7 +134,7 @@ export function groupClassesByHierarchy(classes: ClassType[]): GroupedClasses {
  */
 export function createClassSelectOptions(classes: ClassType[]) {
   const grouped = groupClassesByHierarchy(classes);
-  
+
   return Object.entries(grouped).map(([, sectionData]) => {
     return {
       label: sectionData.section,
@@ -154,24 +150,23 @@ export function createClassSelectOptions(classes: ClassType[]) {
 }
 
 export const getUserRole = (user: UserType) => {
-  // Check for admin roles first
   if (user.is_superuser || user.is_staff) {
     return "admin";
   }
-  
-  // For education levels, make sure to handle case consistently
-  const educationLevel = user.education_level?.toUpperCase();
-  
-  // Check for teacher role
-  if (educationLevel === "PROFESSIONAL") {
+
+  const userType = user.user_type;
+
+  if (userType === "PROFESSIONAL" || (user.class_enrolled === null && (user.platform_usage_reason != null && user.enterprise_name != null && user.is_superuser == false && user.is_staff == false))) {
     return "teacher";
   }
-  
-  // All other education levels are students
-  if (["COLLEGE", "LYCEE", "UNIVERSITY"].includes(educationLevel)) {
+
+  if (userType === "STUDENT") {
     return "student";
   }
-  
-  // If we can't determine the role for some reason, default to student
+
+  if (userType === "ADMIN") {
+    return "admin"
+  }
+
   return "student";
 }
