@@ -266,7 +266,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
             <div className="flex flex-wrap gap-2 select-none">
               <Badge
-                text={student.offer.class_level.name || "N/A"}
+                text={student.offer.class_level.definition_display || "N/A"}
                 variant="blue"
               />
               <Badge
