@@ -80,15 +80,15 @@ export default {
     "Exercices pratiques et évaluations",
     "Sessions en direct et enregistrées"
   ],
-  
+
   "about.platform.grow.title": "Développez Vos Compétences",
   "about.platform.grow.description": "ClassConnect vous aide à développer les compétences nécessaires pour votre réussite académique et professionnelle.",
   "about.platform.grow.startNow": "Commencez votre parcours d'apprentissage",
-  
+
   "about.conclusion.title": "Rejoignez la Communauté ClassConnect",
   "about.conclusion.text": "ClassConnect n'est pas qu'une plateforme, c'est une révolution dans l'éducation. Rejoignez-nous pour transformer votre façon d'apprendre et atteindre vos objectifs académiques ou professionnels.",
   "about.conclusion.joinUs": "Rejoignez-nous Aujourd'hui",
-  
+
   // Developer information translations
   "about.developer.title": "Développeur Full Stack & Passionné d'EdTech",
   "about.developer.description": "Le cerveau derrière l'architecture technique et la conception de l'expérience utilisateur de ClassConnect.",
@@ -97,8 +97,8 @@ export default {
   "about.developer.bio": "Tomdieu Ivan est un développeur full-stack passionné et enthousiaste des technologies éducatives. Fort de son expertise en technologies web modernes, il a conçu et développé ClassConnect de A à Z en se concentrant sur la création d'une plateforme d'apprentissage intuitive, accessible et puissante pour les étudiants à travers l'Afrique.",
   "about.developer.skills": "Compétences Techniques",
   "about.developer.skillsList": [
-    "React", "Next.js", "TypeScript", "Node.js", "Python", 
-    "Django", "PostgreSQL", "UI/UX Design", "APIs RESTful", 
+    "React", "Next.js", "TypeScript", "Node.js", "Python",
+    "Django", "PostgreSQL", "UI/UX Design", "APIs RESTful",
     "GraphQL", "Docker", "Infrastructure Cloud"
   ],
   "about.developer.projectRole": "Rôle dans ClassConnect",
@@ -111,7 +111,7 @@ export default {
     "Fonctionnalités de localisation et d'accessibilité"
   ],
   "about.developer.contact": "Contacter le Développeur",
-  
+
   // Features section descriptions (in French)
   "features.courseManagement.desc": "Plateforme interactive de gestion des cours",
   "features.virtualClassroom.desc": "Environnement de classe virtuelle engageant",
@@ -179,6 +179,16 @@ export default {
   "registerDialog.passwordLabel": "Mot de passe",
   "registerDialog.confirmPasswordLabel": "Confirmer le mot de passe",
   "registerDialog.submitButton": "S'inscrire",
+  "registerDialog.errors.enterpriseRequired": "Le nom de l'entreprise est requis",
+  "registerDialog.errors.reasonRequired": "Veuillez fournir une raison d'au moins 10 caractères",
+  "registerDialog.errors.dateMinAge": "Vous devez avoir au moins 10 ans pour vous inscrire",
+  "registerDialog.errors.pleaseSelectClass": "Veuillez sélectionner une classe parmi les options",
+  "registerDialog.errorToast": "Échec de l'inscription",
+  "registerDialog.errors.dateRequired": "La date de naissance est requise",
+  "registerDialog.errors.classRequired": "La sélection de classe est requise",
+  "common.error": "Erreur",
+  "common.errorOccurred": "Une erreur s'est produite",
+  "register.backToLogin": "Retour à la connexion",
   "registerDialog.educationLevels": {
     college: "Collège",
     lycee: "Lycée",
@@ -236,8 +246,6 @@ export default {
   "registerDialog.errors.phoneRequired": "Le numéro de téléphone est requis",
   "registerDialog.errors.phoneInvalid":
     "Format de numéro de téléphone invalide",
-  "registerDialog.errors.dateRequired": "La date de naissance est requise",
-  "registerDialog.errors.dateMinAge": "Vous devez avoir au moins 13 ans",
   "registerDialog.errors.educationLevelRequired":
     "Le niveau d'études est requis",
   "registerDialog.errors.emailRequired": "L'email est requis",
@@ -306,7 +314,7 @@ export default {
   "dashboardSidebar.contactUs": "Nous Contacter",
   "dashboardSidebar.myCourseOfferings": "Mes offres de cours",
   "dashboardSidebar.onlineMeetings": "Réunions en Ligne",
-  "dashboardSidebar.notifications":"Notifications",
+  "dashboardSidebar.notifications": "Notifications",
   "dashboardPage.welcome": "Bienvenue sur votre tableau de bord",
   "dashboardPage.overview": "Vue d'ensemble",
   "dashboardPage.recentActivities": "Activités Récentes",
@@ -734,7 +742,7 @@ export default {
     "Échec de la mise à jour de la disponibilité",
   "availability.errors.updateSlotFailed":
     "Échec de la mise à jour du créneau horaire",
-    "availability.subtitle":"",
+  "availability.subtitle": "",
 
   // Course Offerings translations
   "courseOfferings.title": "Mes Offres de Cours",
@@ -925,7 +933,6 @@ export default {
   "common.save": "Enregistrer",
   "common.success": "Succès",
   "common.back": "Retour",
-  "common.error": "Erreur",
   "common.errorDesc": "Échec du chargement de {item}. Veuillez réessayer plus tard.",
   "common.return": "Retourner à {destination}",
   "common.dashboard": "Tableau de Bord",
@@ -1150,14 +1157,14 @@ export default {
     "Une erreur est survenue lors de la tentative d'envoie de demande.",
   "courseOfferings.confirm.cancelDescription": "Description",
   "courseOfferings.emptyStateDescription": "Créez votre première offre de cours pour commencer à entrer en contact avec des étudiants. Définissez votre emploi du temps, vos tarifs et vos préférences.",
-"courseOfferings.createFirst": "Créez votre première offre",
-"courseOfferings.getStartedGuide": "Besoin d'aide pour démarrer ? Consultez notre guide sur la création d'offres de cours efficaces.",
-"courseOfferings.benefits.flexibility": "Horaires flexibles",
-"courseOfferings.benefits.flexibilityDesc": "Définissez vos propres heures et emploi du temps",
-"courseOfferings.benefits.targeting": "Ciblez votre expertise",
-"courseOfferings.benefits.targetingDesc": "Concentrez-vous sur les matières et niveaux dans lesquels vous excellez",
-"courseOfferings.benefits.earnings": "Maximisez vos revenus",
-"courseOfferings.benefits.earningsDesc": "Fixez des tarifs compétitifs en fonction de votre expertise",
+  "courseOfferings.createFirst": "Créez votre première offre",
+  "courseOfferings.getStartedGuide": "Besoin d'aide pour démarrer ? Consultez notre guide sur la création d'offres de cours efficaces.",
+  "courseOfferings.benefits.flexibility": "Horaires flexibles",
+  "courseOfferings.benefits.flexibilityDesc": "Définissez vos propres heures et emploi du temps",
+  "courseOfferings.benefits.targeting": "Ciblez votre expertise",
+  "courseOfferings.benefits.targetingDesc": "Concentrez-vous sur les matières et niveaux dans lesquels vous excellez",
+  "courseOfferings.benefits.earnings": "Maximisez vos revenus",
+  "courseOfferings.benefits.earningsDesc": "Fixez des tarifs compétitifs en fonction de votre expertise",
 
 
   "studentsPage.title": "Mes étudiants",
@@ -1353,9 +1360,9 @@ export default {
   "onlineMeetings.details.duration": "Durée",
   "onlineMeetings.details.status": "Statut",
   "onlineMeetings.details.attendees": "Participants",
-  "onlineMeetings.details.join":"Joindre",
-  "onlineMeetings.details.joinNow":"Rejoindre Maintenant",
-  "onlineMeetings.details.view":"Détail",
+  "onlineMeetings.details.join": "Joindre",
+  "onlineMeetings.details.joinNow": "Rejoindre Maintenant",
+  "onlineMeetings.details.view": "Détail",
   "onlineMeetings.details.noAttendees": "Aucun participant n'a encore été ajouté",
   "onlineMeetings.details.addAttendees": "Ajouter des Participants",
   "onlineMeetings.details.meetingLink": "Lien de la Réunion",
@@ -1410,7 +1417,7 @@ export default {
   "stats.withPlans": "Avec plans",
   "stats.withoutPlans": "Sans plans",
 
-  "enrollments":"Inscription Enseignant-Étudiant",
+  "enrollments": "Inscription Enseignant-Étudiant",
   // Forum translations
   "forum.title": "Forum Communautaire",
   "forum.selectForum": "Sélectionner un forum",
@@ -1503,7 +1510,7 @@ export default {
   "admin.forum.viewAllPostsButton": "Voir Toutes les Publications",
   "admin.forum.viewNotificationsButton": "Voir les Notifications",
   "admin.forum.createPostButton": "Créer une Publication",
-  
+
   // Forum Post Management
   "admin.posts.title": "Publications du Forum",
   "admin.posts.description": "Voir et gérer les publications à travers tous les forums",
@@ -1527,7 +1534,7 @@ export default {
   "admin.posts.deleting": "Suppression en cours...",
   "admin.posts.cancel": "Annuler",
   "admin.posts.confirmDelete": "Supprimer",
-  
+
   // Forum Post Detail
   "admin.post.title": "Détails de la Publication",
   "admin.post.backToPosts": "Retour aux Publications",
@@ -1542,7 +1549,7 @@ export default {
   "admin.post.comments": "Commentaires ({count})",
   "admin.post.noComments": "Pas Encore de Commentaires",
   "admin.post.noCommentsDesc": "Cette publication n'a pas encore de commentaires ou de réponses.",
-  
+
   // Forum Create Post
   "admin.createPost.title": "Créer une Nouvelle Publication",
   "admin.createPost.backToPosts": "Retour aux Publications",
@@ -1559,7 +1566,7 @@ export default {
   "admin.createPost.uploadFile": "Télécharger un Fichier",
   "admin.createPost.changeFile": "Changer le Fichier",
   "admin.createPost.clear": "Effacer",
-  
+
   // Forum Detail
   "admin.forumDetail.title": "Forum: {name}",
   "admin.forumDetail.back": "Retour",
@@ -1620,263 +1627,263 @@ export default {
   "about.features.support.title": "Assistance Personnalisée",
 
   // Class sections
-"class.status.active": "Actif",
-"class.status.draft": "Brouillon",
-"class.status.archived": "Archivé",
-"class.status.nonActive": "Inactif",
-"class.metrics.students": "Étudiants",
-"class.metrics.classes": "Cours",
-"class.metrics.completion": "Taux d'achèvement",
-"class.subtitle": "Gérez et organisez vos cours",
-"class.empty.title": "Aucun cours pour le moment",
-"class.empty.description": "Commencez par ajouter votre premier cours pour créer du contenu éducatif",
+  "class.status.active": "Actif",
+  "class.status.draft": "Brouillon",
+  "class.status.archived": "Archivé",
+  "class.status.nonActive": "Inactif",
+  "class.metrics.students": "Étudiants",
+  "class.metrics.classes": "Cours",
+  "class.metrics.completion": "Taux d'achèvement",
+  "class.subtitle": "Gérez et organisez vos cours",
+  "class.empty.title": "Aucun cours pour le moment",
+  "class.empty.description": "Commencez par ajouter votre premier cours pour créer du contenu éducatif",
 
-// Navigation
-"nav.sections": "Sections",
-"nav.levels": "Niveaux d'éducation",
+  // Navigation
+  "nav.sections": "Sections",
+  "nav.levels": "Niveaux d'éducation",
 
-// Section descriptions
-"section.anglophone.description": "Programme éducatif en langue anglaise",
-"section.francophone.description": "Programme éducatif en langue française",
+  // Section descriptions
+  "section.anglophone.description": "Programme éducatif en langue anglaise",
+  "section.francophone.description": "Programme éducatif en langue française",
 
-// Education level descriptions
-"educationLevel.college.description": "Éducation au collège (Forme 1-4)",
-"educationLevel.lycee.description": "Éducation au lycée (Forme 5 - 6e supérieure)",
-"educationLevel.university.description": "Programmes d'enseignement supérieur",
+  // Education level descriptions
+  "educationLevel.college.description": "Éducation au collège (Forme 1-4)",
+  "educationLevel.lycee.description": "Éducation au lycée (Forme 5 - 6e supérieure)",
+  "educationLevel.university.description": "Programmes d'enseignement supérieur",
 
-// Action messages
-"action.addFirst": "Ajouter le premier {item}",
-"action.viewAll": "Voir tous les {item}",
-"action.manage": "Gérer les {item}",
+  // Action messages
+  "action.addFirst": "Ajouter le premier {item}",
+  "action.viewAll": "Voir tous les {item}",
+  "action.manage": "Gérer les {item}",
 
-// Status indicators
-"status.active": "Actif",
-"status.inactive": "Inactif",
-"status.draft": "Brouillon",
+  // Status indicators
+  "status.active": "Actif",
+  "status.inactive": "Inactif",
+  "status.draft": "Brouillon",
 
-// Metrics
-"metrics.total": "Total des {item}",
-"metrics.active": "{item} actifs",
-"metrics.completion": "Taux d'achèvement",
+  // Metrics
+  "metrics.total": "Total des {item}",
+  "metrics.active": "{item} actifs",
+  "metrics.completion": "Taux d'achèvement",
 
-// Empty states
-"empty.noData": "Aucun {item} disponible",
-"empty.noDataDescription": "Commencez par ajouter votre premier {item}",
+  // Empty states
+  "empty.noData": "Aucun {item} disponible",
+  "empty.noDataDescription": "Commencez par ajouter votre premier {item}",
 
-// Dashboard and statistics
-"educationLevels.other": "Autre",
-"stats.userCounts": "Nombre d'utilisateurs par type",
+  // Dashboard and statistics
+  "educationLevels.other": "Autre",
+  "stats.userCounts": "Nombre d'utilisateurs par type",
 
-"student.myCourses.description": "Accédez à tous vos supports de cours",
-"student.myCourses.selectClass": "Sélectionnez une classe pour voir les supports de cours :",
-"student.myCourses.selectClassPlaceholder": "Sélectionner une classe",
-"student.myCourses.noClassesAvailable": "Aucune classe disponible",
+  "student.myCourses.description": "Accédez à tous vos supports de cours",
+  "student.myCourses.selectClass": "Sélectionnez une classe pour voir les supports de cours :",
+  "student.myCourses.selectClassPlaceholder": "Sélectionner une classe",
+  "student.myCourses.noClassesAvailable": "Aucune classe disponible",
 
-"student.myVideos.description": "Accédez à toutes vos vidéos pédagogiques",
-"student.myVideos.selectClass": "Sélectionnez une classe pour regarder les vidéos :",
-"student.myVideos.selectClassPlaceholder": "Sélectionner une classe",
-"student.myVideos.noClassesAvailable": "Aucune classe disponible",
-"student.myVideos.noClassSelected": "Sélectionnez une classe",
-"student.myVideos.selectClassDesc": "Veuillez sélectionner une classe pour consulter les vidéos disponibles",
-"student.myVideos.noVideosAvailableTitle": "Aucune vidéo disponible",
-"student.myVideos.noVideosAvailableDesc": "Il n'y a pas encore de vidéos disponibles pour cette classe.",
+  "student.myVideos.description": "Accédez à toutes vos vidéos pédagogiques",
+  "student.myVideos.selectClass": "Sélectionnez une classe pour regarder les vidéos :",
+  "student.myVideos.selectClassPlaceholder": "Sélectionner une classe",
+  "student.myVideos.noClassesAvailable": "Aucune classe disponible",
+  "student.myVideos.noClassSelected": "Sélectionnez une classe",
+  "student.myVideos.selectClassDesc": "Veuillez sélectionner une classe pour consulter les vidéos disponibles",
+  "student.myVideos.noVideosAvailableTitle": "Aucune vidéo disponible",
+  "student.myVideos.noVideosAvailableDesc": "Il n'y a pas encore de vidéos disponibles pour cette classe.",
 
-// Registration dialog fields and labels
-"register.title": "Inscription",
-"register.description": "Créez votre compte pour commencer votre parcours d'apprentissage",
-"registerDialog.yearPlaceholder": "Année",
-"registerDialog.monthPlaceholder": "Mois",
-"registerDialog.dayPlaceholder": "Jour",
-"registerDialog.yearLabel": "Année",
-"registerDialog.monthLabel": "Mois",
-"registerDialog.dayLabel": "Jour",
-"registerDialog.errors.classRequired": "La classe est requise",
-"registerDialog.errors.pleaseSelectClass": "Veuillez sélectionner une classe",
-"registerDialog.errors.enterpriseRequired": "Le nom de l'entreprise est requis",
-"registerDialog.errors.reasonRequired": "La raison d'utilisation est requise",
-"registerDialog.successToast": "Inscription réussie",
-"registerDialog.successToastDescription": "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
-"registerDialog.errorToast": "Erreur d'inscription",
-"registerDialog.selectSection": "Sélectionner une section",
-"registerDialog.selectLevel": "Sélectionner un niveau",
-"registerDialog.selectClassType": "Sélectionner un type de classe",
-"registerDialog.selectClass": "Sélectionner une classe",
-"registerDialog.generalClasses": "Classes générales",
-"registerDialog.enterpriseName": "Nom de l'entreprise",
-"registerDialog.enterprisePlaceholder": "Entrez le nom de votre entreprise",
-"registerDialog.platformUsageReason": "Raison d'utilisation de la plateforme",
-"registerDialog.reasonPlaceholder": "Expliquez pourquoi vous souhaitez utiliser la plateforme",
+  // Registration dialog fields and labels
+  "register.title": "Inscription",
+  "register.description": "Créez votre compte pour commencer votre parcours d'apprentissage",
+  "registerDialog.yearPlaceholder": "Année",
+  "registerDialog.monthPlaceholder": "Mois",
+  "registerDialog.dayPlaceholder": "Jour",
+  "registerDialog.yearLabel": "Année",
+  "registerDialog.monthLabel": "Mois",
+  "registerDialog.dayLabel": "Jour",
+  "registerDialog.errors.classRequired": "La classe est requise",
+  "registerDialog.errors.pleaseSelectClass": "Veuillez sélectionner une classe",
+  "registerDialog.errors.enterpriseRequired": "Le nom de l'entreprise est requis",
+  "registerDialog.errors.reasonRequired": "La raison d'utilisation est requise",
+  "registerDialog.successToast": "Inscription réussie",
+  "registerDialog.successToastDescription": "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
+  "registerDialog.errorToast": "Erreur d'inscription",
+  "registerDialog.selectSection": "Sélectionner une section",
+  "registerDialog.selectLevel": "Sélectionner un niveau",
+  "registerDialog.selectClassType": "Sélectionner un type de classe",
+  "registerDialog.selectClass": "Sélectionner une classe",
+  "registerDialog.generalClasses": "Classes générales",
+  "registerDialog.enterpriseName": "Nom de l'entreprise",
+  "registerDialog.enterprisePlaceholder": "Entrez le nom de votre entreprise",
+  "registerDialog.platformUsageReason": "Raison d'utilisation de la plateforme",
+  "registerDialog.reasonPlaceholder": "Expliquez pourquoi vous souhaitez utiliser la plateforme",
 
-"register.formTitle": "Créez Votre Compte",
-"register.formDescription": "Remplissez vos informations pour commencer avec ClassConnect",
-"registerDialog.accountType": "Type de Compte",
-"registerDialog.student": "Étudiant",
-"registerDialog.professional": "Professionnel",
-"registerDialog.classLoadError": "Échec du chargement des classes. Veuillez réessayer.",
-"registerDialog.classInformation": "Informations de Classe",
-"registerDialog.professionalInformation": "Informations Professionnelles",
-"registerDialog.creatingAccount": "Création du Compte...",
-"registerDialog.createAccount": "Créer un Compte",
-"registerDialog.firstName": "Prénom",
-"registerDialog.lastName": "Nom",
-"registerDialog.firstNamePlaceholder": "Entrez votre prénom",
-"registerDialog.lastNamePlaceholder": "Entrez votre nom",
-"registerDialog.passwordPlaceholder": "Entrez votre mot de passe",
-"registerDialog.confirmPasswordPlaceholder": "Confirmez votre mot de passe",
-"registerDialog.townPlaceholder": "Entrez votre ville",
-"registerDialog.quarterPlaceholder": "Entrez votre quartier",
-"registerDialog.pickDate": "Choisir une date",
-"registerDialog.email": "Email",
-"registerDialog.town": "Ville",
-"registerDialog.quarter": "Quartier",
-"registerDialog.phoneNumber": "Numéro de téléphone",
-"registerDialog.dateOfBirth": "Date de naissance",
-"registerDialog.password": "Mot de passe",
-"registerDialog.confirmPassword": "Confirmer le mot de passe",
-"register.alreadyHaveAccount": "Vous avez déjà un compte ?",
-"register.loginInstead": "Se connecter",
-"register.backToLogin": "Retour à la connexion",
-"common.reload": "Recharger",
-"registerDialog.noClassesAvailable": "Aucune classe disponible pour l'année scolaire sélectionnée",
-"common.retry": "Réessayer",
-"common.errorOccurred": "Une erreur s'est produite",
-courseOfferings: {
-  title: "Offres de Cours",
-  description: "Parcourir les offres de cours disponibles",
-  subject: "Matière",
-  class: "Classe",
-  hourlyRate: "Tarif Horaire",
-  status: "Statut",
-  actions: {
-    create: "Postuler pour ce cours",
-    loading: "Chargement des actions...",
-    error: "Échec du chargement des actions",
-    noActions: "Aucune action pour l'instant",
-    cancel: "Annuler",
-    status: {
-      pending: "En attente",
-      accepted: "Accepté",
-      rejected: "Refusé",
-      cancelled: "Annulé"
+  "register.formTitle": "Créez Votre Compte",
+  "register.formDescription": "Remplissez vos informations pour commencer avec ClassConnect",
+  "registerDialog.accountType": "Type de Compte",
+  "registerDialog.student": "Étudiant",
+  "registerDialog.professional": "Professionnel",
+  "registerDialog.classLoadError": "Échec du chargement des classes. Veuillez réessayer.",
+  "registerDialog.classInformation": "Informations de Classe",
+  "registerDialog.professionalInformation": "Informations Professionnelles",
+  "registerDialog.creatingAccount": "Création du Compte...",
+  "registerDialog.createAccount": "Créer un Compte",
+  "registerDialog.firstName": "Prénom",
+  "registerDialog.lastName": "Nom",
+  "registerDialog.firstNamePlaceholder": "Entrez votre prénom",
+  "registerDialog.lastNamePlaceholder": "Entrez votre nom",
+  "registerDialog.passwordPlaceholder": "Entrez votre mot de passe",
+  "registerDialog.confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+  "registerDialog.townPlaceholder": "Entrez votre ville",
+  "registerDialog.quarterPlaceholder": "Entrez votre quartier",
+  "registerDialog.pickDate": "Choisir une date",
+  "registerDialog.email": "Email",
+  "registerDialog.town": "Ville",
+  "registerDialog.quarter": "Quartier",
+  "registerDialog.phoneNumber": "Numéro de téléphone",
+  "registerDialog.dateOfBirth": "Date de naissance",
+  "registerDialog.password": "Mot de passe",
+  "registerDialog.confirmPassword": "Confirmer le mot de passe",
+  "register.alreadyHaveAccount": "Vous avez déjà un compte ?",
+  "register.loginInstead": "Se connecter",
+  "register.backToLogin": "Retour à la connexion",
+  "common.reload": "Recharger",
+  "registerDialog.noClassesAvailable": "Aucune classe disponible pour l'année scolaire sélectionnée",
+  "common.retry": "Réessayer",
+  "common.errorOccurred": "Une erreur s'est produite",
+  courseOfferings: {
+    title: "Offres de Cours",
+    description: "Parcourir les offres de cours disponibles",
+    subject: "Matière",
+    class: "Classe",
+    hourlyRate: "Tarif Horaire",
+    status: "Statut",
+    actions: {
+      create: "Postuler pour ce cours",
+      loading: "Chargement des actions...",
+      error: "Échec du chargement des actions",
+      noActions: "Aucune action pour l'instant",
+      cancel: "Annuler",
+      status: {
+        pending: "En attente",
+        accepted: "Accepté",
+        rejected: "Refusé",
+        cancelled: "Annulé"
+      },
+      success: {
+        created: "Candidature soumise avec succès",
+        updated: "Candidature mise à jour avec succès"
+      }
     },
-    success: {
-      created: "Candidature soumise avec succès",
-      updated: "Candidature mise à jour avec succès"
+    add: "Ajouter une nouvelle offre",
+    loading: "Chargement des offres...",
+    error: "Échec du chargement des offres",
+    retry: "Réessayer",
+    noOfferings: "Aucune offre trouvée",
+    available: "Disponible",
+    unavailable: "Indisponible",
+    view: "Voir",
+    detail: {
+      loading: "Chargement des détails du cours...",
+      notFound: "Offre de cours introuvable",
+      retry: "Réessayer",
+      actions: {
+        back: "Retour aux offres"
+      },
+      overview: "Aperçu",
+      courseDetails: "Détails du Cours",
+      startDate: "Date de Début",
+      location: "Lieu",
+      durationFrequency: "Durée et Fréquence",
+      duration: "Durée",
+      hours: "heures",
+      frequency: "Fréquence",
+      timesPerWeek: "fois par semaine",
+      student: "Informations sur l'Étudiant",
+      information: "Informations sur le Cours",
+      created: "Créé le",
+      updated: "Dernière mise à jour",
+      view: "Voir le Profil",
+      noStudents: "Aucun étudiant assigné pour l'instant"
+    },
+    confirm: {
+      cancel: "Annuler",
+      cancelDescription: "Êtes-vous sûr de vouloir annuler cette candidature ? Cette action ne peut pas être annulée.",
+      confirm: "Oui, annuler"
+    },
+    create: {
+      title: "Créer une Offre de Cours",
+      description: "Créer une nouvelle offre de cours pour les étudiants",
+      back: "Retour aux offres de cours",
+      offeringDetails: "Détails de l'Offre de Cours",
+      offeringDetailsDescription: "Fournir des détails sur l'offre de cours",
+      classLevel: "Niveau de Classe",
+      selectClass: "Sélectionner un niveau de classe",
+      searchClass: "Rechercher des classes...",
+      noClassFound: "Aucune classe trouvée",
+      classLevelDescription: "Le niveau de classe pour cette offre de cours",
+      subject: "Matière",
+      selectSubject: "Sélectionner une matière",
+      searchSubject: "Rechercher des matières...",
+      noSubjectFound: "Aucune matière trouvée",
+      subjectDescription: "La matière pour cette offre de cours",
+      student: "Étudiant",
+      selectStudent: "Sélectionner un étudiant",
+      studentNotFound: "Étudiant non trouvé",
+      searchStudent: "Rechercher des étudiants...",
+      noStudentFound: "Aucun étudiant trouvé",
+      studentDescription: "L'étudiant qui suivra ce cours",
+      studentAvailability: "Disponibilité de l'Étudiant",
+      startDate: "Date de Début",
+      pickDate: "Choisir une date",
+      startDateDescription: "Quand le cours commencera",
+      duration: "Durée (par séance)",
+      hour: "heure",
+      hours: "heures",
+      durationDescription: "Combien de temps durera chaque séance",
+      frequency: "Fréquence Hebdomadaire",
+      frequencyDescription: "Combien de fois par semaine le cours aura lieu",
+      hourlyRate: "Tarif Horaire (XAF)",
+      hourlyRateDescription: "Le coût par heure pour ce cours",
+      cancel: "Annuler",
+      submit: "Créer l'Offre",
+      schoolYear: "Année Scolaire",
+      noActiveSchoolYear: "Aucune année scolaire active trouvée",
+      active: "Active"
+    },
+    edit: {
+      title: "Modifier l'Offre de Cours",
+      description: "Modifier les détails de cette offre de cours",
+      back: "Retour",
+      offeringDetails: "Détails de l'Offre de Cours",
+      offeringDetailsDescription: "Mettre à jour les détails de cette offre de cours",
+      availability: "Disponibilité",
+      availabilityDescription: "Rendre cette offre de cours disponible aux enseignants",
+      studentAvailability: "Disponibilité de l'Étudiant",
+      submit: "Mettre à Jour l'Offre",
+      success: "Offre de cours mise à jour avec succès",
+      error: "Échec de la mise à jour de l'offre de cours",
+      notFound: "Offre de cours introuvable"
     }
   },
-  add: "Ajouter une nouvelle offre",
-  loading: "Chargement des offres...",
-  error: "Échec du chargement des offres",
-  retry: "Réessayer",
-  noOfferings: "Aucune offre trouvée",
-  available: "Disponible",
-  unavailable: "Indisponible",
-  view: "Voir",
-  detail: {
-    loading: "Chargement des détails du cours...",
-    notFound: "Offre de cours introuvable",
-    retry: "Réessayer",
-    actions: {
-      back: "Retour aux offres"
+  availability: {
+    studentAvailability: "Disponibilité de l'Étudiant",
+    scheduleDescription: "Les créneaux horaires disponibles de l'étudiant",
+    timeSlot: "Créneau Horaire",
+    studentNotVisibleWarning: "Les informations de disponibilité de l'étudiant ne sont pas accessibles",
+    studentNotAvailable: "L'étudiant n'a pas défini sa disponibilité",
+    notAvailableDescription: "L'étudiant doit définir son emploi du temps de disponibilité avant que vous puissiez le voir",
+    legend: {
+      available: "Disponible",
+      unavailable: "Indisponible"
     },
-    overview: "Aperçu",
-    courseDetails: "Détails du Cours",
-    startDate: "Date de Début",
-    location: "Lieu",
-    durationFrequency: "Durée et Fréquence",
-    duration: "Durée",
-    hours: "heures",
-    frequency: "Fréquence",
-    timesPerWeek: "fois par semaine",
-    student: "Informations sur l'Étudiant",
-    information: "Informations sur le Cours",
-    created: "Créé le",
-    updated: "Dernière mise à jour",
-    view: "Voir le Profil",
-    noStudents: "Aucun étudiant assigné pour l'instant"
+    slotUpdated: "Créneau de disponibilité mis à jour avec succès",
+    errors: {
+      fetchFailed: "Échec de récupération des informations de disponibilité",
+      updateSlotFailed: "Échec de mise à jour du créneau de disponibilité"
+    },
+    statusAvailable: "L'étudiant est disponible",
+    statusUnavailable: "L'étudiant n'est pas disponible",
+    lastUpdated: "Dernière mise à jour : {date}",
+    noDataAvailable: "Aucune donnée de disponibilité disponible"
   },
-  confirm: {
-    cancel: "Annuler",
-    cancelDescription: "Êtes-vous sûr de vouloir annuler cette candidature ? Cette action ne peut pas être annulée.",
-    confirm: "Oui, annuler"
-  },
-  create: {
-    title: "Créer une Offre de Cours",
-    description: "Créer une nouvelle offre de cours pour les étudiants",
-    back: "Retour aux offres de cours",
-    offeringDetails: "Détails de l'Offre de Cours",
-    offeringDetailsDescription: "Fournir des détails sur l'offre de cours",
-    classLevel: "Niveau de Classe",
-    selectClass: "Sélectionner un niveau de classe",
-    searchClass: "Rechercher des classes...",
-    noClassFound: "Aucune classe trouvée",
-    classLevelDescription: "Le niveau de classe pour cette offre de cours",
-    subject: "Matière",
-    selectSubject: "Sélectionner une matière",
-    searchSubject: "Rechercher des matières...",
-    noSubjectFound: "Aucune matière trouvée",
-    subjectDescription: "La matière pour cette offre de cours",
-    student: "Étudiant",
-    selectStudent: "Sélectionner un étudiant",
-    studentNotFound: "Étudiant non trouvé",
-    searchStudent: "Rechercher des étudiants...",
-    noStudentFound: "Aucun étudiant trouvé",
-    studentDescription: "L'étudiant qui suivra ce cours",
-    studentAvailability: "Disponibilité de l'Étudiant",
-    startDate: "Date de Début",
-    pickDate: "Choisir une date",
-    startDateDescription: "Quand le cours commencera",
-    duration: "Durée (par séance)",
-    hour: "heure",
-    hours: "heures",
-    durationDescription: "Combien de temps durera chaque séance",
-    frequency: "Fréquence Hebdomadaire",
-    frequencyDescription: "Combien de fois par semaine le cours aura lieu",
-    hourlyRate: "Tarif Horaire (XAF)",
-    hourlyRateDescription: "Le coût par heure pour ce cours",
-    cancel: "Annuler",
-    submit: "Créer l'Offre",
-    schoolYear: "Année Scolaire",
-    noActiveSchoolYear: "Aucune année scolaire active trouvée",
-    active: "Active"
-  },
-  edit: {
-    title: "Modifier l'Offre de Cours",
-    description: "Modifier les détails de cette offre de cours",
-    back: "Retour",
-    offeringDetails: "Détails de l'Offre de Cours",
-    offeringDetailsDescription: "Mettre à jour les détails de cette offre de cours",
-    availability: "Disponibilité",
-    availabilityDescription: "Rendre cette offre de cours disponible aux enseignants",
-    studentAvailability: "Disponibilité de l'Étudiant",
-    submit: "Mettre à Jour l'Offre",
-    success: "Offre de cours mise à jour avec succès",
-    error: "Échec de la mise à jour de l'offre de cours",
-    notFound: "Offre de cours introuvable"
+  class: {
+    noClassesFound: "Aucune classe trouvée"
   }
-},
-availability: {
-  studentAvailability: "Disponibilité de l'Étudiant",
-  scheduleDescription: "Les créneaux horaires disponibles de l'étudiant",
-  timeSlot: "Créneau Horaire",
-  studentNotVisibleWarning: "Les informations de disponibilité de l'étudiant ne sont pas accessibles",
-  studentNotAvailable: "L'étudiant n'a pas défini sa disponibilité",
-  notAvailableDescription: "L'étudiant doit définir son emploi du temps de disponibilité avant que vous puissiez le voir",
-  legend: {
-    available: "Disponible",
-    unavailable: "Indisponible"
-  },
-  slotUpdated: "Créneau de disponibilité mis à jour avec succès",
-  errors: {
-    fetchFailed: "Échec de récupération des informations de disponibilité",
-    updateSlotFailed: "Échec de mise à jour du créneau de disponibilité"
-  },
-  statusAvailable: "L'étudiant est disponible",
-  statusUnavailable: "L'étudiant n'est pas disponible",
-  lastUpdated: "Dernière mise à jour : {date}",
-  noDataAvailable: "Aucune donnée de disponibilité disponible"
-},
-class: {
-  noClassesFound: "Aucune classe trouvée"
-}
 } as const;
