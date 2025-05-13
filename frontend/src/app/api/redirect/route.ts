@@ -21,18 +21,7 @@ async function handleRedirect(req: NextRequest) {
     const user = session.user as UserType;
     
     // Determine role more explicitly
-    let role = "student"; // Default role
-    
-    if (user.is_superuser || user.is_staff) {
-      role = "admin";
-    } else if (user.education_level === "PROFESSIONAL") {
-      role = "teacher";
-    } else {
-      // Check for student explicitly based on education level
-      if (["COLLEGE", "LYCEE", "UNIVERSITY"].includes(user.education_level)) {
-        role = "student";
-      }
-    }
+    let role = getUserRole(user);
     
     console.log("User details for redirect:", { 
       id: user.id,
