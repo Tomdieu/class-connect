@@ -325,6 +325,7 @@ export default {
   "userDialog.submitButton": "Mettre à jour",
   "class.title": "Classe",
   "class.actions.add": "Ajouter une Class",
+  "class.actions.addToLevel": "Ajouter une classe",
   "class.student": "étudiant",
   "class.students": "étudiants",
   "class.singular": "classe",
