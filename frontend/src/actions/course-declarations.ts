@@ -31,3 +31,32 @@ export const getTeacherCourseDeclarations = async (
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
+
+
+export const getCourseDeclarationsOfTeacher = async (
+  params?: Partial<{
+    status: "PENDING"|"ACCEPTED"|"REJECTED"|"PAID";
+    declaration_date_after: string;
+    declaration_date_before: string;
+    user_id: string;
+  }>
+) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+
+    const response = await api.get("/api/course-declarations/", {
+      headers: {
+        Authorization: `Bearer ${session?.user.accessToken}`,
+      },
+      params: { ...params, user_id:params?.user_id },
+    });
+    return response.data as CourseDeclarationType[];
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
