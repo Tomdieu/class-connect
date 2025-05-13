@@ -5,7 +5,7 @@ import {
   updateCourseOffering,
 } from "@/actions/course-offerings";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Check } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -31,7 +31,7 @@ import { z } from "zod";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -49,27 +49,46 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
-import { listClasses, listSubjects } from "@/actions/courses";
+import { listClasses, listSubjects, getformatedClasses } from "@/actions/courses";
 import { getUsers } from "@/actions/accounts";
-import { ClassType, CourseOfferingCreateType } from "@/types";
+import { getStudentsByClassId } from "@/actions/user-classes";
+import { listSchoolYear } from "@/actions/enrollments";
+import { getAvailabilityOfUser, updateAvailabilityTimeSlot } from "@/actions/user-availability";
+import {
+  ClassType,
+  CourseOfferingCreateType,
+  ClassDetail,
+  ClassStructure,
+  UserClassType,
+  SchoolYearType,
+  UserAvailabilityType,
+  DayOfWeek,
+  TimeSlot
+} from "@/types";
 
-import { formatClassName, groupClassesByHierarchy } from "@/lib/utils";
+import { formatClassName } from "@/lib/utils";
 
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function EditCourseOfferingPage() {
   const t = useI18n();
   const router = useRouter();
   const params = useParams();
   const id = Number(params.id);
+  const queryClient = useQueryClient();
 
-  const [selectedClass, setSelectedClass] = useState<ClassType | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const [selectedClass, setSelectedClass] = useState<ClassDetail | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [subjectOpen, setSubjectOpen] = useState<boolean>(false);
   const [studentOpen, setStudentOpen] = useState<boolean>(false);
-  const [dateOpen, setDateOpen] = useState<boolean>(false); // New state for date popover
+  const [dateOpen, setDateOpen] = useState<boolean>(false);
+  const [showAvailability, setShowAvailability] = useState<boolean>(false);
 
   // Create the form schema
   const formSchema = z.object({
@@ -159,6 +178,12 @@ export default function EditCourseOfferingPage() {
     queryFn: () => listClasses({ params: {} }),
   });
 
+  // Query for fetching formatted classes structure
+  const { data: formattedClasses, isLoading: formattedClassesLoading } = useQuery<ClassStructure>({
+    queryKey: ["formatted-classes"],
+    queryFn: () => getformatedClasses(),
+  });
+
   useEffect(() => {
     if (isError) {
       toast.error(error.message || "Error fetching classes");
@@ -182,12 +207,71 @@ export default function EditCourseOfferingPage() {
     enabled: !!form.watch("class_level_id"),
   });
 
+  // Query for fetching active school year
+  const { data: schoolYears, isLoading: schoolYearsLoading } = useQuery({
+    queryKey: ["school-years"],
+    queryFn: listSchoolYear,
+  });
+
+  // Get the active school year
+  const activeSchoolYear = schoolYears?.find(year => year.is_active);
+
+  // Query for fetching students based on selected class and active school year
+  const { data: classStudents, isLoading: classStudentsLoading } = useQuery({
+    queryKey: ["class-students", form.watch("class_level_id"), activeSchoolYear?.formatted_year],
+    queryFn: () => getStudentsByClassId({ 
+      class_level: form.watch("class_level_id"), 
+      school_year: activeSchoolYear?.formatted_year 
+    }),
+    enabled: !!form.watch("class_level_id") && !!activeSchoolYear,
+  });
+
+  // Query for fetching student availability
+  const { data: studentAvailability, isLoading: availabilityLoading } = useQuery({
+    queryKey: ["student-availability", selectedStudentId],
+    queryFn: () => getAvailabilityOfUser({ params: { user_id: selectedStudentId! } }),
+    enabled: !!selectedStudentId && showAvailability,
+  });
+
+  // Mutation to update student availability
+  const updateAvailabilityMutation = useMutation({
+    mutationFn: async ({ 
+      id, 
+      slot_id, 
+      is_available 
+    }: { 
+      id: number, 
+      slot_id: number, 
+      is_available: boolean 
+    }) => {
+      return await updateAvailabilityTimeSlot({
+        id,
+        data: { slot_id, is_available }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student-availability", selectedStudentId] });
+      toast.success(t("availability.slotUpdated"));
+    },
+    onError: (err) => {
+      toast.error(typeof err === 'string' ? err : t('availability.errors.updateSlotFailed'));
+    }
+  });
+
   // Effect to update form when class is selected
   useEffect(() => {
     if (selectedClass) {
       form.setValue("class_level_id", selectedClass.id);
     }
   }, [selectedClass, form]);
+
+  // Set selectedStudentId when form values change or on initial load
+  useEffect(() => {
+    const studentId = form.watch("student_id");
+    if (studentId && studentId !== selectedStudentId) {
+      setSelectedStudentId(studentId);
+    }
+  }, [form.watch("student_id"), selectedStudentId]);
 
   // Update course offering mutation
   const mutation = useMutation({
@@ -293,7 +377,7 @@ export default function EditCourseOfferingPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Class Level Selection */}
+                {/* Class Level Selection - Updated to use getformatedClasses */}
                 <FormField
                   control={form.control}
                   name="class_level_id"
@@ -314,13 +398,13 @@ export default function EditCourseOfferingPage() {
                               )}
                             >
                               {selectedClass
-                                ? formatClassName(selectedClass)
+                                ? `${selectedClass.definition_display}${selectedClass.variant ? ` (${selectedClass.variant})` : ''}`
                                 : t("courseOfferings.create.selectClass")}
                               <ArrowLeft className="ml-2 h-4 w-4 shrink-0 opacity-50 rotate-90" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-full p-0" align="start">
+                        <PopoverContent className="w-full p-0 max-h-[400px] overflow-y-auto" align="start">
                           <Command>
                             <CommandInput
                               placeholder={t(
@@ -332,48 +416,93 @@ export default function EditCourseOfferingPage() {
                               <CommandEmpty>
                                 {t("courseOfferings.create.noClassFound")}
                               </CommandEmpty>
-                              {!classesLoading &&
-                                classes &&
-                                Object.entries(
-                                  groupClassesByHierarchy(classes)
-                                ).map(([sectionKey, sectionData]) => (
-                                  <div key={sectionKey}>
-                                    <CommandGroup heading={sectionData.section}>
-                                      {Object.entries(sectionData.levels).map(
-                                        ([levelKey, levelData]) => (
-                                          <div key={levelKey}>
-                                            <CommandGroup
-                                              heading={levelData.level}
-                                              className="pl-2"
-                                            >
-                                              {levelData.classes.map(
-                                                (classItem) => (
+                              {formattedClassesLoading ? (
+                                <div className="p-4 text-center">
+                                  <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                                  <p className="text-sm text-muted-foreground mt-2">{t("loading")}</p>
+                                </div>
+                              ) : formattedClasses ? (
+                                Object.entries(formattedClasses).map(([languageCode, sectionDetail]) => (
+                                  <div key={languageCode}>
+                                    <CommandGroup className="font-semibold text-md py-2">
+                                      <div className="flex items-center gap-2 px-2 mb-1">
+                                        <Badge variant="outline" className="bg-primary/5 text-primary">
+                                          {sectionDetail.label}
+                                        </Badge>
+                                      </div>
+                                      
+                                      {Object.entries(sectionDetail.levels).map(([levelKey, levelDetail]) => {
+                                        const levelLabel = levelDetail.label;
+                                        
+                                        return (
+                                          <div key={levelKey} className="mb-1">
+                                            <p className="px-2 text-sm font-medium text-muted-foreground mb-1">
+                                              {levelLabel}
+                                            </p>
+                                            
+                                            {Object.entries(levelDetail.groups).map(([groupKey, classes]) => {
+                                              if (groupKey === 'classes') {
+                                                // Direct classes without further grouping
+                                                return classes && (classes as ClassDetail[]).map((classItem) => (
                                                   <CommandItem
                                                     key={classItem.id}
-                                                    value={
-                                                      classItem.name +
-                                                      (classItem.speciality
-                                                        ? ` ${classItem.speciality}`
-                                                        : "")
-                                                    }
+                                                    value={`${classItem.definition_display}${classItem.variant ? ` ${classItem.variant}` : ''}`}
                                                     onSelect={() => {
-                                                      setSelectedClass(
-                                                        classItem
-                                                      );
-                                                      setOpen(false); // Close the popover when a class is selected
+                                                      setSelectedClass(classItem);
+                                                      form.setValue("class_level_id", classItem.id);
+                                                      setOpen(false);
                                                     }}
+                                                    className="pl-4"
                                                   >
-                                                    {formatClassName(classItem)}
+                                                    <span className="flex-1">{classItem.definition_display}{classItem.variant ? ` (${classItem.variant})` : ''}</span>
+                                                    {field.value === classItem.id && <Check className="h-4 w-4 text-primary ml-2" />}
                                                   </CommandItem>
-                                                )
-                                              )}
-                                            </CommandGroup>
+                                                ));
+                                              } else {
+                                                // Classes with further grouping (e.g., LYCEE specialities)
+                                                return (
+                                                  <div key={groupKey} className="mb-1">
+                                                    <p className="px-4 text-xs font-medium text-muted-foreground/80">
+                                                      {groupKey}
+                                                    </p>
+                                                    {(classes as ClassDetail[]).map((classItem) => (
+                                                      <CommandItem
+                                                        key={classItem.id}
+                                                        value={`${classItem.definition_display}${classItem.variant ? ` ${classItem.variant}` : ''}`}
+                                                        onSelect={() => {
+                                                          setSelectedClass(classItem);
+                                                          form.setValue("class_level_id", classItem.id);
+                                                          setOpen(false);
+                                                        }}
+                                                        className="pl-6"
+                                                      >
+                                                        <span className="flex-1">{classItem.definition_display}{classItem.variant ? ` (${classItem.variant})` : ''}</span>
+                                                        {field.value === classItem.id && <Check className="h-4 w-4 text-primary ml-2" />}
+                                                      </CommandItem>
+                                                    ))}
+                                                  </div>
+                                                );
+                                              }
+                                            })}
+                                            
+                                            {levelKey !== Object.keys(sectionDetail.levels).slice(-1)[0] && (
+                                              <CommandSeparator />
+                                            )}
                                           </div>
-                                        )
-                                      )}
+                                        );
+                                      })}
                                     </CommandGroup>
+                                    
+                                    {languageCode !== Object.keys(formattedClasses).slice(-1)[0] && (
+                                      <CommandSeparator />
+                                    )}
                                   </div>
-                                ))}
+                                ))
+                              ) : (
+                                <div className="p-4 text-center">
+                                  <p className="text-sm text-muted-foreground">{t("class.noClassesFound")}</p>
+                                </div>
+                              )}
                             </CommandList>
                           </Command>
                         </PopoverContent>
@@ -737,6 +866,141 @@ export default function EditCourseOfferingPage() {
                     </FormItem>
                   )}
                 />
+
+                {/* School Year - Non-editable field showing active school year */}
+                <div className="col-span-1 md:col-span-2">
+                  <div className="bg-muted/40 rounded-lg p-4 border border-border">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-medium mb-1">{t("courseOfferings.create.schoolYear")}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {schoolYearsLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
+                          ) : activeSchoolYear ? (
+                            <span className="font-medium">{activeSchoolYear.formatted_year}</span>
+                          ) : (
+                            t("courseOfferings.create.noActiveSchoolYear")
+                          )}
+                        </p>
+                      </div>
+                      {activeSchoolYear && (
+                        <Badge variant="outline" className="bg-primary/10 text-primary">
+                          {t("courseOfferings.create.active")}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Student Availability Section */}
+                {selectedStudentId && (
+                  <div className="col-span-1 md:col-span-2 mt-4">
+                    <Accordion type="single" collapsible>
+                      <AccordionItem value="availability">
+                        <AccordionTrigger 
+                          onClick={() => setShowAvailability(!showAvailability)}
+                          className="text-primary font-medium"
+                        >
+                          {t("courseOfferings.edit.studentAvailability")}
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          {availabilityLoading ? (
+                            <div className="flex justify-center py-6">
+                              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                          ) : studentAvailability ? (
+                            <div className="space-y-4 py-2">
+                              <div className="flex items-center justify-between mb-4 bg-primary/5 p-3 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                  <div className={`h-3 w-3 rounded-full ${studentAvailability.is_available ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                  <span className="font-medium">
+                                    {studentAvailability.is_available 
+                                      ? t("availability.statusAvailable") 
+                                      : t("availability.statusUnavailable")}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {t("availability.lastUpdated", { 
+                                    date: new Date(studentAvailability.last_updated).toLocaleDateString() 
+                                  })}
+                                </div>
+                              </div>
+
+                              {studentAvailability.is_available ? (
+                                <div className="overflow-x-auto shadow-md rounded-lg border border-primary/20">
+                                  <table className="min-w-full border-collapse bg-card/95 backdrop-blur">
+                                    <thead className="bg-primary/10">
+                                      <tr>
+                                        <th className="border border-primary/20 p-2 w-24 md:w-32 sticky left-0 bg-primary/10 z-10">
+                                          {t("availability.timeSlot")}
+                                        </th>
+                                        {['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'].map(day => (
+                                          <th key={day} className="border border-primary/20 p-2 text-center">
+                                            <span className="hidden md:inline">{`${day}.`}</span>
+                                            <span className="md:hidden">{day}</span>
+                                          </th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {['matin', '13h-14h', '14h-15h', '15h-16h', '16h-17h', '17h-18h', '18h-19h', '19h-20h'].map((timeSlot, index) => (
+                                        <tr key={timeSlot} className={`hover:bg-primary/5 ${index % 2 === 0 ? 'bg-white/50' : 'bg-white/80'}`}>
+                                          <td className="border border-primary/20 p-2 font-medium text-center sticky left-0 bg-white/80 z-10">
+                                            {timeSlot}
+                                          </td>
+                                          {(['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'] as DayOfWeek[]).map(day => {
+                                            const slot = studentAvailability.daily_slots.find(
+                                              slot => slot.day === day && slot.time_slot === timeSlot as TimeSlot
+                                            );
+                                            
+                                            return (
+                                              <td key={day} className="border border-primary/20 p-2 text-center">
+                                                <input
+                                                  type="checkbox"
+                                                  checked={slot?.is_available || false}
+                                                  onChange={() => {
+                                                    if (slot) {
+                                                      updateAvailabilityMutation.mutate({
+                                                        id: studentAvailability.id,
+                                                        slot_id: slot.id,
+                                                        is_available: !slot.is_available
+                                                      });
+                                                    }
+                                                  }}
+                                                  className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary/20 cursor-pointer"
+                                                />
+                                              </td>
+                                            );
+                                          })}
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              ) : (
+                                <div className="bg-card/95 backdrop-blur p-6 text-center rounded-lg border border-primary/20 shadow-md">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2 text-muted-foreground">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                  </svg>
+                                  <p className="text-muted-foreground">
+                                    {t("availability.studentNotAvailable")}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="py-4 text-center text-muted-foreground">
+                              {t("availability.noDataAvailable")}
+                            </div>
+                          )}
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                )}
               </div>
 
               <CardFooter className="flex justify-between px-0">
