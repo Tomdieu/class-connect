@@ -20,13 +20,6 @@ function UserTable() {
   const subscriptionStatus = searchParams?.get("subscription") || "all";
   const subscriptionPlan = searchParams?.get("subscription_plan") || "";
   
-  // Education level filters
-  const educationLevel = searchParams?.get("education_level") || "";
-  const collegeClass = searchParams?.get("college_class") || "";
-  const lyceeClass = searchParams?.get("lycee_class") || "";
-  const lyceeSpeciality = searchParams?.get("lycee_speciality") || "";
-  const universityLevel = searchParams?.get("university_level") || "";
-  const universityYear = searchParams?.get("university_year") || "";
   
   const { data, isLoading, isError } = useQuery({
     queryKey: [
@@ -35,12 +28,6 @@ function UserTable() {
       "type", userType, 
       "subscription", subscriptionStatus,
       "subscription_plan", subscriptionPlan,
-      "education_level", educationLevel,
-      "college_class", collegeClass,
-      "lycee_class", lyceeClass,
-      "lycee_speciality", lyceeSpeciality,
-      "university_level", universityLevel,
-      "university_year", universityYear
     ],
     queryFn: () => {
       // Create params object with correct boolean flags based on user type and subscription status
@@ -69,23 +56,7 @@ function UserTable() {
         params.subscription_plan = subscriptionPlan as "BASIC" | "STANDARD" | "PREMIUM";
       }
       
-      // Handle education level filters
-      if (educationLevel) {
-        params.education_level = educationLevel;
-        
-        // Add specific education level filters
-        if (educationLevel === "COLLEGE" && collegeClass) {
-          params.college_class = collegeClass;
-        } 
-        else if (educationLevel === "LYCEE") {
-          if (lyceeClass) params.lycee_class = lyceeClass;
-          if (lyceeSpeciality) params.lycee_speciality = lyceeSpeciality;
-        } 
-        else if (educationLevel === "UNIVERSITY") {
-          if (universityLevel) params.university_level = universityLevel;
-          if (universityYear) params.university_year = universityYear;
-        }
-      }
+     
       
       return getUsers({ params });
     },
