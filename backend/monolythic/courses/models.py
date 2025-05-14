@@ -405,7 +405,7 @@ class TeacherStudentEnrollment(models.Model):
         (COMPLETED, "Completed"),
     ]
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='students')
-    offer = models.ForeignKey(CourseOffering, on_delete=models.PROTECT)
+    offer = models.ForeignKey(CourseOffering, on_delete=models.PROTECT,related_name='teacher_student_enrollments')
     school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     has_class_end = models.BooleanField(default=False)
