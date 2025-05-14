@@ -82,33 +82,36 @@ function DashboardHeader() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-80 p-2">
-              <DropdownMenuLabel className="font-semibold">Notifications</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel className="font-semibold sticky top-0 bg-white z-10">Notifications</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {notifLoading && (
-                <div className="p-2 text-center text-sm text-muted-foreground">Loading...</div>
-              )}
-              {notifError && (
-                <div className="p-2 text-center text-sm text-red-600">
-                  Error loading notifications
-                </div>
-              )}
-              {!notifLoading && notifications.length === 0 && (
-                <div className="p-2 text-center text-sm text-muted-foreground">
-                  No new notifications
-                </div>
-              )}
-              {!notifLoading && notifications.map((notification: any) => (
-                <DropdownMenuItem key={notification.id} className="flex flex-col items-start">
-                  <span className="font-medium">{notification.title}</span>
-                  <span className="text-xs text-gray-500">
-                    {notification.message}
-                  </span>
-                  <span className="text-[10px] text-gray-400">
-                    {new Date(notification.created_at).toLocaleString()}
-                  </span>
-                </DropdownMenuItem>
-              ))}
+              <div className="max-h-[300px] overflow-y-auto px-1">
+                {notifLoading && (
+                  <div className="p-2 text-center text-sm text-muted-foreground">Loading...</div>
+                )}
+                {notifError && (
+                  <div className="p-2 text-center text-sm text-red-600">
+                    Error loading notifications
+                  </div>
+                )}
+                {!notifLoading && notifications.length === 0 && (
+                  <div className="p-2 text-center text-sm text-muted-foreground">
+                    No new notifications
+                  </div>
+                )}
+                {!notifLoading && notifications.map((notification: any) => (
+                  <DropdownMenuItem key={notification.id} className="flex flex-col items-start my-1 p-2">
+                    <span className="font-medium">{notification.title}</span>
+                    <span 
+                      className="text-xs text-gray-500"
+                      dangerouslySetInnerHTML={{ __html: notification.message }}
+                    />
+                    <span className="text-[10px] text-gray-400">
+                      {new Date(notification.created_at).toLocaleString()}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
 
