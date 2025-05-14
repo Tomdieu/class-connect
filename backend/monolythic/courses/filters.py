@@ -187,10 +187,11 @@ class UserClassFilter(django_filters.FilterSet):
     school_year = django_filters.CharFilter(method='filter_by_school_year')
     education_level = django_filters.NumberFilter(field_name='class_level__definition__education_level__id')
     section = django_filters.NumberFilter(field_name='class_level__definition__education_level__section__id')
+    no_assign_teacher = django_filters.BooleanFilter(method='filter_no_assign_teacher')
     
     class Meta:
         model = UserClass
-        fields = ['class_level', 'school_year', 'user', 'education_level', 'section']
+        fields = ['class_level', 'school_year', 'user', 'education_level', 'section', 'no_assign_teacher']
     
     def filter_by_school_year(self, queryset, name, value):
         try:
@@ -199,3 +200,42 @@ class UserClassFilter(django_filters.FilterSet):
             return queryset.filter(school_year=school_year)
         except (ValueError, SchoolYear.DoesNotExist):
             return queryset.none()
+            
+    def filter_no_assign_teacher(self, queryset, name, value):
+        """
+        Filter to find students without assigned teachers
+        If value is True: return students NOT linked to active TeacherStudentEnrollment
+        If value is False: return students WITH active TeacherStudentEnrollment
+        """
+        import sys
+        
+        # Get current school year
+        current_school_year = SchoolYear.current_year()
+        # print("FILTER DEBUG:", file=sys.stderr)
+        # print(f"Filtering for school year: {current_school_year}", file=sys.stderr)
+        
+        # Get all users who have active course offerings with teacher enrollments
+        tse_query = TeacherStudentEnrollment.objects.filter(
+            status=TeacherStudentEnrollment.ACTIVE,
+            school_year=current_school_year,
+            has_class_end=False
+        )
+        
+        # print(f"TeacherStudentEnrollment Query: {tse_query.query}", file=sys.stderr)
+        
+        users_with_teachers_ids = list(tse_query.values_list('offer__student_id', flat=True).distinct())
+        
+        # print(f"Users with teachers: {users_with_teachers_ids}", file=sys.stderr)
+        
+        if value:  # If True, find students WITHOUT teachers
+            # print("Finding students WITHOUT teachers", file=sys.stderr)
+            result = queryset.exclude(user_id__in=users_with_teachers_ids)
+        else:  # If False, find students WITH teachers
+            # print("Finding students WITH teachers", file=sys.stderr)
+            result = queryset.filter(user_id__in=users_with_teachers_ids)
+        
+        # print(f"SQL Query: {str(result.query)}", file=sys.stderr)
+        # print(f"Result count: {result.count()}", file=sys.stderr)
+        
+        # Return the filtered queryset
+        return result
