@@ -609,6 +609,7 @@ export default {
   "users.table.columns.email": "Email",
   "users.table.columns.phone": "Phone Number",
   "users.table.columns.educationLevel": "Education Level",
+  "users.table.columns.userType": "User Type",
   "users.table.columns.class": "Class",
   "users.table.columns.dateJoined": "Date Joined",
   "users.table.actions.update": "Update",
