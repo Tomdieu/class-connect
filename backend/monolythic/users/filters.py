@@ -31,11 +31,41 @@ class UserFilter(django_filters.FilterSet):
         choices=[('BASIC', 'Basic'), ('STANDARD', 'Standard'), ('PREMIUM', 'Premium')],
         method='filter_subscription_plan'
     )
+    # New filters for class and section relationships
+    class_level = django_filters.NumberFilter(field_name='class_enrolled__id')
+    section = django_filters.CharFilter(method='filter_by_section')
+    education_level = django_filters.CharFilter(method='filter_by_education_level')
+    class_name = django_filters.CharFilter(method='filter_by_class_name')
 
     def filter_by_name(self, queryset, name, value):
         return queryset.filter(
             Q(first_name__icontains=value) | 
             Q(last_name__icontains=value)
+        )
+        
+    def filter_by_section(self, queryset, name, value):
+        """Filter users by the section name or code of their enrolled class"""
+        logger.debug(f"filter_by_section received value: {value}")
+        # Look up the section by name or code
+        return queryset.filter(
+            Q(class_enrolled__definition__education_level__section__code__iexact=value) |
+            Q(class_enrolled__definition__education_level__section__label__icontains=value)
+        )
+    
+    def filter_by_education_level(self, queryset, name, value):
+        """Filter users by the education level name or code of their enrolled class"""
+        logger.debug(f"filter_by_education_level received value: {value}")
+        return queryset.filter(
+            Q(class_enrolled__definition__education_level__code__iexact=value) |
+            Q(class_enrolled__definition__education_level__label__icontains=value)
+        )
+    
+    def filter_by_class_name(self, queryset, name, value):
+        """Filter users by their class name, including variant"""
+        logger.debug(f"filter_by_class_name received value: {value}")
+        return queryset.filter(
+            Q(class_enrolled__definition__name__icontains=value) |
+            Q(class_enrolled__variant__icontains=value)
         )
         
     def filter_is_student(self, queryset, name, value):
@@ -229,5 +259,6 @@ class UserFilter(django_filters.FilterSet):
             'email', 'first_name', 'last_name', 'name', 'phone_number', 'user_type',
             'enterprise_name', 'platform_usage_reason', 'is_active', 'date_joined', 
             'is_student', 'is_professional', 'is_admin', 'has_subscription', 
-            'subscription_expiring', 'subscription_expired', 'subscription_plan'
+            'subscription_expiring', 'subscription_expired', 'subscription_plan',
+            'class_level', 'section', 'education_level', 'class_name'
         ]
