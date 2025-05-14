@@ -1006,7 +1006,7 @@ export default function UserDetailPage() {
                                         </TableCell>
                                       ))}
                                       <TableCell className="text-right flex justify-end items-center space-x-2">
-                                        {declaration.status !== "REJECTED" && !declaration.proof_of_payment && (
+                                        {declaration.status !== "REJECTED" && !declaration.proof_of_payment ? (
                                           <Select
                                             value={declaration.status}
                                             onValueChange={(value) => {
@@ -1040,11 +1040,14 @@ export default function UserDetailPage() {
                                               )}
                                             </SelectContent>
                                           </Select>
-                                        )}
-                                        
-                                        {declaration.proof_of_payment && (
-                                          <Badge variant="outline" className="mr-2">
-                                            Status Locked (Paid)
+                                        ) : (
+                                          <Badge 
+                                            variant="outline" 
+                                            className="mr-2"
+                                          >
+                                            {declaration.proof_of_payment 
+                                              ? "Status Locked (Paid)" 
+                                              : "Status Locked (Rejected)"}
                                           </Badge>
                                         )}
                                         
@@ -1775,7 +1778,7 @@ function EnrollmentWithDeclarations({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right space-x-2 flex items-center">
-                      {declaration.status !== "REJECTED" && !declaration.proof_of_payment && (
+                      {declaration.status !== "REJECTED" && !declaration.proof_of_payment ? (
                         <Select
                           value={declaration.status}
                           onValueChange={(value) => {
@@ -1810,11 +1813,14 @@ function EnrollmentWithDeclarations({
                             )}
                           </SelectContent>
                         </Select>
-                      )}
-
-                      {declaration.proof_of_payment && (
-                        <Badge variant="outline" className="mr-2">
-                          Status Locked (Paid)
+                      ) : (
+                        <Badge 
+                          variant="outline" 
+                          className="mr-2"
+                        >
+                          {declaration.proof_of_payment 
+                            ? "Status Locked (Paid)" 
+                            : "Status Locked (Rejected)"}
                         </Badge>
                       )}
 
