@@ -71,7 +71,8 @@ class Command(BaseCommand):
                 )
                 
                 # Create variants like A, B, C, D
-                for variant in ['C','D','A']:
+                variants = ['C','D'] if speciality == scientifique else ['A']
+                for variant in variants:
                     Class.objects.get_or_create(
                         definition=definition,
                         variant=variant
