@@ -69,7 +69,7 @@ export const updateCourseDeclarationStatus = async (
     const session = await auth();
     if (!session?.user) throw Error("Unauthorized user!");
 
-    // First check if the declaration has been paid
+    // First check if the declaration has been paid or is already rejected
     const response = await api.get(`/api/course-declarations/${declarationId}/`, {
       headers: {
         Authorization: `Bearer ${session?.user.accessToken}`,
@@ -83,7 +83,12 @@ export const updateCourseDeclarationStatus = async (
       throw Error("Cannot modify status of a paid declaration");
     }
     
-    // If not paid, proceed with the status update
+    // If the declaration is already rejected, don't allow status changes
+    if (declaration.status === "REJECTED") {
+      throw Error("Cannot modify status of a rejected declaration");
+    }
+    
+    // If not paid or rejected, proceed with the status update
     const updateResponse = await api.patch(`/api/course-declarations/${declarationId}/`, 
       { status: newStatus },
       {
