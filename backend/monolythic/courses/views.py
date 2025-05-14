@@ -1575,55 +1575,69 @@ class UserClassViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
         self.log_activity(request, "Deleted user class", {"user_class_id": kwargs.get("pk")})
         return super().destroy(request, *args, **kwargs)
 
-    # @swagger_auto_schema(
-    #     method='get',
-    #     manual_parameters=[
-    #         openapi.Parameter('school_year', openapi.IN_QUERY, 
-    #                          description="School year in format YYYY-YYYY", 
-    #                          type=openapi.TYPE_STRING, required=False),
-    #     ],
-    #     responses={200: UserClassSerializer(many=True)},
-    #     operation_description="Get all students for a specific class level for the given school year"
-    # )
-    # @action(detail=False, methods=['get'], url_path='students-by-class')
-    # def students_by_class(self, request):
-    #     """Get all students enrolled in a specific class level for a given school year."""
-    #     class_level_id = request.query_params.get('class_level')
-    #     school_year_param = request.query_params.get('school_year')
+    @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter('class_level', openapi.IN_QUERY, description="Class Level ID", type=openapi.TYPE_INTEGER, required=True),
+            openapi.Parameter('school_year', openapi.IN_QUERY, description="School Year in format YYYY-YYYY", type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('no_assign_teacher', openapi.IN_QUERY, description="Filter students without assigned teachers (true/false)", type=openapi.TYPE_BOOLEAN, required=False),
+        ],
+        responses={200: UserClassSerializer(many=True)},
+        operation_description="Get all students enrolled in a specific class level for a given school year, optionally filtering those without assigned teachers"
+    )
+    @action(detail=False, methods=['get'], url_path='students-by-class')
+    def students_by_class(self, request):
+        """Get all students enrolled in a specific class level for a given school year, with optional filtering for those without assigned teachers."""
+        import sys
         
-    #     if not class_level_id:
-    #         return Response(
-    #             {"error": "class_level parameter is required"}, 
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
+        # Get query parameters
+        class_level_id = request.query_params.get('class_level')
+        school_year_param = request.query_params.get('school_year')
+        no_assign_teacher = request.query_params.get('no_assign_teacher')
         
-    #     queryset = UserClass.objects.filter(class_level_id=class_level_id)
+        # print("\nVIEW DEBUG:", file=sys.stderr)
+        # print(f"Query params: class_level={class_level_id}, school_year={school_year_param}, no_assign_teacher={no_assign_teacher}", file=sys.stderr)
         
-    #     if school_year_param:
-    #         try:
-    #             start_year, end_year = school_year_param.split('-')
-    #             school_year_obj = SchoolYear.objects.filter(
-    #                 start_year=start_year,
-    #                 end_year=end_year
-    #             ).first()
-    #             if school_year_obj:
-    #                 queryset = queryset.filter(school_year=school_year_obj)
-    #         except (ValueError, SchoolYear.DoesNotExist):
-    #             return Response(
-    #                 {"error": "Invalid school_year format. Use YYYY-YYYY"}, 
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-    #     else:
-    #         # Default to current school year
-    #         queryset = queryset.filter(school_year=SchoolYear.current_year())
+        if not class_level_id:
+            return Response(
+                {"error": "class_level parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
-    #     page = self.paginate_queryset(queryset)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return self.get_paginated_response(serializer.data)
+        # Build filter data
+        filter_data = {'class_level': class_level_id}
         
-    #     serializer = self.get_serializer(queryset, many=True)
-    #     return Response(serializer.data)
+        # Add school year filter if provided
+        if school_year_param:
+            filter_data['school_year'] = school_year_param
+        
+        # Add no_assign_teacher filter if provided (convert string to boolean)
+        if no_assign_teacher is not None:
+            is_no_assign = no_assign_teacher.lower() == 'true'
+            filter_data['no_assign_teacher'] = is_no_assign
+            print(f"no_assign_teacher param: {no_assign_teacher} -> converted to {is_no_assign}", file=sys.stderr)
+        
+        # print(f"Filter data: {filter_data}", file=sys.stderr)
+        
+        # Get the base queryset
+        queryset = self.queryset
+        # print(f"Base queryset: {str(queryset.query)}", file=sys.stderr)
+        
+        # Apply filters using filterset
+        filterset = UserClassFilter(filter_data, queryset)
+        filtered_qs = filterset.qs
+        
+        # Log the raw SQL and count for debugging
+        # print(f"Final SQL Query: {str(filtered_qs.query)}", file=sys.stderr)
+        # print(f"Result count: {filtered_qs.count()}", file=sys.stderr)
+        
+        page = self.paginate_queryset(filtered_qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(filtered_qs, many=True)
+        return Response(serializer.data)
     
     @swagger_auto_schema(   
         method='get',
@@ -1688,52 +1702,3 @@ class UserClassViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
                 {"error": "Class not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-    
-    @swagger_auto_schema(
-        method='get',
-        manual_parameters=[
-            openapi.Parameter('class_level', openapi.IN_QUERY, description="Class Level ID", type=openapi.TYPE_INTEGER, required=True),
-            openapi.Parameter('school_year', openapi.IN_QUERY, description="School Year in format YYYY-YYYY", type=openapi.TYPE_STRING, required=False),
-        ],
-        responses={200: UserClassSerializer(many=True)},
-        operation_description="Get all students enrolled in a specific class level for a given school year"
-    )
-    @action(detail=False, methods=['get'], url_path='students-by-class')
-    def students_by_class(self, request):
-        """Get all students enrolled in a specific class level for a given school year."""
-        class_level_id = request.query_params.get('class_level')
-        school_year_param = request.query_params.get('school_year')
-        
-        if not class_level_id:
-            return Response(
-                {"error": "class_level parameter is required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        queryset = UserClass.objects.filter(class_level_id=class_level_id)
-        
-        if school_year_param:
-            try:
-                start_year, end_year = school_year_param.split('-')
-                school_year_obj = SchoolYear.objects.filter(
-                    start_year=start_year,
-                    end_year=end_year
-                ).first()
-                if school_year_obj:
-                    queryset = queryset.filter(school_year=school_year_obj)
-            except (ValueError, SchoolYear.DoesNotExist):
-                return Response(
-                    {"error": "Invalid school_year format. Use YYYY-YYYY"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        else:
-            # Default to current school year
-            queryset = queryset.filter(school_year=SchoolYear.current_year())
-        
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
