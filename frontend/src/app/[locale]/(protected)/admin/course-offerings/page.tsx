@@ -246,7 +246,7 @@ export default function CourseOfferingPage() {
                   {offerings.results.map((offering) => (
                     <TableRow key={offering.id}>
                       <TableCell className="font-medium">{offering.subject.name}</TableCell>
-                      <TableCell>{offering.class_level.name}</TableCell>
+                      <TableCell>{offering.class_level.definition_display}</TableCell>
                       <TableCell>{formatCurrency(offering.hourly_rate)}</TableCell>
                       <TableCell>
                         <Badge 
