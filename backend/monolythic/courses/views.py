@@ -26,7 +26,7 @@ from .serializers import (
 )
 from .pagination import CustomPagination
 from .filters import (
-    CourseCategoryFilter, ClassFilter, SubjectFilter,
+    CourseCategoryFilter, ClassFilter, EducationLevelFilter,SpecialityFilter,LevelClassDefinitionFilter, SectionFilter, SubjectFilter,
     ChapterFilter, TopicFilter, ResourceFilter, UserProgressFilter,
     CourseOfferingFilter, CourseOfferingActionFilter,
     TeacherStudentEnrollmentFilter, CourseDeclarationFilter, UserClassFilter
@@ -40,6 +40,8 @@ class SectionViewSet(viewsets.ModelViewSet):
     queryset = Section.objects.all()
     serializer_class = SectionSerializer
     permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = SectionFilter
 
 class SectionHierarchyViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -55,22 +57,29 @@ class SectionHierarchyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SectionDetailSerializer
     permission_classes = [AllowAny]
 
+
 class EducationLevelViewSet(viewsets.ModelViewSet):
     queryset = EducationLevel.objects.all()
     serializer_class = EducationLevelSerializer
     filterset_fields = ['section', 'code']
     permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = EducationLevelFilter
     
 class SpecialityViewSet(viewsets.ModelViewSet):
     queryset = Speciality.objects.all()
     serializer_class = SpecialitySerializer
     permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = SpecialityFilter
     
 class LevelClassDefinitionViewSet(viewsets.ModelViewSet):
     queryset = LevelClassDefinition.objects.all()
     serializer_class = LevelClassDefinitionSerializer
     filterset_fields = ['education_level', 'speciality']
     permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = LevelClassDefinitionFilter
     
 class ClassViewSet(viewsets.ModelViewSet):
     """
