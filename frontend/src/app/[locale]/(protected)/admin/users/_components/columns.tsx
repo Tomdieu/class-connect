@@ -103,15 +103,15 @@ export const userColumns: ColumnDef<UserType>[] = [
     },
   },
   {
-    accessorKey: "education_level",
-    id: "education_level",
+    accessorKey: "user_type",
+    id: "user_type",
     header: () => {
       const t = useI18n();
-      return t("users.table.columns.educationLevel");
+      return t("users.table.columns.userType");
     },
     cell: ({ row }) => {
       const user = row.original;
-      return <span>{user.education_level}</span>;
+      return <span>{user.user_type}</span>;
     },
   },
   {
