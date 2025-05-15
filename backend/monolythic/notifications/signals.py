@@ -1,5 +1,9 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
+from django.utils.timezone import localtime
 
 from payments.models import Subscription
 from courses.models import CourseDeclaration, CourseOfferingAction
@@ -7,6 +11,28 @@ from .models import Notification
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
+# Function to send a notification via WebSocket
+def send_notification_to_websocket(notification):
+    channel_layer = get_channel_layer()
+    # Send to the user's notification group
+    async_to_sync(channel_layer.group_send)(
+        f"user_notifications_{notification.user.id}",
+        {
+            'type': 'notification',
+            'notification_id': notification.id,
+            'title': notification.title,
+            'message': notification.message,
+            'notification_type': notification.notification_type,
+            'created_at': localtime(notification.created_at).isoformat()
+        }
+    )
+
+@receiver(post_save, sender=Notification)
+def notification_created_handler(sender, instance, created, **kwargs):
+    """Send notification to WebSocket when a new notification is created"""
+    if created:
+        send_notification_to_websocket(instance)
 
 @receiver(post_save, sender=Subscription)
 def create_subscription_notification(sender, instance, created, **kwargs):
