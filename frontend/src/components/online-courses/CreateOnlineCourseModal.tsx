@@ -40,7 +40,7 @@ export default function CreateOnlineCourseModal({
   
   const createMeetingSchema = z.object({
     title: z.string().min(1, { message: t("onlineMeetings.validation.titleRequired") }),
-    description: z.string().optional(),
+    description: z.string().min(1, { message: "Description is required" }),
     duration_minutes: z.coerce.number().min(15, { message: t("onlineMeetings.validation.durationMinimum") }),
   });
 
@@ -79,6 +79,11 @@ export default function CreateOnlineCourseModal({
       toast.error(t("onlineMeetings.validation.startTimeInFuture"));
       return;
     }
+
+    if (!values.description || values.description.trim() === "") {
+      toast.error("Description is required");
+      return;
+    }
     
     try {
       setIsSubmitting(true);
@@ -89,7 +94,7 @@ export default function CreateOnlineCourseModal({
         id: 0, // Server will assign actual ID
         instructor_id: String(session?.user.id), // Auth context will provide this on server
         title: values.title,
-        description: values.description || "",
+        description: values.description.trim(),
         start_time: startTime.toISOString(),
         duration_minutes: values.duration_minutes,
         status: "SCHEDULED",
