@@ -41,7 +41,7 @@ export default function CourseOfferingDetailPage() {
   const t = useI18n();
   const params = useParams();
   const router = useRouter();
-  const id = Number(params.id);
+  const id = Number(params?.id);
 
   // Query for fetching course offering details
   const {
@@ -53,7 +53,7 @@ export default function CourseOfferingDetailPage() {
     queryKey: ["courseOffering", id],
     queryFn: () => getCourseOffering(id),
     enabled: !isNaN(id),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds
     retry: 1,
   });
 

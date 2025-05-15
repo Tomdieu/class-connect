@@ -25,12 +25,13 @@ import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/locales/client";
 import { CourseOfferingType, PaginationType } from "@/types";
 import { Edit, Eye, Loader2, Plus, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Users, GraduationCap, Clock, Target, Trophy } from "lucide-react";
+import { motion } from "framer-motion";
+import { BookOpen, Clock, Target, Trophy } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -44,30 +45,42 @@ const sectionVariants = {
 
 export default function CourseOfferingPage() {
   const t = useI18n();
-  const [offerings, setOfferings] = useState<PaginationType<CourseOfferingType> | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [offeringToDelete, setOfferingToDelete] = useState<number | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
-  const loadOfferings = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await listCourseOfferings();
-      setOfferings(data);
-    } catch (err) {
+  // Using TanStack Query to fetch course offerings
+  const { 
+    data: offerings,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isRefetching
+  } = useQuery({
+    queryKey: ['courseOfferings'],
+    queryFn: ()=>listCourseOfferings(),
+    refetchInterval: 10000, // Refetch data every 10 seconds
+    refetchOnWindowFocus: false,
+    staleTime: 10000, // Consider data fresh for 10 seconds
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteCourseOffering(id),
+    onSuccess: () => {
+      toast.success(t("courseOfferings.success.deleted"));
+      queryClient.invalidateQueries({ queryKey: ['courseOfferings'] });
+      setDeleteDialogOpen(false);
+      setOfferingToDelete(null);
+    },
+    onError: (err) => {
       console.error(err);
-      setError(t("courseOfferings.error"));
-    } finally {
-      setLoading(false);
+      toast.error(t("courseOfferings.error.deleted"));
+      setDeleteDialogOpen(false);
+      setOfferingToDelete(null);
     }
-  };
-
-  useEffect(() => {
-    loadOfferings();
-  }, []);
+  });
 
   const handleDeleteClick = (id: number) => {
     setOfferingToDelete(id);
@@ -76,20 +89,7 @@ export default function CourseOfferingPage() {
 
   const handleDelete = async () => {
     if (!offeringToDelete) return;
-    
-    setDeleteLoading(true);
-    try {
-      await deleteCourseOffering(offeringToDelete);
-      toast.success(t("courseOfferings.success.deleted"));
-      loadOfferings();
-    } catch (err) {
-      console.error(err);
-      toast.error(t("courseOfferings.error.deleted"));
-    } finally {
-      setDeleteLoading(false);
-      setDeleteDialogOpen(false);
-      setOfferingToDelete(null);
-    }
+    deleteMutation.mutate(offeringToDelete);
   };
 
   const renderEmptyState = () => (
@@ -218,15 +218,15 @@ export default function CourseOfferingPage() {
           variants={sectionVariants}
           className="bg-white/90 backdrop-blur-sm rounded-xl px-4 py-6 shadow-md hover:shadow-lg transition-shadow duration-300 border border-primary/10 relative overflow-hidden"
         >
-          {loading ? (
+          {isLoading && !isRefetching ? (
             <div className="flex justify-center items-center h-40">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
               <span className="ml-2 text-lg">{t("courseOfferings.loading")}</span>
             </div>
-          ) : error ? (
+          ) : isError ? (
             <div className="flex flex-col justify-center items-center h-40 space-y-4">
-              <p className="text-destructive">{error}</p>
-              <Button onClick={loadOfferings}>{t("courseOfferings.retry")}</Button>
+              <p className="text-destructive">{t("courseOfferings.error")}</p>
+              <Button onClick={() => refetch()}>{t("courseOfferings.retry")}</Button>
             </div>
           ) : !offerings?.results?.length ? (
             renderEmptyState()
@@ -265,24 +265,23 @@ export default function CourseOfferingPage() {
                           </Link>
                         </Button>
                         {offering.is_available && (
-<>
-<Button variant="outline" size="sm" asChild>
-                          <Link href={`/admin/course-offerings/${offering.id}/edit`}>
-                            <Edit className="h-4 w-4 mr-1" />
-                            {t("courseOfferings.edit")}
-                          </Link>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleDeleteClick(offering.id)}
-                        >
-                          <Trash className="h-4 w-4 mr-1" />
-                          {t("courseOfferings.delete")}
-                        </Button>
-</>
+                          <>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={`/admin/course-offerings/${offering.id}/edit`}>
+                                <Edit className="h-4 w-4 mr-1" />
+                                {t("courseOfferings.edit")}
+                              </Link>
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleDeleteClick(offering.id)}
+                            >
+                              <Trash className="h-4 w-4 mr-1" />
+                              {t("courseOfferings.delete")}
+                            </Button>
+                          </>
                         )}
-                        
                       </TableCell>
                     </TableRow>
                   ))}
@@ -302,7 +301,7 @@ export default function CourseOfferingPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteLoading}>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>
               {t("courseOfferings.confirm.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction 
@@ -310,10 +309,10 @@ export default function CourseOfferingPage() {
                 e.preventDefault();
                 handleDelete();
               }}
-              disabled={deleteLoading}
+              disabled={deleteMutation.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleteLoading ? (
+              {deleteMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
               ) : null}
               {t("courseOfferings.confirm.confirm")}
