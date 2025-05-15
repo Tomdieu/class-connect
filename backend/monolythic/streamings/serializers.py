@@ -7,7 +7,7 @@ User = get_user_model()
 
 
 class VideoConferenceSessionSerializer(serializers.ModelSerializer):
-    meeting_link = serializers.URLField(required=False)
+    meeting_link = serializers.URLField(required=False, read_only=True)
     instructor_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True, source="instructor"
     )
@@ -17,7 +17,7 @@ class VideoConferenceSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = VideoConferenceSession
         fields = "__all__"
-        read_only_fields = ["recording_url", "created_at"]
+        read_only_fields = ["recording_url", "created_at", "meeting_link"]
 
 
 class SessionAttendeeSerializer(serializers.Serializer):
