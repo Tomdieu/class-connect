@@ -9,7 +9,13 @@ type Props = {
 };
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions:{
+    queries:{
+      staleTime: 1000 * 30, // 30 seconds
+    }
+  }
+});
 
 const ReactQueryProvider = ({ children }: Props) => {
   return (
