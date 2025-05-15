@@ -40,15 +40,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMeetingStore } from "@/store/meeting-store";
-import { 
-  Credenza,
-  CredenzaContent, 
-  CredenzaHeader,
-  CredenzaTitle,
-  CredenzaDescription,
-  CredenzaBody
-} from "@/components/ui/credenza";
-import { CreateMeetingForm } from "@/components/meeting/create-meeting-form";
+import CreateOnlineCourseModal from "@/components/online-courses/CreateOnlineCourseModal";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -355,20 +347,17 @@ function OnlineMeetingPages() {
         </Tabs>
       </motion.div>
 
-      {/* Create Meeting Modal with Credenza */}
-      <Credenza open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <CredenzaContent className="sm:max-w-[600px]">
-          <CredenzaHeader>
-            <CredenzaTitle className="text-2xl">Create New Meeting</CredenzaTitle>
-            <CredenzaDescription>
-              Set up a virtual meeting for teaching or collaboration.
-            </CredenzaDescription>
-          </CredenzaHeader>
-          <CredenzaBody>
-            <CreateMeetingForm />
-          </CredenzaBody>
-        </CredenzaContent>
-      </Credenza>
+      {/* Create Meeting Modal */}
+      <CreateOnlineCourseModal 
+        isOpen={createDialogOpen} 
+        onClose={() => setCreateDialogOpen(false)} 
+        onSuccess={() => {
+          toast.success("Meeting created successfully!");
+          fetchMeetings();
+          setCreateDialogOpen(false); // Explicitly close the modal after success
+        }}
+        onError={() => toast.error("Failed to create meeting. Please try again.")}
+      />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -493,12 +482,6 @@ function OnlineMeetingPages() {
                     </Button>
                     {meeting.status !== "COMPLETED" && meeting.status !== "CANCELLED" && (
                       <>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/admin/online-meetings/${meeting.id}/edit`}>
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </Link>
-                        </Button>
                         <Button 
                           variant="outline" 
                           size="sm" 
