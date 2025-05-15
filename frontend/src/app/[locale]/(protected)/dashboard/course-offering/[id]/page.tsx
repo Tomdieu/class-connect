@@ -16,6 +16,7 @@ import { useSession } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 const Checkbox = ({ checked, disabled = false }:{checked:boolean,disabled:boolean}) => (
   <div className={`flex items-center justify-center h-5 w-5 rounded border ${checked ? 'bg-primary border-primary' : 'bg-white border-gray-300'} ${disabled ? 'opacity-60' : 'opacity-100'}`}>
@@ -58,7 +59,7 @@ export default function TeacherCourseOfferingDetailPage() {
   const t = useI18n();
   const params = useParams();
   const router = useRouter();
-  const id = Number(params.id);
+  const id = Number(params?.id);
   const queryClient = useQueryClient();
 
   const { data: session } = useSession();
@@ -74,7 +75,7 @@ export default function TeacherCourseOfferingDetailPage() {
     queryKey: ['courseOffering', id],
     queryFn: () => getCourseOffering(id),
     enabled: !isNaN(id),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30s
     retry: 1
   });
 
@@ -91,10 +92,6 @@ export default function TeacherCourseOfferingDetailPage() {
     enabled: !!offering?.student?.id,
     retry: 2,
     retryDelay: 1000,
-    onError: (error) => {
-      console.error("Error fetching student availability:", error);
-      toast.error(t("availability.errors.fetchFailed"));
-    }
   });
 
   const createActionMutation = useMutation({
@@ -128,6 +125,13 @@ export default function TeacherCourseOfferingDetailPage() {
   const handleUpdateAction = (actionId: number, status: ActionStatus) => {
     updateActionMutation.mutate({ actionId, status });
   };
+
+  useEffect(() => {
+    if (studentAvailability.isError) {
+      console.error("Error fetching student availability:", studentAvailability.error);
+      toast.error(t("availability.errors.fetchFailed"));
+    }
+  },[studentAvailability.error])
 
   if (isPending) {
     return (

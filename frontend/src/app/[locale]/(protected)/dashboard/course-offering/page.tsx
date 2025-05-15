@@ -23,34 +23,27 @@ import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/locales/client";
 import { CourseOfferingType, PaginationType } from "@/types";
 import { Eye, Loader2, Plus } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 
 export default function CourseOfferingPage() {
   const t = useI18n();
-  const [offerings, setOfferings] =
-    useState<PaginationType<CourseOfferingType> | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadOfferings = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await listCourseOfferings();
-      setOfferings(data);
-    } catch (err) {
-      console.error(err);
-      setError(t("courseOfferings.error"));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    loadOfferings();
-  }, [loadOfferings]);
+  
+  const { 
+    data: offerings,
+    isLoading, 
+    isError,
+    error,
+    refetch 
+  } = useQuery<PaginationType<CourseOfferingType>>({
+    queryKey: ['courseOfferings'],
+    queryFn: ()=>listCourseOfferings({is_available: true}),
+    refetchInterval: 10000, // Refetch data every 10 seconds
+    refetchIntervalInBackground: true,
+    staleTime: 10000, // Consider data fresh for 10 seconds
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
@@ -78,17 +71,17 @@ export default function CourseOfferingPage() {
             <CardDescription>{t("courseOfferings.description")}</CardDescription>
           </CardHeader>
           <CardContent>
-            {loading ? (
+            {isLoading && !offerings?.results ? (
               <div className="flex justify-center items-center h-40">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 <span className="ml-2 text-lg text-primary">
                   {t("courseOfferings.loading")}
                 </span>
               </div>
-            ) : error ? (
+            ) : isError ? (
               <div className="flex flex-col justify-center items-center h-40 space-y-4">
-                <p className="text-destructive">{error}</p>
-                <Button onClick={loadOfferings} className="bg-primary hover:bg-primary/90 text-white">
+                <p className="text-destructive">{t("courseOfferings.error")}</p>
+                <Button onClick={() => refetch()} className="bg-primary hover:bg-primary/90 text-white">
                   {t("courseOfferings.retry")}
                 </Button>
               </div>
