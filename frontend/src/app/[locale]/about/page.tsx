@@ -124,7 +124,7 @@ function AboutPage() {
   return (
     <div className="min-h-screen pb-16">
       <Helmet>
-        <title>{pageTitle} | ClassConnect - Developed by Tomdieu Ivan</title>
+        <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <meta name='keywords' content={keywords}/>
         <link rel="canonical" href={pageUrl} />
