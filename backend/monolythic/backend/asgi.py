@@ -25,13 +25,13 @@ from forum.routing import websocket_urlpatterns as forum_websocket_urlpatterns
 from notifications.routing import websocket_urlpatterns as notifications_websocket_urlpatterns
 from oauth2_provider.models import AccessToken  # used for token authentication
 
-# Debug prints
-print("Forum WebSocket patterns:", forum_websocket_urlpatterns, file=sys.stderr)
-print("Notifications WebSocket patterns:", notifications_websocket_urlpatterns, file=sys.stderr)
+# # Debug prints
+# print("Forum WebSocket patterns:", forum_websocket_urlpatterns, file=sys.stderr)
+# print("Notifications WebSocket patterns:", notifications_websocket_urlpatterns, file=sys.stderr)
 
 # Combine WebSocket URL patterns from different apps
 all_websocket_urlpatterns = forum_websocket_urlpatterns + notifications_websocket_urlpatterns
-print("All WebSocket patterns:", all_websocket_urlpatterns, file=sys.stderr)
+# print("All WebSocket patterns:", all_websocket_urlpatterns, file=sys.stderr)
 
 # Define a sync function to get user from token
 @database_sync_to_async
