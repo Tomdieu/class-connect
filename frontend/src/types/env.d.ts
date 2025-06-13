@@ -5,5 +5,6 @@ declare namespace NodeJS {
       NEXT_CLASS_CONNECT_CLIENT_ID: string;
       NEXTAUTH_URL:string;
       AUTH_SECRET:string;
+      NEXT_PUBLIC_FREEMOPAY_WEBHOOK: string;
     }
   }
