@@ -1,5 +1,5 @@
 "use client";
-import { subscribeToPlan } from "@/actions/payments";
+import { checkFreeMoReferencePaymentStatus, FreeMoPayResponse, subscribeToPlan, subscribeToPlanFreeMopay } from "@/actions/payments";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,14 +20,15 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SubscriptionPlan } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Loader2, CheckCircle, XCircle, Clock } from "lucide-react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Progress } from "@/components/ui/progress";
 
 // MTN prefixes: 650, 651, 652, 653, 654, 67x, 680, 681, 682, 683
 const MTN_PREFIXES = [
@@ -111,17 +112,82 @@ export default function PaymentForm({ plan }: { plan: SubscriptionPlan }) {
     },
   });
 
+  const [freemoPayResponse,setFreemoPayResponse] = useState<FreeMoPayResponse|null>(null)
+  const [lastProcessedPhoneNumber, setLastProcessedPhoneNumber] = useState<string>("");
+
   // Watch phone number to auto-select carrier
   const phoneNumber = form.watch("phone_number");
 
   useEffect(() => {
-    if (phoneNumber.length >= 3) {
+    // Only process if phone number has actually changed and has enough digits
+    if (phoneNumber.length >= 3 && phoneNumber !== lastProcessedPhoneNumber) {
       const carrier = getCarrierFromNumber(phoneNumber);
-      if (carrier) {
-        form.setValue("method", carrier);
+      const currentMethod = form.getValues("method");
+      
+      // Only update if carrier is valid and different from current method
+      if (carrier && carrier !== currentMethod) {
+        form.setValue("method", carrier, {
+          shouldDirty: false,
+          shouldTouch: false,
+          shouldValidate: false
+        });
       }
+      
+      // Update the last processed phone number to prevent re-processing
+      setLastProcessedPhoneNumber(phoneNumber);
     }
-  }, [phoneNumber, form]);
+  }, [phoneNumber, form, lastProcessedPhoneNumber]);
+
+  const freemoPaySubscribeMutation = useMutation({
+    mutationFn:(phoneNumber:string)=>subscribeToPlanFreeMopay({
+      phone_number:phoneNumber,
+      plan: plan.name.toLowerCase() as "basic" | "standard" | "premium",
+      callback:process.env.NEXT_PUBLIC_FREEMOPAY_WEBHOOK
+    }),
+    onSuccess(data, variables, context) {
+      setFreemoPayResponse(data)
+    },
+    onError: (error: any) => {
+      console.error('Payment error:', error);
+      
+      let errorMessage = "An unexpected error occurred";
+      
+      try {
+        // Try to parse the error if it's a JSON string
+        if (typeof error === 'string') {
+          const parsedError = JSON.parse(error);
+          errorMessage = parsedError.message || parsedError.error || errorMessage;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (error.error) {
+          errorMessage = error.error;
+        }
+      } catch (e) {
+        // If parsing fails, use the string as is
+        errorMessage = error.toString();
+      }
+      
+      toast.error(`Payment Failed: ${errorMessage}`, {
+        duration: 5000,
+      });
+    },
+  })
+
+  const verifyStatusQuery = useQuery({
+    queryKey:['checkTransactionstatus',freemoPayResponse?.reference!],
+    queryFn:()=>checkFreeMoReferencePaymentStatus(freemoPayResponse?.reference!),
+    enabled:!!freemoPayResponse,
+    refetchInterval: (data) => {
+      // Stop auto-refetching if payment is completed (SUCCESS or FAILED)
+      if (data?.state.data?.status === "SUCCESS" || data?.state.data?.status === "FAILED") {
+        return false;
+      }
+      // Continue auto-refetching every 5 seconds while PENDING
+      return 5000;
+    },
+    retry: 3,
+    retryDelay: 2000,
+  })
 
   const subscribeMutation = useMutation({
     mutationFn: (data: PaymentFormValues) =>
@@ -165,9 +231,133 @@ export default function PaymentForm({ plan }: { plan: SubscriptionPlan }) {
     },
   });
 
+  useEffect(()=>{
+    if(verifyStatusQuery){
+      if(verifyStatusQuery.isSuccess && verifyStatusQuery.data){
+        const data = verifyStatusQuery.data;
+        if(data.status === "SUCCESS"){
+          toast.success("Payment successful! Your subscription is now active.", {
+            duration: 5000,
+          });
+          form.reset();
+          // Optionally redirect or update UI
+        } else if(data.status === "FAILED"){
+          toast.error("Payment failed. Please try again.", {
+            duration: 5000,
+          });
+          form.reset();
+          setFreemoPayResponse(null);
+        } else {
+          toast.info("Payment is still pending. Please check back later.", {
+            duration: 5000,
+          });
+        }
+      }
+    }
+  },[verifyStatusQuery])
+
   function onSubmit(data: PaymentFormValues) {
-    subscribeMutation.mutate(data);
+    // subscribeMutation.mutate(data);
+    freemoPaySubscribeMutation.mutate(data.phone_number)
   }
+
+  // Payment Status Progress Component
+  const PaymentStatusProgress = () => {
+    if (!freemoPayResponse) return null;
+
+    const getStatusDetails = () => {
+      const status = verifyStatusQuery.data?.status;
+      
+      switch (status) {
+        case "PENDING":
+          return {
+            icon: <Clock className="h-5 w-5 text-orange-500" />,
+            title: "Payment Pending",
+            description: "Your payment is being processed. Please wait...",
+            progress: 50,
+            progressColor: "bg-orange-500",
+            bgColor: "bg-orange-50",
+            borderColor: "border-orange-200",
+            textColor: "text-orange-700"
+          };
+        case "SUCCESS":
+          return {
+            icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+            title: "Payment Successful",
+            description: "Your subscription has been activated successfully!",
+            progress: 100,
+            progressColor: "bg-green-500",
+            bgColor: "bg-green-50",
+            borderColor: "border-green-200",
+            textColor: "text-green-700"
+          };
+        case "FAILED":
+          return {
+            icon: <XCircle className="h-5 w-5 text-red-500" />,
+            title: "Payment Failed",
+            description: "Your payment could not be processed. Please try again.",
+            progress: 100,
+            progressColor: "bg-red-500",
+            bgColor: "bg-red-50",
+            borderColor: "border-red-200",
+            textColor: "text-red-700"
+          };
+        default:
+          return {
+            icon: <Clock className="h-5 w-5 text-blue-500" />,
+            title: "Processing Payment",
+            description: "Initializing payment request...",
+            progress: 25,
+            progressColor: "bg-blue-500",
+            bgColor: "bg-blue-50",
+            borderColor: "border-blue-200",
+            textColor: "text-blue-700"
+          };
+      }
+    };
+
+    const statusDetails = getStatusDetails();
+
+    return (
+      <div className={`p-4 rounded-lg border-2 ${statusDetails.borderColor} ${statusDetails.bgColor}`}>
+        <div className="flex items-center gap-3 mb-3">
+          {statusDetails.icon}
+          <div className="flex-1">
+            <h3 className={`font-semibold ${statusDetails.textColor}`}>
+              {statusDetails.title}
+            </h3>
+            <p className={`text-sm ${statusDetails.textColor} opacity-80`}>
+              {statusDetails.description}
+            </p>
+          </div>
+          {verifyStatusQuery.isLoading && (
+            <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+          )}
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs text-gray-600">
+            <span>Progress</span>
+            <span>{statusDetails.progress}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className={`h-2 rounded-full transition-all duration-500 ease-in-out ${statusDetails.progressColor}`}
+              style={{ width: `${statusDetails.progress}%` }}
+            />
+          </div>
+        </div>
+        
+        {freemoPayResponse.reference && (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              Reference: <span className="font-mono">{freemoPayResponse.reference}</span>
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Card>
@@ -268,8 +458,8 @@ export default function PaymentForm({ plan }: { plan: SubscriptionPlan }) {
                 </FormItem>
               )}
             />
-
-            <Button
+            {!freemoPayResponse && (
+              <Button
               type="submit"
               className="w-full"
               disabled={subscribeMutation.isPending}
@@ -279,8 +469,31 @@ export default function PaymentForm({ plan }: { plan: SubscriptionPlan }) {
               )}
               Pay {plan.price} XAF
             </Button>
+            )}
+            
           </form>
         </Form>
+          {freemoPayResponse && (
+            <div className="space-y-4">
+              <PaymentStatusProgress />
+              <div className="my-3">
+                <Button 
+                  onClick={() => verifyStatusQuery.refetch()}
+                  disabled={verifyStatusQuery.isFetching}
+                  variant="outline"
+                >
+                  {verifyStatusQuery.isFetching ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Checking...
+                    </>
+                  ) : (
+                    "Check Payment Status"
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
       </CardContent>
     </Card>
   );
