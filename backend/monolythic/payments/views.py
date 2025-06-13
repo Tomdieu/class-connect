@@ -25,6 +25,7 @@ from django.core.cache import cache
 from .pagination import CustomPagination
 from rest_framework.decorators import action
 from utils.mixins import ActivityLoggingMixin
+from payments.lib import FreemoPayManager
 
 class SubscriptionPlanViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     queryset = SubscriptionPlan.objects.filter(active=True)
@@ -369,6 +370,212 @@ class PaymentLinkView(ActivityLoggingMixin, APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+class FreemoPayLinkView(ActivityLoggingMixin, APIView):
+    permission_classes = [IsAuthenticated]
+    
+    
+    def generate_short_reference(self, plan_id, user_id):
+        """Generate a short but unique reference string"""
+        # Combine the IDs with a timestamp for uniqueness
+        combined = f"{plan_id}-{user_id}-{int(timezone.now().timestamp())}"
+        # Create a hash of the combined string
+        hash_object = hashlib.md5(combined.encode())
+        # Take first 12 characters of the hash
+        short_hash = hash_object.hexdigest()[:12]
+        # Combine with IDs in a shorter format
+        return f"fp{plan_id}u{user_id}h{short_hash}"  # 'fp' prefix for FreemoPay
+
+    @swagger_auto_schema(
+        operation_description="Create a FreemoPay payment link for a subscription plan",
+        manual_parameters=[
+            openapi.Parameter(
+                'plan_id',
+                openapi.IN_PATH,
+                description="ID or slug of the subscription plan",
+                type=openapi.TYPE_STRING,
+                required=True
+            )
+        ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['phone_number'],
+            properties={
+                'phone_number': openapi.Schema(
+                    type=openapi.TYPE_STRING, 
+                    description='Phone number in international format (e.g., 237650039773)'
+                ),
+                'callback': openapi.Schema(
+                    type=openapi.TYPE_STRING, 
+                    description='Callback URL for payment notifications (optional)'
+                ),
+            }
+        ),
+        responses={200: "Payment link created successfully"}
+    )
+    def post(self, request, plan_id):
+        try:
+            # Check if user has active subscription
+            if Subscription.has_active_subscription(request.user):
+                return Response(
+                    {
+                        'error': 'You already have an active subscription. Please wait for it to expire before subscribing to a new plan.',
+                        'active': True
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validate phone number
+            phone_number = request.data.get('phone_number')
+            if not phone_number:
+                return Response(
+                    {'error': 'Phone number is required'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Try to get plan by ID first, then by slug
+            try:
+                if plan_id.isdigit():
+                    plan = SubscriptionPlan.objects.get(id=plan_id, active=True)
+                else:
+                    plan = SubscriptionPlan.objects.get(slug=plan_id, active=True)
+            except SubscriptionPlan.DoesNotExist:
+                return Response(
+                    {'error': 'Subscription plan not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Generate internal reference for tracking
+            internal_reference = self.generate_short_reference(plan.id, request.user.id)
+            
+            # Generate unique reference ID for FreemoPay
+            transaction_uuid = uuid.uuid4()
+            
+            # Create a PaymentReference record to store the mapping
+            payment_reference = PaymentReference.objects.create(
+                external_reference=transaction_uuid,  # Use UUID object
+                internal_reference=internal_reference,
+                user=request.user,
+                plan=plan,
+                amount=plan.price,
+                phone_number=phone_number.replace('+', ''),
+                provider='freemopay',  # Mark this as FreemoPay transaction
+                metadata={
+                    'user_email': request.user.email,
+                    'user_first_name': request.user.first_name,
+                    'user_last_name': request.user.last_name,
+                    'plan_name': plan.name,
+                    'created_at': str(timezone.now())
+                }
+            )
+            
+            # Store reference data in Redis cache for backup
+            reference_data = {
+                'plan_id': str(plan.id),
+                'user_id': str(request.user.id),
+                'uuid': str(transaction_uuid),
+                'internal_reference': internal_reference,
+                'phone_number': phone_number.replace('+', ''),
+                'amount': str(plan.price),
+                'user_email': request.user.email,
+                'user_first_name': request.user.first_name,
+                'user_last_name': request.user.last_name,
+                'plan_name': plan.name,
+                'created_at': str(timezone.now()),
+                'provider': 'freemopay'
+            }
+            
+            # Store in Redis with 24-hour expiry as backup
+            cache_key = f"freemo_payment_ref_{internal_reference}"
+            cache.set(cache_key, json.dumps(reference_data), timeout=86400)
+            
+            # Create payment description
+            description = f"Subscription to {plan.name} plan"
+            
+            # Get callback URL (default to webhook endpoint if not provided)
+            callback_url = request.data.get('callback') or request.build_absolute_uri(reverse('freemo-payment-webhook'))
+            
+            # Initialize FreemoPay client
+            freemopay = FreemoPayManager(
+                app_key=settings.FREEMOPAY_APP_KEY,
+                secret_key=settings.FREEMOPAY_SECRET_KEY,
+                base_url=settings.FREEMOPAY_BASE_URL
+            )
+            
+            try:
+                # Initialize payment
+                payment_response = freemopay.init_payment(
+                    payer=phone_number.replace('+', ''),  # Remove + if present
+                    amount=str(plan.price),
+                    external_id=internal_reference,  # Using our internal reference for tracking
+                    description=description,
+                    callback=callback_url,
+                    use_token=False  # Use basic auth for initial implementation
+                )
+                
+                # Create pending transaction record
+                try:
+                    transaction = Transaction(
+                        reference=str(payment_response.get('reference', '')),
+                        status='PENDING',
+                        amount=plan.price,
+                        app_amount=plan.price,
+                        currency='XAF',
+                        operator='MTN',  # Default to MTN, can be updated later
+                        endpoint='freemopay_init',
+                        code='',
+                        operator_reference='',
+                        phone_number=phone_number.replace('+', ''),
+                        external_reference=internal_reference,  # Store our internal reference
+                        provider='freemopay'  # Mark as FreemoPay transaction
+                    )
+                    
+                    # Save the transaction
+                    transaction.save()
+                    
+                except Exception as tx_error:
+                    # Enhanced error logging
+                    print(f"FreemoPay transaction creation error: {str(tx_error)}")
+                    
+                    # Return transaction info even if recording failed
+                    payment_response['internal_reference'] = internal_reference
+                    payment_response['warning'] = f'Payment initialized, but transaction recording failed: {str(tx_error)}'
+                    return Response(payment_response)
+                
+                # Log the payment initiation attempt
+                self.log_activity(request, "Initialized FreemoPay payment", {
+                    "plan_id": plan_id,
+                    "amount": str(plan.price),
+                    "reference": payment_response.get('reference', '')
+                })
+                
+                # Return the FreemoPay response along with our internal reference
+                payment_response['internal_reference'] = internal_reference
+                return Response(payment_response)
+                
+            except Exception as fp_error:
+                # Clean up the payment reference if payment initialization fails
+                payment_reference.delete()
+                
+                print(f"FreemoPay Error: {str(fp_error)}")
+                
+                # Extract error message
+                if isinstance(fp_error, dict) and 'message' in fp_error:
+                    error_message = fp_error['message']
+                else:
+                    error_message = str(fp_error)
+                
+                return Response(
+                    {'error': f"Payment service error: {error_message}", 'freemopay_error': True},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+        except Exception as e:
+            print(f"FreemoPay payment link error: {str(e)}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
 class CurrentSubscriptionView(ActivityLoggingMixin, APIView):
     permission_classes = [IsAuthenticated]
     
@@ -659,6 +866,295 @@ def payment_success(request):
         }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         print(f"Payment success error: {str(e)}")
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@csrf_exempt
+@api_view(['POST'])
+@swagger_auto_schema(
+    operation_description="Webhook endpoint for receiving FreemoPay payment notifications",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'status': openapi.Schema(type=openapi.TYPE_STRING, description='Payment status (SUCCESS or FAILED)'),
+            'reference': openapi.Schema(type=openapi.TYPE_STRING, description='FreemoPay transaction reference'),
+            'externalId': openapi.Schema(type=openapi.TYPE_STRING, description='External ID (your internal reference)'),
+            'amount': openapi.Schema(type=openapi.TYPE_NUMBER, description='Transaction amount'),
+            'transactionType': openapi.Schema(type=openapi.TYPE_STRING, description='Type of transaction'),
+            'message': openapi.Schema(type=openapi.TYPE_STRING, description='Additional message for failed transactions'),
+        }
+    ),
+    responses={200: "Webhook processed successfully"}
+)
+@permission_classes([AllowAny])
+def freemo_payment_webhook(request):
+    """
+    Webhook to handle payment notifications from FreemoPay
+    """
+    try:
+        # Get webhook data from request body
+        if request.content_type == 'application/json':
+            webhook_data = request.data
+        else:
+            webhook_data = request.POST.dict()
+        
+        # Log the webhook data for debugging
+        print(f"Received FreemoPay webhook data: {webhook_data}")
+        
+        # Validate webhook data
+        if not webhook_data or not isinstance(webhook_data, dict):
+            return Response({"status": "error", "message": "Invalid webhook data"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Extract important fields
+        payment_status = webhook_data.get('status')
+        reference = webhook_data.get('reference')
+        external_id = webhook_data.get('externalId')
+        amount = webhook_data.get('amount')
+        transaction_type = webhook_data.get('transactionType')
+        message = webhook_data.get('message', '')
+        
+        # Validate required fields
+        if not all([payment_status, reference, external_id, amount, transaction_type]):
+            return Response({"status": "error", "message": "Missing required webhook parameters"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Find the payment reference by internal reference (external_id in FreemoPay callback)
+        try:
+            payment_ref = PaymentReference.objects.get(internal_reference=external_id)
+        except PaymentReference.DoesNotExist:
+            # Try fetching from Redis cache if DB record not found
+            cache_key = f"freemo_payment_ref_{external_id}"
+            cached_data = cache.get(cache_key)
+            
+            if not cached_data:
+                return Response({"status": "error", "message": "Payment reference not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            # Parse cached reference data
+            ref_data = json.loads(cached_data)
+            print(f"Retrieved payment reference from cache: {ref_data}")
+            
+            # Process from cache data
+            if payment_status == 'SUCCESS':
+                # Create a Transaction record
+                transaction = Transaction.objects.create(
+                    reference=reference,
+                    status='SUCCESSFUL',
+                    amount=float(ref_data.get('amount', 0)),
+                    app_amount=float(ref_data.get('amount', 0)),
+                    currency='XAF',
+                    operator=transaction_type,
+                    endpoint='freemopay_callback',
+                    code='',
+                    operator_reference=reference,
+                    phone_number=ref_data.get('phone_number', ''),
+                    external_reference=external_id,
+                    provider='freemopay'
+                )
+                
+                # Queue payment processing
+                process_payment_task.delay({
+                    'provider': 'freemopay',
+                    'status': payment_status,
+                    'reference': reference,
+                    'amount': amount,
+                    'external_id': external_id,
+                    'plan_id': ref_data.get('plan_id'),
+                    'user_id': ref_data.get('user_id'),
+                })
+                
+                return Response({"status": "success", "message": "Payment processed from cache"})
+            else:
+                # Failed payment
+                Transaction.objects.create(
+                    reference=reference,
+                    status='FAILED',
+                    amount=float(ref_data.get('amount', 0)),
+                    app_amount=float(ref_data.get('amount', 0)),
+                    currency='XAF',
+                    operator=transaction_type,
+                    endpoint='freemopay_callback',
+                    code='',
+                    operator_reference=reference,
+                    phone_number=ref_data.get('phone_number', ''),
+                    external_reference=external_id,
+                    provider='freemopay',
+                    message=message
+                )
+                
+                return Response({"status": "error", "message": f"Payment failed: {message}"})
+        
+        # Payment reference found in database
+        print(f"Found payment reference: {payment_ref.id} for user: {payment_ref.user.id} and plan: {payment_ref.plan.id}")
+        
+        # Update transaction record
+        transaction = Transaction.objects.filter(external_reference=external_id).first()
+        if transaction:
+            transaction.status = 'SUCCESSFUL' if payment_status == 'SUCCESS' else 'FAILED'
+            transaction.operator_reference = reference
+            transaction.message = message
+            transaction.save()
+            print(f"Updated transaction {transaction.reference} status to {transaction.status}")
+        else:
+            # Create new transaction record if not found
+            transaction = Transaction.objects.create(
+                reference=reference,
+                status='SUCCESSFUL' if payment_status == 'SUCCESS' else 'FAILED',
+                amount=payment_ref.amount,
+                app_amount=payment_ref.amount,
+                currency='XAF',
+                operator=transaction_type,
+                endpoint='freemopay_callback',
+                code='',
+                operator_reference=reference,
+                phone_number=payment_ref.phone_number,
+                external_reference=external_id,
+                provider='freemopay',
+                message=message
+            )
+            print(f"Created new transaction with reference {transaction.reference}")
+        
+        # For successful payments, process subscription
+        if payment_status == 'SUCCESS':
+            try:
+                # First create subscription
+                subscription = Subscription.objects.create(
+                    user=payment_ref.user,
+                    plan=payment_ref.plan,
+                    start_date=timezone.now(),
+                    end_date=timezone.now() + timezone.timedelta(days=payment_ref.plan.duration_days),
+                    auto_renew=False,
+                    is_active=True
+                )
+                
+                # Then create payment record with subscription field
+                payment = Payment.objects.create(
+                    user=payment_ref.user,
+                    subscription=subscription,  # Link to subscription
+                    amount=payment_ref.amount,
+                    transaction_id=external_id,
+                    payment_method='FreemoPay',
+                    status='SUCCESSFUL'
+                )
+                
+                print(f"Created subscription {subscription.id} until {subscription.end_date}")
+                
+            except Exception as sub_error:
+                print(f"Error processing subscription: {str(sub_error)}")
+                return Response({
+                    "status": "error", 
+                    "message": f"Error creating subscription: {str(sub_error)}",
+                    "payment_processed": True
+                })
+        
+        return Response({"status": "success", "message": "Webhook processed successfully"})
+        
+    except Exception as e:
+        print(f"FreemoPay webhook error: {str(e)}")
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@swagger_auto_schema(
+    operation_description="Check the status of a FreemoPay payment transaction",
+    manual_parameters=[
+        openapi.Parameter(
+            'reference',
+            openapi.IN_PATH,
+            description="FreemoPay transaction reference",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="Payment status retrieved successfully",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'reference': openapi.Schema(type=openapi.TYPE_STRING, description='FreemoPay transaction reference'),
+                    'status': openapi.Schema(type=openapi.TYPE_STRING, description='Payment status'),
+                    'message': openapi.Schema(type=openapi.TYPE_STRING, description='Additional status message')
+                }
+            )
+        ),
+        400: "Error checking payment status"
+    }
+)
+def freemo_payment_status(request, reference):
+    """
+    Check the status of a FreemoPay payment
+    """
+    try:
+        # Initialize FreemoPay client
+        freemopay = FreemoPayManager(
+            app_key=settings.FREEMOPAY_APP_KEY,
+            secret_key=settings.FREEMOPAY_SECRET_KEY,
+            base_url=settings.FREEMOPAY_BASE_URL
+        )
+        
+        # Query payment status
+        payment_status = freemopay.check_payment_status(reference)
+        
+        # Log the request
+        print(f"Checking FreemoPay payment status for reference: {reference}")
+        
+        return Response(payment_status)
+        
+    except Exception as e:
+        print(f"Error checking FreemoPay payment status: {str(e)}")
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAdminUser])
+@swagger_auto_schema(
+    operation_description="Generate a FreemoPay authentication token (Admin only)",
+    responses={
+        200: openapi.Response(
+            description="Token generated successfully",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'status': openapi.Schema(type=openapi.TYPE_STRING, description='Operation status'),
+                    'token': openapi.Schema(type=openapi.TYPE_STRING, description='FreemoPay authorization token'),
+                    'expires_at': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME, description='Token expiration date/time')
+                }
+            )
+        ),
+        400: "Error generating token",
+        403: "Permission denied - Admin access required"
+    }
+)
+def generate_freemo_token(request):
+    """
+    Generate a FreemoPay authentication token
+    (Admin only endpoint)
+    """
+    try:
+        # Initialize FreemoPay client
+        freemopay = FreemoPayManager(
+            app_key=settings.FREEMOPAY_APP_KEY,
+            secret_key=settings.FREEMOPAY_SECRET_KEY,
+            base_url=settings.FREEMOPAY_BASE_URL
+        )
+        
+        # Generate token
+        token_response = freemopay.generate_token()
+        
+        return Response({
+            'status': 'success',
+            'token': token_response.get('token'),
+            'expires_at': (timezone.now() + timezone.timedelta(seconds=3600)).isoformat()
+        })
+        
+    except Exception as e:
+        print(f"Error generating FreemoPay token: {str(e)}")
         return Response({
             'status': 'error',
             'message': str(e)
