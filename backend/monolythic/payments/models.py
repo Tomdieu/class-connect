@@ -124,6 +124,9 @@ class Transaction(models.Model):
     TRANSACTION_TYPES = [
         ('collect', 'Collection'),
         ('withdraw', 'Withdrawal'),
+        ('DEPOSIT', 'Deposit'),  # Add FreemoPay transaction types
+        ('freemopay_init', 'FreemoPay Initialization'),
+        ('freemopay_callback', 'FreemoPay Callback'),
     ]
     
     TRANSACTION_STATUS = [
@@ -135,6 +138,7 @@ class Transaction(models.Model):
     OPERATORS = [
         ('MTN', 'MTN Money'),
         ('ORANGE', 'Orange Money'),
+        ('DEPOSIT', 'Deposit'),  # Add FreemoPay operator type
     ]
     
     CURRENCIES = [
@@ -147,8 +151,9 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     app_amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3, choices=CURRENCIES, default='XAF')
-    operator = models.CharField(max_length=10, choices=OPERATORS)
-    endpoint = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    operator = models.CharField(max_length=20, choices=OPERATORS)  # Increased max_length from 10 to 20
+    endpoint = models.CharField(max_length=20, choices=TRANSACTION_TYPES)  # Increased max_length from 10 to 20
+    provider = models.CharField(max_length=50, default='campay')  # Add provider field
     
     # Reference numbers
     code = models.CharField(max_length=50)  # Transaction code (e.g., D250214D0016GM)
@@ -164,6 +169,7 @@ class Transaction(models.Model):
     
     # Security and verification
     signature = models.TextField()  # JWT signature for verification
+    message = models.TextField(blank=True, null=True)  # Message from provider
     
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
@@ -210,6 +216,7 @@ class PaymentReference(models.Model):
     plan = models.ForeignKey('SubscriptionPlan', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     phone_number = models.CharField(max_length=20)
+    provider = models.CharField(max_length=50, default='campay')  # Default to 'campay' for backward compatibility
     
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
