@@ -419,3 +419,8 @@ WSGI_REQUEST_TIMEOUT = 1800  # 30 minutes
 # --timeout 1800
 
 JITSI_SERVER=env('JITSI_SERVER',default='meet.classconnect.cm')
+
+# FreemoPay API Configuration
+FREEMOPAY_APP_KEY = os.environ.get('FREEMOPAY_APP_KEY', 'your_freemopay_app_key')
+FREEMOPAY_SECRET_KEY = os.environ.get('FREEMOPAY_SECRET_KEY', 'your_freemopay_secret_key')
+FREEMOPAY_BASE_URL = os.environ.get('FREEMOPAY_BASE_URL', 'https://api-v2.freemopay.com')
