@@ -28,7 +28,8 @@ import { useI18n } from "@/locales/client";
 
 function SubscribePlanPage() {
   const t = useI18n();
-  const { plan } = useParams<{ plan: string }>();
+  const params = useParams<{ plan: string }>();
+  const plan = params?.plan || '';
   const router = useRouter();
   const { data: session } = useSession();
   const { openLogin } = useAuthDialog();
