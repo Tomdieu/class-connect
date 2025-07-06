@@ -77,6 +77,79 @@ export const subscribeToPlan = async ({
   }
 };
 
+// freemopay subscribe to plan
+export type FreeMoPayResponse = {
+  "reference": string,
+  "status": string,
+  "message": string,
+  "internal_reference": string
+}
+export const subscribeToPlanFreeMopay = async ({
+  plan,
+  callback,
+  phone_number,
+}: {
+  plan: "basic" | "standard" | "premium";
+  callback: string;
+  phone_number: string;
+}) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorized user!");
+
+    const response = await api.post(
+      `/api/freemo/plans/${plan}/payment-link/`,
+      {
+        callback,
+        phone_number: `237${phone_number}`,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${session.user.accessToken}`,
+        },
+      }
+    );
+
+    return response.data as FreeMoPayResponse;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+};
+
+
+export type FreeMoPaymentStatus = {
+  reference:string;
+  merchandRef:string;
+  amount:number,
+  status:"FAILED"|"SUCCESS"|"PENDING";
+  reason:string;
+}
+
+export const checkFreeMoReferencePaymentStatus = async (referenceNumber: string) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorized user!");
+    const response = await api.get(`/api/freemo/payment-status/${referenceNumber}/`, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+
+      }
+    })
+
+    return response.data as FreeMoPaymentStatus;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}
+
 // region subscription plan
 
 type SubscriptionPlanParams = {
@@ -86,7 +159,7 @@ type SubscriptionPlanParams = {
   created_at: string;
 }
 
-export const getSubscriptionPlan = async (params?:Partial<SubscriptionPlanParams>) => {
+export const getSubscriptionPlan = async (params?: Partial<SubscriptionPlanParams>) => {
   try {
     const response = await api.get("/api/plans/", {
       params
@@ -102,7 +175,7 @@ export const getSubscriptionPlan = async (params?:Partial<SubscriptionPlanParams
 };
 
 
-export const getSubscriptionPlanByIdorSlug = async (id:number|string)=>{
+export const getSubscriptionPlanByIdorSlug = async (id: number | string) => {
   try {
     const response = await api.get(`/api/plans/${id}/`);
     return response.data as SubscriptionPlan;
@@ -218,7 +291,7 @@ export const getSubscription = async (id: number) => {
   }
 };
 
-export const getMySubscriptions = async ({params}:{params?:Partial<{page:number,page_size:number}>}={}) => {
+export const getMySubscriptions = async ({ params }: { params?: Partial<{ page: number, page_size: number }> } = {}) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
@@ -311,7 +384,7 @@ export const listTransactions = async ({
     if (!session?.user) throw Error("Unauthorize user!");
     const response = await api.get("/api/transactions/", {
       headers: {
-        Authorization: `Bearer ${session.user.accessToken}`,  
+        Authorization: `Bearer ${session.user.accessToken}`,
       },
       params,
     });
@@ -324,3 +397,4 @@ export const listTransactions = async ({
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
+
