@@ -27,7 +27,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Progress } from "@/components/ui/progress";
 
 // MTN prefixes: 650, 651, 652, 653, 654, 67x, 680, 681, 682, 683
@@ -114,11 +114,15 @@ export default function PaymentForm({ plan }: { plan: SubscriptionPlan }) {
 
   const [freemoPayResponse,setFreemoPayResponse] = useState<FreeMoPayResponse|null>(null)
   const [lastProcessedPhoneNumber, setLastProcessedPhoneNumber] = useState<string>("");
+  const isUpdatingRef = useRef(false);
 
   // Watch phone number to auto-select carrier
   const phoneNumber = form.watch("phone_number");
 
   useEffect(() => {
+    // Prevent re-entry if already updating
+    if (isUpdatingRef.current) return;
+    
     // Only process if phone number has actually changed and has enough digits
     if (phoneNumber.length >= 3 && phoneNumber !== lastProcessedPhoneNumber) {
       const carrier = getCarrierFromNumber(phoneNumber);
@@ -126,17 +130,19 @@ export default function PaymentForm({ plan }: { plan: SubscriptionPlan }) {
       
       // Only update if carrier is valid and different from current method
       if (carrier && carrier !== currentMethod) {
+        isUpdatingRef.current = true;
         form.setValue("method", carrier, {
           shouldDirty: false,
           shouldTouch: false,
           shouldValidate: false
         });
+        isUpdatingRef.current = false;
       }
       
       // Update the last processed phone number to prevent re-processing
       setLastProcessedPhoneNumber(phoneNumber);
     }
-  }, [phoneNumber, form, lastProcessedPhoneNumber]);
+  }, [phoneNumber]);
 
   const freemoPaySubscribeMutation = useMutation({
     mutationFn:(phoneNumber:string)=>subscribeToPlanFreeMopay({
