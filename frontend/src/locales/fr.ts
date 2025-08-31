@@ -1902,5 +1902,36 @@ export default {
       currencyRequired: "La devise est requise.",
       taxRateRange: "Le taux de TVA doit être entre 0 et 100."
     }
+  },
+  notifications:{
+    // Header and general
+    title: "Notifications",
+    noNew:"Aucune nouvelle notification",
+    viewAll:"Voir toutes les notifications",
+
+    // Empty state
+    empty: "Aucune notification",
+    emptyDescription: "Vous n'avez aucune notification pour le moment.",
+    
+    // Detail modal
+    detailTitle: "Détails de la notification",
+    detailDescription: "Voir tous les détails de cette notification",
+    type: "Type",
+    status: "Statut",
+    read: "Lu",
+    unread: "Non lu",
+    
+    // Actions
+    delete: "Supprimer",
+    deleteTitle: "Supprimer la notification",
+    deleteDescription: "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action ne peut pas être annulée.",
+    
+    // Toast messages
+    markReadError: "Erreur lors du marquage comme lu",
+    deleteSuccess: "Notification supprimée avec succès",
+    deleteError: "Erreur lors de la suppression de la notification"
+  },
+  common: {
+    close: "Fermer"
   }
 } as const;

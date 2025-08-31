@@ -1936,6 +1936,37 @@ export default {
       currencyRequired: "Currency is required.",
       taxRateRange: "Tax rate must be between 0 and 100."
     }
+  },
+  notifications:{
+    // Header and general
+    title: "Notifications",
+    noNew: "No new notifications",
+    viewAll: "View all notifications",
+    
+    // Empty state
+    empty: "No notifications",
+    emptyDescription: "You don't have any notifications at the moment.",
+    
+    // Detail modal
+    detailTitle: "Notification Details",
+    detailDescription: "View the full details of this notification",
+    type: "Type",
+    status: "Status",
+    read: "Read",
+    unread: "Unread",
+    
+    // Actions
+    delete: "Delete",
+    deleteTitle: "Delete notification",
+    deleteDescription: "Are you sure you want to delete this notification? This action cannot be undone.",
+    
+    // Toast messages
+    markReadError: "Error marking notification as read",
+    deleteSuccess: "Notification deleted successfully",
+    deleteError: "Error deleting notification"
+  },
+  common: {
+    close: "Close"
   }
 
 } as const;
