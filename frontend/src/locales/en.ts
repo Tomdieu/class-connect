@@ -210,7 +210,6 @@ export default {
   "registerDialog.errors.classRequired": "Class selection is required",
   "common.error": "Error",
   "common.errorOccurred": "An error occurred",
-  "register.backToLogin": "Back to login",
   "registerDialog.educationLevels": {
     college: "Middle School",
     lycee: "High School",
@@ -267,8 +266,6 @@ export default {
     "Last name must be at least 2 characters",
   "registerDialog.errors.phoneRequired": "Phone number is required",
   "registerDialog.errors.phoneInvalid": "Invalid phone number format",
-  "registerDialog.errors.dateRequired": "Date of birth is required",
-  "registerDialog.errors.dateMinAge": "You must be at least 13 years old",
   "registerDialog.errors.educationLevelRequired": "Education level is required",
   "registerDialog.errors.emailRequired": "Email is required",
   "registerDialog.errors.emailInvalid": "Invalid email address",
@@ -529,7 +526,6 @@ export default {
   "common.cancel": "Cancel",
   "common.delete": "Delete",
   "common.back": "Back",
-  "common.error": "Error",
   "common.remove": "Remove",
   "resources.title": "Learning Resources",
   "resources.empty": "No resources available",
@@ -1781,7 +1777,6 @@ export default {
   "common.reload": "Reload",
   "registerDialog.noClassesAvailable": "No classes available for this level",
   "common.retry": "Retry",
-  "common.errorOccurred": "An error occurred",
   "altText.enFlag": "EN Flag",
   "altText.frFlag": "FR Flag",
   courseOfferings: {
@@ -1919,6 +1914,28 @@ export default {
     statusUnavailable: "Student is not available",
     lastUpdated: "Last updated: {date}",
     noDataAvailable: "No availability data available"
+  },
+  settings: {
+    title: "Settings",
+    generalSettings: "General Settings",
+    paymentSettings: "Payment Settings",
+    siteName: "Site Name",
+    contactEmail: "Contact Email",
+    currency: "Currency",
+    taxRate: "Tax Rate (%)",
+    save: "Save",
+    saving: "Saving...",
+    loadingError: "Error loading settings.",
+    saveSuccess: "Settings saved",
+    saveSuccessDesc: "Settings have been updated successfully.",
+    saveError: "Error",
+    saveErrorDesc: "Unable to save settings.",
+    validation: {
+      siteNameRequired: "Site name is required.",
+      emailInvalid: "Invalid email.",
+      currencyRequired: "Currency is required.",
+      taxRateRange: "Tax rate must be between 0 and 100."
+    }
   }
 
 } as const;
