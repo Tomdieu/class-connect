@@ -13,7 +13,7 @@ services:
       - .:/app
       - monolythic_static_volume:/app/staticfiles # For static files
     ports:
-      - "8001:8001"
+      - "8000:8000"
     env_file:
       - .envs/.prod/django
       - .envs/.prod/backblaze
