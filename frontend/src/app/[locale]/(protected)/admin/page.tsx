@@ -145,15 +145,11 @@ const StatisticsPage = () => {
       const date = user.date_joined.split("T")[0];
       const dateKey = format(parseISO(date), "yyyy-MM-dd");
 
-      if (
-        user.education_level?.code === "COLLEGE" ||
-        user.education_level?.code === "LYCEE" ||
-        user.education_level?.code === "UNIVERSITY"
-      ) {
+      if (user.user_type === "STUDENT") {
         studentsByDate.set(dateKey, (studentsByDate.get(dateKey) || 0) + 1);
       }
 
-      if (user.education_level?.code === "PROFESSIONAL") {
+      if (user.user_type === "PROFESSIONAL") {
         professionalsByDate.set(dateKey, (professionalsByDate.get(dateKey) || 0) + 1);
       }
     });
