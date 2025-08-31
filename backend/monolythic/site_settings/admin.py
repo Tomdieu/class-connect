@@ -4,6 +4,5 @@ from .models import SiteConfiguration
 
 @admin.register(SiteConfiguration)
 class SiteConfigurationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'site_name', 'site_url', 'created_at', 'updated_at')
-    search_fields = ('site_name', 'site_url')
-    ordering = ('-created_at',)
+    list_display = ('id', 'site_name','email','currency','tax_rate')
+    search_fields = ('site_name',)
