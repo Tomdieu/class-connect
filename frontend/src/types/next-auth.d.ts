@@ -10,13 +10,26 @@ declare module 'next-auth' {
       role: "admin" | "teacher" | "student";
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface AdapterUser extends User {}
+    interface AdapterUser extends User {
+      emailVerified: Date | null;
+    }
   
     interface Session {
-      user: JWT;
+      user: User & {
+        id: string;
+      };
     }
 
-    type JWT = User
+    interface JWT extends Record<string, unknown> {
+      // All User properties
+      [key: string]: any;
+      
+      // JWT specific properties that we want to exclude
+      exp?: number;
+      iat?: number;
+      sub?: string;
+      jti?: string;
+      picture?: string;
+    }
   
   }
