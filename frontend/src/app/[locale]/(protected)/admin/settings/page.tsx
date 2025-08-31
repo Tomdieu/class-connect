@@ -19,24 +19,27 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SiteSettings } from "@/types";
 import { Loader2 } from "lucide-react";
-
-// Define the form schema based on SiteSettings interface
-const formSchema = z.object({
-  site_name: z.string().min(1, {
-    message: "Le nom du site est requis.",
-  }),
-  email: z.string().email({
-    message: "Email invalide.",
-  }),
-  currency: z.string().min(1, {
-    message: "La devise est requise.",
-  }),
-  tax_rate: z.number().min(0).max(100, {
-    message: "Le taux de TVA doit être entre 0 et 100.",
-  }),
-});
+import { useCurrentLocale, useI18n } from "@/locales/client";
 
 const SettingsPage = () => {
+  const t = useI18n();
+
+  // Define the form schema with translated validation messages
+  const formSchema = z.object({
+    site_name: z.string().min(1, {
+      message: t('settings.validation.siteNameRequired'),
+    }),
+    email: z.string().email({
+      message: t('settings.validation.emailInvalid'),
+    }),
+    currency: z.string().min(1, {
+      message: t('settings.validation.currencyRequired'),
+    }),
+    tax_rate: z.number().min(0).max(100, {
+      message: t('settings.validation.taxRateRange'),
+    }).optional(),
+  });
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ['settings'],
     queryFn: () => getSiteSettings()
@@ -45,13 +48,13 @@ const SettingsPage = () => {
   const settingsMutation = useMutation({
     mutationFn: updateSiteSettings,
     onSuccess: () => {
-      toast("Paramètres sauvegardés", {
-        description: "Les paramètres ont été mis à jour avec succès.",
+      toast(t('settings.saveSuccess'), {
+        description: t('settings.saveSuccessDesc'),
       });
     },
     onError: () => {
-      toast("Erreur", {
-        description: "Impossible de sauvegarder les paramètres.",
+      toast(t('settings.saveError'), {
+        description: t('settings.saveErrorDesc'),
       });
     }
   });
@@ -94,9 +97,9 @@ const SettingsPage = () => {
   if (isError) {
     return (
       <div className="space-y-6 container mx-auto">
-        <h2 className="text-2xl font-bold">Paramètres</h2>
+        <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
         <Card className="p-6">
-          <p className="text-red-500">Erreur lors du chargement des paramètres.</p>
+          <p className="text-red-500">{t('settings.loadingError')}</p>
         </Card>
       </div>
     );
@@ -104,19 +107,19 @@ const SettingsPage = () => {
 
   return (
     <div className="space-y-6 container mx-auto flex flex-col gap-5">
-      <h2 className="text-2xl font-bold">Paramètres</h2>
+      <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Paramètres Généraux</h3>
+            <h3 className="text-lg font-medium mb-4">{t('settings.generalSettings')}</h3>
             <div className="space-y-4">
               <FormField
                 control={form.control}
                 name="site_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nom du Site</FormLabel>
+                    <FormLabel>{t('settings.siteName')}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -130,7 +133,7 @@ const SettingsPage = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email de Contact</FormLabel>
+                    <FormLabel>{t('settings.contactEmail')}</FormLabel>
                     <FormControl>
                       <Input type="email" {...field} />
                     </FormControl>
@@ -142,14 +145,14 @@ const SettingsPage = () => {
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Paramètres de Paiement</h3>
+            <h3 className="text-lg font-medium mb-4">{t('settings.paymentSettings')}</h3>
             <div className="space-y-4">
               <FormField
                 control={form.control}
                 name="currency"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Devise</FormLabel>
+                    <FormLabel>{t('settings.currency')}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -163,7 +166,7 @@ const SettingsPage = () => {
                 name="tax_rate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Taux de TVA (%)</FormLabel>
+                    <FormLabel>{t('settings.taxRate')}</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -187,9 +190,9 @@ const SettingsPage = () => {
               {settingsMutation.isPending ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Sauvegarde...</span>
+                  <span>{t('settings.saving')}</span>
                 </div>
-              ) : "Sauvegarder"}
+              ) : t('settings.save')}
             </Button>
           </div>
         </form>
