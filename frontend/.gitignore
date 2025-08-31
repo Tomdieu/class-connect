@@ -44,3 +44,5 @@ certificates
 pspdfkit-lib/
 pdf.worker.min.mjs
 pdf.worker.min.js
+# Sentry Config File
+.env.sentry-build-plugin
