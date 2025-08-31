@@ -39,6 +39,8 @@ urlpatterns = [
                 path("", include("notifications.urls")),
                 path("", include("streamings.urls")),
                 path("", include("forum.urls")),
+                path("", include("site_settings.urls")),
+                
                 # Updated OAuth2 configuration with explicit namespace and application name
                 re_path(
                     r"^auth/",
