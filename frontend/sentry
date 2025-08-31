@@ -1,0 +1,1 @@
+npx @sentry/wizard@latest -i nextjs --saas --org trix-qx --project debug-classconnect-frontend
