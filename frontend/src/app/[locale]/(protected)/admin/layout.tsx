@@ -7,9 +7,11 @@ import { useSession, signOut } from "next-auth/react";
 import { getUserRole } from "@/lib/utils";
 import { UserType } from "@/types";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function AdminLayout({ children }: React.PropsWithChildren) {
   const { data: session, status } = useSession();
+  const router = useRouter()
 
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
@@ -62,7 +64,7 @@ export default function AdminLayout({ children }: React.PropsWithChildren) {
     };
 
     checkAuthorization();
-  }, [session, status]);
+  }, [session, status,router]);
 
   // Show loading state while checking authorization
   if (isAuthorized === null) {
