@@ -24,6 +24,7 @@ import {
   UserRoundCog,
   BookOpen,
   ChevronDown,
+  ChartColumn,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -45,11 +46,11 @@ import {
 } from "recharts";
 import { useState, useMemo } from "react";
 import { format, parseISO, subMonths, startOfMonth, addMonths, subDays, subYears, endOfDay } from "date-fns";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
   SelectValue,
   SelectGroup,
   SelectLabel
@@ -107,7 +108,7 @@ const StatisticsPage = () => {
   const [userFilter, setUserFilter] = useState<string>("all");
   const [selectedSchoolYear, setSelectedSchoolYear] = useState<string | undefined>(undefined);
   const [showActiveOnly, setShowActiveOnly] = useState<boolean>(true);
-  
+
   // Date range filters
   const [dateRange, setDateRange] = useState<DateRange>({
     from: subMonths(new Date(), 3),
@@ -121,9 +122,7 @@ const StatisticsPage = () => {
 
   const { data: users, isLoading: usersLoading } = useQuery({
     queryKey: ["users", userFilter],
-    queryFn: () => getUsers({
-      education_level: userFilter !== "all" ? userFilter : undefined
-    }),
+    queryFn: () => getUsers({}),
   });
 
   const { data: transactions, isLoading: transactionsLoading } = useQuery({
@@ -169,7 +168,7 @@ const StatisticsPage = () => {
   const generateLast30Days = () => {
     const days = [];
     const today = new Date();
-    
+
     for (let i = 30; i >= 0; i--) {
       const date = new Date();
       date.setDate(today.getDate() - i);
@@ -205,62 +204,62 @@ const StatisticsPage = () => {
 
   // Modified to better extract date_joined data from users
   const chartData = useMemo(() => {
-    if (!users) return { 
-      daily: generateLast30Days(), 
-      monthly: generateLast12Months(), 
-      yearly: [] 
+    if (!users) return {
+      daily: generateLast30Days(),
+      monthly: generateLast12Months(),
+      yearly: []
     };
+
+    // Filter users based on userFilter
+    const filteredUsers = userFilter === "all" 
+      ? users 
+      : users.filter(user => user.user_type === userFilter);
 
     // Create a map to count users by join date
     const userJoinDates = new Map();
-    
-    users.forEach(user => {
+
+    filteredUsers.forEach(user => {
       // Extract only the date part from date_joined (YYYY-MM-DD)
       const joinDate = user.date_joined.split("T")[0];
-      
+
       // Increment the count for this date
       userJoinDates.set(joinDate, (userJoinDates.get(joinDate) || 0) + 1);
     });
 
     // Generate last 7 days data structure
     const last7Days = generateLast30Days();
-    
+
     // Populate with actual user join counts
     last7Days.forEach(day => {
       const count = userJoinDates.get(day.date) || 0;
       day.total = count;
-      
+
       // Try to categorize users (this part depends on your data structure)
-      const dateUsers = users.filter(user => user.date_joined.startsWith(day.date));
-      day.students = dateUsers.filter(user => 
-        user.education_level === "COLLEGE" ||
-        user.education_level === "LYCEE" ||
-        user.education_level === "UNIVERSITY"
-      ).length;
-      day.professionals = dateUsers.filter(user => 
-        user.education_level === "PROFESSIONAL"
-      ).length;
+      const dateUsers = filteredUsers.filter(user => user.date_joined.startsWith(day.date));
+      day.students = dateUsers.filter(user => user.user_type === "STUDENT").length;
+      day.professionals = dateUsers.filter(user => user.user_type === "PROFESSIONAL").length;
     });
 
     // Handle monthly data
     const monthlyData = generateLast12Months();
-    const monthMap = new Map(monthlyData.map((item) => [item.monthKey, {...item}]));
+    const monthMap = new Map(monthlyData.map((item) => [item.monthKey, { ...item }]));
 
-    users.forEach(user => {
+    filteredUsers.forEach(user => {
       const joinDate = user.date_joined.split("T")[0];
       const month = joinDate.substring(0, 7); // YYYY-MM format
-      
+
       if (monthMap.has(month)) {
         const monthData = monthMap.get(month);
-        monthData.total += 1;
-        
-        if (user.education_level === "COLLEGE" || 
-            user.education_level === "LYCEE" || 
-            user.education_level === "UNIVERSITY") {
-          monthData.students += 1;
-        } 
-        else if (user.education_level === "PROFESSIONAL") {
-          monthData.professionals += 1;
+        if (monthData) {
+
+          monthData.total += 1;
+
+          if (user.user_type === "STUDENT") {
+            monthData.students += 1;
+          }
+          else if (user.user_type === "PROFESSIONAL") {
+            monthData.professionals += 1;
+          }
         }
       }
     });
@@ -272,8 +271,8 @@ const StatisticsPage = () => {
 
     // Handle yearly data
     const yearlyMap = new Map();
-    
-    users.forEach(user => {
+
+    filteredUsers.forEach(user => {
       const year = user.date_joined.split("-")[0]; // Extract YYYY part
       if (!yearlyMap.has(year)) {
         yearlyMap.set(year, {
@@ -283,16 +282,14 @@ const StatisticsPage = () => {
           total: 0,
         });
       }
-      
+
       const yearData = yearlyMap.get(year);
       yearData.total += 1;
-      
-      if (user.education_level === "COLLEGE" || 
-          user.education_level === "LYCEE" || 
-          user.education_level === "UNIVERSITY") {
+
+      if (user.user_type === "STUDENT") {
         yearData.students += 1;
-      } 
-      else if (user.education_level === "PROFESSIONAL") {
+      }
+      else if (user.user_type === "PROFESSIONAL") {
         yearData.professionals += 1;
       }
     });
@@ -319,7 +316,7 @@ const StatisticsPage = () => {
       monthly: formattedMonthlyData,
       yearly: yearlyData,
     };
-  }, [users]);
+  }, [users, userFilter]);
 
   // New function to get daily signup count data for Admin Dashboard
   const userDailySignupData = useMemo(() => {
@@ -327,7 +324,7 @@ const StatisticsPage = () => {
 
     // Group users by date joined
     const usersByDate = new Map();
-    
+
     users.forEach(user => {
       const date = user.date_joined.split('T')[0];
       if (!usersByDate.has(date)) {
@@ -351,8 +348,8 @@ const StatisticsPage = () => {
     if (!users) return [];
 
     const planCounts = users.reduce((acc, user) => {
-      if (user.subscription_status && user.subscription_status.active === true) {
-        const plan = user.subscription_status.plan || "Unknown";
+      if (user.subscription_status && user.subscription_status.active === true && "plan" in user.subscription_status) {
+        const plan = (user.subscription_status as HasSub).plan || "Unknown";
         acc[plan] = (acc[plan] || 0) + 1;
       } else {
         acc["No Plan"] = (acc["No Plan"] || 0) + 1;
@@ -365,22 +362,43 @@ const StatisticsPage = () => {
       .sort((a, b) => b.value - a.value);
   }, [users]);
 
-  // Modified to change 'admins' to users without education level
+  // Modified to change 'admins' to users without user_type
   const userEducationLevelData = useMemo(() => {
     if (!users) return [];
 
-    const educationCounts = users.reduce((acc, user) => {
-      // For users without education level, show as "Other" instead of "admins"
-      const level = user.education_level || "OTHER";
-      acc[level] = (acc[level] || 0) + 1;
+    const userTypeCounts = users.reduce((acc, user) => {
+      // For users without user_type, show as "OTHER" instead of "admins"
+      const type = user.user_type || "OTHER";
+      acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
-    return Object.entries(educationCounts)
-      .map(([name, value]) => ({ 
-        name: t(`educationLevels.${name.toLowerCase()}`) || name, 
-        value 
-      }))
+    return Object.entries(userTypeCounts)
+      .map(([name, value]) => {
+        // Map user types to display names
+        let displayName: string;
+        switch (name) {
+          case "STUDENT":
+            displayName = "Students";
+            break;
+          case "PROFESSIONAL":
+            displayName = "Professionals";
+            break;
+          case "ADMIN":
+            displayName = "Administrators";
+            break;
+          case "OTHER":
+            displayName = "Other";
+            break;
+          default:
+            displayName = name;
+        }
+        
+        return {
+          name: displayName,
+          value
+        };
+      })
       .sort((a, b) => b.value - a.value);
   }, [users, t]);
 
@@ -395,7 +413,10 @@ const StatisticsPage = () => {
         const month = format(new Date(transaction.created_at), "yyyy-MM");
         if (monthMap.has(month)) {
           const monthData = monthMap.get(month);
-          monthData.amount += transaction.amount;
+          if(monthData){
+
+            monthData.amount += transaction.amount;
+          }
         }
       }
     });
@@ -409,12 +430,12 @@ const StatisticsPage = () => {
   // Calculate revenue trend
   const revenueTrend = useMemo(() => {
     if (!monthlyRevenueData || monthlyRevenueData.length < 2) return 0;
-    
+
     const lastMonth = monthlyRevenueData[monthlyRevenueData.length - 1].amount;
     const previousMonth = monthlyRevenueData[monthlyRevenueData.length - 2].amount;
-    
+
     if (previousMonth === 0) return lastMonth > 0 ? 100 : 0;
-    
+
     return ((lastMonth - previousMonth) / previousMonth) * 100;
   }, [monthlyRevenueData]);
 
@@ -483,7 +504,7 @@ const StatisticsPage = () => {
   // Calculate total revenue from transactions
   const totalRevenue = useMemo(() => {
     if (!transactions?.results) return 0;
-    
+
     return transactions.results.reduce((sum, transaction) => {
       if (transaction.status === "SUCCESSFUL" && transaction.endpoint === "collect") {
         return sum + transaction.amount;
@@ -495,10 +516,10 @@ const StatisticsPage = () => {
   // Calculate total active subscriptions
   const activeSubscriptions = useMemo(() => {
     if (!users) return 0;
-    
-    return users.filter(user => 
-      user.subscription_status && 
-      "active" in user.subscription_status && 
+
+    return users.filter(user =>
+      user.subscription_status &&
+      "active" in user.subscription_status &&
       user.subscription_status.active === true
     ).length;
   }, [users]);
@@ -550,7 +571,7 @@ const StatisticsPage = () => {
 
   if (isLoading) {
     return (
-      <motion.div 
+      <motion.div
         className="w-full flex justify-center items-center h-screen"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -590,7 +611,7 @@ const StatisticsPage = () => {
       transition={{ duration: 0.6 }}
       className="w-full px-4 sm:px-8 py-10 bg-gradient-to-b from-primary/5 via-background to-background min-h-screen"
     >
-      <motion.div 
+      <motion.div
         className="relative flex flex-col sm:flex-row items-center justify-between mb-10 pb-4 border-b border-primary/10 max-w-[2400px] mx-auto"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -598,10 +619,10 @@ const StatisticsPage = () => {
       >
         <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
         <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/10 rounded-tr-full z-0 opacity-10"></div>
-        
+
         <div className="flex items-center mb-4 sm:mb-0 relative z-10">
           <div className="bg-primary/10 p-3 rounded-full mr-4">
-            <BarChartIcon className="h-7 w-7 text-primary" />
+            <ChartColumn className="h-7 w-7 text-primary" />
           </div>
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
@@ -610,20 +631,20 @@ const StatisticsPage = () => {
             <p className="text-sm text-gray-600">{t("common.dashboard")}</p>
           </div>
         </div>
-        
+
         <div className="flex space-x-3 relative z-10">
-          <DatePickerWithRange 
-            date={dateRange} 
+          <DatePickerWithRange
+            date={dateRange}
             onDateChange={(range) => {
               if (range?.from && range?.to) {
                 setDateRange(range);
               }
-            }} 
+            }}
             className="w-full sm:w-auto"
           />
         </div>
       </motion.div>
-      
+
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -644,11 +665,10 @@ const StatisticsPage = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">{stat.value}</h3>
                 <div className="flex items-center">
-                  <div className={`flex items-center ${
-                    stat.changeType === 'increase' ? 'text-green-600' :
-                    stat.changeType === 'decrease' ? 'text-red-600' : 
-                    'text-gray-500'
-                  }`}>
+                  <div className={`flex items-center ${stat.changeType === 'increase' ? 'text-green-600' :
+                      stat.changeType === 'decrease' ? 'text-red-600' :
+                        'text-gray-500'
+                    }`}>
                     {stat.changeType === 'increase' ? (
                       <ArrowUpRight className="h-4 w-4 mr-1" />
                     ) : stat.changeType === 'decrease' ? (
@@ -681,9 +701,12 @@ const StatisticsPage = () => {
                     <PopoverTrigger asChild>
                       <Button variant="outline" size="sm" className="hover:bg-primary/5">
                         <Filter className="h-4 w-4 mr-2" />
-                        {userFilter === "all" 
+                        {userFilter === "all"
                           ? t("users.all")
-                          : t(`educationLevels.${userFilter.toLowerCase()}`)}
+                          : userFilter === "STUDENT" ? "Students" 
+                          : userFilter === "PROFESSIONAL" ? "Professionals"
+                          : userFilter === "ADMIN" ? "Administrators"
+                          : userFilter}
                         <ChevronDown className="h-4 w-4 ml-2" />
                       </Button>
                     </PopoverTrigger>
@@ -699,10 +722,9 @@ const StatisticsPage = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">{t("users.all")}</SelectItem>
-                            <SelectItem value="COLLEGE">{t("educationLevels.college")}</SelectItem>
-                            <SelectItem value="LYCEE">{t("educationLevels.lycee")}</SelectItem>
-                            <SelectItem value="UNIVERSITY">{t("educationLevels.university")}</SelectItem>
-                            <SelectItem value="PROFESSIONAL">{t("users.professionals")}</SelectItem>
+                            <SelectItem value="STUDENT">Students</SelectItem>
+                            <SelectItem value="PROFESSIONAL">Professionals</SelectItem>
+                            <SelectItem value="ADMIN">Administrators</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -718,7 +740,7 @@ const StatisticsPage = () => {
                   </Tabs>
                 </div>
               </div>
-              
+
               <div className="h-[400px] mt-6">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={currentChartData} margin={{ top: 10, right: 10, left: 10, bottom: 30 }}>
@@ -739,10 +761,10 @@ const StatisticsPage = () => {
                       tickMargin={10}
                       axisLine={{ stroke: '#E5E7EB' }}
                     />
-                    <YAxis 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fontSize: 12 }} 
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12 }}
                       tickMargin={10}
                       tickCount={5}
                     />
@@ -780,7 +802,7 @@ const StatisticsPage = () => {
             <div className="p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-2">{t("stats.subscriptionDistribution")}</h2>
               <p className="text-sm text-gray-500 mb-6">{t("users.distributionDescription")}</p>
-              
+
               {subscriptionPlanData.length === 0 ? (
                 <div className="h-[300px] flex items-center justify-center">
                   <p className="text-gray-500">{t("stats.noPaymentsRecorded")}</p>
@@ -802,10 +824,10 @@ const StatisticsPage = () => {
                         labelLine={{ stroke: "#555", strokeWidth: 1, strokeOpacity: 0.5 }}
                       >
                         {subscriptionPlanData.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={PIE_COLORS[index % PIE_COLORS.length]} 
-                            stroke="none" 
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={PIE_COLORS[index % PIE_COLORS.length]}
+                            stroke="none"
                           />
                         ))}
                       </Pie>
@@ -830,17 +852,17 @@ const StatisticsPage = () => {
               <p className="text-sm text-gray-500 mb-6">
                 {t("stats.monthlyRevenue")}
               </p>
-              
+
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart 
-                    data={monthlyRevenueData} 
+                  <BarChart
+                    data={monthlyRevenueData}
                     margin={{ top: 5, right: 20, left: 20, bottom: 30 }}
                     barSize={timeFrame === "monthly" ? 24 : timeFrame === "daily" ? 10 : 40}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                    <XAxis 
-                      dataKey="month" 
+                    <XAxis
+                      dataKey="month"
                       tick={{ fontSize: 12 }}
                       tickMargin={10}
                       axisLine={{ stroke: '#E5E7EB' }}
@@ -848,21 +870,21 @@ const StatisticsPage = () => {
                       angle={-45}
                       textAnchor="end"
                     />
-                    <YAxis 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fontSize: 12 }} 
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12 }}
                       tickMargin={10}
                       tickFormatter={(value) => `${value.toLocaleString()} XAF`}
                     />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value) => [`${Number(value).toLocaleString()} XAF`, t("stats.revenue")]}
                       labelFormatter={(label) => `${label}`}
                     />
-                    <Bar 
-                      dataKey="amount" 
-                      name={t("stats.revenue")} 
-                      fill={COLORS.green} 
+                    <Bar
+                      dataKey="amount"
+                      name={t("stats.revenue")}
+                      fill={COLORS.green}
                       radius={[4, 4, 0, 0]}
                     />
                   </BarChart>
@@ -872,16 +894,16 @@ const StatisticsPage = () => {
           </Card>
         </motion.div>
 
-        {/* Education Level Distribution */}
+        {/* User Type Distribution */}
         <motion.div variants={cardVariants}>
           <Card className="shadow-lg border-primary/20 overflow-hidden">
             <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">{t("users.educationLevel")}</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">User Type Distribution</h2>
               <p className="text-sm text-gray-500 mb-6">{t("users.distribution")}</p>
-              
+
               {userEducationLevelData.length === 0 ? (
                 <div className="h-[300px] flex items-center justify-center">
-                  <p className="text-gray-500">No education level data available</p>
+                  <p className="text-gray-500">No user type data available</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -899,9 +921,9 @@ const StatisticsPage = () => {
                           label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                         >
                           {userEducationLevelData.map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={PIE_COLORS[index % PIE_COLORS.length]} 
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={PIE_COLORS[index % PIE_COLORS.length]}
                             />
                           ))}
                         </Pie>
@@ -909,15 +931,15 @@ const StatisticsPage = () => {
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <h3 className="font-semibold text-lg">{t("users.summary")}</h3>
                     <div className="space-y-3">
                       {userEducationLevelData.map((item, index) => (
                         <div key={index} className="flex justify-between items-center">
                           <div className="flex items-center gap-2">
-                            <div 
-                              className="w-3 h-3 rounded-full" 
+                            <div
+                              className="w-3 h-3 rounded-full"
                               style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }}
                             ></div>
                             <span className="text-sm">{item.name}</span>
@@ -930,7 +952,7 @@ const StatisticsPage = () => {
                           </div>
                         </div>
                       ))}
-                      
+
                       <div className="pt-3 mt-3 border-t">
                         <div className="flex justify-between items-center">
                           <span className="font-medium">{t("users.totalUsers")}</span>
@@ -989,11 +1011,10 @@ const StatisticsPage = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <span
-                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                user.subscriptionStatus === t("stats.noPlan")
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.subscriptionStatus === t("stats.noPlan")
                                   ? "bg-red-100 text-red-800"
                                   : "bg-green-100 text-green-800"
-                              }`}
+                                }`}
                             >
                               {user.subscriptionStatus}
                             </span>
@@ -1022,7 +1043,7 @@ const StatisticsPage = () => {
               <p className="text-sm text-gray-500 mb-6">
                 Daily count of new user registrations
               </p>
-              
+
               {userDailySignupData.length === 0 ? (
                 <div className="h-[200px] flex items-center justify-center">
                   <p className="text-gray-500">No user registration data available</p>
@@ -1050,10 +1071,10 @@ const StatisticsPage = () => {
                             <div className="flex items-center">
                               <span className="font-semibold">{day.count}</span>
                               <div className="ml-3 h-2 w-32 bg-gray-100 rounded-full">
-                                <div 
-                                  className="h-2 bg-primary rounded-full" 
-                                  style={{ 
-                                    width: `${Math.min(100, (day.count / Math.max(...userDailySignupData.map(d => d.count))) * 100)}%` 
+                                <div
+                                  className="h-2 bg-primary rounded-full"
+                                  style={{
+                                    width: `${Math.min(100, (day.count / Math.max(...userDailySignupData.map(d => d.count))) * 100)}%`
                                   }}
                                 ></div>
                               </div>
