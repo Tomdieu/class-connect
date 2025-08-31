@@ -130,11 +130,15 @@ function Header({ className }: { className?: string }) {
               <Link href={"/auth/login"}>
                 <Button
                   variant="ghost"
-                  size={isMobile ? "sm" : "default"}
-                  className="text-foreground hover:text-primary hover:bg-primary/10 font-medium"
+                  // size={isMobile ? "sm" : "default"}
+                  size={"default"}
+
+                  className="text-foreground hover:text-primary hover:bg-primary/10 font-medium flex items-center"
                 >
                   <LogIn className="h-4 w-4 sm:mr-2" />
-                  <span className={isMobile ? "sr-only" : "inline-block"}>
+                  <span 
+                  // className={isMobile ? "sr-only" : "inline-block"}
+                  >
                     {t("nav.login")}
                   </span>
                 </Button>
@@ -142,11 +146,16 @@ function Header({ className }: { className?: string }) {
 
               <Link href={"/auth/register"}>
                 <Button
-                  size={isMobile ? "sm" : "default"}
+                  // size={isMobile ? "sm" : "default"}
+                  size={"default"}
+
                   className="bg-primary hover:bg-primary/90 text-white font-medium transition-colors flex items-center gap-2"
                 >
                   <UserPlus className="h-4 w-4 sm:mr-1" />
-                  <span className={isMobile ? "sr-only" : "inline-block"}>
+                  <span 
+                  // className={isMobile ? "sr-only" : "inline-block"}
+                  className={"inline-block"}
+                  >
                     {t("nav.register")}
                   </span>
                 </Button>
