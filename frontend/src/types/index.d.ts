@@ -1055,3 +1055,12 @@ export interface PaginatedResponse<T> {
   next: string | null;
   previous: string | null;
 }
+
+
+export interface SiteSettings {
+  id:number;
+  site_name:string;
+  email:string;
+  currency:string;
+  tax_rate:number;
+}
