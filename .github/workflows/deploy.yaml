@@ -10,39 +10,39 @@ jobs:
       - name: Pull latest changes in frontend directory
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
-            cd /home/ubuntu/class-connect/frontend &&
+            cd /root/apps/classconnect/frontend &&
             git fetch origin && git reset --hard origin/main &&
             git pull origin main || echo "Failed to pull latest changes in frontend"
           '
       - name: Run execute.sh in frontend directory as root
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
-            cd /home/ubuntu/class-connect/frontend &&
+            cd /root/apps/classconnect/frontend &&
             chmod +x ./execute.sh &&
             ./execute.sh || echo "Failed to execute frontend script"
           '
       - name: Pull latest changes in backend directory
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
-            cd /home/ubuntu/class-connect/backend/monolythic &&
+            cd /root/apps/classconnect/backend/monolythic &&
             git pull origin main || echo "Failed to pull latest changes in backend"
           '
       - name: Run Docker Compose in backend directory as root
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
-            cd /home/ubuntu/class-connect/backend/monolythic &&
+            cd /root/apps/classconnect/backend/monolythic &&
             docker compose -f prod.yml build --no-cache && docker compose -f prod.yml up -d || echo "Failed to start Docker containers"
           '
       - name: Run Docker Logs as root
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
-            cd /home/ubuntu/class-connect/backend/monolythic &&
+            cd /root/apps/classconnect/backend/monolythic &&
             docker compose -f prod.yml logs --tail=500 --no-log-prefix
           '
       - name: Clean up dangling images and volumes
         run: |
           sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
-            cd /home/ubuntu/class-connect/ &&
+            cd /root/apps/classconnect/ &&
             docker image prune -f &&
             docker system prune -a -f &&
             docker volume prune -f --filter "label!=keep" || echo "Cleanup completed with warnings"
