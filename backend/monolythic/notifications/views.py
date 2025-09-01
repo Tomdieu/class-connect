@@ -2,6 +2,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from .models import Notification, EmailNotification
 from .serializers import NotificationSerializer, EmailNotificationSerializer
 from .filters import NotificationFilter, EmailNotificationFilter
@@ -28,6 +30,39 @@ class NotificationViewSet(viewsets.ModelViewSet):
         self.get_queryset().update(read=True)
         return Response({'status': 'all notifications marked as read'})
 
+    @swagger_auto_schema(
+        operation_description="Delete multiple notifications by IDs or delete all notifications for the user",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'notification_ids': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(type=openapi.TYPE_INTEGER),
+                    description='Array of notification IDs to delete. If not provided or empty, all user notifications will be deleted.',
+                    example=[1, 2, 3, 4]
+                )
+            },
+            example={
+                'notification_ids': [1, 2, 3, 4]
+            }
+        ),
+        responses={
+            200: openapi.Response(
+                description="Success response with deletion details",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'status': openapi.Schema(type=openapi.TYPE_STRING, example='success'),
+                        'message': openapi.Schema(type=openapi.TYPE_STRING, example='4 notifications deleted successfully'),
+                        'deleted_count': openapi.Schema(type=openapi.TYPE_INTEGER, example=4)
+                    }
+                )
+            ),
+            400: openapi.Response(description="Bad request"),
+            401: openapi.Response(description="Authentication required")
+        },
+        tags=['notifications']
+    )
     @action(detail=False, methods=['delete'])
     def bulk_delete(self, request):
         """
