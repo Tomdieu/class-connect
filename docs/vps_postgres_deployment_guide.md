@@ -94,7 +94,7 @@ CREATE DATABASE classconnect_db;
 -- Create user with secure password
 CREATE USER classconnect_user WITH ENCRYPTED PASSWORD 'your_secure_app_password';
 
--- Grant privileges
+-- Grant privilegesyour_secure_app_password
 GRANT ALL PRIVILEGES ON DATABASE classconnect_db TO classconnect_user;
 ALTER USER classconnect_user CREATEDB;
 
@@ -109,7 +109,7 @@ GRANT ALL ON SCHEMA public TO classconnect_user;
 ### Configure PostgreSQL for Performance
 ```bash
 # Edit PostgreSQL configuration
-sudo nano /etc/postgresql/14/main/postgresql.conf
+sudo nano /etc/postgresql/16/main/postgresql.conf
 ```
 
 Add/modify these settings based on your VPS specs:
@@ -138,7 +138,7 @@ log_min_duration_statement = 1000  # Log slow queries (>1s)
 ### Configure PostgreSQL Access
 ```bash
 # Edit pg_hba.conf for local connections
-sudo nano /etc/postgresql/14/main/pg_hba.conf
+sudo nano /etc/postgresql/16/main/pg_hba.conf
 ```
 
 Ensure these lines exist:
@@ -478,7 +478,7 @@ sudo ufw status
 ### Secure PostgreSQL
 ```bash
 # Edit postgresql.conf to listen only on localhost
-sudo nano /etc/postgresql/14/main/postgresql.conf
+sudo nano /etc/postgresql/16/main/postgresql.conf
 ```
 
 Ensure:
