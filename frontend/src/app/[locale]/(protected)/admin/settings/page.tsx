@@ -24,17 +24,13 @@ import { useCurrentLocale, useI18n } from "@/locales/client";
 const SettingsPage = () => {
   const t = useI18n();
 
-  // Define the form schema with translated validation messages
+  // Define the form schema with optional fields
   const formSchema = z.object({
-    site_name: z.string().min(1, {
-      message: t('settings.validation.siteNameRequired'),
-    }),
+    site_name: z.string().optional(),
     email: z.string().email({
       message: t('settings.validation.emailInvalid'),
-    }),
-    currency: z.string().min(1, {
-      message: t('settings.validation.currencyRequired'),
-    }),
+    }).optional().or(z.literal("")),
+    currency: z.string().optional(),
     tax_rate: z.number().min(0).max(100, {
       message: t('settings.validation.taxRateRange'),
     }).optional(),
@@ -59,14 +55,14 @@ const SettingsPage = () => {
     }
   });
 
-  // Initialize the form
+  // Initialize the form with empty defaults
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       site_name: "",
       email: "",
       currency: "",
-      tax_rate: 0,
+      tax_rate: undefined,
     },
   });
 
@@ -74,16 +70,21 @@ const SettingsPage = () => {
   useEffect(() => {
     if (data) {
       form.reset({
-        site_name: data.site_name,
-        email: data.email,
-        currency: data.currency,
-        tax_rate: data.tax_rate,
+        site_name: data.site_name || "",
+        email: data.email || "",
+        currency: data.currency || "",
+        tax_rate: data.tax_rate || undefined,
       });
     }
   }, [data, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    settingsMutation.mutate(values as Partial<SiteSettings>);
+    // Filter out empty strings and undefined values for cleaner data
+    const cleanedValues = Object.fromEntries(
+      Object.entries(values).filter(([_, value]) => value !== "" && value !== undefined)
+    );
+    
+    settingsMutation.mutate(cleanedValues as Partial<SiteSettings>);
   };
 
   if (isLoading) {
@@ -119,9 +120,13 @@ const SettingsPage = () => {
                 name="site_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('settings.siteName')}</FormLabel>
+                    <FormLabel>{t('settings.siteName')} <span className="text-gray-500">(Optional)</span></FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input 
+                        {...field} 
+                        placeholder="Enter site name..."
+                        value={field.value || ""} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -133,9 +138,14 @@ const SettingsPage = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('settings.contactEmail')}</FormLabel>
+                    <FormLabel>{t('settings.contactEmail')} <span className="text-gray-500">(Optional)</span></FormLabel>
                     <FormControl>
-                      <Input type="email" {...field} />
+                      <Input 
+                        type="email" 
+                        {...field} 
+                        placeholder="contact@example.com"
+                        value={field.value || ""} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -152,9 +162,13 @@ const SettingsPage = () => {
                 name="currency"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('settings.currency')}</FormLabel>
+                    <FormLabel>{t('settings.currency')} <span className="text-gray-500">(Optional)</span></FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input 
+                        {...field} 
+                        placeholder="USD, EUR, XAF..."
+                        value={field.value || ""} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -166,12 +180,20 @@ const SettingsPage = () => {
                 name="tax_rate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('settings.taxRate')}</FormLabel>
+                    <FormLabel>{t('settings.taxRate')} <span className="text-gray-500">(Optional)</span></FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
+                        step="0.01"
+                        min="0"
+                        max="100"
+                        placeholder="0.00"
                         {...field} 
-                        onChange={e => field.onChange(parseFloat(e.target.value))}
+                        value={field.value || ""} 
+                        onChange={e => {
+                          const value = e.target.value;
+                          field.onChange(value === "" ? undefined : parseFloat(value));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
