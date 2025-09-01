@@ -212,7 +212,7 @@ upstream frontend_upstream {
 server {
     listen 80;
     listen 443 ssl http2;
-    server_name www.classconnect.cm;
+    server_name www.classconnect.cm classconnect.cm;
     
     # SSL Configuration
     ssl_certificate /etc/letsencrypt/live/classconnect.cm/fullchain.pem;
