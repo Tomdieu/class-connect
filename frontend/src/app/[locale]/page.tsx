@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import { SubscriptionPlans } from "@/components/SubscriptionPlans";
 import Footer from "@/components/Footer";
-import { LottieWrapper } from "@/components/ui/lottie-wrapper";
+// import { LottieWrapper } from "@/components/ui/lottie-wrapper";
 import { RevealOnScroll } from "@/components/ui/reveal-on-scroll";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import React, { useState, useEffect, Suspense } from "react";
@@ -106,21 +106,21 @@ interface OptimizedLottieProps {
   className?: string;
 }
 
-const OptimizedLottie = ({ loader, className = "" }: OptimizedLottieProps) => {
-  const [ref, animation] = useLazyLottie(loader);
+// const OptimizedLottie = ({ loader, className = "" }: OptimizedLottieProps) => {
+//   const [ref, animation] = useLazyLottie(loader);
   
-  return (
-    <div ref={ref} className={`relative w-72 h-72 mb-6 ${className}`}>
-      {animation ? (
-        <LottieWrapper animation={animation} className="pointer-events-none select-none" />
-      ) : (
-        <div className="w-full h-full rounded-lg flex items-center justify-center">
-          <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-        </div>
-      )}
-    </div>
-  );
-};
+//   return (
+//     <div ref={ref} className={`relative w-72 h-72 mb-6 ${className}`}>
+//       {animation ? (
+//         <LottieWrapper animation={animation} className="pointer-events-none select-none" />
+//       ) : (
+//         <div className="w-full h-full rounded-lg flex items-center justify-center">
+//           <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
 
 // Enhanced floating CTA button with attention-grabbing animation
 const FloatingCTA: React.FC = () => {

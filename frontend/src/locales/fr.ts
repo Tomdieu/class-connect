@@ -185,7 +185,6 @@ export default {
   "registerDialog.errors.pleaseSelectClass": "Veuillez sélectionner une classe parmi les options",
   "registerDialog.errorToast": "Échec de l'inscription",
   "registerDialog.errors.dateRequired": "La date de naissance est requise",
-  "registerDialog.errors.classRequired": "La sélection de classe est requise",
   "common.error": "Erreur",
   "common.errorOccurred": "Une erreur s'est produite",
   "register.backToLogin": "Retour à la connexion",
@@ -1700,12 +1699,8 @@ export default {
   "registerDialog.monthLabel": "Mois",
   "registerDialog.dayLabel": "Jour",
   "registerDialog.errors.classRequired": "La classe est requise",
-  "registerDialog.errors.pleaseSelectClass": "Veuillez sélectionner une classe",
-  "registerDialog.errors.enterpriseRequired": "Le nom de l'entreprise est requis",
-  "registerDialog.errors.reasonRequired": "La raison d'utilisation est requise",
   "registerDialog.successToast": "Inscription réussie",
   "registerDialog.successToastDescription": "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
-  "registerDialog.errorToast": "Erreur d'inscription",
   "registerDialog.selectSection": "Sélectionner une section",
   "registerDialog.selectLevel": "Sélectionner un niveau",
   "registerDialog.selectClassType": "Sélectionner un type de classe",
@@ -1744,11 +1739,9 @@ export default {
   "registerDialog.confirmPassword": "Confirmer le mot de passe",
   "register.alreadyHaveAccount": "Vous avez déjà un compte ?",
   "register.loginInstead": "Se connecter",
-  "register.backToLogin": "Retour à la connexion",
   "common.reload": "Recharger",
   "registerDialog.noClassesAvailable": "Aucune classe disponible pour l'année scolaire sélectionnée",
   "common.retry": "Réessayer",
-  "common.errorOccurred": "Une erreur s'est produite",
   courseOfferings: {
     title: "Offres de Cours",
     description: "Parcourir les offres de cours disponibles",
@@ -1887,5 +1880,58 @@ export default {
   },
   class: {
     noClassesFound: "Aucune classe trouvée"
+  },
+  settings: {
+    title: "Paramètres",
+    generalSettings: "Paramètres Généraux",
+    paymentSettings: "Paramètres de Paiement",
+    siteName: "Nom du Site",
+    contactEmail: "Email de Contact",
+    currency: "Devise",
+    taxRate: "Taux de TVA (%)",
+    save: "Sauvegarder",
+    saving: "Sauvegarde...",
+    loadingError: "Erreur lors du chargement des paramètres.",
+    saveSuccess: "Paramètres sauvegardés",
+    saveSuccessDesc: "Les paramètres ont été mis à jour avec succès.",
+    saveError: "Erreur",
+    saveErrorDesc: "Impossible de sauvegarder les paramètres.",
+    validation: {
+      siteNameRequired: "Le nom du site est requis.",
+      emailInvalid: "Email invalide.",
+      currencyRequired: "La devise est requise.",
+      taxRateRange: "Le taux de TVA doit être entre 0 et 100."
+    }
+  },
+  notifications:{
+    // Header and general
+    title: "Notifications",
+    noNew:"Aucune nouvelle notification",
+    viewAll:"Voir toutes les notifications",
+
+    // Empty state
+    empty: "Aucune notification",
+    emptyDescription: "Vous n'avez aucune notification pour le moment.",
+    
+    // Detail modal
+    detailTitle: "Détails de la notification",
+    detailDescription: "Voir tous les détails de cette notification",
+    type: "Type",
+    status: "Statut",
+    read: "Lu",
+    unread: "Non lu",
+    
+    // Actions
+    delete: "Supprimer",
+    deleteTitle: "Supprimer la notification",
+    deleteDescription: "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action ne peut pas être annulée.",
+    
+    // Toast messages
+    markReadError: "Erreur lors du marquage comme lu",
+    deleteSuccess: "Notification supprimée avec succès",
+    deleteError: "Erreur lors de la suppression de la notification"
+  },
+  common: {
+    close: "Fermer"
   }
 } as const;

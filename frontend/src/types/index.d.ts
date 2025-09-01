@@ -102,9 +102,9 @@ export interface UserCreateType {
   town: string;
   quarter: string;
   password: string;
-  user_type:"STUDENT" | "PROFESSIONAL" | "ADMIN";
+  user_type: "STUDENT" | "PROFESSIONAL" | "ADMIN";
   class_enrolled?: number | null; // Reference to Class model ID
-  // Optional fields based on if user is a professional
+  // Professional-specific fields
   enterprise_name?: string;
   platform_usage_reason?: string;
   
@@ -146,10 +146,8 @@ export interface UserType {
   last_name: string;
   phone_number: string;
   date_of_birth: string | null;
-  education_level: EducationLevel | null;
+  user_type: "ADMIN" | "STUDENT" | "PROFESSIONAL";
   class_enrolled: number | null; // Reference to Class model ID
-  lycee_speciality: LyceeSpeciality | null;
-  university_level: UniversityLevel | null;
   enterprise_name: string | null;
   platform_usage_reason: string | null;
   email_verified: boolean;
@@ -166,8 +164,6 @@ export interface UserType {
   date_joined: string;
   subscription_status: HasSub | NoSub;
   class_display: string;
-  profile_picture: string | null;
-  user_type:"ADMIN"|"STUDENT"|"PROFESSIONAL"
 }
 
 // export declare interface UserType {
@@ -1054,4 +1050,13 @@ export interface PaginatedResponse<T> {
   count: number;
   next: string | null;
   previous: string | null;
+}
+
+
+export interface SiteSettings {
+  id:number;
+  site_name:string;
+  email:string;
+  currency:string;
+  tax_rate:number;
 }

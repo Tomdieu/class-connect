@@ -60,3 +60,25 @@ export const deleteNotification = async (id: number) => {
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
+
+export const deleteBulkNotifications = async (notification_ids: number[]) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.delete<{ status: string, message: string, deleted_count: number }>(`/api/notifications/bulk_delete/`, {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+      data: {
+        notification_ids: notification_ids
+      }
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}

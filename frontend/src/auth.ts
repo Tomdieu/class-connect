@@ -106,13 +106,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
 
       // Normal session creation from token
-      delete token.exp;
-      delete token.iat;
-      delete token.sub;
-      delete token.jti;
-      delete token.picture;
-      delete token.user;
-      session.user = token;
+      // Create a properly typed user object
+      const userFromToken = { ...token } as any;
+      delete userFromToken.exp;
+      delete userFromToken.iat;
+      delete userFromToken.sub;
+      delete userFromToken.jti;
+      delete userFromToken.picture;
+      
+      // Ensure id is always present and is a string
+      if (!userFromToken.id || typeof userFromToken.id !== 'string') {
+        throw new Error('User ID is required and must be a string');
+      }
+      
+      session.user = userFromToken;
 
       return session;
     },

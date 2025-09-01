@@ -16,32 +16,13 @@ import HelmetWrapper from "@/providers/HelmetWrapperProvider";
 const Inter = localFont({
   src: [
     {
-      path: "../../../public/fonts/Inter/static/Inter-Regular.ttf",
-      weight: "400",
-    },
-    {
-      path: "../../../public/fonts/Inter/static/Inter-Medium.ttf",
-      weight: "500",
-    },
-    {
-      path: "../../../public/fonts/Inter/static/Inter-SemiBold.ttf",
-      weight: "600",
-    },
-    {
-      path: "../../../public/fonts/Inter/static/Inter-Bold.ttf",
-      weight: "700",
-    },
-    {
-      path: "../../../public/fonts/Inter/static/Inter-Black.ttf",
-      weight: "800",
-    },
-    {
-      path: "../../../public/fonts/Inter/static/Inter-ExtraBold.ttf",
-      weight: "900",
+      path: "../../../public/fonts/Inter/Inter-VariableFont_slnt_wght.ttf",
+      weight: "100 900",
+      style: "normal",
     },
   ],
   variable: "--font-inter",
-  display: "optional", // Changed from "swap" to "optional"
+  display: "swap", // Changed from "swap" to "optional"
   preload: true,
 });
 
@@ -368,13 +349,13 @@ export default async function RootLayout({
           hrefLang="x-default"
           href="https://www.classconnect.cm"
         />
-        
+
         {/* Enhanced meta tags for developer attribution */}
         <meta name="author" content="Tomdieu Ivan" />
         <meta name="developer" content="Tomdieu Ivan" />
         <meta name="creator" content="Tomdieu Ivan" />
         <meta name="copyright" content="ClassConnect - Developed by Tomdieu Ivan" />
-        
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}

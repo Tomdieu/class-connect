@@ -86,7 +86,8 @@ const StatisticsPage = () => {
     }
   }, [currentSchoolYear, selectedSchoolYear]);
 
-  const isLoading = statsLoading || usersLoading || transactionsLoading || schoolYearsLoading || enrollmentsLoading;
+  // Remove the combined loading state - each component will handle its own loading
+  // const isLoading = statsLoading || usersLoading || transactionsLoading || schoolYearsLoading || enrollmentsLoading;
 
   // New function to generate data for the last 7 days
   const generateLast7Days = () => {
@@ -144,15 +145,11 @@ const StatisticsPage = () => {
       const date = user.date_joined.split("T")[0];
       const dateKey = format(parseISO(date), "yyyy-MM-dd");
 
-      if (
-        user.education_level === "COLLEGE" ||
-        user.education_level === "LYCEE" ||
-        user.education_level === "UNIVERSITY"
-      ) {
+      if (user.user_type === "STUDENT") {
         studentsByDate.set(dateKey, (studentsByDate.get(dateKey) || 0) + 1);
       }
 
-      if (user.education_level === "PROFESSIONAL") {
+      if (user.user_type === "PROFESSIONAL") {
         professionalsByDate.set(dateKey, (professionalsByDate.get(dateKey) || 0) + 1);
       }
     });
@@ -182,9 +179,11 @@ const StatisticsPage = () => {
       const month = format(parseISO(item.date), "yyyy-MM");
       if (monthMap.has(month)) {
         const monthData = monthMap.get(month);
-        monthData.students += item.students;
-        monthData.professionals += item.professionals;
-        monthData.total += item.total;
+        if(monthData){
+          monthData.students += item.students;
+          monthData.professionals += item.professionals;
+          monthData.total += item.total;
+        }
       }
     });
 
@@ -223,8 +222,12 @@ const StatisticsPage = () => {
     if (!users) return [];
 
     const planCounts = users.reduce((acc, user) => {
-      if (user.subscription_status && user.subscription_status.active === true) {
-        const plan = user.subscription_status.plan || "Unknown";
+      if (
+        user.subscription_status &&
+        user.subscription_status.active === true &&
+        "plan" in user.subscription_status
+      ) {
+        const plan = (user.subscription_status as HasSub).plan || "Unknown";
         acc[plan] = (acc[plan] || 0) + 1;
       } else {
         acc["No Plan"] = (acc["No Plan"] || 0) + 1;
@@ -246,7 +249,9 @@ const StatisticsPage = () => {
         const month = format(new Date(transaction.created_at), "yyyy-MM");
         if (monthMap.has(month)) {
           const monthData = monthMap.get(month);
-          monthData.amount += transaction.amount;
+          if (monthData) {
+            monthData.amount += transaction.amount;
+          }
         }
       }
     });
@@ -343,7 +348,18 @@ const StatisticsPage = () => {
     },
   ];
 
-  if (isLoading) {
+  // Individual loading states for each section
+  const shouldShowStatsCards = !statsLoading;
+  const shouldShowEnrollments = !enrollmentsLoading && !schoolYearsLoading;
+  const shouldShowUserGrowthChart = !usersLoading;
+  const shouldShowSubscriptionChart = !usersLoading;
+  const shouldShowRevenueChart = !transactionsLoading;
+  const shouldShowTopPayingUsers = !usersLoading && !transactionsLoading;
+
+  // Only show main loading if all sections are loading
+  const showMainLoading = statsLoading && usersLoading && transactionsLoading && schoolYearsLoading && enrollmentsLoading;
+
+  if (showMainLoading) {
     return (
       <div className="container mx-auto p-5 space-y-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -365,82 +381,92 @@ const StatisticsPage = () => {
       <h1 className="text-3xl font-bold mb-8">{t("stats.dashboardTitle")}</h1>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {statsCards.map((stat) => (
-          <Card key={stat.title} className="p-6 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900">{stat.value}</p>
+        {shouldShowStatsCards ? (
+          statsCards.map((stat) => (
+            <Card key={stat.title} className="p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">{stat.value}</p>
+                </div>
+                <div className="rounded-full bg-blue-50 p-3">
+                  <stat.icon className="h-6 w-6 text-blue-600" />
+                </div>
               </div>
-              <div className="rounded-full bg-blue-50 p-3">
-                <stat.icon className="h-6 w-6 text-blue-600" />
+              <div className="mt-4">
+                <span
+                  className={`text-sm font-medium ${
+                    stat.changeType === "increase" ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {stat.change}
+                </span>
+                <span className="text-sm text-gray-600"> {t("stats.vsPreviousMonth")}</span>
               </div>
-            </div>
-            <div className="mt-4">
-              <span
-                className={`text-sm font-medium ${
-                  stat.changeType === "increase" ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {stat.change}
-              </span>
-              <span className="text-sm text-gray-600"> {t("stats.vsPreviousMonth")}</span>
+            </Card>
+          ))
+        ) : (
+          statsCards.map((stat, i) => (
+            <Skeleton key={`stats-skeleton-${i}`} className="h-[140px] w-full" />
+          ))
+        )}
+
+        {shouldShowEnrollments ? (
+          <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow col-span-1">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{t(`enrollments`)}</p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">{enrollments?.count || 0}</p>
+                </div>
+                <div className="rounded-full bg-indigo-50 p-3">
+                  <GraduationCap className="h-6 w-6 text-indigo-600" />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mt-2 gap-2">
+                <Select value={selectedSchoolYear} onValueChange={(value) => setSelectedSchoolYear(value)}>
+                  <SelectTrigger className="w-full text-xs">
+                    <SelectValue placeholder="Select School Year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {schoolYears?.map((year) => (
+                      <SelectItem key={year.formatted_year} value={year.formatted_year}>
+                        {year.formatted_year} {year.is_active && "(Current)"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div
+                  className={`flex items-center gap-2 cursor-pointer ${
+                    showActiveOnly ? "text-green-600" : "text-gray-500"
+                  }`}
+                  onClick={() => setShowActiveOnly(true)}
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span className="text-xs">Active</span>
+                </div>
+                <div
+                  className={`flex items-center gap-2 cursor-pointer ${
+                    !showActiveOnly ? "text-amber-600" : "text-gray-500"
+                  }`}
+                  onClick={() => setShowActiveOnly(false)}
+                >
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-xs">All</span>
+                </div>
+                <Badge variant={showActiveOnly ? "outline" : "secondary"} className="text-xs">
+                  {showActiveOnly ? "Active Only" : "All Enrollments"}
+                </Badge>
+              </div>
             </div>
           </Card>
-        ))}
-
-        <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow col-span-1">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{t(`enrollments`)}</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900">{enrollments?.count || 0}</p>
-              </div>
-              <div className="rounded-full bg-indigo-50 p-3">
-                <GraduationCap className="h-6 w-6 text-indigo-600" />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between mt-2 gap-2">
-              <Select value={selectedSchoolYear} onValueChange={(value) => setSelectedSchoolYear(value)}>
-                <SelectTrigger className="w-full text-xs">
-                  <SelectValue placeholder="Select School Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {schoolYears?.map((year) => (
-                    <SelectItem key={year.formatted_year} value={year.formatted_year}>
-                      {year.formatted_year} {year.is_active && "(Current)"}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <div
-                className={`flex items-center gap-2 cursor-pointer ${
-                  showActiveOnly ? "text-green-600" : "text-gray-500"
-                }`}
-                onClick={() => setShowActiveOnly(true)}
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                <span className="text-xs">Active</span>
-              </div>
-              <div
-                className={`flex items-center gap-2 cursor-pointer ${
-                  !showActiveOnly ? "text-amber-600" : "text-gray-500"
-                }`}
-                onClick={() => setShowActiveOnly(false)}
-              >
-                <AlertCircle className="h-4 w-4" />
-                <span className="text-xs">All</span>
-              </div>
-              <Badge variant={showActiveOnly ? "outline" : "secondary"} className="text-xs">
-                {showActiveOnly ? "Active Only" : "All Enrollments"}
-              </Badge>
-            </div>
-          </div>
-        </Card>
+        ) : (
+          <Skeleton className="h-[140px] w-full col-span-1" />
+        )}
       </div>
 
       <Card className="p-6 shadow-lg">
@@ -455,171 +481,187 @@ const StatisticsPage = () => {
           </Tabs>
         </div>
 
-        <ResponsiveContainer width="100%" height={400}>
-          <AreaChart data={currentChartData}>
-            <defs>
-              <linearGradient id="colorStudents" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={COLORS[0]} stopOpacity={0.8} />
-                <stop offset="95%" stopColor={COLORS[0]} stopOpacity={0.1} />
-              </linearGradient>
-              <linearGradient id="colorProfessionals" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={COLORS[1]} stopOpacity={0.8} />
-                <stop offset="95%" stopColor={COLORS[1]} stopOpacity={0.1} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis
-              dataKey={timeFrame === "daily" ? "date" : timeFrame === "monthly" ? "month" : "year"}
-              tick={{ fontSize: 12 }}
-              tickFormatter={(tick) => {
-                if (timeFrame === "daily") return format(new Date(tick), "dd MMM");
-                return tick;
-              }}
-            />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip
-              labelFormatter={(label) => {
-                if (timeFrame === "daily" && label) {
-                  try {
-                    const date = new Date(label);
-                    if (!isNaN(date.getTime())) {
-                      return format(date, "dd MMMM yyyy");
+        {shouldShowUserGrowthChart ? (
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart data={currentChartData}>
+              <defs>
+                <linearGradient id="colorStudents" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={COLORS[0]} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={COLORS[0]} stopOpacity={0.1} />
+                </linearGradient>
+                <linearGradient id="colorProfessionals" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={COLORS[1]} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={COLORS[1]} stopOpacity={0.1} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis
+                dataKey={timeFrame === "daily" ? "date" : timeFrame === "monthly" ? "month" : "year"}
+                tick={{ fontSize: 12 }}
+                tickFormatter={(tick) => {
+                  if (timeFrame === "daily") return format(new Date(tick), "dd MMM");
+                  return tick;
+                }}
+              />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip
+                labelFormatter={(label) => {
+                  if (timeFrame === "daily" && label) {
+                    try {
+                      const date = new Date(label);
+                      if (!isNaN(date.getTime())) {
+                        return format(date, "dd MMMM yyyy");
+                      }
+                    } catch (e) {
+                      console.error("Invalid date format:", label);
                     }
-                  } catch (e) {
-                    console.error("Invalid date format:", label);
                   }
-                }
-                return label;
-              }}
-              formatter={(value, name) => {
-                return [value, name === "students" ? t("stats.students") : t("stats.professionals")];
-              }}
-            />
-            <Legend formatter={(value) => (value === "students" ? t("stats.students") : t("stats.professionals"))} />
-            <Area
-              type="monotone"
-              dataKey="students"
-              stroke={COLORS[0]}
-              fillOpacity={1}
-              fill="url(#colorStudents)"
-              strokeWidth={2}
-              activeDot={{ r: 6 }}
-            />
-            <Area
-              type="monotone"
-              dataKey="professionals"
-              stroke={COLORS[1]}
-              fillOpacity={1}
-              fill="url(#colorProfessionals)"
-              strokeWidth={2}
-              activeDot={{ r: 6 }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+                  return label;
+                }}
+                formatter={(value, name) => {
+                  return [value, name === "students" ? t("stats.students") : t("stats.professionals")];
+                }}
+              />
+              <Legend formatter={(value) => (value === "students" ? t("stats.students") : t("stats.professionals"))} />
+              <Area
+                type="monotone"
+                dataKey="students"
+                stroke={COLORS[0]}
+                fillOpacity={1}
+                fill="url(#colorStudents)"
+                strokeWidth={2}
+                activeDot={{ r: 6 }}
+              />
+              <Area
+                type="monotone"
+                dataKey="professionals"
+                stroke={COLORS[1]}
+                fillOpacity={1}
+                fill="url(#colorProfessionals)"
+                strokeWidth={2}
+                activeDot={{ r: 6 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <Skeleton className="h-[400px] w-full" />
+        )}
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6 shadow-lg">
           <h2 className="text-xl font-bold mb-6">{t("stats.subscriptionDistribution")}</h2>
-          <ResponsiveContainer width="100%" height={350}>
-            <PieChart>
-              <Pie
-                data={subscriptionPlanData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={120}
-                fill="#8884d8"
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                labelLine={{ stroke: "#555", strokeWidth: 1 }}
-              >
-                {subscriptionPlanData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value, name) => [value, name]} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          {shouldShowSubscriptionChart ? (
+            <ResponsiveContainer width="100%" height={350}>
+              <PieChart>
+                <Pie
+                  data={subscriptionPlanData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={120}
+                  fill="#8884d8"
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  labelLine={{ stroke: "#555", strokeWidth: 1 }}
+                >
+                  {subscriptionPlanData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value, name) => [value, name]} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <Skeleton className="h-[350px] w-full" />
+          )}
         </Card>
 
         <Card className="p-6 shadow-lg">
           <h2 className="text-xl font-bold mb-6">{t("stats.monthlyRevenue")}</h2>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={monthlyRevenueData} margin={{ top: 20, right: 30, left: 30, bottom: 40 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${value.toLocaleString()} XAF`} />
-              <Tooltip formatter={(value) => [`${Number(value).toLocaleString()} XAF`, t("stats.revenue")]} />
-              <Bar dataKey="amount" fill={COLORS[2]} radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {shouldShowRevenueChart ? (
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={monthlyRevenueData} margin={{ top: 20, right: 30, left: 30, bottom: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${value.toLocaleString()} XAF`} />
+                <Tooltip formatter={(value) => [`${Number(value).toLocaleString()} XAF`, t("stats.revenue")]} />
+                <Bar dataKey="amount" fill={COLORS[2]} radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <Skeleton className="h-[350px] w-full" />
+          )}
         </Card>
       </div>
 
       <Card className="p-6 shadow-lg">
         <h2 className="text-xl font-bold mb-6">{t("stats.topPayingUsers")}</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded-lg overflow-hidden">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("stats.userName")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("stats.email")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("stats.totalPayments")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("stats.totalAmount")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("stats.lastPayment")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("stats.subscriptionStatus")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {topPayingUsers.length > 0 ? (
-                topPayingUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.paymentCount}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.totalAmount.toLocaleString()} XAF
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.lastPayment ? format(new Date(user.lastPayment), "dd MMM yyyy") : "-"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          user.subscriptionStatus === t("stats.noPlan")
-                            ? "bg-red-100 text-red-800"
-                            : "bg-green-100 text-green-800"
-                        }`}
-                      >
-                        {user.subscriptionStatus}
-                      </span>
+        {shouldShowTopPayingUsers ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white rounded-lg overflow-hidden">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("stats.userName")}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("stats.email")}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("stats.totalPayments")}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("stats.totalAmount")}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("stats.lastPayment")}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("stats.subscriptionStatus")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {topPayingUsers.length > 0 ? (
+                  topPayingUsers.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.paymentCount}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {user.totalAmount.toLocaleString()} XAF
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {user.lastPayment ? format(new Date(user.lastPayment), "dd MMM yyyy") : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            user.subscriptionStatus === t("stats.noPlan")
+                              ? "bg-red-100 text-red-800"
+                              : "bg-green-100 text-green-800"
+                          }`}
+                        >
+                          {user.subscriptionStatus}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                      {t("stats.noPaymentsRecorded")}
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                    {t("stats.noPaymentsRecorded")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <Skeleton className="h-[300px] w-full" />
+        )}
       </Card>
     </div>
   );

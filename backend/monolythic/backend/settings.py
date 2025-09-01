@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     "payments",
     "streamings",
     "forum",
+    "site_settings",
+    
     # third party adds
     "rest_framework",
     "phonenumber_field",

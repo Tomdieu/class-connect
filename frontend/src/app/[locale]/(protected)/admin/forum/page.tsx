@@ -40,6 +40,7 @@ import { Separator } from "@/components/ui/separator";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { Credenza, CredenzaClose, CredenzaContent, CredenzaDescription, CredenzaFooter, CredenzaHeader, CredenzaTitle, CredenzaTrigger } from "@/components/ui/credenza";
 
 // Animation variants
 const containerVariants = {
@@ -250,22 +251,22 @@ export default function AdminForumPage() {
           </div>
         </div>
 
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
+        <Credenza open={dialogOpen} onOpenChange={setDialogOpen}>
+          <CredenzaTrigger asChild>
             <Button 
-              className="w-full sm:w-fit bg-primary hover:bg-primary/90 text-white flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow rounded-lg px-6 py-6 relative z-10"
-              size="lg"
+              className="w-full sm:w-fit bg-primary hover:bg-primary/90 text-white flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow rounded-lg relative z-10"
+              size="default"
             >
               <Plus size={20} /> {t("admin.forum.createForum")}
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t("admin.forum.createForum")}</DialogTitle>
-              <DialogDescription>
+          </CredenzaTrigger>
+          <CredenzaContent className="p-2 mb-10">
+            <CredenzaHeader>
+              <CredenzaTitle>{t("admin.forum.createForum")}</CredenzaTitle>
+              <CredenzaDescription>
                 {t("admin.forum.createForumDescription")}
-              </DialogDescription>
-            </DialogHeader>
+              </CredenzaDescription>
+            </CredenzaHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">{t("admin.forum.forumName")}</Label>
@@ -282,13 +283,15 @@ export default function AdminForumPage() {
                 )}
               </div>
             </div>
-            <DialogFooter>
-              <DialogClose asChild>
+            <CredenzaFooter className="p-0">
+              <div className="flex items-center gap-5">
+                <CredenzaClose asChild className="flex-1">
                 <Button variant="outline">{t("common.cancel")}</Button>
-              </DialogClose>
+              </CredenzaClose>
               <Button 
                 onClick={handleCreateForum} 
                 disabled={createForumMutation.isPending || !newForumName.trim()}
+                className="flex-1"
               >
                 {createForumMutation.isPending ? (
                   <>
@@ -299,9 +302,10 @@ export default function AdminForumPage() {
                   <>{t("admin.forum.createButton")}</>
                 )}
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              </div>
+            </CredenzaFooter>
+          </CredenzaContent>
+        </Credenza>
 
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
@@ -382,11 +386,11 @@ export default function AdminForumPage() {
       <Tabs defaultValue="all" className="space-y-6" onValueChange={setActiveTab}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <TabsList className="sm:min-w-[300px] bg-primary/10">
-            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+            <TabsTrigger value="all" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               <MessagesSquare className="h-4 w-4 mr-2" />
               {t("admin.forum.allForums")}
             </TabsTrigger>
-            <TabsTrigger value="posts" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+            <TabsTrigger value="posts" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               <MessageCircle className="h-4 w-4 mr-2" />
               {t("admin.forum.posts")}
             </TabsTrigger>

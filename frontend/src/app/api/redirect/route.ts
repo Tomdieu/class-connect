@@ -11,55 +11,51 @@ export async function GET(req: NextRequest) {
   return handleRedirect(req);
 }
 
-// Shared handler for both GET and POST requests
+// Optimized handler for fast redirects
 async function handleRedirect(req: NextRequest) {
   const session = await auth();
   let redirectUrl = "/auth/login"; // Default redirect
 
   if (session?.user) {
-    // Cast to UserType to ensure we have the right properties
     const user = session.user as UserType;
     
-    // Determine role more explicitly
-    let role = getUserRole(user);
-    
-    console.log("User details for redirect:", { 
-      id: user.id,
-      email: user.email,
-      educationLevel: user.education_level,
-      isSuperuser: user.is_superuser,
-      isStaff: user.is_staff,
-      role: role
-    });
+    // Fast role determination
+    const role = getUserRole(user);
     
     // Set redirect based on role
-    if (role === "student") {
-      redirectUrl = "/students";
-    } else if (role === "teacher") {
-      redirectUrl = "/dashboard";
-    } else if (role === "admin") {
-      redirectUrl = "/admin";
+    switch (role) {
+      case "student":
+        redirectUrl = "/students";
+        break;
+      case "teacher":
+        redirectUrl = "/dashboard";
+        break;
+      case "admin":
+        redirectUrl = "/admin";
+        break;
+      default:
+        redirectUrl = "/auth/login";
     }
-    
-    console.log(`Redirecting ${role} to: ${redirectUrl}`);
   }
   
-  // Check if this request is likely from a browser and should perform automatic redirect
-  // Look at Accept header to determine if a browser made this request
+  // Check if this request is from a browser
   const acceptHeader = req.headers.get("accept") || "";
   const wantsBrowserResponse = acceptHeader.includes("text/html");
-  
-  // Get the API vs direct navigation preference from query param or header
   const preferJson = req.nextUrl.searchParams.get("json") === "true" || 
                      req.headers.get("X-Prefer-Json") === "true";
                      
   if (wantsBrowserResponse && !preferJson) {
-    // Browser direct navigation - perform automatic redirect
-    return Response.redirect(new URL(redirectUrl, req.url), 307);
+    // Browser direct navigation - perform 301 redirect for caching
+    return Response.redirect(new URL(redirectUrl, req.url), 301);
   }
   
-  // API call or client-side JavaScript - return JSON response
+  // API call - return JSON response with cache headers
   return Response.json({ redirectUrl }, {
     status: 200,
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
   });
 }

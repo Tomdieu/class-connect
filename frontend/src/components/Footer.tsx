@@ -12,6 +12,7 @@ import {
   Heart
 } from "lucide-react";
 import { useCurrentLocale } from "@/locales/client";
+import { Input } from "./ui/input";
 
 const Footer = () => {
   const locale = useCurrentLocale();
@@ -62,11 +63,11 @@ const Footer = () => {
                   {locale === "fr" ? "À Propos" : "About"}
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href={`/${locale}/courses`} className="hover:text-white transition-colors">
                   {locale === "fr" ? "Cours" : "Courses"}
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link href={`/${locale}/contact`} className="hover:text-white transition-colors">
                   {locale === "fr" ? "Contact" : "Contact"}
@@ -108,10 +109,10 @@ const Footer = () => {
                 : "Subscribe to our newsletter to receive the latest news."}
             </p>
             <div className="flex">
-              <input 
+              <Input 
                 type="email" 
                 placeholder={locale === "fr" ? "Votre email" : "Your email"}
-                className="px-4 py-2 rounded-l-md w-full bg-slate-800 border-slate-700 border outline-none focus:ring-2 focus:ring-primary"
+                className="rounded-l-md rounded-r-none w-full bg-slate-800 border-slate-700 border outline-none focus:ring-2 focus:ring-primary"
               />
               <Button className="rounded-l-none">
                 {locale === "fr" ? "OK" : "OK"}
