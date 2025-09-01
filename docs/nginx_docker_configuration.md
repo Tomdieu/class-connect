@@ -126,75 +126,88 @@ Edit `/etc/nginx/nginx.conf`:
 user www-data;
 worker_processes auto;
 pid /run/nginx.pid;
+error_log /var/log/nginx/error.log;
+include /etc/nginx/modules-enabled/*.conf;
 
 events {
-    worker_connections 1024;
-    use epoll;
-    multi_accept on;
+	worker_connections 1024;
+	multi_accept on;
+	use epoll;
 }
 
 http {
-    # Basic Settings
-    sendfile on;
-    tcp_nopush on;
-    tcp_nodelay on;
-    keepalive_timeout 65;
-    types_hash_max_size 2048;
-    server_tokens off;
-    
-    # File Upload Settings
-    client_max_body_size 100M;
-    client_body_buffer_size 128k;
-    client_header_buffer_size 3m;
-    large_client_header_buffers 4 256k;
-    
-    # MIME Types
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
-    
-    # Logging Settings
-    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-                   '$status $body_bytes_sent "$http_referer" '
-                   '"$http_user_agent" "$http_x_forwarded_for"';
-    
-    access_log /var/log/nginx/access.log main;
-    error_log /var/log/nginx/error.log;
-    
-    # Gzip Settings
-    gzip on;
-    gzip_vary on;
-    gzip_proxied any;
-    gzip_comp_level 6;
-    gzip_types
-        text/plain
-        text/css
-        text/xml
-        text/javascript
-        application/json
-        application/javascript
-        application/xml+rss
-        application/atom+xml
-        image/svg+xml;
-    
-    # Rate Limiting
-    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
-    limit_req_zone $binary_remote_addr zone=frontend:10m rate=20r/s;
-    
-    # SSL Settings
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers off;
-    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
-    ssl_session_cache shared:SSL:50m;
-    ssl_session_timeout 1d;
-    ssl_session_tickets off;
-    
-    # OCSP Stapling
-    ssl_stapling on;
-    ssl_stapling_verify on;
-    
-    # Include site configurations
-    include /etc/nginx/conf.d/*.conf;
-    include /etc/nginx/sites-enabled/*;
+
+	##
+	# Basic Settings
+	##
+
+	sendfile on;
+	tcp_nopush on;
+	tcp_nodelay on;
+	keepalive_timeout 65;
+	types_hash_max_size 2048;
+	server_tokens off;
+
+	# File Upload Settings
+        client_max_body_size 4G;
+        client_body_buffer_size 128k;
+        client_header_buffer_size 3m;
+        large_client_header_buffers 4 256k;
+
+	# server_names_hash_bucket_size 64;
+	# server_name_in_redirect off;
+
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+
+	##
+	# SSL Settings
+	##
+
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3; # Dropping SSLv3, ref: POODLE
+	ssl_prefer_server_ciphers off;
+	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+        ssl_session_cache shared:SSL:50m;
+        ssl_session_timeout 1d;
+        ssl_session_tickets off;
+	
+
+	##
+	# Logging Settings
+	##
+
+	# Rate limiting zones
+	limit_req_zone $binary_remote_addr zone=frontend:10m rate=20r/s;
+	limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+	# Log format definition
+	log_format main '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for"';
+	access_log /var/log/nginx/access.log;
+
+	##
+	# Gzip Settings
+	##
+
+	gzip on;
+
+	gzip_vary on;
+	gzip_proxied any;
+	gzip_comp_level 6;
+	gzip_min_length 256;
+	gzip_disable "msie6";
+	# gzip_buffers 16 8k;
+	# gzip_http_version 1.1;
+	 gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript application/atom+xml image/svg+xml;
+
+	# OCSP Stapling
+        ssl_stapling on;
+        ssl_stapling_verify on; 
+
+	##
+	# Virtual Host Configs
+	##
+
+	include /etc/nginx/conf.d/*.conf;
+	include /etc/nginx/sites-enabled/*;
 }
 ```
 
