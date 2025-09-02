@@ -18,7 +18,7 @@ services:
       - .envs/.prod/django
       - .envs/.prod/backblaze
     depends_on:
-      - db
+      # - db
       - rabbitmq
       - redis
     networks:
