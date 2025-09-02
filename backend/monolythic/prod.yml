@@ -21,10 +21,7 @@ services:
       # - db
       - rabbitmq
       - redis
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    networks:
-      - e_learning_network
+    network_mode: "host"
   # db:
   #   image: postgres:14-alpine3.20
   #   restart: unless-stopped
@@ -97,6 +94,7 @@ services:
     restart: unless-stopped
     env_file:
       - .envs/.prod/django
+      
     depends_on:
       - api
       - rabbitmq
@@ -104,8 +102,7 @@ services:
     entrypoint: /entrypoint.sh
     volumes:
       - .:/app
-    networks:
-      - e_learning_network
+    network_mode: "host"
   celery_beat:
     build:
       context: .
@@ -123,8 +120,7 @@ services:
     entrypoint: /entrypoint.sh
     volumes:
       - .:/app
-    networks:
-      - e_learning_network
+    network_mode: "host"
 volumes:
   # monolythic_postgres_data:
   #   name: monolythic_postgres_data
