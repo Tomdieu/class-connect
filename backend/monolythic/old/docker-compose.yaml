@@ -13,7 +13,7 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - GOOGLE_SERVICE_ACCOUNT_FILE=/app/secret/google-secret.json
+      # - GOOGLE_SERVICE_ACCOUNT_FILE=/app/secret/google-secret.json
       - DATABASE_URL=postgres://e_learning_user:e_learning_password@db:5432/e_learning
     depends_on:
       - db
