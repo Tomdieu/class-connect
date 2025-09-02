@@ -29,7 +29,7 @@ RUN apt-get clean && \
 COPY . .
 
 # Copy the Google service account file
-COPY secret/google-secret.json /app/secret/google-secret.json
+# COPY secret/google-secret.json /app/secret/google-secret.json
 
 # Copier le start script, convertir les fins de ligne et les rendre exécutables
 
