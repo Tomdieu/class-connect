@@ -1,0 +1,36 @@
+name: Deploy Frontend
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yaml'
+jobs:
+  deploy_frontend:
+    runs-on: self-hosted
+    steps:
+      - name: Pull latest changes in frontend directory
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /root/apps/classconnect/frontend &&
+            git fetch origin && git reset --hard origin/main &&
+            git pull origin main || echo "Failed to pull latest changes in frontend"
+          '
+      
+      - name: Run execute.sh in frontend directory as root
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /root/apps/classconnect/frontend &&
+            chmod +x ./execute.sh &&
+            ./execute.sh || echo "Failed to execute frontend script"
+          '
+      
+      - name: Clean up dangling images and volumes
+        run: |
+          sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no root@localhost '
+            cd /root/apps/classconnect/ &&
+            docker image prune -f &&
+            docker system prune -a -f &&
+            docker volume prune -f --filter "label!=keep" || echo "Frontend cleanup completed with warnings"
+          '
