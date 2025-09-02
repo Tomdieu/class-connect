@@ -18,7 +18,7 @@ services:
       - .envs/.prod/django
       - .envs/.prod/backblaze
     depends_on:
-      - db
+      # - db
       - rabbitmq
       - redis
     networks:
@@ -124,10 +124,10 @@ services:
     networks:
       - e_learning_network
 volumes:
-  monolythic_postgres_data:
-    name: monolythic_postgres_data
-    labels:
-      - "keep=true"
+  # monolythic_postgres_data:
+  #   name: monolythic_postgres_data
+  #   labels:
+  #     - "keep=true"
   monolythic_rabbitmq_data:
     labels:
       - "keep=true"
@@ -137,7 +137,7 @@ volumes:
   monolythic_redis_data:
     labels:
       - "keep=true"
-  monolythic_postgres_backups:
-    name: monolythic_postgres_backups
-    labels:
-      - "keep=true"
+  # monolythic_postgres_backups:
+  #   name: monolythic_postgres_backups
+  #   labels:
+  #     - "keep=true"
