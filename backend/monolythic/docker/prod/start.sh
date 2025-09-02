@@ -13,5 +13,5 @@ python3 manage.py create_subscription_plans
 python3 manage.py generate_school_year
 
 python3 run_daphne.py
-# daphne -b 0.0.0.0 -p 8001 backend.asgi:application
-# gunicon backend.wsgi --bind 0.0.0.0:8001 --chdir=/app
+# daphne -b 0.0.0.0 -p 8000 backend.asgi:application
+# gunicon backend.wsgi --bind 0.0.0.0:8000 --chdir=/app

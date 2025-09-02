@@ -37,8 +37,8 @@ COPY ./docker/dev/start.sh /start.sh
 RUN sed -i 's/\r$//g' /start.sh
 RUN chmod +x /start.sh
 
-# Make port 8001 available to the world outside this container
-EXPOSE 8001
+# Make port 8000 available to the world outside this container
+EXPOSE 8000
 
 # Define environment variable
 ENV DJANGO_SETTINGS_MODULE=backend.settings

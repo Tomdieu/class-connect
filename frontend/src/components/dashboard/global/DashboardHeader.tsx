@@ -39,7 +39,7 @@ function DashboardHeader() {
   useEffect(() => {
     // Only create WebSocket if user is authenticated
     if (session?.user?.id && session?.user?.accessToken) {
-      const BACKEND_DOMAIN = process.env.NEXT_PUBLIC_BACKEND_DOMAIN || 'localhost:8001';
+      const BACKEND_DOMAIN = process.env.NEXT_PUBLIC_BACKEND_DOMAIN || 'localhost:8000';
       const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
       
       // Create WebSocket connection with better error handling
