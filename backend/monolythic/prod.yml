@@ -94,7 +94,7 @@ services:
     restart: unless-stopped
     env_file:
       - .envs/.prod/django
-      
+      - .envs/.prod/backblaze
     depends_on:
       - api
       - rabbitmq
@@ -112,6 +112,7 @@ services:
     restart: unless-stopped
     env_file:
       - .envs/.prod/django
+      - .envs/.prod/backblaze
     depends_on:
       - api
       - celery_worker
