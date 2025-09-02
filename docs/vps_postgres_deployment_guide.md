@@ -322,6 +322,15 @@ volumes:
       - "keep=true"
 ```
 
+
+Get the network ip ``
+```
+docker network inspect monolythic_e_learning_network \
+  --format='{{(index .IPAM.Config 0).Gateway}}'
+```
+
+update the postgres to accept the Gateway ip
+
 ---
 
 ## 6. Automated Backup Setup
