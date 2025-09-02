@@ -21,40 +21,46 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid Credentials");
-        }
-
-        const body = {
-          username: credentials.email,
-          password: credentials.password,
-          grant_type: "password",
-          client_id: process.env.NEXT_CLASS_CONNECT_CLIENT_ID!,
-          client_secret: process.env.NEXT_CLASS_CONNECT_CLIENT_SECRETE!,
-        };
-
-        const res = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/token/",
-          {
-            method: "POST",
-            body: JSON.stringify(body),
-            headers: { "Content-Type": "application/json" },
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            console.log("Missing credentials");
+            return null;
           }
-        );
 
-        const data = (await res.json()) as LoginResponseType;
+          const body = {
+            username: credentials.email,
+            password: credentials.password,
+            grant_type: "password",
+            client_id: process.env.NEXT_CLASS_CONNECT_CLIENT_ID!,
+            client_secret: process.env.NEXT_CLASS_CONNECT_CLIENT_SECRETE!,
+          };
 
-        if (res.ok && !data.access_token) {
-          return null;
-        }
+          const res = await fetch(
+            process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/token/",
+            {
+              method: "POST",
+              body: JSON.stringify(body),
+              headers: { "Content-Type": "application/json" },
+            }
+          );
 
-        if (res.ok && data.access_token) {
+          if (!res.ok) {
+            console.log("Backend authentication failed:", res.status);
+            return null;
+          }
+
+          const data = (await res.json()) as LoginResponseType;
+
+          if (!data.access_token) {
+            console.log("No access token in response");
+            return null;
+          }
+
           const expires_in = data.expires_in; // in seconds
           // calculate when the token expires to know when to logout the user when it expires
           const expiresAt = Date.now() + expires_in * 1000; // convert to milliseconds
 
           const user = await getAccountInfor(data.access_token);
-          
           
           const role = getUserRole(user);
 
@@ -66,8 +72,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             role,
             expiresAt,
           } as User;
+        } catch (error) {
+          console.log("Authorization error:", error);
+          return null;
         }
-        return null;
       },
     }),
   ],
