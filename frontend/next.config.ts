@@ -60,43 +60,9 @@ const nextConfig: NextConfig = {
   // Enable gzip compression
   compress: true,
 
-  // Configure headers for CSP and caching
+  // Configure headers for caching only
   async headers() {
-    // Get backend URL from environment variable
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
-    const backendDomain = backendUrl ? new URL(backendUrl).origin : '';
-    
-    // For development, also allow localhost
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const developmentDomains = isDevelopment ? 'http://localhost:8000 http://127.0.0.1:8000' : '';
-    
-    // Combine backend domains
-    const allowedDomains = [backendDomain, developmentDomains].filter(Boolean).join(' ');
-    
     return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://pdfanticopy.com https://js.sentry-cdn.com https://www.googletagmanager.com https://www.google-analytics.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https: http:",
-              `media-src 'self' blob: data: https://s3.us-east-005.backblazeb2.com ${allowedDomains}`,
-              `connect-src 'self' ${allowedDomains} https://s3.us-east-005.backblazeb2.com https://js.sentry-cdn.com https://www.google-analytics.com`,
-              "frame-src 'self' https://www.youtube.com https://www.google.com",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "frame-ancestors 'none'",
-              "upgrade-insecure-requests"
-            ].filter(Boolean).join('; ') // Filter out empty strings
-          }
-        ]
-      },
       {
         source: '/_next/static/(.*)',
         headers: [
