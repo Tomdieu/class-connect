@@ -49,13 +49,17 @@ export default function ResourceDetailPage() {
     switch (resource.resource_type) {
       case 'PDFResource':
         const pdfResource = resource as PDFResourceType;
-        return pdfResource.pdf_url ? (
-          <PDFDisplay pdfUrl={pdfResource.pdf_url} />
-        ) : (
-          <div className="text-center p-8">
-            <p className="text-muted-foreground">PDF file is not available.</p>
-          </div>
-        );
+        if (pdfResource.pdf_url) {
+          // Use proxy API to avoid CORS issues with S3
+          const proxiedUrl = `/api/proxy-pdf?url=${encodeURIComponent(pdfResource.pdf_url)}`;
+          return <PDFDisplay pdfUrl={proxiedUrl} />;
+        } else {
+          return (
+            <div className="text-center p-8">
+              <p className="text-muted-foreground">PDF file is not available.</p>
+            </div>
+          );
+        }
 
       case 'VideoResource':
         const videoResource = resource as VideoResourceType;

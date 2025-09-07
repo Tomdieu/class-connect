@@ -5,7 +5,7 @@ import {useParams} from "next/navigation";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 import {Loader} from "lucide-react";
 import {listResources, deleteResource} from "@/actions/courses";
-import {useExerciseStore, usePDFStore, useQuizStore, useRevisionStore, useVideoStore} from "@/hooks/resources-store";
+import {useExerciseStore, usePDFStore, useRevisionStore, useVideoStore} from "@/hooks/resources-store";
 import ResourceMenu from "./_components/ResourceMenu";
 import ResourceCard from "./_components/ResourceCard";
 import {AbstractResourceType, PDFResourceType, VideoResourceType} from "@/types";
@@ -31,8 +31,12 @@ interface PageParams {
 
 const TopicDetailPage: React.FC = () => {
     const t = useI18n();
-    const { id, subjectId, chapterId, topicId } = useParams<PageParams>();
-    const { open } = useDeleteConfirmationStore();
+    const params = useParams<PageParams>();
+    const id = params?.id || "";
+    const subjectId = params?.subjectId || "";
+    const chapterId = params?.chapterId || "";
+    const topicId = params?.topicId || "";
+    const { onOpen } = useDeleteConfirmationStore();
     const queryClient = useQueryClient();
 
     const {data, isError, error, isLoading} = useQuery({
@@ -57,7 +61,6 @@ const TopicDetailPage: React.FC = () => {
     });
 
     const pdfStore = usePDFStore();
-    const quizStore = useQuizStore();
     const revisionStore = useRevisionStore();
     const exerciseStore = useExerciseStore();
     const videoStore = useVideoStore();
@@ -71,13 +74,14 @@ const TopicDetailPage: React.FC = () => {
         switch (resource.resource_type) {
             case "PDFResource":
                 const pdf_resource: PDFResourceType = resource as PDFResourceType
-                setPdfUrl(pdf_resource.pdf_file)
+                const pdfUrl = pdf_resource.pdf_url || pdf_resource.pdf_file;
+                // Use proxy API to avoid CORS issues with S3
+                const proxiedUrl = `/api/proxy-pdf?url=${encodeURIComponent(pdfUrl)}`;
+                setPdfUrl(proxiedUrl);
                 break;
             case "VideoResource":
                 const video_resource: VideoResourceType = resource as VideoResourceType
                 setVideoUrl(video_resource)
-                break;
-            case "QuizResource":
                 break;
             case "RevisionResource":
                 break;
