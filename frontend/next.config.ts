@@ -60,9 +60,30 @@ const nextConfig: NextConfig = {
   // Enable gzip compression
   compress: true,
 
-  // Configure headers for caching only
+  // Configure headers for caching and CSP
   async headers() {
     return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://analytics.ahrefs.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https:",
+              "media-src 'self' blob: https://s3.us-east-005.backblazeb2.com https:",
+              "object-src 'none'",
+              "font-src 'self'",
+              "connect-src 'self' https://analytics.ahrefs.com https://s3.us-east-005.backblazeb2.com https: ws: wss:",
+              "frame-src 'self'",
+              "worker-src 'self' blob:",
+              "child-src 'self' blob:",
+            ].join('; '),
+          },
+        ],
+      },
       {
         source: '/_next/static/(.*)',
         headers: [
