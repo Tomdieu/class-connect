@@ -7,6 +7,8 @@ import { Features } from '@/components/about/Features';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export default function FeaturesPage() {
   const t = useI18n();
@@ -23,6 +25,7 @@ export default function FeaturesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <Header/>
       {/* Header */}
       <div className="container mx-auto px-4 py-8">
         <motion.div
@@ -98,6 +101,8 @@ export default function FeaturesPage() {
           </div>
         </div>
       </motion.div>
+      
+      <Footer/>
     </div>
   );
 }
