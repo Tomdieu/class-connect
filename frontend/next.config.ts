@@ -64,6 +64,10 @@ const nextConfig: NextConfig = {
 
   // Configure headers for CSP and caching
   async headers() {
+    // Get backend URL from environment variable
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+    const backendDomain = backendUrl ? new URL(backendUrl).origin : '';
+    
     return [
       {
         source: '/(.*)',
@@ -76,15 +80,15 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https: http:",
-              "media-src 'self' blob: data: https://s3.us-east-005.backblazeb2.com",
-              "connect-src 'self' https://api.class-connect.trixprojects.online https://s3.us-east-005.backblazeb2.com https://js.sentry-cdn.com https://www.google-analytics.com",
+              "media-src 'self' blob: data: https://s3.us-east-005.backblazeb2.com ${backendDomain}",
+              `connect-src 'self' ${backendDomain} https://s3.us-east-005.backblazeb2.com https://js.sentry-cdn.com https://www.google-analytics.com`,
               "frame-src 'self' https://www.youtube.com https://www.google.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
               "frame-ancestors 'none'",
               "upgrade-insecure-requests"
-            ].join('; ')
+            ].filter(Boolean).join('; ') // Filter out empty strings
           }
         ]
       },

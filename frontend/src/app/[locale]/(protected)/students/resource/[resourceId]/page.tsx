@@ -133,23 +133,17 @@ export default function ResourceView() {
 
       case 'VideoResource':
         const videoResource = resource as VideoResourceType;
-        if (videoResource.video_url) {
-          // Use proxy API to avoid CORS and CSP issues with S3
-          const proxiedVideoUrl = `/api/proxy-video?url=${encodeURIComponent(videoResource.video_url)}`;
-          return (
-            <VideoReader 
-              videoUrl={proxiedVideoUrl}
-              onProgressUpdate={handleVideoProgress}
-              initialTime={progress?.current_time || 0}
-            />
-          );
-        } else {
-          return (
-            <div className="text-center p-8">
-              <p className="text-muted-foreground">Video file is not available.</p>
-            </div>
-          );
-        }
+        return videoResource.video_url ? (
+          <VideoReader 
+            videoUrl={videoResource.video_url}
+            onProgressUpdate={handleVideoProgress}
+            initialTime={progress?.current_time || 0}
+          />
+        ) : (
+          <div className="text-center p-8">
+            <p className="text-muted-foreground">Video file is not available.</p>
+          </div>
+        );
 
       case 'ExerciseResource':
         const exerciseResource = resource as ExerciseResourceType;

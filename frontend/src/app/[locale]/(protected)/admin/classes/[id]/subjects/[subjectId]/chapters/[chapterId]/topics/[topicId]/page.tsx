@@ -81,14 +81,7 @@ const TopicDetailPage: React.FC = () => {
                 break;
             case "VideoResource":
                 const video_resource: VideoResourceType = resource as VideoResourceType
-                const videoUrl = video_resource.video_url || video_resource.video_file;
-                // Use proxy API to avoid CORS and CSP issues with S3
-                const proxiedVideoUrl = `/api/proxy-video?url=${encodeURIComponent(videoUrl)}`;
-                const proxiedVideoResource = {
-                    ...video_resource,
-                    video_url: proxiedVideoUrl
-                };
-                setVideoUrl(proxiedVideoResource);
+                setVideoUrl(video_resource)
                 break;
             case "RevisionResource":
                 break;
