@@ -39,9 +39,9 @@ export async function generateMetadata({
   // Create metadata objects for each language
   const metadata: Record<string, Metadata> = {
     fr: {
-      title: "ClassConnect | Plateforme E-learning N°1 au Cameroun",
+      title: "ClassConnect | E-learning Cameroun",
       description:
-        "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+        "ClassConnect est une plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
       keywords: [
         "ClassConnect",
         "e learning Cameroun",
@@ -60,7 +60,7 @@ export async function generateMetadata({
         type: "website",
         locale: "fr_FR",
         url: `${baseUrl}/fr`,
-        title: "ClassConnect | Meilleure Plateforme E-learning au Cameroun",
+        title: "ClassConnect | Plateforme E-learning au Cameroun",
         description:
           "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés et une expérience d'apprentissage unique.",
         images: [
@@ -91,9 +91,9 @@ export async function generateMetadata({
       },
     },
     en: {
-      title: "ClassConnect | #1 E-learning Platform in Cameroon",
+      title: "ClassConnect | E-learning Platform in Cameroon",
       description:
-        "ClassConnect is the first online learning platform in Cameroon offering personalized courses and learning adapted to your pace.",
+        "ClassConnect is an online learning platform in Cameroon offering personalized courses and learning adapted to your pace.",
       keywords: [
         "ClassConnect",
         "e learning Cameroon",
@@ -112,7 +112,7 @@ export async function generateMetadata({
         type: "website",
         locale: "en_US",
         url: `${baseUrl}/en`,
-        title: "ClassConnect | Best E-learning Platform in Cameroon",
+        title: "ClassConnect | E-learning Platform in Cameroon",
         description:
           "Discover ClassConnect, the innovative e-learning platform in Cameroon. Learn at your own pace with personalized courses and a unique learning experience.",
         images: [
@@ -226,8 +226,8 @@ export default async function RootLayout({
     ],
     description:
       locale === "en"
-        ? "ClassConnect is the first online learning platform in Cameroon offering personalized courses and learning adapted to your pace."
-        : "ClassConnect est la première plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
+        ? "ClassConnect is an online learning platform in Cameroon offering personalized courses and learning adapted to your pace."
+        : "ClassConnect est une plateforme d'apprentissage en ligne au Cameroun offrant des cours personnalisés et un apprentissage adapté à votre rythme.",
     address: {
       "@type": "PostalAddress",
       addressCountry: "CM",
@@ -355,6 +355,24 @@ export default async function RootLayout({
         <meta name="developer" content="Tomdieu Ivan" />
         <meta name="creator" content="Tomdieu Ivan" />
         <meta name="copyright" content="ClassConnect - Developed by Tomdieu Ivan" />
+
+        {/* Ahrefs Analytics Scripts */}
+        <script 
+          src="https://analytics.ahrefs.com/analytics.js" 
+          data-key="/MFs57lLsis1NnIj+lh0Cw" 
+          async
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              var ahrefs_analytics_script = document.createElement('script');
+              ahrefs_analytics_script.async = true;
+              ahrefs_analytics_script.src = 'https://analytics.ahrefs.com/analytics.js';
+              ahrefs_analytics_script.setAttribute('data-key', '/MFs57lLsis1NnIj+lh0Cw');
+              document.getElementsByTagName('head')[0].appendChild(ahrefs_analytics_script);
+            `
+          }}
+        />
 
         <script
           type="application/ld+json"
