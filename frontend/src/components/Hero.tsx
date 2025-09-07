@@ -6,14 +6,10 @@ import { ArrowRight, Sparkle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { Features } from "./about/Features";
-import { Dialog, DialogContent } from "./ui/dialog";
 
 export default function Hero() {
   const t = useI18n();
   const locale = useCurrentLocale();
-  const [openFeatures, setOpenFeatures] = useState(false);
 
   return (
     <div className="relative overflow-hidden">
@@ -83,7 +79,7 @@ export default function Hero() {
                 </motion.div>
               </Link>
 
-              <Link href="#features" onClick={() => setOpenFeatures(true)}>
+              <Link href="/features">
                 <motion.div
                   whileHover={{ scale: 1.05, y: -3 }}
                   whileTap={{ scale: 0.98 }}
@@ -280,17 +276,6 @@ export default function Hero() {
             </div>
           </motion.div>
         </div>
-
-        {/* Features Section */}
-        <Dialog open={openFeatures} onOpenChange={setOpenFeatures}>
-          <DialogContent className="max-w-full w-full max-h-screen h-screen flex flex-col overflow-y-auto p-10 z-[99999999999999999999999]">
-            <div className="container mx-auto">
-
-            <Features />
-            </div>
-
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );

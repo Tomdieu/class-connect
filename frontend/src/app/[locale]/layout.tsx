@@ -357,6 +357,7 @@ export default async function RootLayout({
         <meta name="copyright" content="ClassConnect - Developed by Tomdieu Ivan" />
 
         {/* Ahrefs Analytics Scripts */}
+        <meta name="ahrefs-site-verification" content="3f844052d4daf0dd0483a28b2fc0e0ff709af9ea9c3a14e509774ac126741ee5"></meta>
         <script 
           src="https://analytics.ahrefs.com/analytics.js" 
           data-key="/MFs57lLsis1NnIj+lh0Cw" 
