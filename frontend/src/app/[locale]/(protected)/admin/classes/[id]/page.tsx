@@ -77,6 +77,7 @@ import {
 import { CheckIcon,ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { deleteClass } from "@/actions/sections";
+import { useMediaQuery } from "usehooks-ts";
 
 // Animation variants
 const containerVariants = {
@@ -124,6 +125,7 @@ type AddStudentFormValues = z.infer<typeof addStudentSchema>;
 function ClassDetail() {
   const { id } = useParams<{ id: string }>();
   const t = useI18n();
+  const isMobile = useMediaQuery("(max-width: 640px)");
   const { onAdd, setSubject } = useSubjectStore();
   const [subjectToDelete, setSubjectToDelete] = useState<SubjectType | null>(null);
   const queryClient = useQueryClient();
@@ -410,9 +412,13 @@ function ClassDetail() {
                         variant="outline"
                         className="text-destructive border-destructive/30 hover:bg-destructive/10"
                         onClick={handleDeleteClass}
+                        size={isMobile ? "icon" : "default"}
                       >
                         <Trash2 className="size-4 mr-1" />
+                        <span className="hidden sm:inline">
+
                         {t("class.detail.deleteClass") || "Delete Class"}
+                        </span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>{t("class.detail.deleteClassTooltip") || "Delete this class permanently"}</TooltipContent>
@@ -427,9 +433,13 @@ function ClassDetail() {
                 <Button 
                   onClick={() => data && data.id && onAdd(data.id)}
                   className="bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
+                  size={isMobile ? "icon" : "default"}
                 >
                   <Plus className="size-4 mr-2" />
+                  <span className="hidden sm:inline">
+
                   {t("class.detail.addButton")}
+                  </span>
                 </Button>
               </motion.div>
             </div>

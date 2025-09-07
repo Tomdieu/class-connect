@@ -29,6 +29,16 @@ const nextConfig: NextConfig = {
   // pageExtensions: ['ts', 'tsx'],
   output: "standalone",
   
+  // Configure experimental features for better file handling
+  experimental: {
+    serverComponentsExternalPackages: ['sharp'],
+  },
+  
+  // Configure API settings for large uploads
+  serverRuntimeConfig: {
+    maxFileSize: '2gb', // Allow large video files up to 2GB
+  },
+  
   // Enhanced image configuration
   images: {
     remotePatterns: [
@@ -52,29 +62,86 @@ const nextConfig: NextConfig = {
   // Enable gzip compression
   compress: true,
 
-  // Configure headers for better caching
-  // async headers() {
-  //   return [
-  //     {
-  //       source: '/_next/static/(.*)',
-  //       headers: [
-  //         {
-  //           key: 'Cache-Control',
-  //           value: 'public, max-age=31536000, immutable',
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       source: '/images/(.*)',
-  //       headers: [
-  //         {
-  //           key: 'Cache-Control',
-  //           value: 'public, max-age=86400, stale-while-revalidate=604800',
-  //         },
-  //       ],
-  //     },
-  //   ];
-  // },
+  // Configure headers for CSP and caching
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://pdfanticopy.com https://js.sentry-cdn.com https://www.googletagmanager.com https://www.google-analytics.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https: http:",
+              "media-src 'self' blob: data: https://s3.us-east-005.backblazeb2.com",
+              "connect-src 'self' https://api.class-connect.trixprojects.online https://s3.us-east-005.backblazeb2.com https://js.sentry-cdn.com https://www.google-analytics.com",
+              "frame-src 'self' https://www.youtube.com https://www.google.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              "upgrade-insecure-requests"
+            ].join('; ')
+          }
+        ]
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/images/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/api/proxy-video',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, HEAD, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Range, Content-Type',
+          },
+        ],
+      },
+      {
+        source: '/api/proxy-pdf',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {

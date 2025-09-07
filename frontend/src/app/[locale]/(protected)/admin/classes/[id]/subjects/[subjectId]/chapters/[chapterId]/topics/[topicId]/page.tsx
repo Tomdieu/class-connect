@@ -76,12 +76,19 @@ const TopicDetailPage: React.FC = () => {
                 const pdf_resource: PDFResourceType = resource as PDFResourceType
                 const pdfUrl = pdf_resource.pdf_url || pdf_resource.pdf_file;
                 // Use proxy API to avoid CORS issues with S3
-                const proxiedUrl = `/api/proxy-pdf?url=${encodeURIComponent(pdfUrl)}`;
-                setPdfUrl(proxiedUrl);
+                const proxiedPdfUrl = `/api/proxy-pdf?url=${encodeURIComponent(pdfUrl)}`;
+                setPdfUrl(proxiedPdfUrl);
                 break;
             case "VideoResource":
                 const video_resource: VideoResourceType = resource as VideoResourceType
-                setVideoUrl(video_resource)
+                const videoUrl = video_resource.video_url || video_resource.video_file;
+                // Use proxy API to avoid CORS and CSP issues with S3
+                const proxiedVideoUrl = `/api/proxy-video?url=${encodeURIComponent(videoUrl)}`;
+                const proxiedVideoResource = {
+                    ...video_resource,
+                    video_url: proxiedVideoUrl
+                };
+                setVideoUrl(proxiedVideoResource);
                 break;
             case "RevisionResource":
                 break;
