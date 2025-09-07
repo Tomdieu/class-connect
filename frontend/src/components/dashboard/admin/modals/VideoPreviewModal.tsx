@@ -34,7 +34,7 @@ export const VideoPreviewModal = () => {
                     {video && (
                         <div>
                             <SecureVideoPlayer
-                                src={video.video_url ? `/api/proxy-video?url=${encodeURIComponent(video.video_url)}` : video.video_file}
+                                src={video.video_url || video.video_file}
                                 className="rounded-sm overflow-hidden"
                                 title={video.title}
                                 autoPlay={true}
