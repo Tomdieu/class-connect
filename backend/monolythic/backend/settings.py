@@ -402,9 +402,9 @@ CLASSCONNECT_CLIENT_ID=env('CLASSCONNECT_CLIENT_ID',default='classconnect')
 
 ENABLE_GOOGLE_MEET = True
 
-# File upload settings for 1GB uploads
-DATA_UPLOAD_MAX_MEMORY_SIZE = 1073741824  # 1GB (1024 * 1024 * 1024)
-FILE_UPLOAD_MAX_MEMORY_SIZE = 1073741824  # 1GB (1024 * 1024 * 1024)
+# File upload settings for 2GB uploads
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024 * 1024  # 2GB 
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024 * 1024  # 2GB
 
 # For very large files, it's better to use chunked uploads
 # These settings ensure Django handles the upload efficiently
