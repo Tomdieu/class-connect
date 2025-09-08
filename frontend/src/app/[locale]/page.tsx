@@ -26,34 +26,6 @@ const avatarImages = [
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwcNS7kgWTd3vQkhgMmc-Jm4IuyUSkGOfNaQ&s",
 ];
 
-// Dynamic imports for animations to prevent them from blocking
-const studentAnimationLoader = () => import("@/animations/student-learning.json");
-const teachingAnimationLoader = () => import("@/animations/teaching.json");
-const learningAnimationLoader = () => import("@/animations/learning-process.json");
-
-// Expanded feature list with corresponding icons
-const features = [
-  { 
-    id: 'personalized',
-    icon: <Users className="h-8 w-8" />,
-    color: "bg-gradient-to-br from-indigo-500 to-indigo-600"
-  },
-  { 
-    id: 'interactive',
-    icon: <Play className="h-8 w-8" />,
-    color: "bg-gradient-to-br from-sky-500 to-sky-600"
-  },
-  { 
-    id: 'expert',
-    icon: <Star className="h-8 w-8" />,
-    color: "bg-gradient-to-br from-amber-500 to-amber-600"
-  },
-  { 
-    id: 'community',
-    icon: <MessageCircle className="h-8 w-8" />,
-    color: "bg-gradient-to-br from-emerald-500 to-emerald-600"
-  }
-];
 
 // Skeleton components with enhanced design
 const TestimonialSkeleton = () => (
@@ -80,47 +52,6 @@ const StatCardSkeleton = () => (
     <div className="h-5 bg-gray-200 rounded w-36"></div>
   </div>
 );
-
-type LottieLoader = () => Promise<any>;
-
-const useLazyLottie = (loader: LottieLoader) => {
-  const [animation, setAnimation] = useState(null);
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    rootMargin: '200px 0px', // Load when within 200px of viewport
-  });
-  
-  useEffect(() => {
-    if (inView && !animation) {
-      loader().then(loadedAnimation => {
-        setAnimation(loadedAnimation.default || loadedAnimation);
-      });
-    }
-  }, [inView, animation, loader]);
-  
-  return [ref, animation];
-};
-
-interface OptimizedLottieProps {
-  loader: LottieLoader;
-  className?: string;
-}
-
-// const OptimizedLottie = ({ loader, className = "" }: OptimizedLottieProps) => {
-//   const [ref, animation] = useLazyLottie(loader);
-  
-//   return (
-//     <div ref={ref} className={`relative w-72 h-72 mb-6 ${className}`}>
-//       {animation ? (
-//         <LottieWrapper animation={animation} className="pointer-events-none select-none" />
-//       ) : (
-//         <div className="w-full h-full rounded-lg flex items-center justify-center">
-//           <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
 
 // Enhanced floating CTA button with attention-grabbing animation
 const FloatingCTA: React.FC = () => {

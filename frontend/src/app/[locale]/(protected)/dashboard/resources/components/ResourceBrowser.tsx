@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Users, Loader, ArrowLeft } from "lucide-react";
-import { getformatedClasses, listSubjects } from "@/actions/courses";
+import { getformatedClasses, listSubjects, getClassRessources } from "@/actions/courses";
 import { ClassDetail, Section, ClassStructure, SubjectType } from "@/types";
 import { useResourceBrowserStore } from "@/store/resource-browser-store";
 
@@ -25,6 +25,8 @@ const ResourceBrowser: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [subjects, setSubjects] = useState<SubjectType[]>([]);
   const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
+  const [resources, setResources] = useState<any[]>([]);
+  const [isResourcesLoading, setIsResourcesLoading] = useState(false);
 
   // Fetch and group classes by section, group, and code
   useEffect(() => {
@@ -71,9 +73,10 @@ const ResourceBrowser: React.FC = () => {
     fetchClasses();
   }, []);
 
-  // Fetch subjects for a selected class
+  // Fetch subjects and resources for a selected class
   const fetchSubjects = async (classItem: ClassDetail) => {
     setIsSubjectsLoading(true);
+    setIsResourcesLoading(true);
     setSelectedClass(classItem);
 
     try {
@@ -84,6 +87,16 @@ const ResourceBrowser: React.FC = () => {
       setSubjects([]);
     } finally {
       setIsSubjectsLoading(false);
+    }
+
+    try {
+      const fetchedResources = await getClassRessources(classItem.id.toString());
+      setResources(fetchedResources);
+    } catch (err) {
+      console.error("Error fetching resources:", err);
+      setResources([]);
+    } finally {
+      setIsResourcesLoading(false);
     }
   };
 
@@ -136,13 +149,13 @@ const ResourceBrowser: React.FC = () => {
     ));
   };
 
-  // Internal component to display subjects for a selected class
+  // Internal component to display subjects and resources for a selected class
   const SubjectsView = () => {
-    if (isSubjectsLoading) {
+    if (isSubjectsLoading || isResourcesLoading) {
       return (
-        <div className="flex justify-center items-center h-64">
-          <Loader className="animate-spin h-8 w-8 text-primary" />
-          <span className="ml-2 text-primary">Loading subjects...</span>
+        <div className="flex flex-col justify-center items-center h-64">
+          <Loader className="animate-spin h-8 w-8 text-primary mb-2" />
+          <span className="ml-2 text-primary">Loading subjects and resources...</span>
         </div>
       );
     }
@@ -164,7 +177,7 @@ const ResourceBrowser: React.FC = () => {
         </h2>
 
         {subjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {subjects.map((subject) => (
               <Card key={subject.id} className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
@@ -181,6 +194,30 @@ const ResourceBrowser: React.FC = () => {
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold mb-2">No Subjects Found</h3>
             <p className="text-muted-foreground">There are no subjects available for this class.</p>
+          </div>
+        )}
+
+        <h2 className="text-xl font-semibold mb-4 text-primary">
+          Resources in {selectedClass?.definition_display}
+        </h2>
+        {resources.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {resources.map((resource) => (
+              <Card key={resource.id} className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-primary">{resource.title || resource.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">{resource.description || "No description available"}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <h3 className="text-xl font-semibold mb-2">No Resources Found</h3>
+            <p className="text-muted-foreground">There are no resources available for this class.</p>
           </div>
         )}
       </div>

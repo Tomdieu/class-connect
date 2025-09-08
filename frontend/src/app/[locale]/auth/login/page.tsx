@@ -179,7 +179,7 @@ export default function LoginPage() {
           </Button>
         </div>
 
-        <Card className="shadow-lg border-primary/20 overflow-hidden bg-card/95 backdrop-blur">
+        <Card className="sm:shadow-lg sm:border-primary/20 overflow-hidden sm:bg-card/95 sm:backdrop-blur">
           <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-primary/30 rounded-bl-full z-0 opacity-20"></div>
           <div className="absolute bottom-0 left-0 w-[100px] h-[100px] bg-primary/20 rounded-tr-full z-0 opacity-20"></div>
 
