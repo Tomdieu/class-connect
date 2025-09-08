@@ -24,6 +24,7 @@ cryptography==44.0.0
 daphne==4.1.2
 defusedxml==0.8.0rc2
 Django==5.1.4
+django-admin-resumable-js==3.0
 django-celery-beat==2.7.0
 django-celery-results==2.5.1
 django-cors-headers==4.6.0
