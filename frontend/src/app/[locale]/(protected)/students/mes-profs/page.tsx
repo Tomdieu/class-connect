@@ -138,7 +138,7 @@ function MesProfsPage() {
             <Card className="shadow-lg border-primary/20 overflow-hidden bg-card/95 backdrop-blur">
               <CardContent className="pt-6">
                 <p className="text-center text-muted-foreground mb-4">
-                  {t('common.errorDesc', { item: 'teachers' })}
+                  {t('common.errorDesc')}
                 </p>
                 <div className="flex justify-center">
                   <Button 
@@ -166,7 +166,7 @@ function MesProfsPage() {
                     <div className="absolute top-0 right-0 w-[80px] h-[80px] bg-primary/20 rounded-bl-full z-0 opacity-20"></div>
                     <CardHeader className="flex flex-row items-center gap-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={teacher.avatar} alt={`${teacher.first_name} ${teacher.last_name}`} />
+                        <AvatarImage src={teacher.avatar || undefined} alt={`${teacher.first_name} ${teacher.last_name}`} />
                         <AvatarFallback className="bg-primary/10 text-primary">
                           {getInitials(`${teacher.first_name} ${teacher.last_name}`)}
                         </AvatarFallback>
@@ -178,12 +178,12 @@ function MesProfsPage() {
                     </CardHeader>
                     <CardContent className="relative z-10">
                       <div className="text-sm text-muted-foreground mb-4">
-                        <p>Class: {enrollment.offer.class_level?.level || enrollment.offer.class_level?.name || "Class"}</p>
+                        <p>Class: {enrollment.offer.class_level?.definition_display}</p>
                         <p>Email: {teacher.email}</p>
                         <p>Started: {new Date(enrollment.created_at).toLocaleDateString()}</p>
                       </div>
                       <Button asChild variant="outline" className="w-full hover:bg-primary/10 transition-all">
-                        <Link href={`/students/teachers/${enrollment.id}`}>
+                        <Link href={`/students/mes-profs/${enrollment.id}`}>
                           View Details
                         </Link>
                       </Button>
