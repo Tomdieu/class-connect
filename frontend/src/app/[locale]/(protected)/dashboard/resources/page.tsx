@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 async function ResourcesPage() {
-  // Fetch the formatted class structure
+  // Pre-fetch the formatted class structure for initial hydration
   const classStructure = await getformatedClasses();
 
   return (
