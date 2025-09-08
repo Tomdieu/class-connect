@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Users, Loader, ArrowLeft, FileText, Video, ScrollText, BookOpen, File, Play, Eye } from "lucide-react";
 import { getformatedClasses, listSubjects, getClassRessources } from "@/actions/courses";
 import { ClassDetail, Section, ClassStructure, SubjectType, AbstractResourceType } from "@/types";
@@ -95,6 +96,13 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ classStructure: initi
     }
   }, [classStructure]);
 
+  // Log the persistent state for debugging (can be removed in production)
+  useEffect(() => {
+    if (selectedClass) {
+      console.log('ResourceBrowser: Persistent selected class loaded:', selectedClass.definition_display);
+    }
+  }, [selectedClass]);
+
   // Get resource type icon and color
   const getResourceIcon = (resourceType: string) => {
     switch (resourceType) {
@@ -129,6 +137,8 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ classStructure: initi
 
   // Handle resource click navigation
   const handleResourceClick = (resource: AbstractResourceType) => {
+    // The store will persist the selected class, so when user comes back, 
+    // they'll see the same class's resources
     router.push(`/dashboard/resources/${resource.id}`);
   };
 
@@ -199,44 +209,32 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ classStructure: initi
 
     return (
       <div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setSelectedClass(null)}
-          className="mb-4 flex items-center"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back
-        </Button>
-
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Subjects in {selectedClass?.definition_display}
-        </h2>
-
-        {subjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            {subjects.map((subject) => (
-              <Card key={subject.id} className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-primary">{subject.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">{subject.description || "No description available"}</p>
-                </CardContent>
-              </Card>
-            ))}
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedClass(null)}
+            className="flex items-center"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Classes
+          </Button>
+          
+          <div className="flex items-center text-sm text-muted-foreground">
+            <span>Classes</span>
+            <ChevronRight className="h-4 w-4 mx-1" />
+            <span className="text-primary font-medium">{selectedClass?.definition_display}</span>
           </div>
-        ) : (
-          <div className="text-center py-12">
-            <h3 className="text-xl font-semibold mb-2">No Subjects Found</h3>
-            <p className="text-muted-foreground">There are no subjects available for this class.</p>
-          </div>
-        )}
+        </div>
 
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Resources in {selectedClass?.definition_display}
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-primary">
+            Resources in {selectedClass?.definition_display}
+          </h2>
+          <Badge variant="outline" className="text-xs">
+            {resources.length} {resources.length === 1 ? 'resource' : 'resources'}
+          </Badge>
+        </div>
         {resources.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {resources.map((resource) => {
