@@ -9,8 +9,13 @@ import { getformatedClasses, listSubjects, getClassRessources } from "@/actions/
 import { ClassDetail, Section, ClassStructure, SubjectType, AbstractResourceType } from "@/types";
 import { useResourceBrowserStore } from "@/store/resource-browser-store";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
-const ResourceBrowser: React.FC = () => {
+interface ResourceBrowserProps {
+  classStructure?: ClassStructure;
+}
+
+const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ classStructure: initialClassStructure }) => {
   const router = useRouter();
   const {
     selectedClass,
@@ -23,57 +28,72 @@ const ResourceBrowser: React.FC = () => {
     EN: {},
     FR: {},
   });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [subjects, setSubjects] = useState<SubjectType[]>([]);
-  const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
-  const [resources, setResources] = useState<AbstractResourceType[]>([]);
-  const [isResourcesLoading, setIsResourcesLoading] = useState(false);
 
-  // Fetch and group classes by section, group, and code
+  // React Query for fetching classes
+  const { 
+    data: classStructure, 
+    isLoading, 
+    error 
+  } = useQuery({
+    queryKey: ['formatted-classes'],
+    queryFn: getformatedClasses,
+    initialData: initialClassStructure,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // React Query for fetching subjects when a class is selected
+  const { 
+    data: subjects = [], 
+    isLoading: isSubjectsLoading 
+  } = useQuery({
+    queryKey: ['class-subjects', selectedClass?.id],
+    queryFn: () => listSubjects({ class_pk: selectedClass!.id.toString() }),
+    enabled: !!selectedClass,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+  });
+
+  // React Query for fetching resources when a class is selected
+  const { 
+    data: resources = [], 
+    isLoading: isResourcesLoading 
+  } = useQuery({
+    queryKey: ['class-resources', selectedClass?.id],
+    queryFn: () => getClassRessources(selectedClass!.id.toString()),
+    enabled: !!selectedClass,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+  });
+
+  // Process class structure when data is available
   useEffect(() => {
-    const fetchClasses = async () => {
-      setIsLoading(true);
-      setError(null);
+    if (classStructure) {
+      const groupedBySection: Record<"EN" | "FR", Record<string, Record<string, ClassDetail[]>>> = {
+        EN: {},
+        FR: {},
+      };
 
-      try {
-        const classStructure: ClassStructure = await getformatedClasses();
-        const groupedBySection: Record<"EN" | "FR", Record<string, Record<string, ClassDetail[]>>> = {
-          EN: {},
-          FR: {},
-        };
+      Object.entries(classStructure).forEach(([sectionCode, sectionData]) => {
+        const code = sectionCode as "EN" | "FR";
 
-        Object.entries(classStructure).forEach(([sectionCode, sectionData]) => {
-          const code = sectionCode as "EN" | "FR";
+        Object.values(sectionData.levels).forEach((levelData) => {
+          const levelCode = levelData.code;
 
-          Object.values(sectionData.levels).forEach((levelData) => {
-            const levelCode = levelData.code;
-
-            Object.entries(levelData.groups).forEach(([groupKey, group]) => {
-              if (Array.isArray(group)) {
-                if (!groupedBySection[code][groupKey]) {
-                  groupedBySection[code][groupKey] = {};
-                }
-                if (!groupedBySection[code][groupKey][levelCode]) {
-                  groupedBySection[code][groupKey][levelCode] = [];
-                }
-                groupedBySection[code][groupKey][levelCode].push(...group);
+          Object.entries(levelData.groups).forEach(([groupKey, group]) => {
+            if (Array.isArray(group)) {
+              if (!groupedBySection[code][groupKey]) {
+                groupedBySection[code][groupKey] = {};
               }
-            });
+              if (!groupedBySection[code][groupKey][levelCode]) {
+                groupedBySection[code][groupKey][levelCode] = [];
+              }
+              groupedBySection[code][groupKey][levelCode].push(...group);
+            }
           });
         });
+      });
 
-        setClassesGroupedBySection(groupedBySection);
-      } catch (err) {
-        console.error("Error fetching formatted classes:", err);
-        setError("Failed to load classes. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchClasses();
-  }, []);
+      setClassesGroupedBySection(groupedBySection);
+    }
+  }, [classStructure]);
 
   // Get resource type icon and color
   const getResourceIcon = (resourceType: string) => {
@@ -112,31 +132,9 @@ const ResourceBrowser: React.FC = () => {
     router.push(`/dashboard/resources/${resource.id}`);
   };
 
-  // Fetch subjects and resources for a selected class
-  const fetchSubjects = async (classItem: ClassDetail) => {
-    setIsSubjectsLoading(true);
-    setIsResourcesLoading(true);
+  // Handle class selection (React Query will automatically fetch data)
+  const handleClassSelection = (classItem: ClassDetail) => {
     setSelectedClass(classItem);
-
-    try {
-      const fetchedSubjects = await listSubjects({ class_pk: classItem.id.toString() });
-      setSubjects(fetchedSubjects);
-    } catch (err) {
-      console.error("Error fetching subjects:", err);
-      setSubjects([]);
-    } finally {
-      setIsSubjectsLoading(false);
-    }
-
-    try {
-      const fetchedResources = await getClassRessources(classItem.id.toString());
-      setResources(fetchedResources);
-    } catch (err) {
-      console.error("Error fetching resources:", err);
-      setResources([]);
-    } finally {
-      setIsResourcesLoading(false);
-    }
   };
 
   // Render classes for a specific code
@@ -147,7 +145,7 @@ const ResourceBrowser: React.FC = () => {
           <Card
             key={classItem.id}
             className="hover:shadow-md transition-all cursor-pointer bg-card/95 backdrop-blur border-primary/20 relative overflow-hidden"
-            onClick={() => fetchSubjects(classItem)}
+            onClick={() => handleClassSelection(classItem)}
           >
             <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
             <CardHeader className="pb-2">
@@ -310,7 +308,7 @@ const ResourceBrowser: React.FC = () => {
     return (
       <div className="text-center py-12">
         <h3 className="text-xl font-semibold mb-2 text-red-600">Error</h3>
-        <p className="text-muted-foreground">{error}</p>
+        <p className="text-muted-foreground">{error.message || "Failed to load classes. Please try again later."}</p>
       </div>
     );
   }
