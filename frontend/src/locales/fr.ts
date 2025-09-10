@@ -524,6 +524,7 @@ export default {
   "adminSidebar.items.settings": "Paramètres",
   "adminSidebar.items.courseOfferings": "Offres de Cours",
   "adminSidebar.items.onlineMeetings": "Réunions en Ligne",
+  "adminSidebar.items.messages":"Messages",
   "resources.title": "Ressources d'Apprentissage",
   "resources.empty": "Aucune ressource disponible",
   "resources.loading": "Chargement des ressources...",
