@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "streamings",
     "forum",
     "site_settings",
+    "analytics",
     
     # third party adds
     "rest_framework",
