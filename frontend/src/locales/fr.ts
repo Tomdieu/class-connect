@@ -1184,6 +1184,8 @@ export default {
   "form.errors.dateRequired": "La date est requise",
   "form.errors.durationRange":
     "La durée doit être comprise entre 1 et 5 heures",
+  "form.errors.dateTooOld": "La date ne peut pas être antérieure à 2 jours",
+
   "form.date": "Date",
   "form.duration": "Durée",
   "form.selectDuration": "Sélectionner la durée",
@@ -1389,6 +1391,8 @@ export default {
 
   "toast.courseDeclared": "Cours déclaré avec succès !",
   "toast.courseDeclarationFailed": "Échec de la déclaration du cours.",
+  "toast.enrollmentCompleted":"Cours marqué comme terminé avec succès !",
+  "toast.enrollmentCompletionFailed":"Échec du marquage du cours comme terminé.",
 
   "stats.dashboardTitle": "Statistiques du tableau de bord",
   "stats.userGrowth": "Croissance des utilisateurs",
@@ -1940,6 +1944,9 @@ export default {
     deleteSuccess: "Notification supprimée avec succès",
     deleteError: "Échec de la suppression de la notification",
     markAllAsRead: "Marquer tout comme lu",
+    messageLabel:"Message",
+    close: "Fermer",
+    view: "Voir",
   },
   common: {
     close: "Fermer"

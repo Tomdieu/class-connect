@@ -1198,6 +1198,7 @@ export default {
   "course.noDeclared": "No courses declared",
   "form.errors.dateRequired": "Date is required",
   "form.errors.durationRange": "Duration must be between 1 and 5 hours",
+  "form.errors.dateTooOld": "Date cannot be older than 2 days",
   "form.date": "Date",
   "form.duration": "Duration",
   "form.selectDuration": "Select duration",
@@ -1386,6 +1387,8 @@ export default {
   // Toast messages
   "toast.courseDeclared": "Course declared successfully!",
   "toast.courseDeclarationFailed": "Failed to declare course.",
+  "toast.enrollmentCompleted": "Enrollment completed successfully!",
+  "toast.enrollmentCompletionFailed": "Failed to complete enrollment.",
 
   //
   "pagination.showing": "Showing",
@@ -1974,7 +1977,10 @@ export default {
   deleteSuccess: "Notification successfully deleted",
   deleteError: "Failed to delete notification",
 
-  markAllAsRead:"Mark all as read"
+  markAllAsRead:"Mark all as read",
+  messageLabel:"Message",
+  close: "Close",
+  view: "View",
 }
 ,
   common: {
