@@ -32,7 +32,7 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({
                                                                     }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const progressUpdateInterval = useRef<NodeJS.Timeout>();
+    const progressUpdateInterval = useRef<NodeJS.Timeout | null>(null);
     const [isPlaying, setIsPlaying] = useState(autoPlay);
     const [isMuted, setIsMuted] = useState(true);
     const [progress, setProgress] = useState(initialProgress || 0);
@@ -45,6 +45,18 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({
     const [bufferedProgress, setBufferedProgress] = useState(0);
     const [showInitialLoader, setShowInitialLoader] = useState(true);
     let controlsTimeout: NodeJS.Timeout;
+
+    // Helper function to get proxied video URL
+    const getProxiedVideoUrl = (originalSrc: string) => {
+        // If the src contains Backblaze B2 URL, use the proxy route
+        if (originalSrc.includes('s3.us-east-005.backblazeb2.com') || originalSrc.includes('class-connect')) {
+            return `/api/proxy-video?url=${encodeURIComponent(originalSrc)}`;
+        }
+        // Otherwise, use the original src (for local or other trusted sources)
+        return originalSrc;
+    };
+
+    const proxiedSrc = getProxiedVideoUrl(src);
 
     useEffect(() => {
         const video = videoRef.current;
@@ -151,7 +163,7 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({
                 clearInterval(progressUpdateInterval.current);
             }
         };
-    }, [src, autoPlay, startAt, initialProgress, onProgressChange, onTimeUpdate, onPlay, onPause, onEnd]);
+    }, [proxiedSrc, autoPlay, startAt, initialProgress, onProgressChange, onTimeUpdate, onPlay, onPause, onEnd]);
 
     const togglePlay = () => {
         if (videoRef.current) {
@@ -247,7 +259,7 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({
                 onContextMenu={(e) => e.preventDefault()}
                 controlsList="nodownload"
             >
-                <source src={src} type="video/mp4" />
+                <source src={proxiedSrc} type="video/mp4" />
                 Your browser does not support the video tag.
             </video>
 
