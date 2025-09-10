@@ -158,7 +158,7 @@ function DashboardHeader() {
     }
   };
 
-  const handleLanguageChange = (lang: string) => {
+  const handleLanguageChange = (lang: "fr"|"en") => {
     setSelectedLanguage(lang);
     changeLocale(lang);
   };
@@ -253,7 +253,7 @@ function DashboardHeader() {
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9 border">
                   <AvatarImage
-                    src={session?.user?.avatar}
+                    src={session?.user?.avatar || undefined}
                     alt={session?.user.first_name}
                   />
                   <AvatarFallback>
