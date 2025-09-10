@@ -102,29 +102,18 @@ const VideoReader: React.FC<VideoReaderProps> = ({
   };
 
   return (
-    <div className={cn("video-player-container w-full", className)}>
+    <div className={cn("video-player-container w-full bg-black rounded-lg overflow-hidden", className)}>
       <video
         ref={videoRef}
-        className="w-full max-h-[80vh]"
+        className="w-full h-full object-contain"
         controls
         controlsList="nodownload"
         src={proxiedVideoUrl}
         preload="metadata"
+        style={{ aspectRatio: '16/9' }}
       >
         Your browser does not support the video tag.
       </video>
-      
-      {/* Optional custom progress indicator */}
-      <div className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground">
-        <span>{formatTime(currentTime)}</span>
-        <div className="w-full bg-gray-200 h-1 rounded-full">
-          <div 
-            className="bg-primary h-1 rounded-full transition-all duration-300"
-            style={{ width: `${progressPercentage}%` }}
-          />
-        </div>
-        <span>{formatTime(duration)}</span>
-      </div>
     </div>
   );
 };
