@@ -183,7 +183,7 @@ function MesProfsPage() {
                         <p>Started: {new Date(enrollment.created_at).toLocaleDateString()}</p>
                       </div>
                       <Button asChild variant="outline" className="w-full hover:bg-primary/10 transition-all">
-                        <Link href={`/students/mes-profs/${enrollment.id}`}>
+                        <Link href={`/students/mes-profs/${enrollment.teacher.id}`}>
                           View Details
                         </Link>
                       </Button>
