@@ -82,18 +82,18 @@ function ResourceDetailPage() {
         
         <DashboardHeader
           title={t('common.error')}
-          description={t('common.errorDesc', { item: 'resource' })}
+          description={t('common.errorDesc')}
           icon={<FileText className="h-6 w-6" />}
         />
         
         <Card className="mt-6">
           <CardContent className="py-6 text-center">
             <p className="text-muted-foreground mb-4">
-              {t('common.errorDesc', { item: 'resource' })}
+              {t('common.errorDesc')}
             </p>
             <Button variant="outline" asChild>
               <Link href={`/students/classes/${classId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}`}>
-                {t('common.return', { destination: 'topic' })}
+                {t('common.return')}
               </Link>
             </Button>
           </CardContent>
@@ -119,10 +119,12 @@ function ResourceDetailPage() {
         
       case 'VideoResource':
         return (
-          <div className="mt-6">
-            <VideoReader 
-              videoUrl={(resource as VideoResourceType).video_url || (resource as VideoResourceType).video_file} 
-            />
+          <div className="mt-6 w-full max-w-4xl mx-auto">
+            <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-lg">
+              <VideoReader 
+                videoUrl={(resource as VideoResourceType).video_url || (resource as VideoResourceType).video_file} 
+              />
+            </div>
           </div>
         );
         
