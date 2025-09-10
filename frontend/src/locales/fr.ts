@@ -1686,6 +1686,8 @@ export default {
   "student.myVideos.selectClassDesc": "Veuillez sélectionner une classe pour consulter les vidéos disponibles",
   "student.myVideos.noVideosAvailableTitle": "Aucune vidéo disponible",
   "student.myVideos.noVideosAvailableDesc": "Il n'y a pas encore de vidéos disponibles pour cette classe.",
+  "student.myVideos.watchVideo": "Regarder la vidéo",
+
 
   // Registration dialog fields and labels
   "register.title": "Inscription",

@@ -1696,6 +1696,7 @@ export default {
   "student.myVideos.selectClassDesc": "Please select a class to view available videos",
   "student.myVideos.noVideosAvailableTitle": "No Videos Available",
   "student.myVideos.noVideosAvailableDesc": "There are no videos available for this class yet.",
+  "student.myVideos.watchVideo": "Watch Video",
 
   class: {
     create: {
