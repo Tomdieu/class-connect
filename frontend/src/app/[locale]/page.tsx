@@ -629,7 +629,7 @@ function LandingPage() {
         </section>
 
         {/* Enhanced Testimonials Section */}
-        <section className="py-24 bg-gradient-to-b from-white to-blue-50/80 relative">
+        {/* <section className="py-24 bg-gradient-to-b from-white to-blue-50/80 relative">
           <div className="absolute top-1/4 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
           
@@ -711,7 +711,7 @@ function LandingPage() {
               </Suspense>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Enhanced Subscription Plans Section */}
         <Suspense fallback={
