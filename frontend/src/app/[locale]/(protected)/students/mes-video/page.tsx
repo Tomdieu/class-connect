@@ -263,13 +263,53 @@ function MyVideosPage() {
               >
                 <Card className="shadow-lg border-primary/20 overflow-hidden bg-card/95 backdrop-blur relative group animate-slideUp hover:shadow-xl transition-all duration-300">
                   <div className="absolute top-0 right-0 w-[80px] h-[80px] bg-primary/20 rounded-bl-full z-0 opacity-20"></div>
-                  {/* If you have a thumbnail, you can use it here */}
-                  <div className="w-full h-full flex items-center justify-center bg-gray-800 text-white">
-                    {video?.title || "Video"}
+                  
+                  {/* Video thumbnail with proper aspect ratio */}
+                  <div className="relative aspect-video bg-gray-800 overflow-hidden">
+                    <div className="w-full h-full flex items-center justify-center text-white">
+                      <div className="text-center">
+                        <Video className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                        <p className="text-sm font-medium px-4 text-center line-clamp-2">
+                          {video?.title || "Video"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <Play className="h-16 w-16 text-white bg-primary/90 p-4 rounded-full shadow-lg" />
+                    </div>
                   </div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Play className="h-16 w-16 text-white bg-primary/80 p-4 rounded-full" />
-                  </div>
+                  
+                  {/* Video details */}
+                  <CardHeader className="relative z-10">
+                    <CardTitle className="text-base font-medium line-clamp-2">
+                      {video?.title}
+                    </CardTitle>
+                  </CardHeader>
+                  
+                  <CardContent className="pt-0 relative z-10">
+                    {video?.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                        {video.description}
+                      </p>
+                    )}
+                    {video?.created_at && (
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(video.created_at), 'PPP')}
+                      </p>
+                    )}
+                  </CardContent>
+                  
+                  <CardFooter className="relative z-10">
+                    <Button 
+                      asChild 
+                      className="w-full bg-primary hover:bg-primary/90 transition-colors"
+                    >
+                      <Link href={video?.video_url || video?.video_file || '#'}>
+                        <Play className="h-4 w-4 mr-2" />
+                        {t('student.myVideos.watchVideo')}
+                      </Link>
+                    </Button>
+                  </CardFooter>
                 </Card>
               </motion.div>
             ))}
