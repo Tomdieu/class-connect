@@ -12,6 +12,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { SchoolYearManager } from "@/components/dashboard/admin/SchoolYearManager";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClassCreationDialog } from "@/components/dialogs/ClassCreationDialog";
@@ -446,6 +447,19 @@ function CoursesPages() {
           <Plus size={20} />
           {t("class.actions.add")}
         </Button> */}
+      </motion.div>
+      
+      {/* School Year Manager Component */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="mb-10 max-w-[2400px] mx-auto"
+      >
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl px-6 py-6 shadow-md border border-primary/10 relative overflow-hidden">
+          
+          <SchoolYearManager />
+        </div>
       </motion.div>
 
       <motion.div 
