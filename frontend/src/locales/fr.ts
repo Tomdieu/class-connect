@@ -524,7 +524,7 @@ export default {
   "adminSidebar.items.settings": "Paramètres",
   "adminSidebar.items.courseOfferings": "Offres de Cours",
   "adminSidebar.items.onlineMeetings": "Réunions en Ligne",
-  "adminSidebar.items.messages":"Messages",
+  "adminSidebar.items.messages": "Messages",
   "resources.title": "Ressources d'Apprentissage",
   "resources.empty": "Aucune ressource disponible",
   "resources.loading": "Chargement des ressources...",
@@ -1936,7 +1936,8 @@ export default {
     // Messages de confirmation / erreur
     markReadError: "Erreur lors du marquage de la notification comme lue",
     deleteSuccess: "Notification supprimée avec succès",
-    deleteError: "Échec de la suppression de la notification"
+    deleteError: "Échec de la suppression de la notification",
+    markAllAsRead: "Marquer tout comme lu",
   },
   common: {
     close: "Fermer"

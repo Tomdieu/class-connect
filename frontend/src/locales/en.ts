@@ -1970,7 +1970,9 @@ export default {
   // Toast messages
   markReadError: "Error marking notification as read",
   deleteSuccess: "Notification successfully deleted",
-  deleteError: "Failed to delete notification"
+  deleteError: "Failed to delete notification",
+
+  markAllAsRead:"Mark all as read"
 }
 ,
   common: {
