@@ -371,9 +371,10 @@ function MyVideosPage() {
           
           <div className="px-6 pb-6">
             {selectedVideo && (
-              <div className="aspect-video bg-black rounded-lg overflow-hidden">
+              <div className="w-full">
                 <VideoReader 
-                  videoUrl={selectedVideo.video_url || selectedVideo.video_file} 
+                  videoUrl={selectedVideo.video_url || selectedVideo.video_file}
+                  className="w-full rounded-lg overflow-hidden shadow-lg"
                 />
               </div>
             )}
