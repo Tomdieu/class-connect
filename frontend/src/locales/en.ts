@@ -527,6 +527,7 @@ export default {
   "common.delete": "Delete",
   "common.back": "Back",
   "common.remove": "Remove",
+  "common.locale": 'fr',
   "resources.title": "Learning Resources",
   "resources.empty": "No resources available",
   "resources.loading": "Loading resources...",
@@ -670,16 +671,6 @@ export default {
   "contact.form.subject": "Subject",
   "contact.form.message": "Message",
   "contact.form.submit": "Send Message",
-  "notifications.title": "Notifications",
-  "notifications.empty": "No notifications",
-  "notifications.emptyDescription":
-    "You don't have any notifications at the moment",
-  "notifications.error": "Failed to load notifications",
-  "notifications.deleteSuccess": "Notification deleted successfully",
-  "notifications.deleteError": "Failed to delete notification",
-  "notifications.deleteTitle": "Delete Notification",
-  "notifications.deleteDescription":
-    "Are you sure you want to delete this notification? This action cannot be undone.",
   "stats.totalUsers": "Total Users",
   "stats.activeCourses": "Active Courses",
   "stats.monthlyRevenue": "Monthly Revenue",
@@ -1937,36 +1928,104 @@ export default {
       taxRateRange: "Tax rate must be between 0 and 100."
     }
   },
-  notifications:{
-    // Header and general
-    title: "Notifications",
-    noNew: "No new notifications",
-    viewAll: "View all notifications",
-    
-    // Empty state
-    empty: "No notifications",
-    emptyDescription: "You don't have any notifications at the moment.",
-    
-    // Detail modal
-    detailTitle: "Notification Details",
-    detailDescription: "View the full details of this notification",
-    type: "Type",
-    status: "Status",
-    read: "Read",
-    unread: "Unread",
-    
-    // Actions
-    delete: "Delete",
-    deleteTitle: "Delete notification",
-    deleteDescription: "Are you sure you want to delete this notification? This action cannot be undone.",
-    
-    // Toast messages
-    markReadError: "Error marking notification as read",
-    deleteSuccess: "Notification deleted successfully",
-    deleteError: "Error deleting notification"
-  },
+  notifications: {
+  // Header and general
+  title: "Notifications",
+  noNew: "No new notifications",
+  viewAll: "View all notifications",
+
+  // Counts
+  singleCount: "notification",
+  pluralCount: "notifications",
+
+  // Empty state
+  emptyTitle: "No notifications",
+  empty: "You have no notifications at the moment.",
+  emptyDescription: "You don't have any notifications at the moment.",
+
+  // Error handling
+  error: "Error loading notifications",
+  errorMessage: "An unexpected error occurred while retrieving your notifications.",
+
+  // Table headers
+  titleHeader: "Title",
+  messageHeader: "Message",
+  dateHeader: "Date",
+  actions: "Actions",
+
+  // Detail modal
+  detailTitle: "Notification Details",
+  detailDescription: "View the full details of this notification",
+  type: "Type",
+  status: "Status",
+  read: "Read",
+  unread: "Unread",
+
+  // Actions
+  delete: "Delete notification",
+  deleteTitle: "Delete notification",
+  deleteDescription: "Are you sure you want to delete this notification? This action cannot be undone.",
+
+  // Toast messages
+  markReadError: "Error marking notification as read",
+  deleteSuccess: "Notification successfully deleted",
+  deleteError: "Failed to delete notification"
+}
+,
   common: {
     close: "Close"
-  }
+  },
+  contact: {
+    title: 'Messaging',
+    subtitle: 'Communicate with administration and track your messages.',
+    tabs: {
+      newMessage: 'New message',
+      myMessages: 'My messages'
+    },
+    form: {
+      title: 'Send a message',
+      description: 'We will respond to you as soon as possible.',
+      name: 'Name',
+      namePlaceholder: 'Your full name',
+      email: 'Email',
+      emailPlaceholder: 'your.email@example.com',
+      subject: 'Subject',
+      subjectPlaceholder: 'Subject of your message',
+      isAboutStudent: 'This message concerns a student being monitored:',
+      no: 'No',
+      yes: 'Yes',
+      studentHelp: 'Select "Yes" if your message concerns a specific student.',
+      message: 'Message',
+      messagePlaceholder: 'Enter your message here...',
+      send: 'Send'
+    },
+    success: {
+      description: 'Your message has been sent successfully. We will respond to you soon.'
+    },
+    error: {
+      description: 'An error occurred while sending your message. Please try again.'
+    },
+    history: {
+      title: 'My message history',
+      refresh: 'Refresh',
+      loading: 'Loading your messages...',
+      error: 'Loading error',
+      tryAgain: 'Unable to load your messages. Please try again.',
+      retry: 'Retry',
+      empty: 'No messages sent',
+      emptyDescription: 'You haven\'t sent any messages to the administration yet. Use the form to send your first message.',
+      createFirst: 'Send a message'
+    },
+    status: {
+      replied: 'Replied',
+      pending: 'Pending'
+    },
+    reply: {
+      from: 'Reply from'
+    }
+  },
+  
+
+
 
 } as const;

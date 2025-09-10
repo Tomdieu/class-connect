@@ -666,16 +666,6 @@ export default {
   "contact.form.message": "Message",
   "contact.form.submit": "Envoyer le Message",
 
-  "notifications.title": "Notifications",
-  "notifications.empty": "Aucune notification",
-  "notifications.emptyDescription":
-    "Vous n'avez aucune notification pour le moment",
-  "notifications.error": "Échec du chargement des notifications",
-  "notifications.deleteSuccess": "Notification supprimée avec succès",
-  "notifications.deleteError": "Échec de la suppression de la notification",
-  "notifications.deleteTitle": "Supprimer la notification",
-  "notifications.deleteDescription":
-    "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action ne peut pas être annulée.",
   "stats.totalUsers": "Utilisateurs Totaux",
   "stats.activeCourses": "Cours Actifs",
   "stats.monthlyRevenue": "Revenus Mensuels",
@@ -934,6 +924,7 @@ export default {
   "common.save": "Enregistrer",
   "common.success": "Succès",
   "common.back": "Retour",
+  "common.locale": 'en',
   "common.errorDesc": "Échec du chargement de {item}. Veuillez réessayer plus tard.",
   "common.return": "Retourner à {destination}",
   "common.dashboard": "Tableau de Bord",
@@ -1903,35 +1894,100 @@ export default {
       taxRateRange: "Le taux de TVA doit être entre 0 et 100."
     }
   },
-  notifications:{
-    // Header and general
+  notifications: {
+    // En-tête et général
     title: "Notifications",
-    noNew:"Aucune nouvelle notification",
-    viewAll:"Voir toutes les notifications",
+    noNew: "Aucune nouvelle notification",
+    viewAll: "Voir toutes les notifications",
 
-    // Empty state
-    empty: "Aucune notification",
+    // Compteurs
+    singleCount: "notification",
+    pluralCount: "notifications",
+
+    // État vide
+    emptyTitle: "Aucune notification",
+    empty: "Vous n'avez aucune notification pour le moment.",
     emptyDescription: "Vous n'avez aucune notification pour le moment.",
-    
-    // Detail modal
+
+    // Gestion des erreurs
+    error: "Erreur lors du chargement des notifications",
+    errorMessage: "Une erreur inattendue s'est produite lors de la récupération de vos notifications.",
+
+    // En-têtes de tableau
+    titleHeader: "Titre",
+    messageHeader: "Message",
+    dateHeader: "Date",
+    actions: "Actions",
+
+    // Fenêtre de détail
     detailTitle: "Détails de la notification",
     detailDescription: "Voir tous les détails de cette notification",
     type: "Type",
     status: "Statut",
-    read: "Lu",
-    unread: "Non lu",
-    
+    read: "Lue",
+    unread: "Non lue",
+
     // Actions
-    delete: "Supprimer",
+    delete: "Supprimer la notification",
     deleteTitle: "Supprimer la notification",
-    deleteDescription: "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action ne peut pas être annulée.",
-    
-    // Toast messages
-    markReadError: "Erreur lors du marquage comme lu",
+    deleteDescription: "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action est irréversible.",
+
+    // Messages de confirmation / erreur
+    markReadError: "Erreur lors du marquage de la notification comme lue",
     deleteSuccess: "Notification supprimée avec succès",
-    deleteError: "Erreur lors de la suppression de la notification"
+    deleteError: "Échec de la suppression de la notification"
   },
   common: {
     close: "Fermer"
-  }
+  },
+  contact: {
+    title: 'Messagerie',
+    subtitle: 'Communiquez avec l\'administration et suivez vos messages.',
+    tabs: {
+      newMessage: 'Nouveau message',
+      myMessages: 'Mes messages'
+    },
+    form: {
+      title: 'Envoyer un message',
+      description: 'Nous vous répondrons dans les plus brefs délais.',
+      name: 'Nom',
+      namePlaceholder: 'Votre nom complet',
+      email: 'Email',
+      emailPlaceholder: 'votre.email@exemple.com',
+      subject: 'Sujet',
+      subjectPlaceholder: 'Sujet de votre message',
+      isAboutStudent: 'Ce message concerne un élève suivi :',
+      no: 'Non',
+      yes: 'Oui',
+      studentHelp: 'Sélectionnez "Oui" si votre message concerne un étudiant spécifique.',
+      message: 'Message',
+      messagePlaceholder: 'Saisissez votre message ici...',
+      send: 'Envoyer'
+    },
+    success: {
+      description: 'Votre message a été envoyé avec succès. Nous vous répondrons bientôt.'
+    },
+    error: {
+      description: 'Une erreur est survenue lors de l\'envoi de votre message. Veuillez réessayer.'
+    },
+    history: {
+      title: 'Historique de mes messages',
+      refresh: 'Actualiser',
+      loading: 'Chargement de vos messages...',
+      error: 'Erreur de chargement',
+      tryAgain: 'Impossible de charger vos messages. Veuillez réessayer.',
+      retry: 'Réessayer',
+      empty: 'Aucun message envoyé',
+      emptyDescription: 'Vous n\'avez pas encore envoyé de message à l\'administration. Utilisez le formulaire pour envoyer votre premier message.',
+      createFirst: 'Envoyer un message'
+    },
+    status: {
+      replied: 'Répondu',
+      pending: 'En attente'
+    },
+    reply: {
+      from: 'Réponse de'
+    }
+  },
+
 } as const;
