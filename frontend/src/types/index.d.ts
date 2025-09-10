@@ -1128,3 +1128,19 @@ export interface ContactReplyFilterType {
   email_sent?: boolean;
   notification_sent?: boolean;
 }
+
+
+export interface DailyVisitorType {
+  id: number;
+  visitor_id: string;
+  readonly date: string;          // ISO date string (YYYY-MM-DD)
+  readonly time: string;          // ISO datetime string
+  ip_address: string;
+  user_agent: string;
+  referrer?: string | null;
+  path: string;
+  browser_language?: string | null;
+  screen_width?: number | null;
+  screen_height?: number | null;
+  user?: number | null;  // usually user ID if linked
+}
