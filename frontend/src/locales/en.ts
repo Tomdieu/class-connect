@@ -187,6 +187,7 @@ export default {
   "loginDialog.errors.passwordRequired": "Password is required",
   "loginDialog.errors.emailInvalid": "Email is not valid",
   "loginDialog.alreadyHaveAccount": "Already have an account?",
+  "loginDialog.successMessage":"Login successful!",
   "registerDialog.title": "Join ClassConnect",
   "registerDialog.subtitle":
     "Create your account to start your learning journey",
