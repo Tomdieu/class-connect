@@ -22,7 +22,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
           {icon && <span className="mr-2">{icon}</span>}
           {title}
         </h1>
