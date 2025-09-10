@@ -928,6 +928,16 @@ class SchoolYearViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
     serializer_class = SchoolYearSerializer
     
     def list(self, request, *args, **kwargs):
+        # Ensure at least one school year exists
+        if not SchoolYear.objects.exists():
+            from datetime import date
+            current_year = date.today().year
+            # Create a default school year for the current academic year
+            SchoolYear.objects.create(
+                start_year=current_year,
+                end_year=current_year + 1,
+                name=f"{current_year}-{current_year + 1}"
+            )
         self.log_activity(request, "Viewed school years")
         return super().list(request, *args, **kwargs)
     
