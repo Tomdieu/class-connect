@@ -6,7 +6,8 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Play, Video } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ArrowLeft, Play, Video, X } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import { useI18n } from "@/locales/client";
@@ -17,6 +18,7 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useSubscriptionStore } from '@/store/subscriptionStore';
 import { motion } from "framer-motion";
+import VideoReader from '@/components/VideoReader';
 
 // Define a type for the nested video resource structure
 interface VideoResponse {
@@ -59,6 +61,8 @@ function MyVideosPage() {
   const t = useI18n();
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [processedVideos, setProcessedVideos] = useState<VideoResourceType[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<VideoResourceType | null>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   
   // Fetch classes
   const { data: myClasses, isLoading: classesLoading } = useQuery({
@@ -94,6 +98,16 @@ function MyVideosPage() {
   
   const handleClassChange = (value: string) => {
     setSelectedClass(value);
+  };
+  
+  const handleWatchVideo = (video: VideoResourceType) => {
+    setSelectedVideo(video);
+    setIsVideoModalOpen(true);
+  };
+  
+  const handleCloseVideoModal = () => {
+    setIsVideoModalOpen(false);
+    setSelectedVideo(null);
   };
   
   // Extract unique classes to prevent duplicates
@@ -301,13 +315,11 @@ function MyVideosPage() {
                   
                   <CardFooter className="relative z-10">
                     <Button 
-                      asChild 
+                      onClick={() => handleWatchVideo(video)}
                       className="w-full bg-primary hover:bg-primary/90 transition-colors"
                     >
-                      <Link href={video?.video_url || video?.video_file || '#'}>
-                        <Play className="h-4 w-4 mr-2" />
-                        {t('student.myVideos.watchVideo')}
-                      </Link>
+                      <Play className="h-4 w-4 mr-2" />
+                      {t('student.myVideos.watchVideo')}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -331,6 +343,43 @@ function MyVideosPage() {
           </motion.div>
         )}
       </motion.div>
+
+      {/* Video Modal */}
+      <Dialog open={isVideoModalOpen} onOpenChange={setIsVideoModalOpen}>
+        <DialogContent className="max-w-6xl w-full max-h-[90vh] overflow-hidden p-0">
+          <DialogHeader className="p-6 pb-4">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl font-semibold flex items-center">
+                <Video className="h-5 w-5 mr-2 text-primary" />
+                {selectedVideo?.title}
+              </DialogTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCloseVideoModal}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            {selectedVideo?.description && (
+              <p className="text-sm text-muted-foreground mt-2">
+                {selectedVideo.description}
+              </p>
+            )}
+          </DialogHeader>
+          
+          <div className="px-6 pb-6">
+            {selectedVideo && (
+              <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                <VideoReader 
+                  videoUrl={selectedVideo.video_url || selectedVideo.video_file} 
+                />
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
