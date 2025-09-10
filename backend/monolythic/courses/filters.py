@@ -95,7 +95,7 @@ class ResourceFilter(django_filters.FilterSet):
     topic = django_filters.ModelChoiceFilter(queryset=Topic.objects.all())
     created_at = django_filters.DateTimeFromToRangeFilter()
     resource_type = django_filters.CharFilter(method='filter_resource_type')
-    
+
     class Meta:
         model = AbstractResource
         fields = ['title', 'topic']
