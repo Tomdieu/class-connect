@@ -107,15 +107,15 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ classStructure: initi
   const getResourceIcon = (resourceType: string) => {
     switch (resourceType) {
       case 'PDFResource':
-        return { icon: FileText, color: 'text-red-500' };
+        return { icon: FileText, color: 'text-red-500', bgColor: 'bg-red-50' };
       case 'VideoResource':
-        return { icon: Video, color: 'text-blue-500' };
+        return { icon: Video, color: 'text-blue-500', bgColor: 'bg-blue-50' };
       case 'ExerciseResource':
-        return { icon: ScrollText, color: 'text-green-500' };
+        return { icon: ScrollText, color: 'text-green-500', bgColor: 'bg-green-50' };
       case 'RevisionResource':
-        return { icon: BookOpen, color: 'text-purple-500' };
+        return { icon: BookOpen, color: 'text-purple-500', bgColor: 'bg-purple-50' };
       default:
-        return { icon: File, color: 'text-gray-400' };
+        return { icon: File, color: 'text-gray-500', bgColor: 'bg-gray-50' };
     }
   };
 
@@ -238,8 +238,9 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ classStructure: initi
         {resources.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {resources.map((resource) => {
-              const { icon: IconComponent, color } = getResourceIcon(resource.resource_type);
+              const { icon: IconComponent, color, bgColor } = getResourceIcon(resource.resource_type);
               const typeDisplay = getResourceTypeDisplay(resource.resource_type);
+              const hasDescription = resource.description && resource.description.trim().length > 0;
               
               return (
                 <Card 
@@ -249,33 +250,32 @@ const ResourceBrowser: React.FC<ResourceBrowserProps> = ({ classStructure: initi
                 >
                   <div className="absolute top-0 right-0 w-8 h-8 bg-primary/10 rounded-bl-lg"></div>
                   <div className="absolute top-2 left-2">
-                    <div className={`p-2 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm`}>
-                      <IconComponent className={`h-4 w-4 ${color}`} />
+                    <div className={`p-2 rounded-lg ${bgColor} shadow-sm border border-white/20`}>
+                      <IconComponent className={`h-5 w-5 ${color}`} />
                     </div>
                   </div>
                   <CardHeader className="pt-12 pb-2">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${bgColor} ${color}`}>
                         {typeDisplay}
                       </span>
                       <Eye className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <CardTitle className="text-primary line-clamp-2">{resource.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {resource.description || "No description available"}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="pt-0">
+                  {hasDescription && (
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {resource.description}
+                      </p>
+                    </CardContent>
+                  )}
+                  <CardFooter className={hasDescription ? "pt-0" : "pt-2"}>
                     <Button 
                       size="sm" 
                       className="w-full bg-primary/10 hover:bg-primary hover:text-white text-primary transition-colors"
                     >
-                      {resource.resource_type === 'VideoResource' && <Play className="h-4 w-4 mr-2" />}
-                      {resource.resource_type === 'PDFResource' && <FileText className="h-4 w-4 mr-2" />}
-                      {resource.resource_type === 'ExerciseResource' && <ScrollText className="h-4 w-4 mr-2" />}
-                      {resource.resource_type === 'RevisionResource' && <BookOpen className="h-4 w-4 mr-2" />}
+                      <IconComponent className="h-4 w-4 mr-2" />
                       View {typeDisplay}
                     </Button>
                   </CardFooter>
