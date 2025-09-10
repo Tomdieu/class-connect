@@ -1,5 +1,5 @@
 "use client";
-import { Users, BookOpen, BarChart3, Settings, CreditCard, Rss, Bell, GraduationCap, X, Video } from "lucide-react";
+import { Users, BookOpen, BarChart3, Settings, CreditCard, Rss, Bell, GraduationCap, X, Video, MessageCircle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -34,6 +34,8 @@ export const AdminSidebar = () => {
         { title: t("adminSidebar.items.payments"), icon: CreditCard, url: "/admin/payments" },
         { title: t("adminSidebar.items.forum"), icon: Rss, url: "/admin/forum" },
         { title: t("adminSidebar.items.onlineMeetings"), icon: Video, url: "/admin/online-meetings" },
+        { title: t("adminSidebar.items.messages"), icon: MessageCircle, url: "/admin/messages" },
+
       ],
     },
     {

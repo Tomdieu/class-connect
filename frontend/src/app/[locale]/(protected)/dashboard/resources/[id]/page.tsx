@@ -17,7 +17,7 @@ import ScreenshotProtectionProvider from '@/providers/ScreenshotProtectionProvid
 export default function ResourceDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const resourceId = params.id as string;
+  const resourceId = params?.id as string;
 
   const { data: resource, isLoading, error } = useQuery({
     queryKey: ['resource', resourceId],
