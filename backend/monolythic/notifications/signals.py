@@ -122,3 +122,79 @@ def notify_admins_of_new_user(sender, instance, created, **kwargs):
                 message=f"Un nouvel utilisateur '{instance.get_full_name()}' ({instance.email}) s'est inscrit. Type d'utilisateur: {instance.user_type}.",
                 notification_type='SYSTEM',
             )
+
+from django.core.mail import send_mail
+from django.conf import settings
+from users.tasks.task import send_async_mail
+from .models import ContactReply
+import logging
+
+logger = logging.getLogger(__name__)
+
+@receiver(post_save, sender=ContactReply)
+def handle_contact_reply(sender, instance, created, **kwargs):
+    """
+    When a contact reply is created:
+    1. Send an email to the contact person
+    2. Create a notification if the contact is associated with a user
+    """
+    if not created:
+        # Only run on creation, not updates
+        return
+    
+    # Get the related contact
+    contact = instance.contact
+    reply_content = instance.message
+    admin_name = instance.admin_user.get_full_name() if instance.admin_user else "Admin"
+    
+    # Update contact status to RESOLVED if it's not already closed
+    if contact.status not in ['RESOLVED', 'CLOSED']:
+        contact.status = 'RESOLVED'
+        contact.save(update_fields=['status'])
+    
+    # 1. Send email to the contact person
+    subject = f"Re: {contact.subject} - Response from {settings.SITE_NAME}"
+    email_message = f"""
+Hello {contact.name},
+
+Thank you for contacting us about "{contact.subject}".
+
+{admin_name} has replied to your inquiry:
+
+"{reply_content}"
+
+If you have any further questions, please feel free to reply to this email or submit another contact form on our website.
+
+Best regards,
+The {settings.SITE_NAME} Team
+"""
+    
+    try:
+        # Queue email sending via Celery
+        send_async_mail.delay(
+            subject=subject,
+            message=email_message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[contact.email],
+            fail_silently=True
+        )
+        # Mark as sent
+        instance.email_sent = True
+        instance.save(update_fields=['email_sent'])
+    except Exception as e:
+        logger.error(f"Error sending contact reply email: {str(e)}")
+    
+    # 2. Create notification if the contact is associated with a user
+    if contact.user:
+        try:
+            notification = Notification.objects.create(
+                user=contact.user,
+                title=f"Response to your inquiry: {contact.subject}",
+                message=f"An administrator has responded to your inquiry. {reply_content[:100]}{'...' if len(reply_content) > 100 else ''}",
+                notification_type='CONTACT_REPLY',
+            )
+            # Mark notification as sent
+            instance.notification_sent = True
+            instance.save(update_fields=['notification_sent'])
+        except Exception as e:
+            logger.error(f"Error creating notification for contact reply: {str(e)}")
