@@ -140,7 +140,7 @@ export function createClassSelectOptions(classes: ClassType[]) {
       label: sectionData.section,
       options: Object.entries(sectionData.levels).flatMap(([, levelData]) => {
         return levelData.classes.map(classItem => ({
-          value: classItem.id.toString(),
+          value: classItem.id?.toString() || '',
           label: formatClassName(classItem),
           data: classItem
         }));
