@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
 import {
   Form,
@@ -9,6 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Credenza,
   CredenzaClose,
@@ -16,18 +18,16 @@ import {
   CredenzaHeader,
   CredenzaTitle,
 } from "@/components/ui/credenza";
-
+import { Loader, TriangleAlert } from "lucide-react";
 import { useI18n } from "@/locales/client";
 import { useForm } from "react-hook-form";
+import { addSubject, updateSubject } from "@/actions/courses";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSubjectStore } from "@/hooks/subject-store";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addSubject, updateSubject } from "@/actions/courses";
-import { toast } from "sonner";
-import { Loader, TriangleAlert } from "lucide-react";
+
 
 function SubjectModal() {
   const t = useI18n();

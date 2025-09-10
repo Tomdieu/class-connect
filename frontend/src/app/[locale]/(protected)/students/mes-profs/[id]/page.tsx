@@ -2,12 +2,8 @@
 
 import { useParams } from 'next/navigation'
 import React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { getUser } from '@/actions/accounts'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { 
     User, 
@@ -23,10 +19,19 @@ import {
     Star
 } from 'lucide-react'
 import { format } from 'date-fns'
-import { useRouter } from 'next/navigation'
+
+import { useQuery } from '@tanstack/react-query'
+import { getUser } from '@/actions/accounts'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+
+
+
 
 function TeacherDetails() {
-    const { id } = useParams<{ id: string }>()
+    const params = useParams<{ id: string }>()
+    const id = params?.id
     const router = useRouter()
 
     const { 
@@ -35,7 +40,7 @@ function TeacherDetails() {
         error 
     } = useQuery({
         queryKey: ['teacher', id],
-        queryFn: () => getUser(id),
+        queryFn: () => getUser(id?.toString() || ''),
         enabled: !!id,
         staleTime: 5 * 60 * 1000, // 5 minutes
     })
@@ -285,34 +290,7 @@ function TeacherDetails() {
                         </Card>
                     )}
 
-                    {/* Subscription Status */}
-                    <Card>
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-lg flex items-center gap-2">
-                                <Star className="h-5 w-5" />
-                                Subscription Status
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {teacher.subscription_status.active ? (
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <Badge className="bg-green-100 text-green-800">Active</Badge>
-                                        {'plan' in teacher.subscription_status && (
-                                            <Badge variant="outline">{teacher.subscription_status.plan}</Badge>
-                                        )}
-                                    </div>
-                                    {'expires_at' in teacher.subscription_status && teacher.subscription_status.expires_at && (
-                                        <p className="text-sm text-muted-foreground">
-                                            Expires: {format(new Date(teacher.subscription_status.expires_at), 'PPP')}
-                                        </p>
-                                    )}
-                                </div>
-                            ) : (
-                                <Badge className="bg-red-100 text-red-800">No Active Subscription</Badge>
-                            )}
-                        </CardContent>
-                    </Card>
+                    
                 </CardContent>
             </Card>
         </div>
