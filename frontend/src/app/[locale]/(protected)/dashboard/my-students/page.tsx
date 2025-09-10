@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ChevronDown, X, ChevronLeft, ChevronRight, Filter, LoaderCircle } from "lucide-react";
-import { listSchoolYear, getMyStudents, createEnrollmentDeclaration, listEnrollmentDeclarations } from "@/actions/enrollments";
+import { listSchoolYear, getMyStudents, createEnrollmentDeclaration, listEnrollmentDeclarations, completeEnrollment } from "@/actions/enrollments";
 import { SchoolYearType, TeacherStudentEnrollmentType, CourseDeclarationType, PaginationType, ActionStatus } from "@/types";
 import {
   Select,
@@ -112,6 +112,22 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  const completeTeacherStudentEnrollmentMutation = useMutation({
+    mutationFn:completeEnrollment
+  })
+
+
+  const onCompleteEnrollment = (enrollmentId: number) => {
+    completeTeacherStudentEnrollmentMutation.mutate(enrollmentId, {
+      onSuccess: () => {
+        toast.success(t("toast.enrollmentCompleted"));
+      },
+      onError: () => {
+        toast.error(t("toast.enrollmentCompletionFailed"));
+      }
+    })
+  }
+
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
   };
@@ -180,15 +196,30 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
   };
 
   const formSchema = z.object({
-    declaration_date: z.string().nonempty({ message: t("form.errors.dateRequired") }),
+    declaration_date: z.string()
+      .nonempty({ message: t("form.errors.dateRequired") })
+      .refine((date) => {
+        const selectedDate = new Date(date);
+        const today = new Date();
+        const twoDaysAgo = new Date();
+        twoDaysAgo.setDate(today.getDate() - 2);
+        
+        // Set hours to 0 for accurate date comparison
+        selectedDate.setHours(0, 0, 0, 0);
+        twoDaysAgo.setHours(0, 0, 0, 0);
+        
+        return selectedDate >= twoDaysAgo;
+      }, { message: t("form.errors.dateTooOld") }),
     duration: z.coerce.number().min(1).max(5, { message: t("form.errors.durationRange") }),
   });
 
-  const form = useForm({
+  type FormValues = z.infer<typeof formSchema>;
+
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       declaration_date: "",
-      duration: "1",
+      duration: 1,
     },
   });
 
@@ -252,8 +283,8 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
   };
 
   return (
-    <div className="bg-card/95 backdrop-blur rounded-lg shadow-md border border-primary/20 mb-4 overflow-hidden relative">
-      <div className="absolute top-0 right-0 w-[100px] h-[100px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div>
+    <div className="bg-card/95 backdrop-blur rounded-sm shadow-md border border-primary/20 mb-4 overflow-hidden relative">
+      {/* <div className="absolute top-0 right-0 w-[100px] h-[100px] bg-primary/10 rounded-bl-full z-0 opacity-20"></div> */}
       
       <div
         className="flex items-center justify-between p-4 cursor-pointer relative z-10"
@@ -344,15 +375,31 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                           <FormField
                             name="declaration_date"
                             control={form.control}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>{t("form.date")}</FormLabel>
-                                <FormControl>
-                                  <Input type="date" {...field} className="bg-background" />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
+                            render={({ field }) => {
+                              // Calculate the minimum allowed date (2 days ago)
+                              const twoDaysAgo = new Date();
+                              twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+                              const minDate = twoDaysAgo.toISOString().split('T')[0];
+                              
+                              // Calculate today's date as max
+                              const today = new Date().toISOString().split('T')[0];
+                              
+                              return (
+                                <FormItem>
+                                  <FormLabel>{t("form.date")}</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      type="date" 
+                                      {...field} 
+                                      className="bg-background"
+                                      min={minDate}
+                                      max={today}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              );
+                            }}
                           />
                           <FormField
                             name="duration"
@@ -394,7 +441,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
                       </Form>
                     </CredenzaContent>
                   </Credenza>
-                  <Button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
+                  <Button onClick={() => onCompleteEnrollment(student.offer.id)} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
                     {t("course.reportEnd")}
                   </Button>
                 </div>
@@ -638,6 +685,7 @@ const StudentsPage: React.FC = () => {
     queryFn: getMyStudents,
     enabled: !!selectedYear, // Only fetch when a year is selected
   });
+
 
   // Filter students based on selected school year and active status
   const students = allStudents.filter((student) => {
