@@ -49,7 +49,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 // Updated imports for new class structure and required functions
-import { listSubjects, getformatedClasses } from "@/actions/courses";
+import { listSubjects, getformatedClasses, listClasses } from "@/actions/courses";
 import { getStudentsByClassId } from "@/actions/user-classes";
 import { listSchoolYear } from "@/actions/enrollments";
 import { getAvailabilityOfUser, updateAvailabilityTimeSlot } from "@/actions/user-availability";
@@ -72,6 +72,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { getUsers } from "@/actions/accounts";
 
 export default function CreateCourseOfferPage() {
   const t = useI18n();
@@ -175,7 +176,7 @@ export default function CreateCourseOfferPage() {
     queryFn: () => getStudentsByClassId({ 
       class_level: form.watch("class_level_id"), 
       school_year: activeSchoolYear?.formatted_year,
-      no_assign_teacher:true
+      no_assign_teacher: true
     }),
     enabled: !!form.watch("class_level_id") && !!activeSchoolYear,
   });

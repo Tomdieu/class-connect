@@ -10,6 +10,7 @@ import {
   TeacherStudentEnrollmentType,
 } from "@/types";
 import { AxiosError } from "axios";
+import { string } from "zod";
 
 export const listSchoolYear = async () => {
   try {
@@ -29,6 +30,32 @@ export const listSchoolYear = async () => {
     throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 };
+
+export const addSchoolYear = async ({ start_year, end_year }: { start_year: string, end_year: string }) => {
+  try {
+    const session = await auth();
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.post("/api/school-year/", 
+      {
+        start_year,
+        end_year,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${session.user.accessToken}`,
+        },
+      }
+    );
+    return response.data as SchoolYearType;
+
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.data) {
+      throw JSON.stringify(axiosError.response.data);
+    }
+    throw JSON.stringify({ message: "An unexpected error occurred" });
+  }
+}
 
 type EnrollmentParams = {
   teacher: string;
@@ -164,7 +191,7 @@ export const completeEnrollment = async (id: number) => {
 // region Course Declarations
 
 interface CourseDeclarationFilter {
-  page?: string|number;
+  page?: string | number;
   page_size?: number;
   user_id?: string; // UUID is typically represented as a string in TypeScript
   status?: ActionStatus; // Using the ActionStatus type for consistency
@@ -175,10 +202,10 @@ export const listEnrollmentDeclarations = async (id: number, params?: Partial<Co
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
-    
+
     // Prepare API params by transforming the nested date structure if it exists
     const apiParams: Record<string, any> = { ...params };
-    
+
     // Handle the nested date structure for the API
     if (params?.declaration_date) {
       if (params.declaration_date.from) {
@@ -190,7 +217,7 @@ export const listEnrollmentDeclarations = async (id: number, params?: Partial<Co
       // Remove the nested structure as the API expects flat parameters
       delete apiParams.declaration_date;
     }
-    
+
     const response = await api.get(`/api/enrollments/${id}/declarations/`, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
@@ -207,11 +234,11 @@ export const listEnrollmentDeclarations = async (id: number, params?: Partial<Co
   }
 };
 
-export const createEnrollmentDeclaration = async ({enrollmentId,data}:{enrollmentId:number,data:{duration:number,declaration_date:string}})=>{
+export const createEnrollmentDeclaration = async ({ enrollmentId, data }: { enrollmentId: number, data: { duration: number, declaration_date: string } }) => {
   try {
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
-    const response = await api.post(`/api/enrollments/${enrollmentId}/declarations/`,{...data,teacher_student_enrollment_id:enrollmentId}, {
+    const response = await api.post(`/api/enrollments/${enrollmentId}/declarations/`, { ...data, teacher_student_enrollment_id: enrollmentId }, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
@@ -252,22 +279,22 @@ export const getEnrollmentDeclaration = async (
 };
 
 
-export const updateEnrollmentDeclaration = async ({id,declarationId,data}:{id:number,declarationId:number,data:Partial<CourseDeclarationCreateType>})=>{
-  try{
+export const updateEnrollmentDeclaration = async ({ id, declarationId, data }: { id: number, declarationId: number, data: Partial<CourseDeclarationCreateType> }) => {
+  try {
     const session = await auth();
-    if(!session?.user) throw Error("Unauthorize user!");
-    const response = await api.patch(`/api/enrollments/${id}/declarations/${declarationId}/`,data,{
-      headers:{
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.patch(`/api/enrollments/${id}/declarations/${declarationId}/`, data, {
+      headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
     });
     return response.data as CourseDeclarationType;
-  }catch(error:unknown){
+  } catch (error: unknown) {
     const axiosError = error as AxiosError;
-    if(axiosError.response?.data){
+    if (axiosError.response?.data) {
       throw JSON.stringify(axiosError.response.data);
     }
-    throw JSON.stringify({message:"An unexpected error occurred"});
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 }
 
@@ -284,8 +311,8 @@ export const updateEnrollmentDeclarationPaid = async ({
     const session = await auth();
     if (!session?.user) throw Error("Unauthorize user!");
     const formData = new FormData()
-    formData.append('proof_of_payment',data.proof_of_payment)
-    formData.append('payment_comment',data.payment_comment)
+    formData.append('proof_of_payment', data.proof_of_payment)
+    formData.append('payment_comment', data.payment_comment)
     const response = await api.post(
       `/api/enrollments/${id}/declarations/${declarationId}/mark-as-paid/`,
       formData,
@@ -305,40 +332,40 @@ export const updateEnrollmentDeclarationPaid = async ({
   }
 };
 
-export const deleteEnrollmentDeclaration = async (id:number,declarationId:number)=>{
-  try{
+export const deleteEnrollmentDeclaration = async (id: number, declarationId: number) => {
+  try {
     const session = await auth();
-    if(!session?.user) throw Error("Unauthorize user!");
-    const response = await api.delete(`/api/enrollments/${id}/declarations/${declarationId}/`,{
-      headers:{
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.delete(`/api/enrollments/${id}/declarations/${declarationId}/`, {
+      headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
     });
     return response.data as CourseDeclarationType;
-  }catch(error:unknown){
+  } catch (error: unknown) {
     const axiosError = error as AxiosError;
-    if(axiosError.response?.data){
+    if (axiosError.response?.data) {
       throw JSON.stringify(axiosError.response.data);
     }
-    throw JSON.stringify({message:"An unexpected error occurred"});
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 }
 
-export const updateEnrollmentDeclarationStatus = async (id:number,declarationId:number,data:{status:Omit<ActionStatus, "CANCELLED">})=>{
-  try{
+export const updateEnrollmentDeclarationStatus = async (id: number, declarationId: number, data: { status: Omit<ActionStatus, "CANCELLED"> }) => {
+  try {
     const session = await auth();
-    if(!session?.user) throw Error("Unauthorize user!");
-    const response = await api.patch(`/api/enrollments/${id}/declarations/${declarationId}/status/`,data,{
-      headers:{
+    if (!session?.user) throw Error("Unauthorize user!");
+    const response = await api.patch(`/api/enrollments/${id}/declarations/${declarationId}/status/`, data, {
+      headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },
     });
     return response.data as CourseDeclarationType;
-  }catch(error:unknown){
+  } catch (error: unknown) {
     const axiosError = error as AxiosError;
-    if(axiosError.response?.data){
+    if (axiosError.response?.data) {
       throw JSON.stringify(axiosError.response.data);
     }
-    throw JSON.stringify({message:"An unexpected error occurred"});
+    throw JSON.stringify({ message: "An unexpected error occurred" });
   }
 }

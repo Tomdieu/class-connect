@@ -5,13 +5,20 @@ import {
   CredenzaHeader,
 } from "@/components/ui/credenza";
 import { DialogTitle } from "@/components/ui/dialog";
-import { useAuthDialog } from "@/hooks/use-auth-dialog";
-import { BookOpen, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useI18n } from "@/locales/client";
+import { updateUser } from '@/actions/accounts';
 
+import { useI18n } from "@/locales/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Textarea } from "@/components/ui/textarea";
+import { useUserStore } from "@/hooks/user-store";
+import { Switch } from "@/components/ui/switch";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -30,27 +37,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Textarea } from "@/components/ui/textarea";
-import { useUserStore } from "@/hooks/user-store";
-import { Switch } from "@/components/ui/switch";
-import { updateUser } from "@/actions/accounts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
-const EDUCATION_LEVELS = [
-  "COLLEGE",
-  "LYCEE",
-  "UNIVERSITY",
-  "PROFESSIONAL",
-] as const;
-const COLLEGE_CLASSES = ["6eme", "5eme", "4eme", "3eme"] as const;
-const LYCEE_CLASSES = ["2nde", "1ere", "terminale"] as const;
-const UNIVERSITY_LEVELS = ["licence", "master", "doctorat"] as const;
-const LICENCE_YEARS = ["L1", "L2", "L3"] as const;
-const MASTER_YEARS = ["M1", "M2"] as const;
-const LYCEE_SPECIALITIES = ["scientifique", "litteraire"] as const;
+
+// async function callUpdateUser({ id, body }: { id: string | number, body: any }) {
+//   return updateUser({ id, body });
+// }
+
+const USER_TYPES = ["ADMIN", "STUDENT", "PROFESSIONAL"] as const;
 
 function UserDialog() {
   const { isOpen, user, onClose } = useUserStore();
@@ -86,6 +79,7 @@ function UserDialog() {
 
       is_staff: z.boolean(),
       is_active: z.boolean(),
+      user_type: z.enum(["ADMIN", "STUDENT", "PROFESSIONAL"]),
     });
 
     // Add conditional validation based on is_staff
@@ -94,14 +88,9 @@ function UserDialog() {
       baseSchema.extend({
         is_staff: z.literal(true),
         date_of_birth: z.string().optional().nullable(),
-        education_level: z.enum(EDUCATION_LEVELS).optional().nullable(),
         town: z.string().optional().nullable(),
         quarter: z.string().optional().nullable(),
-        college_class: z.enum(COLLEGE_CLASSES).optional().nullable(),
-        lycee_class: z.enum(LYCEE_CLASSES).optional().nullable(),
-        lycee_speciality: z.enum(LYCEE_SPECIALITIES).optional().nullable(),
-        university_level: z.enum(UNIVERSITY_LEVELS).optional().nullable(),
-        university_year: z.string().optional().nullable(),
+        class_enrolled: z.number().optional().nullable(),
         enterprise_name: z.string().optional().nullable(),
         platform_usage_reason: z.string().optional().nullable(),
       }),
@@ -120,11 +109,6 @@ function UserDialog() {
             },
             { message: t("registerDialog.errors.dateMinAge") }
           ),
-        education_level: z.enum(EDUCATION_LEVELS, {
-          errorMap: () => ({
-            message: t("registerDialog.errors.educationLevelRequired"),
-          }),
-        }),
         town: z
           .string()
           .min(1, { message: t("registerDialog.errors.townRequired") })
@@ -133,11 +117,7 @@ function UserDialog() {
           .string()
           .min(1, { message: t("registerDialog.errors.quarterRequired") })
           .min(2, { message: t("registerDialog.errors.quarterMin") }),
-        college_class: z.enum(COLLEGE_CLASSES).optional().nullable(),
-        lycee_class: z.enum(LYCEE_CLASSES).optional().nullable(),
-        lycee_speciality: z.enum(LYCEE_SPECIALITIES).optional().nullable(),
-        university_level: z.enum(UNIVERSITY_LEVELS).optional().nullable(),
-        university_year: z.string().optional().nullable(),
+        class_enrolled: z.number().optional().nullable(),
         enterprise_name: z.string().optional().nullable(),
         platform_usage_reason: z.string().optional().nullable(),
       }),
@@ -155,17 +135,13 @@ function UserDialog() {
       last_name: "",
       phone_number: "",
       date_of_birth: "", // Changed from null to empty string
-      education_level: undefined, // Changed from null to undefined
       email: "",
       town: "", // Changed from null to empty string
       quarter: "", // Changed from null to empty string
       is_staff: false,
       is_active: true,
-      college_class: undefined, // Changed from null to undefined
-      lycee_class: undefined,
-      lycee_speciality: undefined,
-      university_level: undefined,
-      university_year: "",
+      user_type: "STUDENT",
+      class_enrolled: null,
       enterprise_name: "",
       platform_usage_reason: "",
     },
@@ -179,30 +155,18 @@ function UserDialog() {
         last_name: user.last_name,
         phone_number: user.phone_number,
         date_of_birth: user.date_of_birth || "", // Changed from null to empty string
-        education_level: user.education_level || undefined, // Changed from null to undefined
         email: user.email,
         town: user.town || "", // Changed from null to empty string
         quarter: user.quarter || "", // Changed from null to empty string
-        college_class: user.college_class || undefined, // Changed from null to undefined
-        lycee_class: user.lycee_class || undefined,
-        lycee_speciality: user.lycee_speciality || undefined,
-        university_level: user.university_level || undefined,
-        university_year: user.university_year || "",
+        user_type: user.user_type,
+        class_enrolled: user.class_enrolled,
         enterprise_name: user.enterprise_name || "",
         platform_usage_reason: user.platform_usage_reason || "",
         is_staff: user.is_staff,
         is_active: user.is_active,
       });
-      
-      // Set university level state if it exists
-      if (user.university_level) {
-        setUniversityLevel(user.university_level);
-      }
     }
   }, [form, user]);
-
-  // Add state for university level
-  const [universityLevel, setUniversityLevel] = React.useState<string>("");
 
   // Update form validation whenever language changes
   useEffect(() => {
@@ -216,11 +180,15 @@ function UserDialog() {
     const isStaff = form.watch("is_staff");
     if (isStaff) {
       // Clear validation errors for optional fields when user becomes staff
-      form.clearErrors(["date_of_birth", "education_level", "town", "quarter"]);
+      form.clearErrors(["date_of_birth", "town", "quarter"]);
     }
   }, [form]);
 
   // Add update user mutation
+  // const updateUserMutation = useMutation({
+  //   mutationFn: updateUser,
+  // });
+
   const updateUserMutation = useMutation({
     mutationFn: updateUser,
   });
@@ -236,7 +204,7 @@ function UserDialog() {
       // Call the updateUser mutation
       updateUserMutation.mutate(
         {
-          id: user?.id ||id|| "",
+          id: user?.id || id || "",
           body: updateData,
         },
         {
@@ -280,39 +248,26 @@ function UserDialog() {
     }
   };
 
-  // Render dynamic fields based on education level
+  // Render dynamic fields based on user type
   const renderDynamicFields = () => {
-    const educationLevel = form.watch("education_level");
-    const lyceeClass = form.watch("lycee_class");
+    const userType = form.watch("user_type");
 
-    if (educationLevel === "COLLEGE") {
+    if (userType === "STUDENT") {
       return (
         <FormField
           control={form.control}
-          name="college_class"
+          name="class_enrolled"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("registerDialog.collegeClassLabel")}</FormLabel>
+              <FormLabel>{t("registerDialog.classEnrolledLabel") || "Class"}</FormLabel>
               <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={t("registerDialog.collegeClassLabel")}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COLLEGE_CLASSES.map((collegeClass) => (
-                      <SelectItem key={collegeClass} value={collegeClass}>
-                        {t(
-                          `registerDialog.collegeClasses.${collegeClass}` as keyof typeof t
-                        )}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  type="number"
+                  {...field}
+                  value={field.value || ""}
+                  onChange={e => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                  placeholder={t("registerDialog.classEnrolledPlaceholder") || "Class ID"}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -321,187 +276,7 @@ function UserDialog() {
       );
     }
 
-    if (educationLevel === "LYCEE") {
-      return (
-        <>
-          <FormField
-            control={form.control}
-            name="lycee_class"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("registerDialog.lyceeClassLabel")}</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("registerDialog.lyceeClassLabel")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {LYCEE_CLASSES.map((lyceeClass) => (
-                        <SelectItem key={lyceeClass} value={lyceeClass}>
-                          {t(
-                            `registerDialog.lyceeClasses.${lyceeClass}` as keyof typeof t
-                          )}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="lycee_speciality"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {t("registerDialog.lyceeSpecialityLabel")}
-                </FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("registerDialog.lyceeSpecialityLabel")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {LYCEE_SPECIALITIES.map((speciality) => (
-                        <SelectItem key={speciality} value={speciality}>
-                          {t(
-                            `registerDialog.lyceeSpecialities.${speciality}` as keyof typeof t
-                          )}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </>
-      );
-    }
-
-    if (educationLevel === "UNIVERSITY") {
-      return (
-        <>
-          <FormField
-            control={form.control}
-            name="university_level"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {t("registerDialog.universityLevelLabel")}
-                </FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      setUniversityLevel(value);
-                    }}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("registerDialog.universityLevelLabel")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {UNIVERSITY_LEVELS.map((level) => (
-                        <SelectItem key={level} value={level}>
-                          {t(
-                            `registerDialog.universityLevels.${level}` as keyof typeof t
-                          )}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {universityLevel === "licence" && (
-            <FormField
-              control={form.control}
-              name="university_year"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("registerDialog.licenceYearLabel")}</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("registerDialog.licenceYearLabel")}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LICENCE_YEARS.map((year) => (
-                          <SelectItem key={year} value={year}>
-                            {t(
-                              `registerDialog.licenceYears.${year}` as keyof typeof t
-                            )}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-          {universityLevel === "master" && (
-            <FormField
-              control={form.control}
-              name="university_year"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("registerDialog.masterYearLabel")}</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("registerDialog.masterYearLabel")}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MASTER_YEARS.map((year) => (
-                          <SelectItem key={year} value={year}>
-                            {t(
-                              `registerDialog.masterYears.${year}` as keyof typeof t
-                            )}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-        </>
-      );
-    }
-
-    if (educationLevel === "PROFESSIONAL") {
+    if (userType === "PROFESSIONAL") {
       return (
         <>
           <FormField
@@ -655,11 +430,11 @@ function UserDialog() {
                   />
                   <FormField
                     control={form.control}
-                    name="education_level"
+                    name="user_type"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          {t("registerDialog.educationLevelLabel")}
+                          {t("registerDialog.userTypeLabel") || "User Type"}
                         </FormLabel>
                         <FormControl>
                           <Select
@@ -669,16 +444,16 @@ function UserDialog() {
                             <SelectTrigger>
                               <SelectValue
                                 placeholder={t(
-                                  "registerDialog.educationLevelLabel"
-                                )}
+                                  "registerDialog.userTypeLabel"
+                                ) || "User Type"}
                               />
                             </SelectTrigger>
                             <SelectContent>
-                              {EDUCATION_LEVELS.map((level) => (
-                                <SelectItem key={level} value={level}>
+                              {USER_TYPES.map((type) => (
+                                <SelectItem key={type} value={type}>
                                   {t(
-                                    `registerDialog.educationLevels.${level.toLowerCase()}` as keyof typeof t
-                                  )}
+                                    `registerDialog.userTypes.${type.toLowerCase()}` as keyof typeof t
+                                  ) || type}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -792,8 +567,8 @@ function UserDialog() {
                 >
                   {(form.formState.isSubmitting ||
                     updateUserMutation.isPending) && (
-                    <Loader className="size-4 animate-spin" />
-                  )}
+                      <Loader className="size-4 animate-spin" />
+                    )}
                   {t("userDialog.submitButton")}
                 </Button>
               </form>

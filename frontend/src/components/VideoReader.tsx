@@ -23,6 +23,18 @@ const VideoReader: React.FC<VideoReaderProps> = ({
   const [duration, setDuration] = useState(0);
   const [progressPercentage, setProgressPercentage] = useState(0);
   
+  // Helper function to get proxied video URL
+  const getProxiedVideoUrl = (originalUrl: string) => {
+    // If the URL contains Backblaze B2 URL, use the proxy route
+    if (originalUrl.includes('s3.us-east-005.backblazeb2.com') || originalUrl.includes('class-connect')) {
+      return `/api/proxy-video?url=${encodeURIComponent(originalUrl)}`;
+    }
+    // Otherwise, use the original URL (for local or other trusted sources)
+    return originalUrl;
+  };
+
+  const proxiedVideoUrl = getProxiedVideoUrl(videoUrl);
+  
   // Set initial time when component mounts
   useEffect(() => {
     if (videoRef.current && initialTime > 0) {
@@ -96,7 +108,7 @@ const VideoReader: React.FC<VideoReaderProps> = ({
         className="w-full max-h-[80vh]"
         controls
         controlsList="nodownload"
-        src={videoUrl}
+        src={proxiedVideoUrl}
         preload="metadata"
       >
         Your browser does not support the video tag.

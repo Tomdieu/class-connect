@@ -19,6 +19,18 @@ export function VideoPlayer({ src, poster, aspectRatio = "video", className, ...
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(false);
 
+  // Helper function to get proxied video URL
+  const getProxiedVideoUrl = (originalSrc: string) => {
+    // If the src contains Backblaze B2 URL, use the proxy route
+    if (originalSrc.includes('s3.us-east-005.backblazeb2.com') || originalSrc.includes('class-connect')) {
+      return `/api/proxy-video?url=${encodeURIComponent(originalSrc)}`;
+    }
+    // Otherwise, use the original src (for local or other trusted sources)
+    return originalSrc;
+  };
+
+  const proxiedSrc = getProxiedVideoUrl(src);
+
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -98,7 +110,7 @@ export function VideoPlayer({ src, poster, aspectRatio = "video", className, ...
     >
       <video
         ref={videoRef}
-        src={src}
+        src={proxiedSrc}
         poster={poster}
         className="w-full h-full object-contain"
         onTimeUpdate={handleTimeUpdate}

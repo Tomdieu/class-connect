@@ -488,8 +488,8 @@ export declare interface SchoolYearType {
   id:number;
   start_year: number;
   end_year: number;
-  is_active: boolean;
-  formatted_year: string;
+  is_active: boolean; // read only
+  formatted_year: string; // read only
 }
 
 export declare interface TeacherStudentEnrollmentType {
@@ -1059,4 +1059,72 @@ export interface SiteSettings {
   email:string;
   currency:string;
   tax_rate:number;
+}
+
+
+export type ContactStatus = 'NEW' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
+
+export interface UserMinimalType {
+  id: string;
+  email: string;
+  full_name: string;
+}
+
+export interface ContactReplyType {
+  id: number;
+  contact: number;
+  admin_user: string | null;
+  admin_user_details: UserMinimalType;
+  message: string;
+  email_sent: boolean;
+  notification_sent: boolean;
+  created_at: string;
+}
+
+export interface ContactType {
+  id: number;
+  user: string | null;
+  user_details?: UserMinimalType;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  concerns_student: boolean | null;
+  status: ContactStatus;
+  created_at: string;
+  updated_at: string;
+  replies: ContactReplyType[];
+}
+
+export interface ContactCreateType {
+  user?: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  concerns_student?: boolean;
+}
+
+export interface ContactReplyCreateType {
+  contact: number;
+  admin_user: string;
+  message: string;
+}
+
+export interface ContactFilterType {
+  status?: ContactStatus;
+  created_at_after?: string; // ISO date string
+  created_at_before?: string; // ISO date string
+  concerns_student?: boolean;
+  has_user?: boolean; // corresponds to user__isnull filter with exclude=True
+  user?: string; // User ID
+}
+
+export interface ContactReplyFilterType {
+  contact?: number;
+  admin_user?: string;
+  created_at_after?: string; // ISO date string
+  created_at_before?: string; // ISO date string
+  email_sent?: boolean;
+  notification_sent?: boolean;
 }
