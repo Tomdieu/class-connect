@@ -33,7 +33,7 @@ export default function LoginPage() {
   const locale = useCurrentLocale();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get("callbackUrl");
-  const { status } = useSession();
+  const { status, data: session } = useSession();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,16 +41,36 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Function to determine appropriate route based on user role
+  const getRedirectPath = (user: any) => {
+    if (!user) return null;
+    
+    // Handle redirection based on user role directly
+    if (user.is_superuser || user.is_staff || user.user_type === "ADMIN") {
+      return `/${locale}/admin`;
+    } else if (user.user_type === "STUDENT") {
+      return `/${locale}/students`;
+    } else {
+      return `/${locale}/dashboard`;
+    }
+  };
+
   // Check if user is already logged in and redirect accordingly
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === "authenticated" && session?.user) {
       if (callbackUrl) {
         router.push(decodeURIComponent(callbackUrl));
       } else {
-        router.push("/redirect");
+        // Get redirect path based on user data
+        const redirectPath = getRedirectPath(session.user);
+        if (redirectPath) {
+          router.push(redirectPath);
+        } else {
+          router.push("/redirect"); // Fallback to middleware
+        }
       }
     }
-  }, [status, callbackUrl, router]);
+  }, [status, session, callbackUrl, router, locale]);
 
   // Base URL with locale
   const baseUrl = `https://www.classconnect.cm/${locale}`;
@@ -126,16 +146,37 @@ export default function LoginPage() {
 
       if (res && res.ok && !res.error) {
         setIsLoading(false);
-        toast.success("Login successful!");
-        router.refresh();
+        toast.success(t("loginDialog.successMessage") || "Login successful!");
 
         // If a callbackUrl is provided, use it
         if (callbackUrl) {
           router.push(decodeURIComponent(callbackUrl));
         } else {
-          // Use the automatic redirection feature
-          router.push("/redirect");
-          // window.location.href = "/redirect";
+          // First refresh to update the session
+          router.refresh();
+          
+          // We need to wait a bit for the session to update
+          setTimeout(async () => {
+            try {
+              // Get the updated session directly from the server
+              const response = await fetch('/api/auth/session');
+              const sessionData = await response.json();
+              
+              if (sessionData.user) {
+                const redirectPath = getRedirectPath(sessionData.user);
+                if (redirectPath) {
+                  router.push(redirectPath);
+                  return;
+                }
+              }
+              
+              // Fallback to middleware redirect
+              router.push(`/${locale}/redirect`);
+            } catch (error) {
+              console.error("Error fetching session:", error);
+              router.push(`/${locale}/redirect`);
+            }
+          }, 300);
         }
       }
     } catch (error) {
