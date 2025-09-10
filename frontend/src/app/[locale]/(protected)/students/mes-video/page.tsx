@@ -2,11 +2,10 @@
 
 import { getClassVideoResources } from '@/actions/courses';
 import { getMyClass } from '@/actions/user-classes';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, Play, Video, X } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
@@ -63,6 +62,8 @@ function MyVideosPage() {
   const [processedVideos, setProcessedVideos] = useState<VideoResourceType[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<VideoResourceType | null>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [hoveredVideoId, setHoveredVideoId] = useState<number | null>(null);
+  const [previewTimeouts, setPreviewTimeouts] = useState<Record<number, NodeJS.Timeout>>({});
   
   // Fetch classes
   const { data: myClasses, isLoading: classesLoading } = useQuery({
@@ -109,6 +110,45 @@ function MyVideosPage() {
     setIsVideoModalOpen(false);
     setSelectedVideo(null);
   };
+
+  const handleMouseEnter = (videoId: number) => {
+    // Clear any existing timeout for this video
+    if (previewTimeouts[videoId]) {
+      clearTimeout(previewTimeouts[videoId]);
+    }
+
+    // Set a timeout to start preview after 500ms
+    const timeout = setTimeout(() => {
+      setHoveredVideoId(videoId);
+    }, 500);
+
+    setPreviewTimeouts(prev => ({
+      ...prev,
+      [videoId]: timeout
+    }));
+  };
+
+  const handleMouseLeave = (videoId: number) => {
+    // Clear the timeout
+    if (previewTimeouts[videoId]) {
+      clearTimeout(previewTimeouts[videoId]);
+      setPreviewTimeouts(prev => {
+        const newTimeouts = { ...prev };
+        delete newTimeouts[videoId];
+        return newTimeouts;
+      });
+    }
+
+    // Stop preview immediately
+    setHoveredVideoId(null);
+  };
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(previewTimeouts).forEach(timeout => clearTimeout(timeout));
+    };
+  }, [previewTimeouts]);
   
   // Extract unique classes to prevent duplicates
   const uniqueClasses = myClasses ? Array.from(
@@ -253,7 +293,7 @@ function MyVideosPage() {
             <Card className="shadow-lg border-primary/20 overflow-hidden bg-card/95 backdrop-blur">
               <CardContent className="pt-6">
                 <p className="text-center text-muted-foreground mb-4">
-                  {t('common.errorDesc', { item: 'videos' })}
+                  {t('common.errorDesc')}
                 </p>
                 <div className="flex justify-center">
                   <Button 
@@ -279,18 +319,55 @@ function MyVideosPage() {
                   <div className="absolute top-0 right-0 w-[80px] h-[80px] bg-primary/20 rounded-bl-full z-0 opacity-20"></div>
                   
                   {/* Video thumbnail with proper aspect ratio */}
-                  <div className="relative aspect-video bg-gray-800 overflow-hidden">
-                    <div className="w-full h-full flex items-center justify-center text-white">
-                      <div className="text-center">
-                        <Video className="h-12 w-12 mx-auto mb-2 text-gray-300" />
-                        <p className="text-sm font-medium px-4 text-center line-clamp-2">
-                          {video?.title || "Video"}
-                        </p>
+                  <div 
+                    className="relative aspect-video bg-gray-800 overflow-hidden"
+                    onMouseEnter={() => handleMouseEnter(video.id)}
+                    onMouseLeave={() => handleMouseLeave(video.id)}
+                  >
+                    {/* Preview Video */}
+                    {hoveredVideoId === video.id && video.video_url ? (
+                      <video
+                        className="absolute inset-0 w-full h-full object-cover"
+                        src={video.video_url || video.video_file}
+                        autoPlay
+                        muted
+                        loop={false}
+                        playsInline
+                        style={{ zIndex: 2 }}
+                        onError={(e) => {
+                          console.log('Video preview failed to load:', e);
+                          setHoveredVideoId(null);
+                        }}
+                      />
+                    ) : (
+                      /* Thumbnail placeholder */
+                      <div className="w-full h-full flex items-center justify-center text-white">
+                        <div className="text-center">
+                          <Video className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                          <p className="text-sm font-medium px-4 text-center line-clamp-2">
+                            {video?.title || "Video"}
+                          </p>
+                        </div>
                       </div>
+                    )}
+                    
+                    {/* Hover overlay with play button */}
+                    <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${
+                      hoveredVideoId === video.id 
+                        ? 'bg-black/30 opacity-100' 
+                        : 'bg-black/20 opacity-0 group-hover:opacity-100'
+                    }`} style={{ zIndex: 3 }}>
+                      <Play className={`text-white bg-primary/90 p-4 rounded-full shadow-lg transition-all duration-200 ${
+                        hoveredVideoId === video.id ? 'h-12 w-12' : 'h-16 w-16'
+                      }`} />
                     </div>
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <Play className="h-16 w-16 text-white bg-primary/90 p-4 rounded-full shadow-lg" />
-                    </div>
+
+                    {/* Loading indicator for preview */}
+                    {hoveredVideoId === video.id && (
+                      <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded" style={{ zIndex: 4 }}>
+                        Preview
+                      </div>
+                    )}
                   </div>
                   
                   {/* Video details */}
