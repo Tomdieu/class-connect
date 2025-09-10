@@ -41,33 +41,14 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Function to determine appropriate route based on user role
-  const getRedirectPath = (user: any) => {
-    if (!user) return null;
-    
-    // Handle redirection based on user role directly
-    if (user.is_superuser || user.is_staff || user.user_type === "ADMIN") {
-      return `/${locale}/admin`;
-    } else if (user.user_type === "STUDENT") {
-      return `/${locale}/students`;
-    } else {
-      return `/${locale}/dashboard`;
-    }
-  };
-
   // Check if user is already logged in and redirect accordingly
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       if (callbackUrl) {
         router.push(decodeURIComponent(callbackUrl));
       } else {
-        // Get redirect path based on user data
-        const redirectPath = getRedirectPath(session.user);
-        if (redirectPath) {
-          router.push(redirectPath);
-        } else {
-          router.push("/redirect"); // Fallback to middleware
-        }
+        // Always redirect to the redirect route to handle role-based routing
+        router.push(`/${locale}/redirect`);
       }
     }
   }, [status, session, callbackUrl, router, locale]);
@@ -152,31 +133,9 @@ export default function LoginPage() {
         if (callbackUrl) {
           router.push(decodeURIComponent(callbackUrl));
         } else {
-          // First refresh to update the session
-          router.refresh();
-          
-          // We need to wait a bit for the session to update
-          setTimeout(async () => {
-            try {
-              // Get the updated session directly from the server
-              const response = await fetch('/api/auth/session');
-              const sessionData = await response.json();
-              
-              if (sessionData.user) {
-                const redirectPath = getRedirectPath(sessionData.user);
-                if (redirectPath) {
-                  router.push(redirectPath);
-                  return;
-                }
-              }
-              
-              // Fallback to middleware redirect
-              router.push(`/${locale}/redirect`);
-            } catch (error) {
-              console.error("Error fetching session:", error);
-              router.push(`/${locale}/redirect`);
-            }
-          }, 300);
+          // Always redirect to the redirect route to handle role-based routing
+          // This ensures consistent behavior and lets your middleware handle the logic
+          router.push(`/${locale}/redirect`);
         }
       }
     } catch (error) {
