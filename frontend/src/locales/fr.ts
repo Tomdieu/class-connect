@@ -693,6 +693,7 @@ export default {
     "Votre session est sur le point d'expirer en raison d'inactivité. Vous serez automatiquement déconnecté dans {seconds} secondes.",
   "timeout.staySignedIn": "Rester Connecté",
   "timeout.signOut": "Se Déconnecter Maintenant",
+  "timeout.secondsRemaining":"secondes restantes",
   "chat.searchPlaceholder": "Rechercher ou démarrer une nouvelle discussion",
   "chat.messagePlaceholder": "Tapez un message",
   "chat.online": "En ligne",

@@ -710,6 +710,7 @@ export default {
     "Your session is about to expire due to inactivity. You will be automatically signed out in {seconds} seconds.",
   "timeout.staySignedIn": "Stay Signed In",
   "timeout.signOut": "Sign Out Now",
+  "timeout.secondsRemaining":"seconds remaining",
   "chat.searchPlaceholder": "Search or start new chat",
   "chat.messagePlaceholder": "Type a message",
   "chat.online": "Online",
