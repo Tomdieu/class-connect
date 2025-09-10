@@ -11,6 +11,7 @@ import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import React, { ReactElement } from "react";
 import InactivityProvider from "@/providers/InactivityProvider";
 import HelmetWrapper from "@/providers/HelmetWrapperProvider";
+import VisitorTrackingProvider from "@/providers/VisitorTrackingProvider";
 
 // Optimize font loading
 const Inter = localFont({
@@ -394,9 +395,11 @@ export default async function RootLayout({
             <ReactQueryProvider>
               <Providers locale={locale}>
                 <HelmetWrapper>
-                  <InactivityProvider>{children}</InactivityProvider>
-                  <Modals />
-                  <Toaster />
+                  <VisitorTrackingProvider>
+                    <InactivityProvider>{children}</InactivityProvider>
+                    <Modals />
+                    <Toaster />
+                  </VisitorTrackingProvider>
                 </HelmetWrapper>
               </Providers>
             </ReactQueryProvider>
