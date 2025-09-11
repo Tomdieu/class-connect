@@ -1598,24 +1598,26 @@ class UserClassViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
         method='get',
         manual_parameters=[
             openapi.Parameter('class_level', openapi.IN_QUERY, description="Class Level ID", type=openapi.TYPE_INTEGER, required=True),
+            openapi.Parameter('subject', openapi.IN_QUERY, description="Subject ID to filter students by subject", type=openapi.TYPE_INTEGER, required=False),
             openapi.Parameter('school_year', openapi.IN_QUERY, description="School Year in format YYYY-YYYY", type=openapi.TYPE_STRING, required=False),
             openapi.Parameter('no_assign_teacher', openapi.IN_QUERY, description="Filter students without assigned teachers (true/false)", type=openapi.TYPE_BOOLEAN, required=False),
         ],
         responses={200: UserClassSerializer(many=True)},
-        operation_description="Get all students enrolled in a specific class level for a given school year, optionally filtering those without assigned teachers"
+        operation_description="Get all students enrolled in a specific class level for a given school year, optionally filtering by subject and those without assigned teachers"
     )
     @action(detail=False, methods=['get'], url_path='students-by-class')
     def students_by_class(self, request):
-        """Get all students enrolled in a specific class level for a given school year, with optional filtering for those without assigned teachers."""
+        """Get all students enrolled in a specific class level for a given school year, with optional filtering by subject and for those without assigned teachers."""
         import sys
         
         # Get query parameters
         class_level_id = request.query_params.get('class_level')
+        subject_id = request.query_params.get('subject')
         school_year_param = request.query_params.get('school_year')
         no_assign_teacher = request.query_params.get('no_assign_teacher')
         
         # print("\nVIEW DEBUG:", file=sys.stderr)
-        # print(f"Query params: class_level={class_level_id}, school_year={school_year_param}, no_assign_teacher={no_assign_teacher}", file=sys.stderr)
+        # print(f"Query params: class_level={class_level_id}, subject={subject_id}, school_year={school_year_param}, no_assign_teacher={no_assign_teacher}", file=sys.stderr)
         
         if not class_level_id:
             return Response(
@@ -1626,6 +1628,10 @@ class UserClassViewSet(ActivityLoggingMixin, viewsets.ModelViewSet):
         # Build filter data
         filter_data = {'class_level': class_level_id}
         
+        # Add subject filter if provided
+        if subject_id:
+            filter_data['subject'] = subject_id
+            
         # Add school year filter if provided
         if school_year_param:
             filter_data['school_year'] = school_year_param
