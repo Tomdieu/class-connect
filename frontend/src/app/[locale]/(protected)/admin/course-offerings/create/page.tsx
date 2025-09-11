@@ -172,10 +172,11 @@ export default function CreateCourseOfferPage() {
 
   // Query for fetching students based on selected class and active school year
   const { data: classStudents, isLoading: classStudentsLoading } = useQuery({
-    queryKey: ["class-students", form.watch("class_level_id"), activeSchoolYear?.formatted_year],
+    queryKey: ["class-students", form.watch("class_level_id"), form.watch("subject_id"), activeSchoolYear?.formatted_year],
     queryFn: () => getStudentsByClassId({ 
       class_level: form.watch("class_level_id"), 
       school_year: activeSchoolYear?.formatted_year,
+      subject: form.watch("subject_id"),
       no_assign_teacher: true
     }),
     enabled: !!form.watch("class_level_id") && !!activeSchoolYear,
