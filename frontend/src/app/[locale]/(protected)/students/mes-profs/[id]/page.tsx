@@ -25,6 +25,7 @@ import { getUser } from '@/actions/accounts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { motion } from 'framer-motion'
 
 
 
@@ -116,184 +117,201 @@ function TeacherDetails() {
     const userTypeInfo = getUserTypeDisplay(teacher.user_type)
 
     return (
-        <div className="container mx-auto py-6 space-y-6">
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="min-h-screen w-full bg-gradient-to-b from-primary/5 via-background to-background p-4 sm:p-6"
+        >
             {/* Header with back button */}
-            <div className="flex items-center gap-4">
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="w-full max-w-[2400px] mx-auto mb-6"
+            >
                 <Button 
-                    variant="ghost" 
+                    variant="outline" 
                     onClick={() => router.back()}
                     size="sm"
+                    className="hover:bg-primary/10 transition-all"
                 >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back
                 </Button>
-                <h1 className="text-2xl font-bold">Teacher Profile</h1>
-            </div>
+            </motion.div>
 
             {/* Main Profile Card */}
-            <Card>
-                <CardHeader>
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                        {/* Avatar */}
-                        <Avatar className="h-24 w-24">
-                            <AvatarImage src={teacher.avatar || undefined} />
-                            <AvatarFallback className="text-lg font-semibold">
-                                {getInitials(teacher.first_name, teacher.last_name)}
-                            </AvatarFallback>
-                        </Avatar>
+            <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="max-w-[2400px] mx-auto"
+            >
+                <Card>
+                    <CardHeader>
+                        <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                            {/* Avatar */}
+                            <Avatar className="h-24 w-24">
+                                <AvatarImage src={teacher.avatar || undefined} />
+                                <AvatarFallback className="text-lg font-semibold">
+                                    {getInitials(teacher.first_name, teacher.last_name)}
+                                </AvatarFallback>
+                            </Avatar>
 
-                        {/* Basic Info */}
-                        <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                                <CardTitle className="text-2xl">
-                                    {teacher.first_name} {teacher.last_name}
-                                </CardTitle>
-                                {teacher.email_verified && (
-                                    <Verified className="h-5 w-5 text-green-600" />
-                                )}
-                            </div>
-                            
-                            <div className="flex flex-wrap items-center gap-2 mb-3">
-                                <Badge className={userTypeInfo.color}>
-                                    {userTypeInfo.label}
-                                </Badge>
-                                {teacher.is_staff && (
-                                    <Badge variant="secondary">Staff</Badge>
-                                )}
-                                {teacher.is_superuser && (
-                                    <Badge variant="destructive">Super User</Badge>
-                                )}
-                                <Badge variant={teacher.is_active ? "default" : "secondary"}>
-                                    {teacher.is_active ? "Active" : "Inactive"}
-                                </Badge>
-                            </div>
-
-                            {teacher.class_display && (
-                                <CardDescription className="flex items-center gap-2">
-                                    <GraduationCap className="h-4 w-4" />
-                                    {teacher.class_display}
-                                </CardDescription>
-                            )}
-                        </div>
-                    </div>
-                </CardHeader>
-
-                <CardContent className="space-y-6">
-                    {/* Contact Information */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card>
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-lg flex items-center gap-2">
-                                    <Mail className="h-5 w-5" />
-                                    Contact Information
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <Mail className="h-4 w-4 text-muted-foreground" />
-                                    <div>
-                                        <p className="font-medium">{teacher.email}</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {teacher.email_verified ? "Verified" : "Not verified"}
-                                        </p>
-                                    </div>
+                            {/* Basic Info */}
+                            <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                                        {teacher.first_name} {teacher.last_name}
+                                    </h1>
+                                    {teacher.email_verified && (
+                                        <Verified className="h-5 w-5 text-green-600" />
+                                    )}
                                 </div>
                                 
-                                {teacher.phone_number && (
-                                    <div className="flex items-center gap-3">
-                                        <Phone className="h-4 w-4 text-muted-foreground" />
-                                        <p className="font-medium">{teacher.phone_number}</p>
-                                    </div>
-                                )}
-                                
-                                {(teacher.town || teacher.quarter) && (
-                                    <div className="flex items-center gap-3">
-                                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                                        <p className="font-medium">
-                                            {[teacher.quarter, teacher.town].filter(Boolean).join(', ')}
-                                        </p>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                    <Badge className={userTypeInfo.color}>
+                                        {userTypeInfo.label}
+                                    </Badge>
+                                    {teacher.is_staff && (
+                                        <Badge variant="secondary">Staff</Badge>
+                                    )}
+                                    {teacher.is_superuser && (
+                                        <Badge variant="destructive">Super User</Badge>
+                                    )}
+                                    <Badge variant={teacher.is_active ? "default" : "secondary"}>
+                                        {teacher.is_active ? "Active" : "Inactive"}
+                                    </Badge>
+                                </div>
 
-                        {/* Personal Information */}
-                        <Card>
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-lg flex items-center gap-2">
-                                    <User className="h-5 w-5" />
-                                    Personal Information
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                {teacher.date_of_birth && (
+                                {teacher.class_display && (
+                                    <CardDescription className="flex items-center gap-2">
+                                        <GraduationCap className="h-4 w-4" />
+                                        {teacher.class_display}
+                                    </CardDescription>
+                                )}
+                            </div>
+                        </div>
+                    </CardHeader>
+
+                    <CardContent className="space-y-6">
+                        {/* Contact Information */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Card>
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-lg flex items-center gap-2">
+                                        <Mail className="h-5 w-5" />
+                                        Contact Information
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
                                     <div className="flex items-center gap-3">
-                                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                                        <Mail className="h-4 w-4 text-muted-foreground" />
                                         <div>
-                                            <p className="font-medium">Date of Birth</p>
+                                            <p className="font-medium">{teacher.email}</p>
                                             <p className="text-sm text-muted-foreground">
-                                                {format(new Date(teacher.date_of_birth), 'PPP')}
+                                                {teacher.email_verified ? "Verified" : "Not verified"}
                                             </p>
                                         </div>
                                     </div>
-                                )}
-                                
-                                <div className="flex items-center gap-3">
-                                    <Clock className="h-4 w-4 text-muted-foreground" />
-                                    <div>
-                                        <p className="font-medium">Member Since</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {format(new Date(teacher.date_joined), 'PPP')}
-                                        </p>
-                                    </div>
-                                </div>
+                                    
+                                    {teacher.phone_number && (
+                                        <div className="flex items-center gap-3">
+                                            <Phone className="h-4 w-4 text-muted-foreground" />
+                                            <p className="font-medium">{teacher.phone_number}</p>
+                                        </div>
+                                    )}
+                                    
+                                    {(teacher.town || teacher.quarter) && (
+                                        <div className="flex items-center gap-3">
+                                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                                            <p className="font-medium">
+                                                {[teacher.quarter, teacher.town].filter(Boolean).join(', ')}
+                                            </p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
 
-                                {teacher.last_login && (
+                            {/* Personal Information */}
+                            <Card>
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-lg flex items-center gap-2">
+                                        <User className="h-5 w-5" />
+                                        Personal Information
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                    {teacher.date_of_birth && (
+                                        <div className="flex items-center gap-3">
+                                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                                            <div>
+                                                <p className="font-medium">Date of Birth</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {format(new Date(teacher.date_of_birth), 'PPP')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
                                     <div className="flex items-center gap-3">
                                         <Clock className="h-4 w-4 text-muted-foreground" />
                                         <div>
-                                            <p className="font-medium">Last Login</p>
+                                            <p className="font-medium">Member Since</p>
                                             <p className="text-sm text-muted-foreground">
-                                                {format(new Date(teacher.last_login), 'PPp')}
+                                                {format(new Date(teacher.date_joined), 'PPP')}
                                             </p>
                                         </div>
                                     </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
 
-                    {/* Professional Information (for PROFESSIONAL user type) */}
-                    {teacher.user_type === 'PROFESSIONAL' && (teacher.enterprise_name || teacher.platform_usage_reason) && (
-                        <Card>
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-lg flex items-center gap-2">
-                                    <Building className="h-5 w-5" />
-                                    Professional Information
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                {teacher.enterprise_name && (
-                                    <div>
-                                        <p className="font-medium text-sm text-muted-foreground">Enterprise</p>
-                                        <p className="font-medium">{teacher.enterprise_name}</p>
-                                    </div>
-                                )}
-                                
-                                {teacher.platform_usage_reason && (
-                                    <div>
-                                        <p className="font-medium text-sm text-muted-foreground">Platform Usage Reason</p>
-                                        <p className="font-medium">{teacher.platform_usage_reason}</p>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
+                                    {teacher.last_login && (
+                                        <div className="flex items-center gap-3">
+                                            <Clock className="h-4 w-4 text-muted-foreground" />
+                                            <div>
+                                                <p className="font-medium">Last Login</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {format(new Date(teacher.last_login), 'PPp')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
 
-                    
-                </CardContent>
-            </Card>
-        </div>
+                        {/* Professional Information (for PROFESSIONAL user type) */}
+                        {teacher.user_type === 'PROFESSIONAL' && (teacher.enterprise_name || teacher.platform_usage_reason) && (
+                            <Card>
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-lg flex items-center gap-2">
+                                        <Building className="h-5 w-5" />
+                                        Professional Information
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                    {teacher.enterprise_name && (
+                                        <div>
+                                            <p className="font-medium text-sm text-muted-foreground">Enterprise</p>
+                                            <p className="font-medium">{teacher.enterprise_name}</p>
+                                        </div>
+                                    )}
+                                    
+                                    {teacher.platform_usage_reason && (
+                                        <div>
+                                            <p className="font-medium text-sm text-muted-foreground">Platform Usage Reason</p>
+                                            <p className="font-medium">{teacher.platform_usage_reason}</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        
+                    </CardContent>
+                </Card>
+            </motion.div>
+        </motion.div>
     )
 }
 
