@@ -51,7 +51,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { convertMinutesToHours, formatCurrency, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { 
@@ -335,7 +335,7 @@ export default function CourseOfferingDetailPage() {
                 {declaration.status}
               </Badge>
               <span className="text-sm font-medium">
-                {declaration.duration} hours
+                {String(convertMinutesToHours(declaration.duration,"string"))}
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
