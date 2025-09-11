@@ -187,7 +187,7 @@ export default {
   "loginDialog.errors.passwordRequired": "Password is required",
   "loginDialog.errors.emailInvalid": "Email is not valid",
   "loginDialog.alreadyHaveAccount": "Already have an account?",
-  "loginDialog.successMessage":"Login successful!",
+  "loginDialog.successMessage": "Login successful!",
   "registerDialog.title": "Join ClassConnect",
   "registerDialog.subtitle":
     "Create your account to start your learning journey",
@@ -203,9 +203,12 @@ export default {
   "registerDialog.confirmPasswordLabel": "Confirm Password",
   "registerDialog.submitButton": "Register",
   "registerDialog.errors.enterpriseRequired": "Enterprise name is required",
-  "registerDialog.errors.reasonRequired": "Please provide a reason with at least 10 characters",
-  "registerDialog.errors.dateMinAge": "You must be at least 10 years old to register",
-  "registerDialog.errors.pleaseSelectClass": "Please select a class from the options",
+  "registerDialog.errors.reasonRequired":
+    "Please provide a reason with at least 10 characters",
+  "registerDialog.errors.dateMinAge":
+    "You must be at least 10 years old to register",
+  "registerDialog.errors.pleaseSelectClass":
+    "Please select a class from the options",
   "registerDialog.errorToast": "Registration Failed",
   "registerDialog.errors.dateRequired": "Date of birth is required",
   "registerDialog.errors.classRequired": "Class selection is required",
@@ -355,7 +358,8 @@ export default {
   "userDialog.subtitle": "Modify user details below",
   "userDialog.submitButton": "Update",
   "class.title": "Class",
-  "class.subtitle": "Manage and organize all classes by education level and section.",
+  "class.subtitle":
+    "Manage and organize all classes by education level and section.",
   "class.actions.add": "Add Class",
   "class.actions.addToLevel": "Add Class to this Level",
   "class.student": "student",
@@ -371,7 +375,8 @@ export default {
   "class.status.archived": "Archived",
   "class.status.nonActive": "Non-active",
   "class.empty.title": "No Classes Yet",
-  "class.empty.description": "There are no classes in this group yet. Click the button to add the first one!",
+  "class.empty.description":
+    "There are no classes in this group yet. Click the button to add the first one!",
   "class.metrics.students": "Students",
   "class.metrics.classes": "Classes",
   "class.metrics.overview": "Group Overview",
@@ -528,7 +533,7 @@ export default {
   "common.delete": "Delete",
   "common.back": "Back",
   "common.remove": "Remove",
-  "common.locale": 'fr',
+  "common.locale": "fr",
   "resources.title": "Learning Resources",
   "resources.empty": "No resources available",
   "resources.loading": "Loading resources...",
@@ -710,7 +715,7 @@ export default {
     "Your session is about to expire due to inactivity. You will be automatically signed out in {seconds} seconds.",
   "timeout.staySignedIn": "Stay Signed In",
   "timeout.signOut": "Sign Out Now",
-  "timeout.secondsRemaining":"seconds remaining",
+  "timeout.secondsRemaining": "seconds remaining",
   "chat.searchPlaceholder": "Search or start new chat",
   "chat.messagePlaceholder": "Type a message",
   "chat.online": "Online",
@@ -1163,15 +1168,20 @@ export default {
   "courseOfferings.actions.error.created":
     "An error occurred while attempting to send the request.",
   "courseOfferings.confirm.cancelDescription": "Description",
-  "courseOfferings.emptyStateDescription": "Create your first course offering to start connecting with students. Set your schedule, rates, and preferences.",
+  "courseOfferings.emptyStateDescription":
+    "Create your first course offering to start connecting with students. Set your schedule, rates, and preferences.",
   "courseOfferings.createFirst": "Create Your First Offering",
-  "courseOfferings.getStartedGuide": "Need help getting started? Check out our guide on creating effective course offerings.",
+  "courseOfferings.getStartedGuide":
+    "Need help getting started? Check out our guide on creating effective course offerings.",
   "courseOfferings.benefits.flexibility": "Flexible Scheduling",
-  "courseOfferings.benefits.flexibilityDesc": "Set your own hours and teaching schedule",
+  "courseOfferings.benefits.flexibilityDesc":
+    "Set your own hours and teaching schedule",
   "courseOfferings.benefits.targeting": "Target Your Expertise",
-  "courseOfferings.benefits.targetingDesc": "Focus on subjects and levels you excel in",
+  "courseOfferings.benefits.targetingDesc":
+    "Focus on subjects and levels you excel in",
   "courseOfferings.benefits.earnings": "Maximize Earnings",
-  "courseOfferings.benefits.earningsDesc": "Set competitive rates for your expertise",
+  "courseOfferings.benefits.earningsDesc":
+    "Set competitive rates for your expertise",
 
   "availability.studentAvailability": "Student Availability",
   "availability.studentNotVisibleWarning":
@@ -1639,7 +1649,6 @@ export default {
   "about.technology.database": "Database",
   "about.technology.hosting": "Hosting",
 
-
   // About page feature titles (English)
   "about.features.courseManagement.title": "Course Management",
   "about.features.virtualClassroom.title": "Virtual Classroom",
@@ -1658,7 +1667,8 @@ export default {
 
   // Education level descriptions
   "educationLevel.college.description": "Middle school education (Form 1-4)",
-  "educationLevel.lycee.description": "High school education (Form 5-Upper 6th)",
+  "educationLevel.lycee.description":
+    "High school education (Form 5-Upper 6th)",
   "educationLevel.university.description": "Higher education programs",
 
   // Action messages
@@ -1693,9 +1703,11 @@ export default {
   "student.myVideos.selectClassPlaceholder": "Select a class",
   "student.myVideos.noClassesAvailable": "No classes available",
   "student.myVideos.noClassSelected": "Select a class",
-  "student.myVideos.selectClassDesc": "Please select a class to view available videos",
+  "student.myVideos.selectClassDesc":
+    "Please select a class to view available videos",
   "student.myVideos.noVideosAvailableTitle": "No Videos Available",
-  "student.myVideos.noVideosAvailableDesc": "There are no videos available for this class yet.",
+  "student.myVideos.noVideosAvailableDesc":
+    "There are no videos available for this class yet.",
   "student.myVideos.watchVideo": "Watch Video",
 
   class: {
@@ -1703,8 +1715,10 @@ export default {
       title: "Create New Class",
       descriptionCollege: "Create a new class for college level education",
       descriptionLycee: "Create a new class for lycée level education",
-      descriptionUniversity: "Create a new class for university level education",
-      descriptionProfessional: "Create a new class for professional level education",
+      descriptionUniversity:
+        "Create a new class for university level education",
+      descriptionProfessional:
+        "Create a new class for professional level education",
       name: "Class Name",
       nameDescription: "The name of the class (e.g., 6ème, 2nde, Licence)",
       speciality: "Speciality",
@@ -1717,7 +1731,7 @@ export default {
       addVariant: "Add Variant",
       variantNumber: "Variant {number}",
       successMessage: "Class created successfully",
-      errorMessage: "Failed to create class. Please try again."
+      errorMessage: "Failed to create class. Please try again.",
     },
 
     actions: {
@@ -1731,18 +1745,20 @@ export default {
   "register.title": "Register",
   "register.description": "Create your account to start your learning journey",
   "registerDialog.successToast": "Registration Successful",
-  "registerDialog.successToastDescription": "Your account has been successfully created. You can now log in.",
-
+  "registerDialog.successToastDescription":
+    "Your account has been successfully created. You can now log in.",
 
   "registerDialog.selectLevel": "Select a level",
   "registerDialog.selectClassType": "Select a class type",
   "registerDialog.selectClass": "Select a class",
   "registerDialog.generalClasses": "General classes",
   "registerDialog.platformUsageReason": "Reason for using the platform",
-  "registerDialog.reasonPlaceholder": "Explain why you want to use the platform",
+  "registerDialog.reasonPlaceholder":
+    "Explain why you want to use the platform",
 
   "register.formTitle": "Create Your Account",
-  "register.formDescription": "Fill in your details to get started with ClassConnect",
+  "register.formDescription":
+    "Fill in your details to get started with ClassConnect",
   "registerDialog.accountType": "Account Type",
   "registerDialog.student": "Student",
   "registerDialog.professional": "Professional",
@@ -1794,12 +1810,12 @@ export default {
         pending: "Pending",
         accepted: "Accepted",
         rejected: "Rejected",
-        cancelled: "Cancelled"
+        cancelled: "Cancelled",
       },
       success: {
         created: "Application submitted successfully",
-        updated: "Application updated successfully"
-      }
+        updated: "Application updated successfully",
+      },
     },
     add: "Add new offering",
     loading: "Loading offerings...",
@@ -1814,7 +1830,7 @@ export default {
       notFound: "Course offering not found",
       retry: "Retry",
       actions: {
-        back: "Back to offerings"
+        back: "Back to offerings",
       },
       overview: "Overview",
       courseDetails: "Course Details",
@@ -1830,12 +1846,13 @@ export default {
       created: "Created",
       updated: "Last Updated",
       view: "View Profile",
-      noStudents: "No student assigned yet"
+      noStudents: "No student assigned yet",
     },
     confirm: {
       cancel: "Cancel",
-      cancelDescription: "Are you sure you want to cancel this application? This action cannot be undone.",
-      confirm: "Yes, cancel"
+      cancelDescription:
+        "Are you sure you want to cancel this application? This action cannot be undone.",
+      confirm: "Yes, cancel",
     },
     create: {
       title: "Create Course Offering",
@@ -1875,7 +1892,7 @@ export default {
       submit: "Create Offering",
       schoolYear: "School Year",
       noActiveSchoolYear: "No active school year found",
-      active: "Active"
+      active: "Active",
     },
     edit: {
       title: "Edit Course Offering",
@@ -1884,34 +1901,37 @@ export default {
       offeringDetails: "Course Offering Details",
       offeringDetailsDescription: "Update the details for this course offering",
       availability: "Availability",
-      availabilityDescription: "Make this course offering available to teachers",
+      availabilityDescription:
+        "Make this course offering available to teachers",
       studentAvailability: "Student Availability",
       submit: "Update Offering",
       success: "Course offering updated successfully",
       error: "Failed to update course offering",
-      notFound: "Course offering not found"
-    }
+      notFound: "Course offering not found",
+    },
   },
   availability: {
     studentAvailability: "Student Availability",
     scheduleDescription: "The student's available time slots",
     timeSlot: "Time Slot",
-    studentNotVisibleWarning: "Student availability information is not accessible",
+    studentNotVisibleWarning:
+      "Student availability information is not accessible",
     studentNotAvailable: "Student has not set their availability",
-    notAvailableDescription: "The student needs to set their availability schedule before you can see it",
+    notAvailableDescription:
+      "The student needs to set their availability schedule before you can see it",
     legend: {
       available: "Available",
-      unavailable: "Unavailable"
+      unavailable: "Unavailable",
     },
     slotUpdated: "Availability slot updated successfully",
     errors: {
       fetchFailed: "Failed to fetch availability information",
-      updateSlotFailed: "Failed to update availability slot"
+      updateSlotFailed: "Failed to update availability slot",
     },
     statusAvailable: "Student is available",
     statusUnavailable: "Student is not available",
     lastUpdated: "Last updated: {date}",
-    noDataAvailable: "No availability data available"
+    noDataAvailable: "No availability data available",
   },
   settings: {
     title: "Settings",
@@ -1932,112 +1952,131 @@ export default {
       siteNameRequired: "Site name is required.",
       emailInvalid: "Invalid email.",
       currencyRequired: "Currency is required.",
-      taxRateRange: "Tax rate must be between 0 and 100."
-    }
+      taxRateRange: "Tax rate must be between 0 and 100.",
+    },
   },
   notifications: {
-  // Header and general
-  title: "Notifications",
-  noNew: "No new notifications",
-  viewAll: "View all notifications",
+    // Header and general
+    title: "Notifications",
+    noNew: "No new notifications",
+    viewAll: "View all notifications",
 
-  // Counts
-  singleCount: "notification",
-  pluralCount: "notifications",
+    // Counts
+    singleCount: "notification",
+    pluralCount: "notifications",
 
-  // Empty state
-  emptyTitle: "No notifications",
-  empty: "You have no notifications at the moment.",
-  emptyDescription: "You don't have any notifications at the moment.",
+    // Empty state
+    emptyTitle: "No notifications",
+    empty: "You have no notifications at the moment.",
+    emptyDescription: "You don't have any notifications at the moment.",
 
-  // Error handling
-  error: "Error loading notifications",
-  errorMessage: "An unexpected error occurred while retrieving your notifications.",
+    // Error handling
+    error: "Error loading notifications",
+    errorMessage:
+      "An unexpected error occurred while retrieving your notifications.",
 
-  // Table headers
-  titleHeader: "Title",
-  messageHeader: "Message",
-  dateHeader: "Date",
-  actions: "Actions",
+    // Table headers
+    titleHeader: "Title",
+    messageHeader: "Message",
+    dateHeader: "Date",
+    actions: "Actions",
 
-  // Detail modal
-  detailTitle: "Notification Details",
-  detailDescription: "View the full details of this notification",
-  type: "Type",
-  status: "Status",
-  read: "Read",
-  unread: "Unread",
+    // Detail modal
+    detailTitle: "Notification Details",
+    detailDescription: "View the full details of this notification",
+    type: "Type",
+    status: "Status",
+    read: "Read",
+    unread: "Unread",
 
-  // Actions
-  delete: "Delete notification",
-  deleteTitle: "Delete notification",
-  deleteDescription: "Are you sure you want to delete this notification? This action cannot be undone.",
+    // Actions
+    delete: "Delete notification",
+    deleteTitle: "Delete notification",
+    deleteDescription:
+      "Are you sure you want to delete this notification? This action cannot be undone.",
 
-  // Toast messages
-  markReadError: "Error marking notification as read",
-  deleteSuccess: "Notification successfully deleted",
-  deleteError: "Failed to delete notification",
+    // Toast messages
+    markReadError: "Error marking notification as read",
+    deleteSuccess: "Notification successfully deleted",
+    deleteError: "Failed to delete notification",
 
-  markAllAsRead:"Mark all as read",
-  messageLabel:"Message",
-  close: "Close",
-  view: "View",
-}
-,
+    markAllAsRead: "Mark all as read",
+    messageLabel: "Message",
+    close: "Close",
+    view: "View",
+  },
   common: {
-    close: "Close"
+    close: "Close",
   },
   contact: {
-    title: 'Messaging',
-    subtitle: 'Communicate with administration and track your messages.',
+    title: "Messaging",
+    subtitle: "Communicate with administration and track your messages.",
+    description: "Get in touch with our support team. We're here to help!",
     tabs: {
-      newMessage: 'New message',
-      myMessages: 'My messages'
+      newMessage: "New message",
+      myMessages: "My messages",
     },
     form: {
-      title: 'Send a message',
-      description: 'We will respond to you as soon as possible.',
-      name: 'Name',
-      namePlaceholder: 'Your full name',
-      email: 'Email',
-      emailPlaceholder: 'your.email@example.com',
-      subject: 'Subject',
-      subjectPlaceholder: 'Subject of your message',
-      isAboutStudent: 'This message concerns a student being monitored:',
-      no: 'No',
-      yes: 'Yes',
+      title: "Send a message",
+      subtitle:
+        "Fill out the form below and we'll get back to you as soon as possible.",
+      description: "We will respond to you as soon as possible.",
+      name: "Name",
+      namePlaceholder: "Your full name",
+      email: "Email",
+      emailPlaceholder: "your.email@example.com",
+      subject: "Subject",
+      subjectPlaceholder: "Subject of your message",
+      isAboutStudent: "This message concerns a student being monitored:",
+      no: "No",
+      yes: "Yes",
       studentHelp: 'Select "Yes" if your message concerns a specific student.',
-      message: 'Message',
-      messagePlaceholder: 'Enter your message here...',
-      send: 'Send'
+      message: "Message",
+      messagePlaceholder: "Enter your message here...",
+      authenticatedUser: "Signed in as",
+      anonymousUser: "Sending as anonymous user",
+      sending: "Sending...",
+      submit: "Send Message",
+      send: "Send",
+      success: "Message sent successfully! We'll get back to you soon.",
+      error: "Failed to send message. Please try again.",
+      rateLimited:
+        "You can only send one message per day. Please try again tomorrow.",
+      rateLimitMessage: "You've already sent a message today. Please wait",
+      beforeSendingAgain: "before sending another message",
+      validation: {
+        nameRequired: "Name must be at least 2 characters.",
+        emailInvalid: "Please enter a valid email address.",
+        subjectRequired: "Subject must be at least 3 characters.",
+        messageRequired: "Message must be at least 10 characters.",
+      },
     },
     success: {
-      description: 'Your message has been sent successfully. We will respond to you soon.'
+      description:
+        "Your message has been sent successfully. We will respond to you soon.",
     },
     error: {
-      description: 'An error occurred while sending your message. Please try again.'
+      description:
+        "An error occurred while sending your message. Please try again.",
     },
     history: {
-      title: 'My message history',
-      refresh: 'Refresh',
-      loading: 'Loading your messages...',
-      error: 'Loading error',
-      tryAgain: 'Unable to load your messages. Please try again.',
-      retry: 'Retry',
-      empty: 'No messages sent',
-      emptyDescription: 'You haven\'t sent any messages to the administration yet. Use the form to send your first message.',
-      createFirst: 'Send a message'
+      title: "My message history",
+      refresh: "Refresh",
+      loading: "Loading your messages...",
+      error: "Loading error",
+      tryAgain: "Unable to load your messages. Please try again.",
+      retry: "Retry",
+      empty: "No messages sent",
+      emptyDescription:
+        "You haven't sent any messages to the administration yet. Use the form to send your first message.",
+      createFirst: "Send a message",
     },
     status: {
-      replied: 'Replied',
-      pending: 'Pending'
+      replied: "Replied",
+      pending: "Pending",
     },
     reply: {
-      from: 'Reply from'
-    }
+      from: "Reply from",
+    },
   },
-  
-
-
-
 } as const;

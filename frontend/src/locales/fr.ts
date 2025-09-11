@@ -68,38 +68,53 @@ export default {
     "Participez aux sessions en direct",
   ],
   "about.pageTitle": "À Propos",
-  "about.pageDescription": "Découvrez ClassConnect et l'équipe derrière la plateforme.",
+  "about.pageDescription":
+    "Découvrez ClassConnect et l'équipe derrière la plateforme.",
   "about.tabs.platform": "La Plateforme",
   "about.tabs.features": "Fonctionnalités",
   "about.tabs.developer": "Développeur",
   "about.platform.learn.title": "Expérience d'Apprentissage",
-  "about.platform.learn.description": "Notre plateforme offre une expérience d'apprentissage complète conçue pour vous aider à réussir.",
+  "about.platform.learn.description":
+    "Notre plateforme offre une expérience d'apprentissage complète conçue pour vous aider à réussir.",
   "about.platform.learn.points": [
     "Cours structurés par niveau d'éducation",
     "Contenu multimédia interactif",
     "Exercices pratiques et évaluations",
-    "Sessions en direct et enregistrées"
+    "Sessions en direct et enregistrées",
   ],
 
   "about.platform.grow.title": "Développez Vos Compétences",
-  "about.platform.grow.description": "ClassConnect vous aide à développer les compétences nécessaires pour votre réussite académique et professionnelle.",
+  "about.platform.grow.description":
+    "ClassConnect vous aide à développer les compétences nécessaires pour votre réussite académique et professionnelle.",
   "about.platform.grow.startNow": "Commencez votre parcours d'apprentissage",
 
   "about.conclusion.title": "Rejoignez la Communauté ClassConnect",
-  "about.conclusion.text": "ClassConnect n'est pas qu'une plateforme, c'est une révolution dans l'éducation. Rejoignez-nous pour transformer votre façon d'apprendre et atteindre vos objectifs académiques ou professionnels.",
+  "about.conclusion.text":
+    "ClassConnect n'est pas qu'une plateforme, c'est une révolution dans l'éducation. Rejoignez-nous pour transformer votre façon d'apprendre et atteindre vos objectifs académiques ou professionnels.",
   "about.conclusion.joinUs": "Rejoignez-nous Aujourd'hui",
 
   // Developer information translations
   "about.developer.title": "Développeur Full Stack & Passionné d'EdTech",
-  "about.developer.description": "Le cerveau derrière l'architecture technique et la conception de l'expérience utilisateur de ClassConnect.",
+  "about.developer.description":
+    "Le cerveau derrière l'architecture technique et la conception de l'expérience utilisateur de ClassConnect.",
   "about.developer.location": "Cameroun",
   "about.developer.aboutTitle": "À Propos du Développeur",
-  "about.developer.bio": "Tomdieu Ivan est un développeur full-stack passionné et enthousiaste des technologies éducatives. Fort de son expertise en technologies web modernes, il a conçu et développé ClassConnect de A à Z en se concentrant sur la création d'une plateforme d'apprentissage intuitive, accessible et puissante pour les étudiants à travers l'Afrique.",
+  "about.developer.bio":
+    "Tomdieu Ivan est un développeur full-stack passionné et enthousiaste des technologies éducatives. Fort de son expertise en technologies web modernes, il a conçu et développé ClassConnect de A à Z en se concentrant sur la création d'une plateforme d'apprentissage intuitive, accessible et puissante pour les étudiants à travers l'Afrique.",
   "about.developer.skills": "Compétences Techniques",
   "about.developer.skillsList": [
-    "React", "Next.js", "TypeScript", "Node.js", "Python",
-    "Django", "PostgreSQL", "UI/UX Design", "APIs RESTful",
-    "GraphQL", "Docker", "Infrastructure Cloud"
+    "React",
+    "Next.js",
+    "TypeScript",
+    "Node.js",
+    "Python",
+    "Django",
+    "PostgreSQL",
+    "UI/UX Design",
+    "APIs RESTful",
+    "GraphQL",
+    "Docker",
+    "Infrastructure Cloud",
   ],
   "about.developer.projectRole": "Rôle dans ClassConnect",
   "about.developer.responsibilities": [
@@ -108,14 +123,17 @@ export default {
     "Conception et optimisation de la base de données",
     "Développement et intégration d'APIs",
     "Optimisation des performances et sécurité",
-    "Fonctionnalités de localisation et d'accessibilité"
+    "Fonctionnalités de localisation et d'accessibilité",
   ],
   "about.developer.contact": "Contacter le Développeur",
 
   // Features section descriptions (in French)
-  "features.courseManagement.desc": "Plateforme interactive de gestion des cours",
-  "features.virtualClassroom.desc": "Environnement de classe virtuelle engageant",
-  "features.experience.desc": "Expériences d'apprentissage adaptées à tous les niveaux",
+  "features.courseManagement.desc":
+    "Plateforme interactive de gestion des cours",
+  "features.virtualClassroom.desc":
+    "Environnement de classe virtuelle engageant",
+  "features.experience.desc":
+    "Expériences d'apprentissage adaptées à tous les niveaux",
   "features.subscriptions.desc": "Plans d'abonnement flexibles pour tous",
   "features.payments.desc": "Options de paiement sécurisées et pratiques",
   "features.support.desc": "Support dédié quand vous en avez besoin",
@@ -165,7 +183,7 @@ export default {
   "loginDialog.errors.passwordRequired": "Le mot de passe est requis",
   "loginDialog.errors.emailInvalid": "L'email n'est pas valide",
   "loginDialog.alreadyHaveAccount": "Vous avez déjà un compte?",
-  "loginDialog.successMessage":"Connexion réussie!",
+  "loginDialog.successMessage": "Connexion réussie!",
   "registerDialog.title": "Rejoignez ClassConnect",
   "registerDialog.subtitle":
     "Créez votre compte pour commencer votre parcours d'apprentissage",
@@ -180,10 +198,14 @@ export default {
   "registerDialog.passwordLabel": "Mot de passe",
   "registerDialog.confirmPasswordLabel": "Confirmer le mot de passe",
   "registerDialog.submitButton": "S'inscrire",
-  "registerDialog.errors.enterpriseRequired": "Le nom de l'entreprise est requis",
-  "registerDialog.errors.reasonRequired": "Veuillez fournir une raison d'au moins 10 caractères",
-  "registerDialog.errors.dateMinAge": "Vous devez avoir au moins 10 ans pour vous inscrire",
-  "registerDialog.errors.pleaseSelectClass": "Veuillez sélectionner une classe parmi les options",
+  "registerDialog.errors.enterpriseRequired":
+    "Le nom de l'entreprise est requis",
+  "registerDialog.errors.reasonRequired":
+    "Veuillez fournir une raison d'au moins 10 caractères",
+  "registerDialog.errors.dateMinAge":
+    "Vous devez avoir au moins 10 ans pour vous inscrire",
+  "registerDialog.errors.pleaseSelectClass":
+    "Veuillez sélectionner une classe parmi les options",
   "registerDialog.errorToast": "Échec de l'inscription",
   "registerDialog.errors.dateRequired": "La date de naissance est requise",
   "common.error": "Erreur",
@@ -331,7 +353,7 @@ export default {
   "class.singular": "classe",
   "class.plural": "classes",
   "class.noDescription": "Pas de description disponible",
-  "loading": "Chargement",
+  loading: "Chargement",
   educationLevels: {
     lycee: "Lycée",
     university: "Université",
@@ -693,7 +715,7 @@ export default {
     "Votre session est sur le point d'expirer en raison d'inactivité. Vous serez automatiquement déconnecté dans {seconds} secondes.",
   "timeout.staySignedIn": "Rester Connecté",
   "timeout.signOut": "Se Déconnecter Maintenant",
-  "timeout.secondsRemaining":"secondes restantes",
+  "timeout.secondsRemaining": "secondes restantes",
   "chat.searchPlaceholder": "Rechercher ou démarrer une nouvelle discussion",
   "chat.messagePlaceholder": "Tapez un message",
   "chat.online": "En ligne",
@@ -927,8 +949,9 @@ export default {
   "common.save": "Enregistrer",
   "common.success": "Succès",
   "common.back": "Retour",
-  "common.locale": 'en',
-  "common.errorDesc": "Échec du chargement de {item}. Veuillez réessayer plus tard.",
+  "common.locale": "en",
+  "common.errorDesc":
+    "Échec du chargement de {item}. Veuillez réessayer plus tard.",
   "common.return": "Retourner à {destination}",
   "common.dashboard": "Tableau de Bord",
   "common.remove": "Supprimer",
@@ -984,7 +1007,8 @@ export default {
   // NotFound page translations
   "notFound.title": "404",
   "notFound.heading": "Page non trouvée",
-  "notFound.description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+  "notFound.description":
+    "La page que vous recherchez n'existe pas ou a été déplacée.",
   "notFound.goBack": "Retour",
   "notFound.returnHome": "Retour à l'accueil",
 
@@ -1118,7 +1142,8 @@ export default {
   "payment.success.transactionCode": "Code de Transaction",
   "payment.success.customer": "Client",
   "payment.success.accountUpdated": "Informations du compte mises à jour",
-  "payment.success.updateError": "Échec de l'actualisation des informations du compte",
+  "payment.success.updateError":
+    "Échec de l'actualisation des informations du compte",
 
   "payment.failed.title": "Paiement Échoué",
   "payment.failed.description":
@@ -1151,16 +1176,20 @@ export default {
   "courseOfferings.actions.error.created":
     "Une erreur est survenue lors de la tentative d'envoie de demande.",
   "courseOfferings.confirm.cancelDescription": "Description",
-  "courseOfferings.emptyStateDescription": "Créez votre première offre de cours pour commencer à entrer en contact avec des étudiants. Définissez votre emploi du temps, vos tarifs et vos préférences.",
+  "courseOfferings.emptyStateDescription":
+    "Créez votre première offre de cours pour commencer à entrer en contact avec des étudiants. Définissez votre emploi du temps, vos tarifs et vos préférences.",
   "courseOfferings.createFirst": "Créez votre première offre",
-  "courseOfferings.getStartedGuide": "Besoin d'aide pour démarrer ? Consultez notre guide sur la création d'offres de cours efficaces.",
+  "courseOfferings.getStartedGuide":
+    "Besoin d'aide pour démarrer ? Consultez notre guide sur la création d'offres de cours efficaces.",
   "courseOfferings.benefits.flexibility": "Horaires flexibles",
-  "courseOfferings.benefits.flexibilityDesc": "Définissez vos propres heures et emploi du temps",
+  "courseOfferings.benefits.flexibilityDesc":
+    "Définissez vos propres heures et emploi du temps",
   "courseOfferings.benefits.targeting": "Ciblez votre expertise",
-  "courseOfferings.benefits.targetingDesc": "Concentrez-vous sur les matières et niveaux dans lesquels vous excellez",
+  "courseOfferings.benefits.targetingDesc":
+    "Concentrez-vous sur les matières et niveaux dans lesquels vous excellez",
   "courseOfferings.benefits.earnings": "Maximisez vos revenus",
-  "courseOfferings.benefits.earningsDesc": "Fixez des tarifs compétitifs en fonction de votre expertise",
-
+  "courseOfferings.benefits.earningsDesc":
+    "Fixez des tarifs compétitifs en fonction de votre expertise",
 
   "studentsPage.title": "Mes étudiants",
   "studentsPage.schoolYear": "Année scolaire",
@@ -1262,17 +1291,22 @@ export default {
   "profile.quarterPlaceholder": "Entrez votre quartier",
   "profile.enterpriseNamePlaceholder": "Entrez le nom de votre entreprise",
   "profile.platformUsageReason": "Raison d'utilisation de la plateforme",
-  "profile.platformUsageReasonPlaceholder": "Expliquez pourquoi vous utilisez la plateforme",
+  "profile.platformUsageReasonPlaceholder":
+    "Expliquez pourquoi vous utilisez la plateforme",
   "profile.currentEmail": "Adresse e-mail actuelle",
 
   // Admin-specific translations
   "admin.permissions": "Permissions administratives",
-  "admin.isStaff": "Privilèges du personnel (peut accéder à la zone d'administration)",
-  "admin.isSuperuser": "Privilèges super-utilisateur (accès complet au système)",
+  "admin.isStaff":
+    "Privilèges du personnel (peut accéder à la zone d'administration)",
+  "admin.isSuperuser":
+    "Privilèges super-utilisateur (accès complet au système)",
 
   // Email change form translations
-  "profile.currentEmailDescription": "Votre adresse e-mail actuelle que vous utilisez pour vous connecter",
-  "profile.emailChangeInfo": "Après avoir changé votre e-mail, vous devrez vérifier votre nouvelle adresse",
+  "profile.currentEmailDescription":
+    "Votre adresse e-mail actuelle que vous utilisez pour vous connecter",
+  "profile.emailChangeInfo":
+    "Après avoir changé votre e-mail, vous devrez vérifier votre nouvelle adresse",
   "profile.newEmailPlaceholder": "Entrez votre nouvelle adresse e-mail",
   "profile.confirmEmailPlaceholder": "Confirmez votre nouvelle adresse e-mail",
   "student.dashboard.myCourses": "Mes cours",
@@ -1327,14 +1361,16 @@ export default {
   "users.count": "Nombre",
   "users.percentage": "Pourcentage",
   "users.summary": "Résumé de l'utilisateur",
-  "users.distributionDescription": "Répartition des utilisateurs selon les différents types d'utilisateurs",
+  "users.distributionDescription":
+    "Répartition des utilisateurs selon les différents types d'utilisateurs",
   "users.totalUsers": "Nombre total d'utilisateurs",
   "users.scientifique": "Scientifique",
   "users.litteraire": "Littéraire",
 
   // Online meetings translations
   "onlineMeetings.title": "Réunions en Ligne",
-  "onlineMeetings.description": "Créez et gérez vos réunions en ligne et classes virtuelles",
+  "onlineMeetings.description":
+    "Créez et gérez vos réunions en ligne et classes virtuelles",
   "onlineMeetings.createNew": "Créer une Nouvelle Réunion",
   "onlineMeetings.upcoming": "Réunions à Venir",
   "onlineMeetings.past": "Réunions Passées",
@@ -1345,7 +1381,8 @@ export default {
   "onlineMeetings.form.title": "Titre de la Réunion",
   "onlineMeetings.form.titlePlaceholder": "Entrez un titre pour votre réunion",
   "onlineMeetings.form.description": "Description",
-  "onlineMeetings.form.descriptionPlaceholder": "Décrivez l'objectif de cette réunion",
+  "onlineMeetings.form.descriptionPlaceholder":
+    "Décrivez l'objectif de cette réunion",
   "onlineMeetings.form.startTime": "Heure de Début",
   "onlineMeetings.form.duration": "Durée (minutes)",
   "onlineMeetings.form.durationPlaceholder": "Entrez la durée en minutes",
@@ -1360,18 +1397,21 @@ export default {
   "onlineMeetings.details.join": "Joindre",
   "onlineMeetings.details.joinNow": "Rejoindre Maintenant",
   "onlineMeetings.details.view": "Détail",
-  "onlineMeetings.details.noAttendees": "Aucun participant n'a encore été ajouté",
+  "onlineMeetings.details.noAttendees":
+    "Aucun participant n'a encore été ajouté",
   "onlineMeetings.details.addAttendees": "Ajouter des Participants",
   "onlineMeetings.details.meetingLink": "Lien de la Réunion",
   "onlineMeetings.details.copy": "Copier le Lien",
   "onlineMeetings.details.copied": "Lien copié dans le presse-papiers !",
   "onlineMeetings.details.joinMeeting": "Rejoindre la Réunion",
   "onlineMeetings.details.deleteMeeting": "Supprimer la Réunion",
-  "onlineMeetings.details.deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette réunion ?",
+  "onlineMeetings.details.deleteConfirm":
+    "Êtes-vous sûr de vouloir supprimer cette réunion ?",
   "onlineMeetings.details.deleteSuccess": "Réunion supprimée avec succès",
   //```typescript
   "onlineMeetings.details.deleteError": "Échec de la suppression de la réunion",
-  "onlineMeetings.attendees.searchPlaceholder": "Rechercher des utilisateurs à ajouter",
+  "onlineMeetings.attendees.searchPlaceholder":
+    "Rechercher des utilisateurs à ajouter",
   "onlineMeetings.attendees.noResults": "Aucun utilisateur trouvé",
   "onlineMeetings.attendees.add": "Ajouter",
   "onlineMeetings.attendees.added": "Ajouté",
@@ -1381,18 +1421,22 @@ export default {
   "onlineMeetings.status.completed": "Terminée",
   "onlineMeetings.status.cancelled": "Annulée",
   "onlineMeetings.duration.minutes": "minutes",
-  "onlineMeetings.validation.titleRequired": "Le titre de la réunion est requis",
+  "onlineMeetings.validation.titleRequired":
+    "Le titre de la réunion est requis",
   "onlineMeetings.validation.startTimeRequired": "L'heure de début est requise",
-  "onlineMeetings.validation.startTimeInFuture": "L'heure de début doit être dans le futur",
+  "onlineMeetings.validation.startTimeInFuture":
+    "L'heure de début doit être dans le futur",
   "onlineMeetings.validation.durationRequired": "La durée est requise",
-  "onlineMeetings.validation.durationMinimum": "La durée doit être d'au moins 15 minutes",
+  "onlineMeetings.validation.durationMinimum":
+    "La durée doit être d'au moins 15 minutes",
   "onlineMeetings.createSuccess": "Réunion créée avec succès",
   "onlineMeetings.createError": "Échec de la création de la réunion",
 
   "toast.courseDeclared": "Cours déclaré avec succès !",
   "toast.courseDeclarationFailed": "Échec de la déclaration du cours.",
-  "toast.enrollmentCompleted":"Cours marqué comme terminé avec succès !",
-  "toast.enrollmentCompletionFailed":"Échec du marquage du cours comme terminé.",
+  "toast.enrollmentCompleted": "Cours marqué comme terminé avec succès !",
+  "toast.enrollmentCompletionFailed":
+    "Échec du marquage du cours comme terminé.",
 
   "stats.dashboardTitle": "Statistiques du tableau de bord",
   "stats.userGrowth": "Croissance des utilisateurs",
@@ -1416,7 +1460,7 @@ export default {
   "stats.withPlans": "Avec plans",
   "stats.withoutPlans": "Sans plans",
 
-  "enrollments": "Inscription Enseignant-Étudiant",
+  enrollments: "Inscription Enseignant-Étudiant",
   // Forum translations
   "forum.title": "Forum Communautaire",
   "forum.selectForum": "Sélectionner un forum",
@@ -1424,7 +1468,8 @@ export default {
   "forum.selectForumError": "Sélection de forum requise",
   "forum.postCreatedSuccess": "Votre publication a été publiée avec succès",
   "forum.error": "Erreur",
-  "forum.postCreationFailed": "Échec de la création de la publication. Veuillez réessayer.",
+  "forum.postCreationFailed":
+    "Échec de la création de la publication. Veuillez réessayer.",
   "forum.whatsOnYourMind": "Qu'avez-vous entête ?",
   "forum.photo": "Photo",
   "forum.file": "Fichier",
@@ -1433,10 +1478,13 @@ export default {
   "forum.like": "J'aime",
   "forum.comment": "Commenter",
   "forum.noPostsYet": "Pas encore de publications",
-  "forum.beTheFirstToPost": "Soyez le premier à partager quelque chose avec la communauté",
+  "forum.beTheFirstToPost":
+    "Soyez le premier à partager quelque chose avec la communauté",
   "forum.loadMore": "Charger plus",
-  "forum.noComments": "Pas encore de commentaires. Soyez le premier à commenter !",
-  "forum.postNotFound": "La publication que vous recherchez n'a pas pu être trouvée",
+  "forum.noComments":
+    "Pas encore de commentaires. Soyez le premier à commenter !",
+  "forum.postNotFound":
+    "La publication que vous recherchez n'a pas pu être trouvée",
   "forum.somethingWentWrong": "Une erreur s'est produite",
   "forum.backToForum": "Retour au Forum",
   // Forum notifications
@@ -1464,36 +1512,43 @@ export default {
   // Add these new translations for comments
   "forum.commentCreated": "Commentaire ajouté",
   "forum.commentCreatedSuccess": "Votre commentaire a été publié avec succès",
-  "forum.commentCreationFailed": "Échec de l'ajout du commentaire. Veuillez réessayer.",
+  "forum.commentCreationFailed":
+    "Échec de l'ajout du commentaire. Veuillez réessayer.",
   "forum.reply": "Répondre",
   "forum.replyingTo": "En réponse à",
   "forum.writeReply": "Écrire une réponse...",
 
   // Add these new translations for forum validation
   "forum.contentRequired": "Le contenu est requis pour toutes les publications",
-  "forum.maxFileSize": "Tailles maximales de fichiers : Images ({image}), Fichiers ({file})",
+  "forum.maxFileSize":
+    "Tailles maximales de fichiers : Images ({image}), Fichiers ({file})",
 
   // Forum Admin translations
   "adminSidebar.items.forum": "Forum",
   "admin.forum.title": "Gestion du Forum",
-  "admin.forum.description": "Gérez les forums, les publications et les discussions sur votre plateforme",
+  "admin.forum.description":
+    "Gérez les forums, les publications et les discussions sur votre plateforme",
   "admin.forum.createForum": "Créer un Forum",
-  "admin.forum.createForumDescription": "Ajouter un nouveau forum de discussion à votre plateforme",
+  "admin.forum.createForumDescription":
+    "Ajouter un nouveau forum de discussion à votre plateforme",
   "admin.forum.forumName": "Nom du Forum",
   "admin.forum.enterForumName": "Entrez le nom du forum",
-  "admin.forum.forumNameRequired": "Le nom du forum doit comporter au moins 3 caractères",
+  "admin.forum.forumNameRequired":
+    "Le nom du forum doit comporter au moins 3 caractères",
   "admin.forum.createButton": "Créer le Forum",
   "admin.forum.creatingButton": "Création en cours...",
   "admin.forum.createSuccess": "Forum créé avec succès",
-  "admin.forum.createDescription": "Le forum \"{name}\" a été créé",
+  "admin.forum.createDescription": 'Le forum "{name}" a été créé',
   "admin.forum.createError": "Échec de la création du forum",
   "admin.forum.unexpectedError": "Une erreur inattendue s'est produite",
   "admin.forum.allForums": "Tous les Forums",
   "admin.forum.posts": "Publications",
   "admin.forum.searchForums": "Rechercher des forums...",
   "admin.forum.noForumsFound": "Aucun Forum Trouvé",
-  "admin.forum.noForumsMatchSearch": "Aucun forum ne correspond à votre recherche pour \"{search}\"",
-  "admin.forum.noForumsYet": "Vous n'avez pas encore créé de forums. Créez votre premier forum pour démarrer des discussions.",
+  "admin.forum.noForumsMatchSearch":
+    'Aucun forum ne correspond à votre recherche pour "{search}"',
+  "admin.forum.noForumsYet":
+    "Vous n'avez pas encore créé de forums. Créez votre premier forum pour démarrer des discussions.",
   "admin.forum.createFirstForum": "Créer Votre Premier Forum",
   "admin.forum.forumId": "ID: {id}",
   "admin.forum.createdOn": "Créé le {date}",
@@ -1503,24 +1558,30 @@ export default {
   "admin.forum.allForumPosts": "Toutes les Publications du Forum",
   "admin.forum.viewAllPosts": "Voir Toutes les Publications",
   "admin.forum.quickAccess": "Accès Rapide",
-  "admin.forum.forumPostsDescription": "Voir et gérer toutes les publications à travers les forums",
-  "admin.forum.forumNotificationsDescription": "Consultez vos notifications de forum",
-  "admin.forum.createPostDescription": "Créer une nouvelle publication dans n'importe quel forum",
+  "admin.forum.forumPostsDescription":
+    "Voir et gérer toutes les publications à travers les forums",
+  "admin.forum.forumNotificationsDescription":
+    "Consultez vos notifications de forum",
+  "admin.forum.createPostDescription":
+    "Créer une nouvelle publication dans n'importe quel forum",
   "admin.forum.viewAllPostsButton": "Voir Toutes les Publications",
   "admin.forum.viewNotificationsButton": "Voir les Notifications",
   "admin.forum.createPostButton": "Créer une Publication",
 
   // Forum Post Management
   "admin.posts.title": "Publications du Forum",
-  "admin.posts.description": "Voir et gérer les publications à travers tous les forums",
+  "admin.posts.description":
+    "Voir et gérer les publications à travers tous les forums",
   "admin.posts.backToForums": "Retour aux Forums",
   "admin.posts.selectForum": "Sélectionner un Forum",
   "admin.posts.allForums": "Tous les Forums",
   "admin.posts.searchPosts": "Rechercher des publications...",
   "admin.posts.createPost": "Créer une Publication",
   "admin.posts.noPosts": "Aucune Publication Trouvée",
-  "admin.posts.noPostsDesc": "Aucune publication ne correspond à vos filtres actuels",
-  "admin.posts.noPostsYet": "Il n'y a pas encore de publications dans aucun forum",
+  "admin.posts.noPostsDesc":
+    "Aucune publication ne correspond à vos filtres actuels",
+  "admin.posts.noPostsYet":
+    "Il n'y a pas encore de publications dans aucun forum",
   "admin.posts.createAPost": "Créer une Publication",
   "admin.posts.viewDetails": "Voir les Détails",
   "admin.posts.viewOnSite": "Voir sur le Site",
@@ -1528,8 +1589,10 @@ export default {
   "admin.posts.hasImage": "Contient une image",
   "admin.posts.hasFile": "Contient un fichier",
   "admin.posts.deleteConfirmation": "Supprimer la Publication",
-  "admin.posts.deleteWarning": "Êtes-vous sûr de vouloir supprimer cette publication ? Cette action ne peut pas être annulée.",
-  "admin.posts.commentDeleteWarning": "Attention : Cette publication a {count} {count, plural, one {commentaire} other {commentaires}} qui seront également supprimés !",
+  "admin.posts.deleteWarning":
+    "Êtes-vous sûr de vouloir supprimer cette publication ? Cette action ne peut pas être annulée.",
+  "admin.posts.commentDeleteWarning":
+    "Attention : Cette publication a {count} {count, plural, one {commentaire} other {commentaires}} qui seront également supprimés !",
   "admin.posts.deleting": "Suppression en cours...",
   "admin.posts.cancel": "Annuler",
   "admin.posts.confirmDelete": "Supprimer",
@@ -1547,13 +1610,15 @@ export default {
   "admin.post.viewForum": "Voir le Forum",
   "admin.post.comments": "Commentaires ({count})",
   "admin.post.noComments": "Pas Encore de Commentaires",
-  "admin.post.noCommentsDesc": "Cette publication n'a pas encore de commentaires ou de réponses.",
+  "admin.post.noCommentsDesc":
+    "Cette publication n'a pas encore de commentaires ou de réponses.",
 
   // Forum Create Post
   "admin.createPost.title": "Créer une Nouvelle Publication",
   "admin.createPost.backToPosts": "Retour aux Publications",
   "admin.createPost.postContent": "Contenu de la Publication",
-  "admin.createPost.postContentDesc": "Créer une nouvelle publication à partager avec votre communauté",
+  "admin.createPost.postContentDesc":
+    "Créer une nouvelle publication à partager avec votre communauté",
   "admin.createPost.selectForum": "Sélectionner un Forum",
   "admin.createPost.selectAForum": "Sélectionner un forum",
   "admin.createPost.postContentLabel": "Contenu de la Publication",
@@ -1576,37 +1641,43 @@ export default {
   "admin.forumDetail.stats": "Statistiques du Forum",
   "admin.forumDetail.searchPosts": "Rechercher des publications...",
   "admin.forumDetail.noPosts": "Aucune Publication Trouvée",
-  "admin.forumDetail.noPostsDesc": "Il n'y a pas encore de publications dans ce forum. Créez la première publication pour commencer la discussion.",
+  "admin.forumDetail.noPostsDesc":
+    "Il n'y a pas encore de publications dans ce forum. Créez la première publication pour commencer la discussion.",
   "admin.forumDetail.totalPosts": "Total des Publications",
   "admin.forumDetail.activeUsers": "Utilisateurs Actifs",
   "admin.forumDetail.uniquePosters": "Auteurs uniques",
   "admin.forumDetail.comments": "Commentaires",
   "admin.forumDetail.acrossAllPosts": "À travers toutes les publications",
   "admin.forumDetail.forumActivity": "Activité du Forum",
-  "admin.forumDetail.forumActivityDesc": "Voir l'engagement du forum au fil du temps",
+  "admin.forumDetail.forumActivityDesc":
+    "Voir l'engagement du forum au fil du temps",
   "admin.forumDetail.activityChart": "Le graphique d'activité apparaîtrait ici",
 
   // Additional forum post editing/deleting translations
   "forum.editPost": "Modifier la Publication",
-  "forum.editPostDescription": "Effectuez des modifications à votre publication ci-dessous.",
+  "forum.editPostDescription":
+    "Effectuez des modifications à votre publication ci-dessous.",
   "forum.deletePost": "Supprimer la Publication",
-  "forum.deletePostWarning": "Cette action ne peut pas être annulée. Cette opération supprimera définitivement votre publication et tous ses commentaires.",
+  "forum.deletePostWarning":
+    "Cette action ne peut pas être annulée. Cette opération supprimera définitivement votre publication et tous ses commentaires.",
   "forum.updating": "Mise à jour...",
   "forum.deleting": "Suppression...",
   "forum.saveChanges": "Enregistrer les Modifications",
   "forum.postUpdated": "Publication Mise à Jour",
   "forum.postUpdatedSuccess": "Votre publication a été mise à jour avec succès",
-  "forum.postUpdateFailed": "Échec de la mise à jour de la publication. Veuillez réessayer.",
+  "forum.postUpdateFailed":
+    "Échec de la mise à jour de la publication. Veuillez réessayer.",
   "forum.postDeleted": "Publication Supprimée",
   "forum.postDeletedSuccess": "Votre publication a été supprimée avec succès",
-  "forum.postDeleteFailed": "Échec de la suppression de la publication. Veuillez réessayer.",
+  "forum.postDeleteFailed":
+    "Échec de la suppression de la publication. Veuillez réessayer.",
   "forum.scrollToTop": "Remonter en haut",
   "common.updating": "Mise à jour en cours...",
 
-
   // Add new translations for Add Student functionality
   "class.detail.addStudent": "Ajouter un Étudiant à la Classe",
-  "class.detail.addStudentDesc": "Sélectionnez un étudiant à ajouter à {name} pour l'année scolaire {year}.",
+  "class.detail.addStudentDesc":
+    "Sélectionnez un étudiant à ajouter à {name} pour l'année scolaire {year}.",
   "class.detail.studentLabel": "Étudiant",
   "class.detail.selectStudent": "Sélectionnez un étudiant",
   "class.detail.searchStudents": "Rechercher des étudiants...",
@@ -1614,7 +1685,8 @@ export default {
   "class.detail.addStudentButton": "Ajouter l'Étudiant",
   "class.detail.studentAdded": "Étudiant ajouté avec succès",
   "class.detail.studentAddFailed": "Échec de l'ajout de l'étudiant",
-  "class.detail.selectSchoolYearFirst": "Veuillez d'abord sélectionner une année scolaire",
+  "class.detail.selectSchoolYearFirst":
+    "Veuillez d'abord sélectionner une année scolaire",
   "class.detail.invalidSchoolYear": "Année scolaire sélectionnée invalide",
 
   // About page feature titles
@@ -1635,7 +1707,8 @@ export default {
   "class.metrics.completion": "Taux d'achèvement",
   "class.subtitle": "Gérez et organisez vos cours",
   "class.empty.title": "Aucun cours pour le moment",
-  "class.empty.description": "Commencez par ajouter votre premier cours pour créer du contenu éducatif",
+  "class.empty.description":
+    "Commencez par ajouter votre premier cours pour créer du contenu éducatif",
 
   // Navigation
   "nav.sections": "Sections",
@@ -1647,8 +1720,10 @@ export default {
 
   // Education level descriptions
   "educationLevel.college.description": "Éducation au collège (Forme 1-4)",
-  "educationLevel.lycee.description": "Éducation au lycée (Forme 5 - 6e supérieure)",
-  "educationLevel.university.description": "Programmes d'enseignement supérieur",
+  "educationLevel.lycee.description":
+    "Éducation au lycée (Forme 5 - 6e supérieure)",
+  "educationLevel.university.description":
+    "Programmes d'enseignement supérieur",
 
   // Action messages
   "action.addFirst": "Ajouter le premier {item}",
@@ -1674,24 +1749,28 @@ export default {
   "stats.userCounts": "Nombre d'utilisateurs par type",
 
   "student.myCourses.description": "Accédez à tous vos supports de cours",
-  "student.myCourses.selectClass": "Sélectionnez une classe pour voir les supports de cours :",
+  "student.myCourses.selectClass":
+    "Sélectionnez une classe pour voir les supports de cours :",
   "student.myCourses.selectClassPlaceholder": "Sélectionner une classe",
   "student.myCourses.noClassesAvailable": "Aucune classe disponible",
 
   "student.myVideos.description": "Accédez à toutes vos vidéos pédagogiques",
-  "student.myVideos.selectClass": "Sélectionnez une classe pour regarder les vidéos :",
+  "student.myVideos.selectClass":
+    "Sélectionnez une classe pour regarder les vidéos :",
   "student.myVideos.selectClassPlaceholder": "Sélectionner une classe",
   "student.myVideos.noClassesAvailable": "Aucune classe disponible",
   "student.myVideos.noClassSelected": "Sélectionnez une classe",
-  "student.myVideos.selectClassDesc": "Veuillez sélectionner une classe pour consulter les vidéos disponibles",
+  "student.myVideos.selectClassDesc":
+    "Veuillez sélectionner une classe pour consulter les vidéos disponibles",
   "student.myVideos.noVideosAvailableTitle": "Aucune vidéo disponible",
-  "student.myVideos.noVideosAvailableDesc": "Il n'y a pas encore de vidéos disponibles pour cette classe.",
+  "student.myVideos.noVideosAvailableDesc":
+    "Il n'y a pas encore de vidéos disponibles pour cette classe.",
   "student.myVideos.watchVideo": "Regarder la vidéo",
-
 
   // Registration dialog fields and labels
   "register.title": "Inscription",
-  "register.description": "Créez votre compte pour commencer votre parcours d'apprentissage",
+  "register.description":
+    "Créez votre compte pour commencer votre parcours d'apprentissage",
   "registerDialog.yearPlaceholder": "Année",
   "registerDialog.monthPlaceholder": "Mois",
   "registerDialog.dayPlaceholder": "Jour",
@@ -1700,7 +1779,8 @@ export default {
   "registerDialog.dayLabel": "Jour",
   "registerDialog.errors.classRequired": "La classe est requise",
   "registerDialog.successToast": "Inscription réussie",
-  "registerDialog.successToastDescription": "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
+  "registerDialog.successToastDescription":
+    "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
   "registerDialog.selectSection": "Sélectionner une section",
   "registerDialog.selectLevel": "Sélectionner un niveau",
   "registerDialog.selectClassType": "Sélectionner un type de classe",
@@ -1709,14 +1789,17 @@ export default {
   "registerDialog.enterpriseName": "Nom de l'entreprise",
   "registerDialog.enterprisePlaceholder": "Entrez le nom de votre entreprise",
   "registerDialog.platformUsageReason": "Raison d'utilisation de la plateforme",
-  "registerDialog.reasonPlaceholder": "Expliquez pourquoi vous souhaitez utiliser la plateforme",
+  "registerDialog.reasonPlaceholder":
+    "Expliquez pourquoi vous souhaitez utiliser la plateforme",
 
   "register.formTitle": "Créez Votre Compte",
-  "register.formDescription": "Remplissez vos informations pour commencer avec ClassConnect",
+  "register.formDescription":
+    "Remplissez vos informations pour commencer avec ClassConnect",
   "registerDialog.accountType": "Type de Compte",
   "registerDialog.student": "Étudiant",
   "registerDialog.professional": "Professionnel",
-  "registerDialog.classLoadError": "Échec du chargement des classes. Veuillez réessayer.",
+  "registerDialog.classLoadError":
+    "Échec du chargement des classes. Veuillez réessayer.",
   "registerDialog.classInformation": "Informations de Classe",
   "registerDialog.professionalInformation": "Informations Professionnelles",
   "registerDialog.creatingAccount": "Création du Compte...",
@@ -1740,7 +1823,8 @@ export default {
   "register.alreadyHaveAccount": "Vous avez déjà un compte ?",
   "register.loginInstead": "Se connecter",
   "common.reload": "Recharger",
-  "registerDialog.noClassesAvailable": "Aucune classe disponible pour l'année scolaire sélectionnée",
+  "registerDialog.noClassesAvailable":
+    "Aucune classe disponible pour l'année scolaire sélectionnée",
   "common.retry": "Réessayer",
   courseOfferings: {
     title: "Offres de Cours",
@@ -1759,12 +1843,12 @@ export default {
         pending: "En attente",
         accepted: "Accepté",
         rejected: "Refusé",
-        cancelled: "Annulé"
+        cancelled: "Annulé",
       },
       success: {
         created: "Candidature soumise avec succès",
-        updated: "Candidature mise à jour avec succès"
-      }
+        updated: "Candidature mise à jour avec succès",
+      },
     },
     add: "Ajouter une nouvelle offre",
     loading: "Chargement des offres...",
@@ -1779,7 +1863,7 @@ export default {
       notFound: "Offre de cours introuvable",
       retry: "Réessayer",
       actions: {
-        back: "Retour aux offres"
+        back: "Retour aux offres",
       },
       overview: "Aperçu",
       courseDetails: "Détails du Cours",
@@ -1795,12 +1879,13 @@ export default {
       created: "Créé le",
       updated: "Dernière mise à jour",
       view: "Voir le Profil",
-      noStudents: "Aucun étudiant assigné pour l'instant"
+      noStudents: "Aucun étudiant assigné pour l'instant",
     },
     confirm: {
       cancel: "Annuler",
-      cancelDescription: "Êtes-vous sûr de vouloir annuler cette candidature ? Cette action ne peut pas être annulée.",
-      confirm: "Oui, annuler"
+      cancelDescription:
+        "Êtes-vous sûr de vouloir annuler cette candidature ? Cette action ne peut pas être annulée.",
+      confirm: "Oui, annuler",
     },
     create: {
       title: "Créer une Offre de Cours",
@@ -1840,46 +1925,50 @@ export default {
       submit: "Créer l'Offre",
       schoolYear: "Année Scolaire",
       noActiveSchoolYear: "Aucune année scolaire active trouvée",
-      active: "Active"
+      active: "Active",
     },
     edit: {
       title: "Modifier l'Offre de Cours",
       description: "Modifier les détails de cette offre de cours",
       back: "Retour",
       offeringDetails: "Détails de l'Offre de Cours",
-      offeringDetailsDescription: "Mettre à jour les détails de cette offre de cours",
+      offeringDetailsDescription:
+        "Mettre à jour les détails de cette offre de cours",
       availability: "Disponibilité",
-      availabilityDescription: "Rendre cette offre de cours disponible aux enseignants",
+      availabilityDescription:
+        "Rendre cette offre de cours disponible aux enseignants",
       studentAvailability: "Disponibilité de l'Étudiant",
       submit: "Mettre à Jour l'Offre",
       success: "Offre de cours mise à jour avec succès",
       error: "Échec de la mise à jour de l'offre de cours",
-      notFound: "Offre de cours introuvable"
-    }
+      notFound: "Offre de cours introuvable",
+    },
   },
   availability: {
     studentAvailability: "Disponibilité de l'Étudiant",
     scheduleDescription: "Les créneaux horaires disponibles de l'étudiant",
     timeSlot: "Créneau Horaire",
-    studentNotVisibleWarning: "Les informations de disponibilité de l'étudiant ne sont pas accessibles",
+    studentNotVisibleWarning:
+      "Les informations de disponibilité de l'étudiant ne sont pas accessibles",
     studentNotAvailable: "L'étudiant n'a pas défini sa disponibilité",
-    notAvailableDescription: "L'étudiant doit définir son emploi du temps de disponibilité avant que vous puissiez le voir",
+    notAvailableDescription:
+      "L'étudiant doit définir son emploi du temps de disponibilité avant que vous puissiez le voir",
     legend: {
       available: "Disponible",
-      unavailable: "Indisponible"
+      unavailable: "Indisponible",
     },
     slotUpdated: "Créneau de disponibilité mis à jour avec succès",
     errors: {
       fetchFailed: "Échec de récupération des informations de disponibilité",
-      updateSlotFailed: "Échec de mise à jour du créneau de disponibilité"
+      updateSlotFailed: "Échec de mise à jour du créneau de disponibilité",
     },
     statusAvailable: "L'étudiant est disponible",
     statusUnavailable: "L'étudiant n'est pas disponible",
     lastUpdated: "Dernière mise à jour : {date}",
-    noDataAvailable: "Aucune donnée de disponibilité disponible"
+    noDataAvailable: "Aucune donnée de disponibilité disponible",
   },
   class: {
-    noClassesFound: "Aucune classe trouvée"
+    noClassesFound: "Aucune classe trouvée",
   },
   settings: {
     title: "Paramètres",
@@ -1900,8 +1989,8 @@ export default {
       siteNameRequired: "Le nom du site est requis.",
       emailInvalid: "Email invalide.",
       currencyRequired: "La devise est requise.",
-      taxRateRange: "Le taux de TVA doit être entre 0 et 100."
-    }
+      taxRateRange: "Le taux de TVA doit être entre 0 et 100.",
+    },
   },
   notifications: {
     // En-tête et général
@@ -1920,7 +2009,8 @@ export default {
 
     // Gestion des erreurs
     error: "Erreur lors du chargement des notifications",
-    errorMessage: "Une erreur inattendue s'est produite lors de la récupération de vos notifications.",
+    errorMessage:
+      "Une erreur inattendue s'est produite lors de la récupération de vos notifications.",
 
     // En-têtes de tableau
     titleHeader: "Titre",
@@ -1939,68 +2029,93 @@ export default {
     // Actions
     delete: "Supprimer la notification",
     deleteTitle: "Supprimer la notification",
-    deleteDescription: "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action est irréversible.",
+    deleteDescription:
+      "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action est irréversible.",
 
     // Messages de confirmation / erreur
     markReadError: "Erreur lors du marquage de la notification comme lue",
     deleteSuccess: "Notification supprimée avec succès",
     deleteError: "Échec de la suppression de la notification",
     markAllAsRead: "Marquer tout comme lu",
-    messageLabel:"Message",
+    messageLabel: "Message",
     close: "Fermer",
     view: "Voir",
   },
   common: {
-    close: "Fermer"
+    close: "Fermer",
   },
   contact: {
-    title: 'Messagerie',
-    subtitle: 'Communiquez avec l\'administration et suivez vos messages.',
+    title: "Messagerie",
+    subtitle: "Communiquez avec l'administration et suivez vos messages.",
+    description:
+      "Contactez notre équipe d'assistance. Nous sommes là pour vous aider !",
     tabs: {
-      newMessage: 'Nouveau message',
-      myMessages: 'Mes messages'
+      newMessage: "Nouveau message",
+      myMessages: "Mes messages",
     },
     form: {
-      title: 'Envoyer un message',
-      description: 'Nous vous répondrons dans les plus brefs délais.',
-      name: 'Nom',
-      namePlaceholder: 'Votre nom complet',
-      email: 'Email',
-      emailPlaceholder: 'votre.email@exemple.com',
-      subject: 'Sujet',
-      subjectPlaceholder: 'Sujet de votre message',
-      isAboutStudent: 'Ce message concerne un élève suivi :',
-      no: 'Non',
-      yes: 'Oui',
-      studentHelp: 'Sélectionnez "Oui" si votre message concerne un étudiant spécifique.',
-      message: 'Message',
-      messagePlaceholder: 'Saisissez votre message ici...',
-      send: 'Envoyer'
+      title: "Envoyer un message",
+      subtitle:
+        "Remplissez le formulaire ci-dessous et nous vous répondrons dès que possible.",
+      description: "Nous vous répondrons dès que possible.",
+      name: "Nom",
+      namePlaceholder: "Votre nom complet",
+      email: "Email",
+      emailPlaceholder: "votre.email@exemple.com",
+      subject: "Sujet",
+      subjectPlaceholder: "Sujet de votre message",
+      isAboutStudent: "Ce message concerne un élève suivi :",
+      no: "Non",
+      yes: "Oui",
+      studentHelp:
+        "Sélectionnez « Oui » si votre message concerne un élève spécifique.",
+      message: "Message",
+      messagePlaceholder: "Entrez votre message ici...",
+      authenticatedUser: "Connecté en tant que",
+      anonymousUser: "Envoi en tant qu'utilisateur anonyme",
+      sending: "Envoi...",
+      submit: "Envoyer le message",
+      send: "Envoyer",
+      success: "Message envoyé avec succès ! Nous vous répondrons bientôt.",
+      error: "Échec de l'envoi du message. Veuillez réessayer.",
+      rateLimited:
+        "Vous ne pouvez envoyer qu'un seul message par jour. Veuillez réessayer demain.",
+      rateLimitMessage:
+        "Vous avez déjà envoyé un message aujourd'hui. Veuillez attendre",
+      beforeSendingAgain: "avant d'envoyer un autre message",
+      validation: {
+        nameRequired: "Le nom doit comporter au moins 2 caractères.",
+        emailInvalid: "Veuillez entrer une adresse email valide.",
+        subjectRequired: "Le sujet doit comporter au moins 3 caractères.",
+        messageRequired: "Le message doit comporter au moins 10 caractères.",
+      },
     },
     success: {
-      description: 'Votre message a été envoyé avec succès. Nous vous répondrons bientôt.'
+      description:
+        "Votre message a été envoyé avec succès. Nous vous répondrons bientôt.",
     },
     error: {
-      description: 'Une erreur est survenue lors de l\'envoi de votre message. Veuillez réessayer.'
+      description:
+        "Une erreur est survenue lors de l'envoi de votre message. Veuillez réessayer.",
     },
     history: {
-      title: 'Historique de mes messages',
-      refresh: 'Actualiser',
-      loading: 'Chargement de vos messages...',
-      error: 'Erreur de chargement',
-      tryAgain: 'Impossible de charger vos messages. Veuillez réessayer.',
-      retry: 'Réessayer',
-      empty: 'Aucun message envoyé',
-      emptyDescription: 'Vous n\'avez pas encore envoyé de message à l\'administration. Utilisez le formulaire pour envoyer votre premier message.',
-      createFirst: 'Envoyer un message'
+      title: "Historique de mes messages",
+      refresh: "Rafraîchir",
+      loading: "Chargement de vos messages...",
+      error: "Erreur de chargement",
+      tryAgain: "Impossible de charger vos messages. Veuillez réessayer.",
+      retry: "Réessayer",
+      empty: "Aucun message envoyé",
+      emptyDescription:
+        "Vous n'avez encore envoyé aucun message à l'administration. Utilisez le formulaire pour envoyer votre premier message.",
+      createFirst: "Envoyer un message",
     },
     status: {
-      replied: 'Répondu',
-      pending: 'En attente'
+      replied: "Répondu",
+      pending: "En attente",
     },
     reply: {
-      from: 'Réponse de'
-    }
+      from: "Réponse de",
+    },
   },
-
 } as const;
