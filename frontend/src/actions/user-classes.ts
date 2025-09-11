@@ -188,7 +188,7 @@ export async function getStudentsByClass(classId: string, schoolYearId?: number)
 // endregion User Classes
 
 
-export const getStudentsByClassId = async (params?: { class_level?: string | number, school_year?: string | number, page?: number, no_assign_teacher?: boolean }) => {
+export const getStudentsByClassId = async (params?: { class_level?: string | number, school_year?: string | number, subject?: string | number, page?: number, no_assign_teacher?: boolean }) => {
   try {
     const session = await auth();
     if (!session?.user) throw new Error("Unauthorized");
