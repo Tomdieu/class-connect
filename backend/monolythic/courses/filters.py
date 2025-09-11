@@ -187,11 +187,12 @@ class UserClassFilter(django_filters.FilterSet):
     school_year = django_filters.CharFilter(method='filter_by_school_year')
     education_level = django_filters.NumberFilter(field_name='class_level__definition__education_level__id')
     section = django_filters.NumberFilter(field_name='class_level__definition__education_level__section__id')
+    subject = django_filters.NumberFilter(method='filter_by_subject')
     no_assign_teacher = django_filters.BooleanFilter(method='filter_no_assign_teacher')
     
     class Meta:
         model = UserClass
-        fields = ['class_level', 'school_year', 'user', 'education_level', 'section', 'no_assign_teacher']
+        fields = ['class_level', 'school_year', 'user', 'education_level', 'section', 'subject', 'no_assign_teacher']
     
     def filter_by_school_year(self, queryset, name, value):
         try:
@@ -201,11 +202,26 @@ class UserClassFilter(django_filters.FilterSet):
         except (ValueError, SchoolYear.DoesNotExist):
             return queryset.none()
             
+    def filter_by_subject(self, queryset, name, value):
+        """
+        Filter user classes by subject ID
+        This allows assigning students to different teachers based on subject
+        """
+        # The subject is not directly linked to UserClass, so we need to filter
+        # by class_level and then check that the subject belongs to that class
+        try:
+            # First, get the subject
+            subject = Subject.objects.get(id=value)
+            # Then filter user classes by the class_level of the subject
+            return queryset.filter(class_level=subject.class_level)
+        except Subject.DoesNotExist:
+            return queryset.none()
+            
     def filter_no_assign_teacher(self, queryset, name, value):
         """
-        Filter to find students without assigned teachers
-        If value is True: return students NOT linked to active TeacherStudentEnrollment
-        If value is False: return students WITH active TeacherStudentEnrollment
+        Filter to find students without assigned teachers for a specific subject (if provided)
+        If value is True: return students NOT linked to active TeacherStudentEnrollment for the subject
+        If value is False: return students WITH active TeacherStudentEnrollment for the subject
         """
         import sys
         
@@ -214,12 +230,20 @@ class UserClassFilter(django_filters.FilterSet):
         # print("FILTER DEBUG:", file=sys.stderr)
         # print(f"Filtering for school year: {current_school_year}", file=sys.stderr)
         
+        # Check if a subject filter is applied
+        subject_id = self.data.get('subject')
+        
         # Get all users who have active course offerings with teacher enrollments
         tse_query = TeacherStudentEnrollment.objects.filter(
             status=TeacherStudentEnrollment.ACTIVE,
             school_year=current_school_year,
             has_class_end=False
         )
+        
+        # If subject is specified, filter enrollments by subject
+        if subject_id:
+            tse_query = tse_query.filter(offer__subject_id=subject_id)
+            # print(f"Filtering teacher enrollments by subject_id: {subject_id}", file=sys.stderr)
         
         # print(f"TeacherStudentEnrollment Query: {tse_query.query}", file=sys.stderr)
         
