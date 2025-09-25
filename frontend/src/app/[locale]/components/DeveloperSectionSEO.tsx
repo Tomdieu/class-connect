@@ -9,11 +9,11 @@ import Link from 'next/link';
 function DeveloperSectionSEO() {
     const locale = useCurrentLocale();
     return (
-        <section className="py-16 bg-gradient-to-b from-white to-blue-50/50 relative overflow-hidden hidden" id="developer">
+        <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50/50 relative overflow-hidden" id="developer">
             <div className="absolute top-1/4 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
             <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
 
-            <div className="container mx-auto px-4">
+            <div className="container mx-auto px-4 py-16 w-full">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
