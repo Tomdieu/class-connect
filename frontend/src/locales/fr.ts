@@ -678,11 +678,11 @@ export default {
   "privacy.cookies.title": "Politique des Cookies",
   "privacy.cookies.content":
     "Nous utilisons des cookies pour améliorer votre expérience de navigation et fournir des services personnalisés.",
-
+  "pricing":"Tarifs",
   "pricing.title": "Nos Forfaits",
   "pricing.subtitle":
     "Choisissez le forfait qui correspond le mieux à vos besoins d'apprentissage",
-
+  "most-popular": "Le plus populaire",
   "contact.title": "Contactez-nous",
   "contact.form.name": "Votre Nom",
   "contact.form.email": "Votre Email",

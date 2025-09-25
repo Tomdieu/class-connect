@@ -670,8 +670,10 @@ export default {
   "privacy.cookies.title": "Cookies Policy",
   "privacy.cookies.content":
     "We use cookies to enhance your browsing experience and provide personalized services.",
+  "pricing":"Pricing",
   "pricing.title": "Our Pricing Plans",
   "pricing.subtitle": "Choose the plan that best fits your learning needs",
+  "most-popular":"Most Popular",
   "contact.title": "Contact Us",
   "contact.form.name": "Your Name",
   "contact.form.email": "Your Email",
