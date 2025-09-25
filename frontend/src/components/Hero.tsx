@@ -13,7 +13,7 @@ export default function Hero({className}:{className?:string}) {
   const locale = useCurrentLocale();
 
   return (
-    <div className={cn(`relative overflow-hidden`, className)}>
+    <div className={cn(`relative overflow-hidden min-h-screen flex items-center justify-center`, className)}>
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-white z-0"></div>
       <div className="absolute top-20 left-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
@@ -24,8 +24,8 @@ export default function Hero({className}:{className?:string}) {
       <div className="absolute inset-0 bg-grid-pattern opacity-5 z-0"></div>
 
       {/* Hero Content */}
-      <div className="container mx-auto px-4 py-12 md:py-24 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
+      <div className="container mx-auto px-4 py-12 md:py-24 relative z-10 w-full">
+        <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[80vh]">
           {/* Text Content */}
           <div className="w-full lg:w-1/2 space-y-6 text-center lg:text-left">
             <motion.div
@@ -74,7 +74,6 @@ export default function Hero({className}:{className?:string}) {
                     className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 font-semibold px-8 py-6 rounded-xl"
                   >
                     {t("hero.start")}
-                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </motion.div>
               </Link>
@@ -86,10 +85,12 @@ export default function Hero({className}:{className?:string}) {
                 >
                   <Button
                     size="lg"
-                    variant="outline"
+                    variant="link"
                     className="border-primary/20 text-primary hover:bg-primary/5 font-semibold px-8 py-6 rounded-xl"
                   >
                     {t("hero.learnMore")}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+
                   </Button>
                 </motion.div>
               </Link>
