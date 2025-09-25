@@ -182,7 +182,7 @@ export function SubscriptionPlans() {
           className="text-center max-w-3xl mx-auto mb-10 sm:mb-16"
         >
           <div className="inline-flex items-center px-4 py-2  rounded-full border border-blue-600/15">
-            <span className="text-primary font-semibold tracking-wider uppercase mb-2 sm:mb-3 inline-block">
+            <span className="text-primary font-semibold tracking-wider uppercase inline-block">
               {t("pricing")}
             </span>
           </div>
@@ -250,7 +250,7 @@ export function SubscriptionPlans() {
                   <div className="mb-2">
                     <div className="flex items-baseline flex-wrap">
                       <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
-                        {planPrices[plan.id] ?? plan.price}
+                        {planPrices[plan.id] ? Math.floor(planPrices[plan.id]) : plan.price}
                       </span>
                       <div className="ml-2">
                         <span className="text-lg sm:text-xl font-semibold">{plan.currency}</span>
