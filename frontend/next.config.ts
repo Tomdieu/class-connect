@@ -60,31 +60,10 @@ const nextConfig: NextConfig = {
   // Enable gzip compression
   compress: true,
 
-  // Configure headers for caching and CSP
+  // Configure headers for caching (CSP disabled for development)
   async headers() {
     return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://analytics.ahrefs.com https://meet.classconnect.cm https://www.googletagmanager.com https://cdn.consentmanager.net",
-              "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://analytics.ahrefs.com https://meet.classconnect.cm https://www.googletagmanager.com https://cdn.consentmanager.net",
-              "style-src 'self' 'unsafe-inline' https://meet.classconnect.cm",
-              "img-src 'self' data: blob: https: https://meet.classconnect.cm",
-              "media-src 'self' blob: https://s3.us-east-005.backblazeb2.com https://*.backblazeb2.com https://meet.classconnect.cm data:",
-              "object-src 'none'",
-              "font-src 'self' https://meet.classconnect.cm",
-              "connect-src 'self' https://analytics.ahrefs.com https://s3.us-east-005.backblazeb2.com https://*.backblazeb2.com https://api.ipify.org https://meet.classconnect.cm https://www.api.classconnect.cm https://www.google-analytics.com https://d.delivery.consentmanager.net https: ws: wss:",
-              "frame-src 'self' https://meet.classconnect.cm",
-              "worker-src 'self' blob:",
-              "child-src 'self' blob: https://meet.classconnect.cm",
-            ].join('; '),
-          },
-        ],
-      },
+      // Completely disable CSP by not including any CSP headers
       {
         source: '/_next/static/(.*)',
         headers: [
