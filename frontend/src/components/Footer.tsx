@@ -29,7 +29,7 @@ const Footer = () => {
               <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-blue-500 bg-clip-text text-transparent">ClassConnect</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">ClassConnect</span>
             </div>
             
             <p className="text-slate-300 leading-relaxed max-w-md">
