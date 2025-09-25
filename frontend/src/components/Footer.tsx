@@ -26,10 +26,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center space-x-2">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
+              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">ClassConnect</span>
+              <span className="text-xl font-bold text-blue-500 bg-clip-text text-transparent">ClassConnect</span>
             </div>
             
             <p className="text-slate-300 leading-relaxed max-w-md">
@@ -38,7 +38,7 @@ const Footer = () => {
                 : "Empowering education through technology. Join thousands of students who are transforming their learning journey with ClassConnect."}
             </p>
             
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <div className="flex items-center space-x-3 text-slate-300">
                 <Mail className="w-5 h-5" />
                 <span>hello@classconnect.cm</span>
@@ -51,7 +51,7 @@ const Footer = () => {
                 <MapPin className="w-5 h-5" />
                 <span>{locale === "fr" ? "Douala, Cameroun" : "Douala, Cameroon"}</span>
               </div>
-            </div>
+            </div> */}
 
             <div className="flex space-x-4">
               <Link href="#" className="text-slate-300 hover:text-white transition-colors">
@@ -121,7 +121,7 @@ const Footer = () => {
         </div>
 
         {/* Newsletter Section - Now separate row */}
-        <div className="mb-10">
+        {/* <div className="mb-10">
           <div className="max-w-md">
             <h3 className="text-xl font-bold mb-4">
               {locale === "fr" ? "Newsletter" : "Newsletter"}
@@ -142,7 +142,7 @@ const Footer = () => {
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
         
         <div className="border-t border-slate-800 pt-6 mt-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
