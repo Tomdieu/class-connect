@@ -17,10 +17,18 @@ export function VisitorTrackingProvider({ children }: VisitorTrackingProviderPro
   
   const getClientIP = async (): Promise<string> => {
     try {
-      // Try to get IP from a public API service
-      const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip || 'unknown';
+      // Use our internal API to avoid CORS issues
+      const response = await fetch('/api/get-ip', {
+        method: 'GET',
+        cache: 'no-cache'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.ip || 'unknown';
+      }
+      
+      return 'unknown';
     } catch (error) {
       console.warn('Could not fetch IP address:', error);
       return 'unknown';
