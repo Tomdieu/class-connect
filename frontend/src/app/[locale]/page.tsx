@@ -162,44 +162,57 @@ function LandingPage() {
       <div className="h-20 mt-10 md:mt-0 md:h-20"></div>
 
       <main className="flex-1">
+        {/* Hero Section - Full Screen */}
         <Suspense fallback={<Loading />}>
-          <div className="hero-container">
-            <Hero />
-          </div>
+          <section className="min-h-screen flex items-center justify-center relative">
+            <Hero className="w-full" />
+          </section>
         </Suspense>
-        <FeaturesSection />
-        <Suspense fallback={
-          <div className="py-24 bg-blue-50">
-            <div className="container mx-auto px-4 animate-pulse">
-              <div className="text-center mb-16">
-                <div className="h-10 bg-gray-200 rounded w-64 mx-auto mb-4"></div>
-                <div className="h-6 bg-gray-200 rounded w-96 mx-auto"></div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="bg-white rounded-2xl p-8 shadow-md">
-                    <div className="h-8 bg-gray-200 rounded w-32 mb-4"></div>
-                    <div className="h-12 bg-gray-200 rounded w-40 mb-6"></div>
-                    <div className="space-y-3 mb-8">
-                      {[1, 2, 3, 4].map(j => (
-                        <div key={j} className="h-5 bg-gray-200 rounded w-full"></div>
-                      ))}
+
+        {/* Features Section - Full Screen */}
+        <section className="min-h-screen flex items-center justify-center relative">
+          <FeaturesSection className="w-full" />
+        </section>
+
+        {/* Subscription Plans Section - Full Screen */}
+        <section className="min-h-screen flex items-center justify-center relative">
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-blue-50 w-full">
+              <div className="container mx-auto px-4 animate-pulse">
+                <div className="text-center mb-16">
+                  <div className="h-10 bg-gray-200 rounded w-64 mx-auto mb-4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-96 mx-auto"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="bg-white rounded-2xl p-8 shadow-md">
+                      <div className="h-8 bg-gray-200 rounded w-32 mb-4"></div>
+                      <div className="h-12 bg-gray-200 rounded w-40 mb-6"></div>
+                      <div className="space-y-3 mb-8">
+                        {[1, 2, 3, 4].map(j => (
+                          <div key={j} className="h-5 bg-gray-200 rounded w-full"></div>
+                        ))}
+                      </div>
+                      <div className="h-12 bg-gray-200 rounded w-full"></div>
                     </div>
-                    <div className="h-12 bg-gray-200 rounded w-full"></div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        }>
-          <SubscriptionPlans />
-        </Suspense>
+          }>
+            <SubscriptionPlans />
+          </Suspense>
+        </section>
 
-        {/* New Developer Section for SEO Visibility */}
-        <DeveloperSectionSEO />
+        {/* Developer Section - Full Screen */}
+        <section className="min-h-screen flex items-center justify-center relative">
+          <DeveloperSectionSEO />
+        </section>
 
-        {/* Enhanced Final CTA Section with modern particle effects */}
-        <CTASection />
+        {/* CTA Section - Full Screen */}
+        <section className="min-h-screen flex items-center justify-center relative">
+          <CTASection className="w-full" />
+        </section>
       </main>
 
       <Footer />
