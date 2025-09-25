@@ -330,16 +330,29 @@ server {
 Create `/etc/nginx/sites-available/classconnect-api`:
 
 ```nginx
-# Backend API Configuration - api.classconnect.cm
-upstream api_upstream {
-    server 127.0.0.1:8000;
+# Frontend Configuration - classconnect.cm
+upstream frontend_upstream {
+    server 127.0.0.1:3000;
     keepalive 32;
 }
 
-# HTTP to HTTPS redirect for API domain
+# Redirect www.classconnect.cm to classconnect.cm (HTTPS only)
+server {
+    listen 443 ssl http2;
+    server_name www.classconnect.cm;
+    
+    # SSL Configuration
+    ssl_certificate /etc/letsencrypt/live/classconnect.cm/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/classconnect.cm/privkey.pem;
+    
+    # Redirect to non-www
+    return 301 https://classconnect.cm$request_uri;
+}
+
+# HTTP to HTTPS redirect for all domains
 server {
     listen 80;
-    server_name api.classconnect.cm www.api.classconnect.cm;
+    server_name classconnect.cm www.classconnect.cm;
     
     # Certbot challenge location
     location /.well-known/acme-challenge/ {
@@ -348,67 +361,28 @@ server {
     
     # Redirect all other HTTP traffic to HTTPS
     location / {
-        return 301 https://www.api.classconnect.cm$request_uri;
+        return 301 https://classconnect.cm$request_uri;
     }
 }
 
-# Redirect non-www api to www (api.classconnect.cm -> www.api.classconnect.cm)
+# Main Frontend Server - HTTPS
 server {
     listen 443 ssl http2;
-    server_name api.classconnect.cm;
+    server_name classconnect.cm;
     
     # SSL Configuration
     ssl_certificate /etc/letsencrypt/live/classconnect.cm/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/classconnect.cm/privkey.pem;
     
-    # Redirect to www subdomain
-    return 301 https://www.api.classconnect.cm$request_uri;
-}
-
-# Main API Server - HTTPS
-server {
-    listen 443 ssl http2;
-    server_name www.api.classconnect.cm;
     
-    # SSL Configuration
-    ssl_certificate /etc/letsencrypt/live/classconnect.cm/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/classconnect.cm/privkey.pem;
-    
-    # Security Headers
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-    add_header X-Content-Type-Options nosniff always;
-    add_header X-Frame-Options DENY always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    
-    # CORS Headers for API
-    add_header Access-Control-Allow-Origin "https://classconnect.cm" always;
-    add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
-    add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control" always;
-    add_header Access-Control-Allow-Credentials true always;
-    
-    # Rate Limiting for API
-    limit_req zone=api burst=10 nodelay;
     
     # Logging
-    access_log /var/log/nginx/api_access.log main;
-    error_log /var/log/nginx/api_error.log;
+    access_log /var/log/nginx/frontend_access.log main;
+    error_log /var/log/nginx/frontend_error.log;
     
-    # Handle preflight requests
+    # Main location - proxy to React app
     location / {
-        if ($request_method = 'OPTIONS') {
-            add_header Access-Control-Allow-Origin "https://classconnect.cm";
-            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
-            add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control";
-            add_header Access-Control-Allow-Credentials true;
-            add_header Access-Control-Max-Age 1728000;
-            add_header Content-Type 'text/plain charset=UTF-8';
-            add_header Content-Length 0;
-            return 204;
-        }
-        
-        # Proxy to Django API
-        proxy_pass http://api_upstream;
+        proxy_pass http://frontend_upstream;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -420,8 +394,8 @@ server {
         
         # Timeouts
         proxy_connect_timeout 60s;
-        proxy_send_timeout 300s;
-        proxy_read_timeout 300s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
         
         # Buffer settings
         proxy_buffering on;
@@ -430,43 +404,115 @@ server {
         proxy_busy_buffers_size 256k;
     }
     
-    # Django static files
-    location /static/ {
-        proxy_pass http://api_upstream;
+    # Static files optimization
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        proxy_pass http://frontend_upstream;
         proxy_cache_valid 200 30d;
         add_header Cache-Control "public, immutable";
         expires 30d;
     }
     
-    # Django media files
-    location /media/ {
-        proxy_pass http://api_upstream;
-        proxy_cache_valid 200 7d;
-        add_header Cache-Control "public";
-        expires 7d;
+    # Health check
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
     }
-    
-    # Admin interface
-    location /admin/ {
-        proxy_pass http://api_upstream;
+}
+
+```
+
+### JITSI MEET CONFIGURATION
+
+```
+server {
+    listen 80;
+    listen [::]:80;
+    server_name meet.classconnect.cm;
+
+    # For Let's Encrypt challenge
+    location ^~ /.well-known/acme-challenge/ {
+        proxy_pass http://127.0.0.1:9000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Additional security for admin
-        # Uncomment and modify if you want IP restrictions
-        # allow 192.168.1.0/24;  # Your office IP range
-        # deny all;
     }
-    
-    # Health check for API
-    location /health/ {
-        proxy_pass http://api_upstream;
-        access_log off;
+
+    # Redirect all other HTTP requests to HTTPS
+    location / {
+        return 301 https://$host$request_uri;
     }
 }
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name meet.classconnect.cm;
+
+    # Use existing Let's Encrypt certificate if available
+    ssl_certificate /etc/letsencrypt/live/classconnect.cm/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/classconnect.cm/privkey.pem;
+    
+    # SSL Security
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_tickets off;
+
+
+    # Proxy configuration - Use HTTP to avoid SSL issues with Jitsi container
+    location / {
+        proxy_pass http://127.0.0.1:9000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_redirect off;
+        
+        # Important for Jitsi WebSocket connections
+        proxy_buffering off;
+        proxy_request_buffering off;
+        
+        # Increase proxy timeouts for long-lived connections
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+    }
+
+    # Specific handling for WebSocket connections
+    location ~ ^/(colibri-ws|xmpp-websocket) {
+        proxy_pass http://127.0.0.1:9000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_redirect off;
+        
+        # WebSocket specific settings
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+        tcp_nodelay on;
+    }
+
+    # Logging
+    access_log /var/log/nginx/meet.classconnect.cm.access.log;
+    error_log /var/log/nginx/meet.classconnect.cm.error.log;
+}
+
 ```
+
 
 ### Enable Site Configurations
 ```bash
