@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "copy": "cp node_modules/pdfjs-dist/build/pdf.worker.min.js ./public/pdf.worker.min.js",
+    "copy": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./public/pdf.worker.min.js",
     "dev": "next dev --turbopack",
     "n:dev": "npm run copy && next dev --turbopack",
     "build": "npm run copy && next build",
@@ -75,7 +75,7 @@
     "next-international": "^1.2.0-rc.0",
     "next-pwa": "^5.6.0",
     "next-themes": "^0.4.6",
-    "pdfjs-dist": "4.2.67",
+    "pdfjs-dist": "^4.2.67",
     "pspdfkit": "^2024.8.1",
     "react": "^19.1.1",
     "react-aria-components": "^1.10.1",
