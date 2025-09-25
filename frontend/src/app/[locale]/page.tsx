@@ -11,12 +11,10 @@ import CTASection from "./components/CTASection";
 import DeveloperSectionSEO from "./components/DeveloperSectionSEO";
 import FeaturesSection from "./components/FeaturesSection";
 import FloatingCTA from "./components/FloatingCTA";
-import { useGSAPScrollAnimations, useGSAPSectionSnap } from "@/hooks/useGSAPAnimations";
 
 function LandingPage() {
   const t = useI18n();
   const locale = useCurrentLocale();
-  const containerRef = useGSAPScrollAnimations();
   
   // Enable smooth section snapping
   // useGSAPSectionSnap();
@@ -128,7 +126,7 @@ function LandingPage() {
   ];
 
   return (
-    <div ref={containerRef} className="relative flex-1 w-full h-full flex flex-col">
+    <div className="relative flex-1 w-full h-full flex flex-col">
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
