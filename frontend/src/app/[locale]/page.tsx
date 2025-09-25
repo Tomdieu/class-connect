@@ -19,7 +19,7 @@ function LandingPage() {
   const containerRef = useGSAPScrollAnimations();
   
   // Enable smooth section snapping
-  useGSAPSectionSnap();
+  // useGSAPSectionSnap();
 
   // Create enhanced localized JSON-LD data using translations and including developer info
   const jsonLdData = {
