@@ -327,12 +327,12 @@ export const useGSAPSectionSnap = () => {
     };
 
     // Uncomment to enable section snapping (disabled by default for better UX)
-    // window.addEventListener('wheel', throttledWheelHandler, { passive: false });
-    // window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('wheel', throttledWheelHandler, { passive: false });
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      // window.removeEventListener('wheel', throttledWheelHandler);
-      // window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('wheel', throttledWheelHandler);
+      window.removeEventListener('keydown', handleKeyDown);
       if (throttleTimer) clearTimeout(throttleTimer);
     };
   }, []);
