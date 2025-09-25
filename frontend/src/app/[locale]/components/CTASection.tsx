@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { motion } from "framer-motion";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 
 // New type for particle properties
@@ -16,7 +17,7 @@ interface ParticleProps {
     delay: number;
 }
 
-function CTASection() {
+function CTASection({className}: {className?: string}) {
 
     const t = useI18n();
     const locale = useCurrentLocale();
@@ -56,7 +57,7 @@ function CTASection() {
     }, []); // Empty dependency array ensures this runs only once on the client after mount
 
     return (
-        <section className="py-24 bg-gradient-to-br from-primary-600 bg-primary to-primary relative overflow-hidden">
+        <section className={cn("min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 bg-primary to-primary relative overflow-hidden",className)} id="cta">
             {/* Animated particles background */}
             <div className="absolute inset-0">
                 <div className="absolute inset-0 bg-[url('/patterns/grid.svg')] bg-center opacity-10"></div>
@@ -85,7 +86,7 @@ function CTASection() {
                 ))}
             </div>
 
-            <div className="container mx-auto px-4 relative z-10">
+            <div className="container mx-auto px-4 relative z-10 py-24 w-full">
                 <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
