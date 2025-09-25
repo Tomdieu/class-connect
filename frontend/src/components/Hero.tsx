@@ -6,13 +6,14 @@ import { ArrowRight, Sparkle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-export default function Hero() {
+export default function Hero({className}:{className?:string}) {
   const t = useI18n();
   const locale = useCurrentLocale();
 
   return (
-    <div className="relative overflow-hidden">
+    <div className={cn(`relative overflow-hidden`, className)}>
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-white z-0"></div>
       <div className="absolute top-20 left-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
@@ -72,7 +73,6 @@ export default function Hero() {
                     size="lg"
                     className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 font-semibold px-8 py-6 rounded-xl"
                   >
-                    <Sparkle className="mr-2 h-5 w-5 text-yellow-200" />
                     {t("hero.start")}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
@@ -96,7 +96,7 @@ export default function Hero() {
             </motion.div>
 
             {/* Trust Indicators */}
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 1 }}
@@ -154,7 +154,7 @@ export default function Hero() {
                   {locale === "fr" ? "Paiement sécurisé" : "Secure payments"}
                 </span>
               </div>
-            </motion.div>
+            </motion.div> */}
           </div>
 
           {/* Hero Image */}
@@ -169,7 +169,7 @@ export default function Hero() {
               <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-3 md:p-6 overflow-hidden">
                 <div className="relative w-full h-full rounded-xl overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
                   <Image
-                    src="/images/hero-ilustration.png"
+                    src="/images/hero-image.jpg"
                     alt="ClassConnect learning platform"
                     width={600}
                     height={450}
@@ -181,28 +181,6 @@ export default function Hero() {
                         "https://placehold.co/600x450/e2e8f0/64748b?text=ClassConnect";
                     }}
                   />
-
-                  {/* Play Button Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg cursor-pointer"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="32"
-                        height="32"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                      </svg>
-                    </motion.div>
-                  </div>
                 </div>
               </div>
 
