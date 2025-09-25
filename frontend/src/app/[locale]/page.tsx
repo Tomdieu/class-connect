@@ -205,7 +205,7 @@ function LandingPage() {
         </section>
 
         {/* Developer Section - Full Screen */}
-        <section className="min-h-screen flex items-center justify-center relative">
+        <section className="min-h-screen hidden items-center justify-center relative">
           <DeveloperSectionSEO />
         </section>
 
