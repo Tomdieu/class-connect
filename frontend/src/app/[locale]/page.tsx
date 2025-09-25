@@ -4,17 +4,22 @@ import Hero from "@/components/Hero";
 import { SubscriptionPlans } from "@/components/SubscriptionPlans";
 import Footer from "@/components/Footer";
 import { useCurrentLocale, useI18n } from "@/locales/client";
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import Loading from "./loading";
 import CTASection from "./components/CTASection";
 import DeveloperSectionSEO from "./components/DeveloperSectionSEO";
 import FeaturesSection from "./components/FeaturesSection";
 import FloatingCTA from "./components/FloatingCTA";
+import { useGSAPScrollAnimations, useGSAPSectionSnap } from "@/hooks/useGSAPAnimations";
 
 function LandingPage() {
   const t = useI18n();
   const locale = useCurrentLocale();
+  const containerRef = useGSAPScrollAnimations();
+  
+  // Enable smooth section snapping
+  useGSAPSectionSnap();
 
   // Create enhanced localized JSON-LD data using translations and including developer info
   const jsonLdData = {
@@ -123,7 +128,7 @@ function LandingPage() {
   ];
 
   return (
-    <div className="relative flex-1 w-full h-full flex flex-col">
+    <div ref={containerRef} className="relative flex-1 w-full h-full flex flex-col">
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
@@ -162,20 +167,21 @@ function LandingPage() {
       <div className="h-20 mt-10 md:mt-0 md:h-20"></div>
 
       <main className="flex-1">
-        {/* Hero Section - Full Screen */}
+        {/* Hero Section - Full Screen with GSAP animations */}
         <Suspense fallback={<Loading />}>
-          <section className="min-h-screen flex items-center justify-center relative">
-            <Hero className="w-full" />
+          <section className="hero-section section-animate min-h-screen flex items-center justify-center relative full-section">
+            <div className="hero-bg absolute inset-0 bg-gradient-to-b from-blue-50 to-white"></div>
+            <Hero className="w-full relative z-10" />
           </section>
         </Suspense>
 
-        {/* Features Section - Full Screen */}
-        <section className="min-h-screen flex items-center justify-center relative">
+        {/* Features Section - Full Screen with GSAP animations */}
+        <section className="features-section section-animate min-h-screen flex items-center justify-center relative full-section">
           <FeaturesSection className="w-full" />
         </section>
 
-        {/* Subscription Plans Section - Full Screen */}
-        <section className="min-h-screen flex items-center justify-center relative">
+        {/* Subscription Plans Section - Full Screen with GSAP animations */}
+        <section className="subscription-section section-animate min-h-screen flex items-center justify-center relative full-section">
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center bg-blue-50 w-full">
               <div className="container mx-auto px-4 animate-pulse">
@@ -185,7 +191,7 @@ function LandingPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                   {[1, 2, 3].map(i => (
-                    <div key={i} className="bg-white rounded-2xl p-8 shadow-md">
+                    <div key={i} className="bg-white rounded-2xl p-8 shadow-md subscription-card">
                       <div className="h-8 bg-gray-200 rounded w-32 mb-4"></div>
                       <div className="h-12 bg-gray-200 rounded w-40 mb-6"></div>
                       <div className="space-y-3 mb-8">
@@ -204,14 +210,16 @@ function LandingPage() {
           </Suspense>
         </section>
 
-        {/* Developer Section - Full Screen */}
-        <section className="min-h-screen hidden items-center justify-center relative">
+        {/* Developer Section - Hidden for SEO only */}
+        <div className="hidden">
           <DeveloperSectionSEO />
-        </section>
+        </div>
 
-        {/* CTA Section - Full Screen */}
-        <section className="min-h-screen flex items-center justify-center relative">
-          <CTASection className="w-full" />
+        {/* CTA Section - Full Screen with GSAP animations */}
+        <section className="cta-section section-animate min-h-screen flex items-center justify-center relative full-section">
+          <div className="cta-content w-full">
+            <CTASection className="w-full" />
+          </div>
         </section>
       </main>
 

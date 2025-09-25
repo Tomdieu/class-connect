@@ -44,7 +44,7 @@ export default function Hero({className}:{className?:string}) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight"
+              className="text-reveal text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight"
             >
               {t("hero.title")}
             </motion.h1>
@@ -53,7 +53,7 @@ export default function Hero({className}:{className?:string}) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-xl text-gray-600 max-w-lg mx-auto lg:mx-0"
+              className="text-reveal text-xl text-gray-600 max-w-lg mx-auto lg:mx-0"
             >
               {t("hero.subtitle")}
             </motion.p>
@@ -190,7 +190,7 @@ export default function Hero({className}:{className?:string}) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8, duration: 0.5 }}
-                className="absolute -top-6 -left-6 bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 border border-gray-100"
+                className="floating-element absolute -top-6 -left-6 bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 border border-gray-100"
               >
                 <div className="bg-green-500 text-white p-2 rounded-lg">
                   <svg
@@ -224,7 +224,7 @@ export default function Hero({className}:{className?:string}) {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1, duration: 0.5 }}
-                className="absolute -bottom-4 -right-4 md:-right-10 bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 border border-gray-100"
+                className="floating-element absolute -bottom-4 -right-4 md:-right-10 bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 border border-gray-100"
               >
                 <div className="bg-blue-500 text-white p-2 rounded-lg">
                   <svg

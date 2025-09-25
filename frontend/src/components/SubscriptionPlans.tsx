@@ -213,7 +213,7 @@ export function SubscriptionPlans() {
               <motion.div
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className={`relative rounded-2xl shadow-xl overflow-hidden h-full border border-gray-100 bg-white ${plan.popular ? 'ring-2 ring-primary lg:scale-105' : ''
+                className={`subscription-card relative rounded-2xl shadow-xl overflow-hidden h-full border border-gray-100 bg-white ${plan.popular ? 'ring-2 ring-primary lg:scale-105' : ''
                   }`}
               >
                 {/* Popular Badge */}

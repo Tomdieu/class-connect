@@ -11,14 +11,54 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Custom scroll snap for full page sections */
-main {
-  scroll-snap-type: y mandatory;
+/* Enhanced GSAP-friendly styles */
+.section-animate {
+  will-change: transform, opacity;
 }
 
-section {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+.feature-card {
+  will-change: transform, opacity;
+}
+
+.subscription-card {
+  will-change: transform, opacity, scale;
+}
+
+.floating-element {
+  will-change: transform;
+}
+
+.text-reveal {
+  will-change: transform, opacity;
+}
+
+/* Smoother transitions */
+* {
+  transform-origin: center;
+}
+
+/* Custom scrollbar for better aesthetics */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
+}
+
+/* Firefox scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
 }
 
 /* Enhanced animations */

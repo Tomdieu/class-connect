@@ -20,7 +20,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       <motion.div
         whileHover={{ y: -10 }}
         transition={{ type: "spring", stiffness: 300 }}
-        className="flex flex-col bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl border border-primary/10 overflow-hidden relative group"
+        className="feature-card flex flex-col bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl border border-primary/10 overflow-hidden relative group"
       >
         <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-primary/5 transition-all duration-500 group-hover:scale-150"></div>
 
