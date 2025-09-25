@@ -135,7 +135,7 @@ export function SubscriptionPlans() {
   }, [plansMockData]);
 
   return (
-    <section className="relative py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden" id="pricing">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" id="pricing">
       {/* Enhanced Background Elements with interactive particles */}
       <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/80 z-0"></div>
 
@@ -173,7 +173,7 @@ export function SubscriptionPlans() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 relative z-10 py-12 sm:py-16 md:py-20 lg:py-24 w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -181,9 +181,11 @@ export function SubscriptionPlans() {
           transition={{ duration: 0.7 }}
           className="text-center max-w-3xl mx-auto mb-10 sm:mb-16"
         >
-          <span className="text-primary font-semibold tracking-wider uppercase mb-2 sm:mb-3 inline-block">
-            {t("pricing")}
-          </span>
+          <div className="inline-flex items-center px-4 py-2  rounded-full border border-blue-600/15">
+            <span className="text-primary font-semibold tracking-wider uppercase mb-2 sm:mb-3 inline-block">
+              {t("pricing")}
+            </span>
+          </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-5 tracking-tight">
             {t("subscriptionPlans.title")}
           </h2>
@@ -221,7 +223,7 @@ export function SubscriptionPlans() {
                       <div className="absolute -inset-3 bg-primary/20 rounded-full blur-xl opacity-70"></div>
                       <div className="relative bg-gradient-to-r from-primary to-primary-600 text-white text-xs font-bold px-3 sm:px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
                         <Sparkle className="h-3.5 w-3.5 inline-block mr-1 text-yellow-200" />
-                        {t("most popular")}
+                        {t("most-popular")}
                       </div>
                     </div>
                   </div>
