@@ -54,13 +54,24 @@ def create_subscription_notification(sender, instance, created, **kwargs):
 @receiver(post_save, sender=CourseDeclaration)
 def create_course_declaration_notification(sender, instance, created, **kwargs):
     """
-    Create a notification when a CourseDeclaration is paid or accepted.
+    Create a notification when a CourseDeclaration is created, paid, or accepted.
     """
-    # Skip on creation since no status change has happened yet
-    if created:
-        return
-    
     enrollment = instance.teacher_student_enrollment
+    
+    # Notification for when a new declaration is created - notify all admins
+    if created:
+        # Get all admin users
+        admin_users = User.objects.filter(is_staff=True)
+        
+        # Create a notification for each admin
+        for admin in admin_users:
+            Notification.objects.create(
+                user=admin,
+                title="Nouvelle Déclaration de Cours",
+                message=f"Une nouvelle déclaration de cours a été soumise par {enrollment.teacher.get_full_name()} pour {enrollment.offer.subject.name} avec {enrollment.offer.student.get_full_name()}. Durée: {instance.duration} minutes. Date: {instance.declaration_date}",
+                notification_type='COURSE',
+            )
+        return
     
     # Notification for when declaration is paid
     if instance.status == CourseDeclaration.PAID:
