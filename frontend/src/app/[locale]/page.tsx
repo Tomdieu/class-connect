@@ -83,16 +83,13 @@ function LandingPage() {
     }
   };
 
-  // Create localized meta tags with enhanced SEO for developer name
-  const pageTitle =
-    locale === "fr"
-      ? "ClassConnect | Plateforme E-learning N°1 au Cameroun | Développée par Tomdieu Ivan"
-      : "ClassConnect | #1 E-learning Platform in Cameroon | Developed by Tomdieu Ivan";
+  // Create localized meta tags
+  const pageTitle = "ClassConnect";
 
   const pageDescription =
     locale === "fr"
-      ? "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun développée par Tomdieu Ivan. Apprenez à votre rythme avec des cours personnalisés."
-      : "Discover ClassConnect, the innovative e-learning platform in Cameroon developed by Tomdieu Ivan. Learn at your own pace with personalized courses.";
+      ? "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés."
+      : "Discover ClassConnect, the innovative e-learning platform in Cameroon. Learn at your own pace with personalized courses.";
 
   // Enhanced keywords for better SEO including developer name and more search terms
   const keywords =
