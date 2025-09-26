@@ -22,8 +22,8 @@ function FeaturesSection({ className }: { className?: string }) {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center px-4 py-2  rounded-full border border-blue-600/15">
-            <span className="text-primary font-semibold tracking-wider uppercase mb-2 block">
+          <div className="inline-flex items-center px-4 py-2 rounded-full border border-blue-600/15">
+            <span className="text-primary font-semibold tracking-wider uppercase block">
               {locale === "fr" ? "POURQUOI NOUS CHOISIR" : "WHY CHOOSE US"}
             </span>
           </div>
