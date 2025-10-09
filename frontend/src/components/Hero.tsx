@@ -86,7 +86,7 @@ export default function Hero({className}:{className?:string}) {
                   <Button
                     size="lg"
                     variant="link"
-                    className="border-primary/20 hover:bg-transparent text-primary hover:bg-primary/5 font-semibold px-8 py-6 rounded-xl"
+                    className="border-primary/20 text-primary hover:bg-primary/5 font-semibold px-8 py-6 rounded-xl"
                   >
                     {t("hero.learnMore")}
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -176,6 +176,7 @@ export default function Hero({className}:{className?:string}) {
                     height={450}
                     className="object-cover rounded-lg"
                     priority
+                    fetchPriority="high"
                     onError={(e) => {
                       // Fallback for missing image
                       e.currentTarget.src =
