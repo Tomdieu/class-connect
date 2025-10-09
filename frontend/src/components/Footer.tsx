@@ -26,7 +26,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center space-x-2">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg">
+              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-600 rounded-lg">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">ClassConnect</span>
