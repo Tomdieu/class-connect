@@ -421,6 +421,8 @@ export default {
   "footer.faq": "FAQ",
   "footer.helpCenter": "Help Center",
   "footer.privacy": "Privacy Policy",
+  "footer.terms": "Terms of Service",
+  "footer.cookies": "Cookie Policy",
   "footer.connect": "Connect With Us",
   "footer.rights": "All rights reserved.",
   "plans.title": "Subscription Plans",

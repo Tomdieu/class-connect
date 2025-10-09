@@ -439,6 +439,8 @@ export default {
   "footer.faq": "FAQ",
   "footer.helpCenter": "Centre d'Aide",
   "footer.privacy": "Politique de Confidentialité",
+  "footer.terms": "Conditions d'Utilisation",
+  "footer.cookies": "Politique des Cookies",
   "footer.connect": "Suivez-nous",
   "footer.rights": "Tous droits réservés.",
   "animatedFeatures.selfPaced.title": "Apprenez à Votre Rythme",
