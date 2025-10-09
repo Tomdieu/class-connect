@@ -1,3 +1,4 @@
+"use client"
 import { useCurrentLocale, useI18n } from '@/locales/client';
 import React, { useEffect, useState } from 'react'
 import { motion } from "framer-motion";
