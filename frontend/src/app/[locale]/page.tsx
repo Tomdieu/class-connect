@@ -1,160 +1,184 @@
-"use client";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import { SubscriptionPlans } from "@/components/SubscriptionPlans";
 import Footer from "@/components/Footer";
-import { useCurrentLocale, useI18n } from "@/locales/client";
-import React, { Suspense, useEffect, useRef } from "react";
-import { Helmet } from "react-helmet-async";
+import React, { Suspense } from "react";
 import Loading from "./loading";
 import CTASection from "./components/CTASection";
-import DeveloperSectionSEO from "./components/DeveloperSectionSEO";
 import FeaturesSection from "./components/FeaturesSection";
 import FloatingCTA from "./components/FloatingCTA";
+import FAQSection from "./components/FAQSection";
+import type { Metadata } from "next";
 
-function LandingPage() {
-  const t = useI18n();
-  const locale = useCurrentLocale();
-  
-  // Enable smooth section snapping
-  // useGSAPSectionSnap();
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseUrl = "https://www.classconnect.cm";
 
-  // Create enhanced localized JSON-LD data using translations and including developer info
-  const jsonLdData = {
+  // Optimized keywords - focused on most relevant terms
+  const keywords = locale === "fr"
+    ? "e-learning Cameroun, ClassConnect, cours en ligne Cameroun, plateforme éducative Cameroun, apprentissage en ligne, formation en ligne, éducation numérique Cameroun, EdTech Cameroun, cours personnalisés, enseignement à distance"
+    : "e-learning Cameroon, ClassConnect, online courses Cameroon, educational platform Cameroon, online learning, digital education Cameroon, EdTech Cameroon, personalized courses, distance learning";
+
+  const pageTitle = locale === "fr"
+    ? "ClassConnect | Plateforme E-learning N°1 au Cameroun"
+    : "ClassConnect | #1 E-learning Platform in Cameroon";
+
+  const pageDescription = locale === "fr"
+    ? "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés, des enseignants qualifiés et une communauté active."
+    : "Discover ClassConnect, the innovative e-learning platform in Cameroon. Learn at your own pace with personalized courses, qualified teachers and an active community.";
+
+  // Enhanced structured data
+  const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    name:
-      locale === "fr"
-        ? "ClassConnect - Plateforme d'Apprentissage en Ligne"
-        : "ClassConnect - Online Learning Platform",
-    description: t("hero.subtitle"),
-    author: {
-      "@type": "Person",
-      name: "Tomdieu Ivan",
-      url: "https://github.com/Tomdieu",
-      sameAs: [
-        "https://www.linkedin.com/in/tomdieuivan/",
-        "https://github.com/Tomdieu"
-      ]
+    "@type": "EducationalOrganization",
+    name: "ClassConnect",
+    alternateName: "ClassConnect E-learning Platform",
+    url: baseUrl,
+    description: pageDescription,
+    logo: {
+      "@type": "ImageObject",
+      url: `${baseUrl}/logo.png`,
+      width: "180",
+      height: "180"
     },
-    creator: {
+    sameAs: [
+      "https://www.linkedin.com/in/tomdieuivan",
+      "https://github.com/Tomdieu",
+    ],
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "CM",
+      addressRegion: "Littoral",
+      addressLocality: "Douala",
+    },
+    areaServed: {
+      "@type": "Country",
+      name: "Cameroon"
+    },
+    founder: {
       "@type": "Person",
       name: "Tomdieu Ivan",
       jobTitle: "Full Stack Developer",
       url: "https://github.com/Tomdieu",
       sameAs: [
-        "https://www.linkedin.com/in/tomdieuivan/",
+        "https://www.linkedin.com/in/tomdieuivan",
         "https://github.com/Tomdieu"
       ]
     },
-    offers: {
-      "@type": "AggregateOffer",
-      offers: [
+    availableLanguage: ["French", "English"],
+    educationalLevel: ["Middle School", "High School", "University", "Professional Development"],
+    teaches: ["High School Education", "Computer Science", "Mathematics", "Physics"],
+  };
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
+    keywords,
+    authors: [
+      {
+        name: "Tomdieu Ivan",
+        url: "https://www.linkedin.com/in/tomdieuivan",
+      },
+    ],
+    creator: "Tomdieu Ivan",
+    publisher: "ClassConnect",
+    openGraph: {
+      type: "website",
+      locale: locale === "fr" ? "fr_FR" : "en_US",
+      url: `${baseUrl}/${locale}`,
+      title: pageTitle,
+      description: pageDescription,
+      images: [
         {
-          "@type": "Offer",
-          name: t("subscriptionPlans.basic.name"),
-          description: t("subscriptionPlans.basic.description"),
-          availableLanguage: [locale === "fr" ? "French" : "English"],
+          url: `${baseUrl}/og-image.jpg`,
+          width: 1200,
+          height: 630,
+          alt: "ClassConnect E-learning Platform",
         },
+      ],
+      siteName: "ClassConnect",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: pageTitle,
+      description: pageDescription,
+      images: [`${baseUrl}/twitter-image.jpg`],
+      creator: "@tomdieuivan",
+      site: "@classconnect",
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        fr: `${baseUrl}/fr`,
+        en: `${baseUrl}/en`,
+      },
+    },
+    other: {
+      "application-name": "ClassConnect",
+      "structured-data": JSON.stringify(structuredData),
+    },
+  };
+}
+
+export default async function LandingPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
+  // Page-specific structured data for rich snippets
+  const pageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: locale === "fr"
+      ? "ClassConnect - Plateforme d'Apprentissage en Ligne"
+      : "ClassConnect - Online Learning Platform",
+    description: locale === "fr"
+      ? "La meilleure plateforme d'e-learning au Cameroun"
+      : "The best e-learning platform in Cameroon",
+    url: `https://www.classconnect.cm/${locale}`,
+    inLanguage: locale === "fr" ? "fr" : "en",
+    isPartOf: {
+      "@type": "WebSite",
+      url: "https://www.classconnect.cm",
+      name: "ClassConnect",
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
         {
-          "@type": "Offer",
-          name: t("subscriptionPlans.standard.name"),
-          description: t("subscriptionPlans.standard.description"),
-          availableLanguage: [locale === "fr" ? "French" : "English"],
-        },
-        {
-          "@type": "Offer",
-          name: t("subscriptionPlans.premium.name"),
-          description: t("subscriptionPlans.premium.description"),
-          availableLanguage: [locale === "fr" ? "French" : "English"],
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: `https://www.classconnect.cm/${locale}`,
         },
       ],
     },
-    inLanguage: locale === "fr" ? "fr" : "en",
-    mainEntity: {
-      "@type": "SoftwareApplication",
-      name: "ClassConnect",
-      applicationCategory: "EducationalApplication",
-      operatingSystem: "Web",
-      author: {
-        "@type": "Person",
-        name: "Tomdieu Ivan"
-      }
-    }
   };
-
-  // Create localized meta tags
-  const pageTitle = "ClassConnect";
-
-  const pageDescription =
-    locale === "fr"
-      ? "Découvrez ClassConnect, la plateforme d'e-learning innovante au Cameroun. Apprenez à votre rythme avec des cours personnalisés."
-      : "Discover ClassConnect, the innovative e-learning platform in Cameroon. Learn at your own pace with personalized courses.";
-
-  // Enhanced keywords for better SEO including developer name and more search terms
-  const keywords =
-    "e-learning, éducation en ligne, cours en ligne, Cameroun, apprentissage en ligne, plateforme éducative, cours personnalisés, enseignement à distance, école virtuelle, lycée en ligne, université en ligne, tutorat, développement professionnel, compétences numériques, enseignement interactif, formation continue, soutien scolaire, préparation aux examens, apprentissage mobile, éducation en Afrique, plateforme éducative Cameroun, cours en ligne certifiés, apprentissage numérique Afrique, Tomdieu Ivan, développeur Tomdieu Ivan, ClassConnect Tomdieu, Ivan Tomdieu, Cameroun développeur, " +
-    "e-learning, online education, online courses, Cameroon, online learning, educational platform, personalized courses, distance learning, virtual school, online high school, online university, tutoring, professional development, digital skills, interactive teaching, continuing education, academic support, exam preparation, mobile learning, education in Africa, online learning Cameroon, virtual classroom Africa, Cameroon education technology, Tomdieu Ivan, developer Tomdieu Ivan, ClassConnect Tomdieu, Ivan Tomdieu, Cameroon developer, " +
-    // Add more specific and broader keywords
-    "cours de mathématiques en ligne, cours de physique en ligne, cours de chimie en ligne, cours de biologie en ligne, cours de français en ligne, cours d'anglais en ligne, cours d'informatique en ligne, programmation web, développement web Cameroun, " +
-    "formation professionnelle Cameroun, certification en ligne, MOOC Cameroun, SPOC Cameroun, éducation numérique Cameroun, technologie éducative, EdTech Cameroun, " +
-    "soutien scolaire primaire, soutien scolaire collège, soutien scolaire lycée, préparation baccalauréat Cameroun, préparation GCE Cameroon, " +
-    "apprentissage adaptatif, microlearning, gamification éducation, classe virtuelle interactive, plateforme LMS Cameroun, " +
-    "meilleure plateforme e-learning Cameroun, cours en ligne abordables, éducation de qualité Cameroun, transformation digitale éducation, " +
-    "online math courses, online physics courses, online chemistry courses, online biology courses, online French courses, online English courses, online computer science courses, web programming, web development Cameroon, " +
-    "vocational training Cameroon, online certification, MOOC Cameroon, SPOC Cameroon, digital education Cameroon, educational technology, EdTech Cameroon, " +
-    "primary school tutoring, middle school tutoring, high school tutoring, baccalaureate preparation Cameroon, GCE preparation Cameroon, " +
-    "adaptive learning, microlearning, education gamification, interactive virtual classroom, LMS platform Cameroon, " +
-    "best e-learning platform Cameroon, affordable online courses, quality education Cameroon, digital transformation education, " +
-    "remote learning solutions, homeschooling support, adult learning online, career change courses, upskilling platform, lifelong learning opportunities, digital literacy Cameroon, tech skills training";
-
-
-  const additionalMetaTags = [
-    { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
-    { name: "theme-color", content: "#ffffff" },
-    { name: "msapplication-TileColor", content: "#ffffff" },
-    { name: "google-site-verification", content: "google1a036d19159746c1" },
-    // { name: "fb:app_id", content: "your-fb-app-id" },
-    { name: "og:site_name", content: "ClassConnect" },
-    { name: "og:image", content: "https://www.classconnect.cm/og-image.jpg" },
-    { name: "og:image:width", content: "1200" },
-    { name: "og:image:height", content: "630" },
-    { name: "twitter:image", content: "https://www.classconnect.cm/twitter-image.jpg" },
-  ];
 
   return (
     <div className="relative flex-1 w-full h-full flex flex-col">
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta name="keywords" content={keywords} />
-        <link rel="canonical" href={`https://www.classconnect.cm/${locale}`} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={`https://www.classconnect.cm/${locale}`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:locale" content={locale === "fr" ? "fr_FR" : "en_US"} />
-        <meta property="og:image" content="https://www.classconnect.cm/og-image.jpg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageTitle} />
-        <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="https://www.classconnect.cm/twitter-image.jpg" />
-        <meta name="author" content="Tomdieu Ivan" />
-
-        {/* Additional meta tags for developer attribution */}
-        <meta name="developer" content="Tomdieu Ivan" />
-        <meta name="creator" content="Tomdieu Ivan" />
-        <meta name="copyright" content="ClassConnect - Tomdieu Ivan" />
-        <meta name="application-developer" content="Tomdieu Ivan" />
-        <meta name="owner" content="Tomdieu Ivan" />
-        {/* New additional SEO meta tags */}
-        {additionalMetaTags.map((tag, index) => (
-          <meta key={index} name={tag.name} content={tag.content} />
-        ))}
-        <script type="application/ld+json">{JSON.stringify(jsonLdData)}</script>
-      </Helmet>
+      {/* Inject structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }}
+      />
 
       <Header className="fixed top-0 left-0 right-0 shadow-md bg-white/95 backdrop-blur-md border-b border-gray-100 px-5 z-[99999999]" />
 
@@ -162,21 +186,48 @@ function LandingPage() {
       <div className="h-20 mt-10 md:mt-0 md:h-20"></div>
 
       <main className="flex-1">
-        {/* Hero Section - Full Screen with GSAP animations */}
+        {/* Hero Section with semantic heading */}
         <Suspense fallback={<Loading />}>
-          <section className="hero-section section-animate min-h-screen flex items-center justify-center relative full-section">
+          <section
+            className="hero-section section-animate min-h-screen flex items-center justify-center relative full-section"
+            aria-label={locale === "fr" ? "Section principale" : "Main section"}
+          >
             <div className="hero-bg absolute inset-0 bg-gradient-to-b from-blue-50 to-white"></div>
-            <Hero className="w-full relative z-10" />
+            {/* Add semantic H1 for SEO */}
+            <div className="w-full relative z-10">
+              <h1 className="sr-only">
+                {locale === "fr"
+                  ? "ClassConnect - Plateforme E-learning N°1 au Cameroun"
+                  : "ClassConnect - #1 E-learning Platform in Cameroon"}
+              </h1>
+              <Hero className="w-full" />
+            </div>
           </section>
         </Suspense>
 
-        {/* Features Section - Full Screen with GSAP animations */}
-        <section className="features-section section-animate min-h-screen flex items-center justify-center relative full-section">
-          <FeaturesSection className="w-full" />
+        {/* Features Section with semantic heading */}
+        <section
+          className="features-section section-animate min-h-screen flex items-center justify-center relative full-section"
+          aria-label={locale === "fr" ? "Nos fonctionnalités" : "Our features"}
+        >
+          <div className="w-full">
+            <h2 className="sr-only">
+              {locale === "fr"
+                ? "Pourquoi choisir ClassConnect"
+                : "Why choose ClassConnect"}
+            </h2>
+            <FeaturesSection className="w-full" />
+          </div>
         </section>
 
-        {/* Subscription Plans Section - Full Screen with GSAP animations */}
-        <section className="subscription-section section-animate min-h-screen flex items-center justify-center relative full-section">
+        {/* Subscription Plans Section with semantic heading */}
+        <section
+          className="subscription-section section-animate min-h-screen flex items-center justify-center relative full-section"
+          aria-label={locale === "fr" ? "Nos offres" : "Our plans"}
+        >
+          <h2 className="sr-only">
+            {locale === "fr" ? "Plans d'abonnement" : "Subscription plans"}
+          </h2>
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center bg-blue-50 w-full">
               <div className="container mx-auto px-4 animate-pulse">
@@ -205,14 +256,20 @@ function LandingPage() {
           </Suspense>
         </section>
 
-        {/* Developer Section - Hidden for SEO only */}
-        <div className="hidden">
-          <DeveloperSectionSEO />
-        </div>
+        {/* FAQ Section with semantic heading and schema markup */}
+        <FAQSection locale={locale} />
 
-        {/* CTA Section - Full Screen with GSAP animations */}
-        <section className="cta-section section-animate min-h-screen flex items-center justify-center relative full-section">
+        {/* CTA Section with semantic heading */}
+        <section
+          className="cta-section section-animate min-h-screen flex items-center justify-center relative full-section"
+          aria-label={locale === "fr" ? "Commencez maintenant" : "Get started"}
+        >
           <div className="cta-content w-full">
+            <h2 className="sr-only">
+              {locale === "fr"
+                ? "Commencez votre apprentissage aujourd'hui"
+                : "Start your learning journey today"}
+            </h2>
             <CTASection className="w-full" />
           </div>
         </section>
@@ -223,5 +280,3 @@ function LandingPage() {
     </div>
   );
 }
-
-export default LandingPage;
